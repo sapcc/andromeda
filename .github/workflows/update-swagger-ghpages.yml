@@ -1,0 +1,27 @@
+name: update-swagger-ghpages
+
+on:
+  push:
+    tags:
+      - v*
+    branches: [ main ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Copy swagger.yml
+      run: cp swagger.yml /tmp
+    - uses: actions/checkout@v2
+      with:
+        ref: gh-pages
+    - name: Copy back swagger.yml
+      run: cp /tmp/swagger.yml .
+    - name: Commit report
+      run: |
+        git config --global user.name 'GitHub Pages Bot'
+        git config --global user.email 'gh-pages@users.noreply.github.com'
+        git commit -am "Update swagger.yml" || true
+        git push

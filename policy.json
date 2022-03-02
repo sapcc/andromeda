@@ -1,0 +1,17 @@
+{
+  "cloud_admin": "project_domain_name:ccadmin and project_name:cloud_admin",
+  "owner": "project_id:%(project_id)s",
+  "member": "role:member and rule:owner",
+  "viewer": "rule:owner",
+  "context_is_admin": "rule:cloud_admin",
+
+  "context_is_editor": "rule:member",
+  "context_is_viewer": "rule:context_is_editor or rule:viewer",
+
+  "andromeda:domain:get_all": "rule:context_is_viewer",
+  "andromeda:domain:get_all-global": "rule:context_is_admin",
+  "andromeda:domain:post": "rule:context_is_editor",
+  "andromeda:domain:put": "rule:context_is_editor",
+  "andromeda:domain:get_one": "rule:context_is_viewer",
+  "andromeda:domain:delete": "rule:context_is_editor"
+}

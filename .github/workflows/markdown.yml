@@ -1,0 +1,24 @@
+name: markdown
+
+on:
+  push:
+    tags:
+      - v*
+    branches:
+      - master
+      - main
+jobs:
+  generate-markdown:
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/goswagger/swagger
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build
+      run: swagger generate markdown --copyright-file COPYRIGHT.txt --output docs/api.md
+    - name: Commit API Doc
+      run: |
+        git config --global user.name 'GitHub Action'
+        git config --global user.email 'markdown-generator@users.noreply.github.com'
+        git commit -am "Update docs/api.md" || true
+        git push

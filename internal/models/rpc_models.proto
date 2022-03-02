@@ -1,0 +1,56 @@
+syntax = "proto3";
+option go_package = "github.com/sapcc/andromeda/internal/models";
+
+message Domain {
+  string id = 1;
+  bool admin_state_up = 2;
+  repeated string aliases = 3;
+  string fqdn = 4;
+  string mode = 5;
+  repeated Pool pools = 6;
+  string record_type = 7;
+}
+
+message Pool {
+  string id = 1;
+  bool admin_state_up = 2;
+  repeated Member members = 3;
+  repeated Monitor monitors = 4;
+}
+
+message Datacenter {
+  string id = 1;
+  bool admin_state_up = 2;
+  string continent = 3;
+  string country = 4;
+  string state_or_province = 5;
+  string city = 6;
+  float longitude = 7;
+  float latitude = 8;
+}
+
+message Member {
+  string id = 1;
+  bool admin_state_up = 2;
+  fixed32 address = 3;
+  uint32 port = 4;
+  string datacenter = 5;
+}
+
+message Monitor {
+  string id = 1;
+  bool admin_state_up = 2;
+  int64 interval = 3;
+  string pool = 4;
+  string send = 5;
+  string receive = 6;
+  int64 timeout = 7;
+  enum MonitorType {
+    HTTP = 0;
+    HTTPS = 1;
+    ICMP = 2;
+    TCP = 3;
+    UDP = 4;
+  }
+  MonitorType type = 8;
+}

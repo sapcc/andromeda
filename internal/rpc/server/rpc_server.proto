@@ -1,0 +1,74 @@
+syntax = "proto3";
+import "internal/models/rpc_models.proto";
+option go_package = "github.com/sapcc/andromeda/internal/rpc/server";
+
+service RPCServer {
+  rpc UpdateProvisioningStatus(ProvisioningStatusRequest) returns (ProvisioningStatusResponse);
+  rpc UpdateMemberStatus(MemberStatusRequest) returns (MemberStatusResponse);
+  rpc GetDomains(SearchRequest) returns (DomainsResponse);
+  rpc GetMembers(SearchRequest) returns (MembersResponse);
+}
+
+message SearchRequest {
+  string provider = 1;
+  bool fully_populated = 2;
+  int32 page_number = 3;
+  int32 result_per_page = 4;
+  bool pending = 5;
+}
+
+message DomainsResponse {
+  repeated Domain response = 1;
+}
+
+message MembersResponse {
+  repeated Member response = 1;
+}
+
+message ProvisioningStatusRequest {
+  repeated ProvisioningStatus provisioning_status = 1;
+  message ProvisioningStatus {
+    string id = 1;
+    enum Model {
+      DOMAIN = 0;
+      POOL = 1;
+      MEMBER = 2;
+      MONITOR = 3;
+      DATACENTER = 4;
+    }
+    Model model = 2;
+    enum StatusType {
+      PENDING = 0;
+      ACTIVE = 1;
+      ERROR = 2;
+    }
+    StatusType status = 3;
+  }
+}
+
+message ProvisioningStatusResponse {
+  repeated StatusResult provisioning_status_result = 1;
+}
+
+message MemberStatusRequest {
+  repeated MemberStatus member_status = 1;
+  message MemberStatus {
+    string id = 1;
+    enum StatusType {
+      ONLINE = 0;
+      OFFLINE = 1;
+      UNKNOWN = 2;
+    }
+    StatusType status = 2;
+  }
+}
+
+message MemberStatusResponse {
+  repeated StatusResult member_status_result = 1;
+
+}
+
+message StatusResult {
+  string id = 1;
+  bool success = 2;
+}
