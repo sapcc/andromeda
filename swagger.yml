@@ -1,7 +1,7 @@
 consumes:
 - application/json
 info:
-  description: <div>Platform agnostic GSLB frontend</div><img src="./andromeda.png" />
+  description: Platform agnostic GSLB frontend
   title: Andromeda
   version: 1.0.0
 produces:
@@ -21,7 +21,16 @@ parameters:
     in: query
     type: integer
     description: Sets the page size.
-
+  sort:
+    name: sort
+    in: query
+    type: string
+    description: Comma-separated list of sort keys, optinally prefix with - to reverse sort order.
+  page_reverse:
+    name: page_reverse
+    in: query
+    type: boolean
+    description: Sets the page direction.
 
 paths:
   /domains:
@@ -29,9 +38,12 @@ paths:
       tags:
         - Domains
       summary: List domains
+      x-policy: andromeda:domain:get_all
       parameters:
         - $ref: '#/parameters/marker'
         - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/sort'
+        - $ref: '#/parameters/page_reverse'
       responses:
         200:
           description: A JSON array of domains
@@ -47,10 +59,20 @@ paths:
                 type: array
                 items:
                   $ref: '#/definitions/link'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+
     post:
       tags:
         - Domains
       summary: Create new domain
+      x-policy: andromeda:domain:post
       parameters:
         - in: body
           name: domain
@@ -74,6 +96,10 @@ paths:
           description: Bad request
           schema:
             $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
 
   /domains/{domain_id}:
     parameters:
@@ -87,6 +113,7 @@ paths:
       tags:
         - Domains
       summary: Show domain detail
+      x-policy: andromeda:domain:get_one
       responses:
         200:
           description: Shows the details of a specific domain.
@@ -99,10 +126,16 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+
     put:
       tags:
         - Domains
       summary: Update a domain
+      x-policy: andromeda:domain:put
       parameters:
         - in: body
           name: domain
@@ -122,19 +155,33 @@ paths:
             properties:
               domain:
                 $ref: '#/definitions/domain'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error'
         404:
           description: Not Found
           schema:
             $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+
     delete:
       tags:
         - Domains
       summary: Delete a domain
+      x-policy: andromeda:domain:delete
       responses:
         204:
           description: Resource successfully deleted.
         404:
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
           schema:
             $ref: '#/definitions/error'
 
@@ -143,9 +190,12 @@ paths:
       tags:
         - Pools
       summary: List pools
+      x-policy: andromeda:pool:get_all
       parameters:
         - $ref: '#/parameters/marker'
         - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/sort'
+        - $ref: '#/parameters/page_reverse'
       responses:
         200:
           description: A JSON array of pools
@@ -161,10 +211,20 @@ paths:
                 type: array
                 items:
                   $ref: '#/definitions/link'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+
     post:
       tags:
         - Pools
       summary: Create new pool
+      x-policy: andromeda:pool:post
       parameters:
         - in: body
           name: pool
@@ -188,6 +248,10 @@ paths:
           description: Bad request
           schema:
             $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
 
   /pools/{pool_id}:
     parameters:
@@ -201,6 +265,7 @@ paths:
       tags:
         - Pools
       summary: Show pool detail
+      x-policy: andromeda:pool:get_one
       responses:
         200:
           description: Shows the details of a specific pool.
@@ -213,10 +278,16 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+
     put:
       tags:
         - Pools
       summary: Update a pool
+      x-policy: andromeda:pool:put
       parameters:
         - in: body
           name: pool
@@ -240,10 +311,16 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+
     delete:
       tags:
         - Pools
       summary: Delete a pool
+      x-policy: andromeda:pool:delete
       responses:
         204:
           description: Resource successfully deleted.
@@ -251,136 +328,29 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/error'
-
-  /datacenters:
-    get:
-      tags:
-        - Datacenters
-      summary: List datacenters
-      parameters:
-        - $ref: '#/parameters/marker'
-        - $ref: '#/parameters/limit'
-      responses:
-        200:
-          description: A JSON array of datacenters
-          schema:
-            type: object
-            properties:
-              datacenters:
-                type: array
-                items:
-                  $ref: '#/definitions/datacenter'
-              links:
-                x-omitempty: true
-                type: array
-                items:
-                  $ref: '#/definitions/link'
-    post:
-      tags:
-        - Datacenters
-      summary: Create new datacenter
-      parameters:
-        - in: body
-          name: datacenter
-          required: true
-          schema:
-            type: object
-            required:
-              - datacenter
-            properties:
-              datacenter:
-                $ref: '#/definitions/datacenter'
-      responses:
-        201:
-          description: Created datacenter.
-          schema:
-            type: object
-            properties:
-              datacenter:
-                $ref: '#/definitions/datacenter'
-        404:
-          description: Not Found
+        default:
+          description: Unexpected Error
           schema:
             $ref: '#/definitions/error'
 
-  /datacenters/{datacenter_id}:
+  /pools/{pool_id}/members:
     parameters:
       - in: path
-        name: datacenter_id
+        name: pool_id
         required: true
         type: string
         format: uuid
-        description: The UUID of the datacenter
-    get:
-      tags:
-        - Datacenters
-      summary: Show datacenter detail
-      responses:
-        200:
-          description: Shows the details of a specific datacenter.
-          schema:
-            type: object
-            properties:
-              datacenter:
-                $ref: '#/definitions/datacenter'
-        404:
-          description: Not Found
-          schema:
-            $ref: '#/definitions/error'
-    put:
-      tags:
-        - Datacenters
-      summary: Update a datacenter
-      parameters:
-        - in: body
-          name: datacenter
-          required: true
-          schema:
-            type: object
-            required:
-              - datacenter
-            properties:
-              datacenter:
-                $ref: '#/definitions/datacenter'
-      responses:
-        202:
-          description: Updated datacenter.
-          schema:
-            type: object
-            properties:
-              datacenter:
-                $ref: '#/definitions/datacenter'
-        404:
-          description: Not Found
-          schema:
-            $ref: '#/definitions/error'
-    delete:
-      tags:
-        - Datacenters
-      summary: Delete a datacenter
-      responses:
-        204:
-          description: Resource successfully deleted.
-        404:
-          description: Not Found
-          schema:
-            $ref: '#/definitions/error'
-
-  /datacenters/{datacenter_id}/members:
-    parameters:
-      - in: path
-        name: datacenter_id
-        required: true
-        type: string
-        format: uuid
-        description: The UUID of the datacenter
+        description: The UUID of the pool
     get:
       tags:
         - Members
       summary: List members
+      x-policy: andromeda:member:get_all
       parameters:
         - $ref: '#/parameters/marker'
         - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/sort'
+        - $ref: '#/parameters/page_reverse'
       responses:
         200:
           description: A JSON array of members
@@ -396,10 +366,20 @@ paths:
                 type: array
                 items:
                   $ref: '#/definitions/link'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+
     post:
       tags:
         - Members
       summary: Create new member
+      x-policy: andromeda:member:post
       parameters:
         - in: body
           name: member
@@ -419,15 +399,27 @@ paths:
             properties:
               member:
                 $ref: '#/definitions/member'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
 
-  /datacenters/{datacenter_id}/members/{member_id}:
+  /pools/{pool_id}/members/{member_id}:
     parameters:
       - in: path
-        name: datacenter_id
+        name: pool_id
         required: true
         type: string
         format: uuid
-        description: The UUID of the datacenter
+        description: The UUID of the pool
       - in: path
         name: member_id
         required: true
@@ -438,6 +430,7 @@ paths:
       tags:
         - Members
       summary: Show member detail
+      x-policy: andromeda:member:get_one
       responses:
         200:
           description: Shows the details of a specific member.
@@ -450,10 +443,16 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+
     put:
       tags:
         - Members
       summary: Update a member
+      x-policy: andromeda:member:put
       parameters:
         - in: body
           name: member
@@ -477,15 +476,173 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+
     delete:
       tags:
         - Members
       summary: Delete a member
+      x-policy: andromeda:member:delete
       responses:
         204:
           description: Resource successfully deleted.
         404:
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+
+  /datacenters:
+    get:
+      tags:
+        - Datacenters
+      summary: List datacenters
+      x-policy: andromeda:datacenter:get_all
+      parameters:
+        - $ref: '#/parameters/marker'
+        - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/sort'
+        - $ref: '#/parameters/page_reverse'
+      responses:
+        200:
+          description: A JSON array of datacenters
+          schema:
+            type: object
+            properties:
+              datacenters:
+                type: array
+                items:
+                  $ref: '#/definitions/datacenter'
+              links:
+                x-omitempty: true
+                type: array
+                items:
+                  $ref: '#/definitions/link'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+
+    post:
+      tags:
+        - Datacenters
+      summary: Create new datacenter
+      x-policy: andromeda:datacenter:post
+      parameters:
+        - in: body
+          name: datacenter
+          required: true
+          schema:
+            type: object
+            required:
+              - datacenter
+            properties:
+              datacenter:
+                $ref: '#/definitions/datacenter'
+      responses:
+        201:
+          description: Created datacenter.
+          schema:
+            type: object
+            properties:
+              datacenter:
+                $ref: '#/definitions/datacenter'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+
+  /datacenters/{datacenter_id}:
+    parameters:
+      - in: path
+        name: datacenter_id
+        required: true
+        type: string
+        format: uuid
+        description: The UUID of the datacenter
+    get:
+      tags:
+        - Datacenters
+      summary: Show datacenter detail
+      x-policy: andromeda:datacenter:get_one
+      responses:
+        200:
+          description: Shows the details of a specific datacenter.
+          schema:
+            type: object
+            properties:
+              datacenter:
+                $ref: '#/definitions/datacenter'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+
+    put:
+      tags:
+        - Datacenters
+      summary: Update a datacenter
+      x-policy: andromeda:datacenter:put
+      parameters:
+        - in: body
+          name: datacenter
+          required: true
+          schema:
+            type: object
+            required:
+              - datacenter
+            properties:
+              datacenter:
+                $ref: '#/definitions/datacenter'
+      responses:
+        202:
+          description: Updated datacenter.
+          schema:
+            type: object
+            properties:
+              datacenter:
+                $ref: '#/definitions/datacenter'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+
+    delete:
+      tags:
+        - Datacenters
+      summary: Delete a datacenter
+      x-policy: andromeda:datacenter:delete
+      responses:
+        204:
+          description: Resource successfully deleted.
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
           schema:
             $ref: '#/definitions/error'
 
@@ -494,9 +651,12 @@ paths:
       tags:
         - Monitors
       summary: List monitors
+      x-policy: andromeda:monitor:get_all
       parameters:
         - $ref: '#/parameters/marker'
         - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/sort'
+        - $ref: '#/parameters/page_reverse'
       responses:
         200:
           description: A JSON array of monitors
@@ -512,10 +672,20 @@ paths:
                 type: array
                 items:
                   $ref: '#/definitions/link'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+
     post:
       tags:
         - Monitors
       summary: Create new monitor
+      x-policy: andromeda:monitor:post
       parameters:
         - in: body
           name: monitor
@@ -524,6 +694,7 @@ paths:
             type: object
             required:
               - monitor
+              - monitor.pool_id
             properties:
               monitor:
                 $ref: '#/definitions/monitor'
@@ -535,10 +706,19 @@ paths:
             properties:
               monitor:
                 $ref: '#/definitions/monitor'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error'
         404:
           description: Not Found
           schema:
             $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+
   /monitors/{monitor_id}:
     parameters:
       - in: path
@@ -551,6 +731,7 @@ paths:
       tags:
         - Monitors
       summary: Show monitor detail
+      x-policy: andromeda:monitor:get_one
       responses:
         200:
           description: Shows the details of a specific monitor.
@@ -563,10 +744,16 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+
     put:
       tags:
         - Monitors
       summary: Update a monitor
+      x-policy: andromeda:monitor:put
       parameters:
         - in: body
           name: monitor
@@ -586,19 +773,196 @@ paths:
             properties:
               monitor:
                 $ref: '#/definitions/monitor'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error'
         404:
           description: Not Found
           schema:
             $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+
     delete:
       tags:
         - Monitors
       summary: Delete a monitor
+      x-policy: andromeda:monitor:delete
       responses:
         204:
           description: Resource successfully deleted.
         404:
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+
+  /services:
+    get:
+      tags:
+        - Administrative
+      summary: List Services
+      x-policy: andromeda:service:get_all
+      responses:
+        200:
+          description: A JSON array of services
+          schema:
+            type: object
+            properties:
+              services:
+                type: array
+                items:
+                  $ref: '#/definitions/service'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+  /sync:
+    post:
+      tags:
+        - Administrative
+      summary: Enqueue a full sync
+      x-policy: andromeda:sync:post
+      responses:
+        202:
+          description: Full sync has been enqueued.
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+  /quotas:
+    parameters:
+      - in: query
+        name: project_id
+        type: string
+        description: The ID of the project to query.
+        minLength: 32
+        maxLength: 32
+    get:
+      tags:
+        - Administrative
+      summary: List Quotas
+      x-policy: andromeda:quota:get_all
+      responses:
+        200:
+          description: A JSON array of quotas
+          schema:
+            type: object
+            properties:
+              quotas:
+                type: array
+                items:
+                  allOf:
+                    - $ref: '#/definitions/quota'
+                    - $ref: '#/definitions/quota_usage'
+                    - properties:
+                        project_id:
+                          type: string
+                          description: The ID of the project owning this resource.
+                          example: fa84c217f361441986a220edf9b1e337
+                          minLength: 32
+                          maxLength: 32
+                          x-nullable: true
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+  /quotas/defaults:
+    get:
+      tags:
+        - Administrative
+      summary: Show Quota Defaults
+      x-policy: andromeda:quota:get_one
+      responses:
+        200:
+          description: Show the quota defaults configured for new projects.
+          schema:
+            type: object
+            properties:
+              quota:
+                $ref: '#/definitions/quota'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+  /quotas/{project_id}:
+    parameters:
+      - in: path
+        name: project_id
+        required: true
+        type: string
+        description: The ID of the project to query.
+    get:
+      tags:
+        - Administrative
+      summary: Show Quota detail
+      x-policy: andromeda:quota:get_one
+      responses:
+        200:
+          description: Shows the details of a specific monitor.
+          schema:
+            type: object
+            properties:
+              quota:
+                allOf:
+                  - $ref: '#/definitions/quota'
+                  - $ref: '#/definitions/quota_usage'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+    put:
+      tags:
+        - Administrative
+      summary: Update Quota
+      x-policy: andromeda:quota:get_one
+      parameters:
+        - in: body
+          name: quota
+          required: true
+          schema:
+            type: object
+            required:
+              - quota
+            properties:
+              quota:
+                $ref: '#/definitions/quota'
+      responses:
+        202:
+          description: Updated quota for a project.
+          schema:
+            type: object
+            properties:
+              quota:
+                $ref: '#/definitions/quota'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+    delete:
+      tags:
+        - Administrative
+      summary: Reset all Quota of a project
+      x-policy: andromeda:quota:delete
+      responses:
+        204:
+          description: Resource successfully reseted.
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
           schema:
             $ref: '#/definitions/error'
 
@@ -647,6 +1011,13 @@ definitions:
           - ACTIVE
           - ERROR
         readOnly: true
+      project_id:
+        type: string
+        description: The ID of the project owning this resource.
+        example: fa84c217f361441986a220edf9b1e337
+        minLength: 32
+        maxLength: 32
+        x-nullable: true
       fqdn:
         type: string
         format: hostname
@@ -685,11 +1056,12 @@ definitions:
           description: Pool that this domain uses for load balancing.
       provider:
         type: string
-        description: Provider driver for the backend solution
+        description: Supported provider drivers
         example: akamai
         enum:
           - akamai
           - f5
+        x-nullable: true
 
   pool:
     type: object
@@ -733,10 +1105,24 @@ definitions:
           - ACTIVE
           - ERROR
         readOnly: true
-      datacenters:
+      project_id:
+        type: string
+        description: The ID of the project owning this resource.
+        example: fa84c217f361441986a220edf9b1e337
+        minLength: 32
+        maxLength: 32
+        x-nullable: true
+      members:
         type: array
         readOnly: true
-        description: Array of datacenter-ids that this pool uses for load balancing.
+        description: Array of member ids that this pool uses for load balancing.
+        items:
+          format: uuid
+          type: string
+      monitors:
+        type: array
+        readOnly: true
+        description: Array of monitor ids that this pool uses health checks.
         items:
           format: uuid
           type: string
@@ -751,8 +1137,6 @@ definitions:
 
   datacenter:
     type: object
-    required:
-      - pool_id
     properties:
       id:
         type: string
@@ -768,6 +1152,7 @@ definitions:
         type: boolean
         description: The administrative state of the resource, which is up (true) or down (false). Default is true.
         default: true
+        x-nullable: true
       created_at:
         type: string
         format: dateTime
@@ -787,45 +1172,70 @@ definitions:
           - ACTIVE
           - ERROR
         readOnly: true
-      pool_id:
+      project_id:
         type: string
-        format: uuid
-        description: The id of the associated pool.
-      weight:
-        type: integer
-        default: 1
-        minimum: 1
-        maximum: 255
-        description: Weight of the datacenter. Only applicable to *WEIGHTED* domain mode.
+        description: The ID of the project owning this resource.
+        example: fa84c217f361441986a220edf9b1e337
+        minLength: 32
+        maxLength: 32
+        x-nullable: true
+      scope:
+        type: string
+        description: Visibility of datacenter between different projects
+        enum:
+          - private
+          - shared
+        default: private
+        x-nullable: true
+      provider:
+        description: Provider driver for the backend solution
+        example: akamai
+        type: string
+        enum:
+          - akamai
+          - f5
       continent:
         type: string
         maxLength: 255
         example: EU
+        x-omitempty: false
+        x-nullable: true
       country:
         type: string
         maxLength: 255
         example: DE
+        x-omitempty: false
+        x-nullable: true
       city:
         type: string
         maxLength: 255
         example: Berlin
+        x-omitempty: false
+        x-nullable: true
       state_or_province:
         type: string
         maxLength: 255
         example: Berlin
+        x-omitempty: false
+        x-nullable: true
       latitude:
         type: number
         format: float
         example: 52.526055
+        x-omitempty: false
+        x-nullable: true
       longitude:
         type: number
         format: float
         example: 13.403454
+        x-omitempty: false
+        x-nullable: true
 
   member:
     type: object
     required:
       - address
+      - port
     properties:
       id:
         type: string
@@ -841,6 +1251,7 @@ definitions:
         type: boolean
         description: The administrative state of the resource, which is up (true) or down (false). Default is true.
         default: true
+        x-nullable: true
       created_at:
         type: string
         format: dateTime
@@ -860,6 +1271,13 @@ definitions:
           - ACTIVE
           - ERROR
         readOnly: true
+      project_id:
+        type: string
+        description: The ID of the project owning this resource.
+        example: fa84c217f361441986a220edf9b1e337
+        minLength: 32
+        maxLength: 32
+        x-nullable: true
       status:
         type: string
         enum:
@@ -869,7 +1287,7 @@ definitions:
         readOnly: true
       port:
         type: integer
-        description: L4 Port to use (optional)
+        description: Port to use for monitor checks.
         example: 80
         minimum: 0
         maximum: 65535
@@ -878,6 +1296,16 @@ definitions:
         format: ipv4
         description: Address to use.
         example: 1.2.3.4
+      pool_id:
+        type: string
+        format: uuid
+        description: pool id.
+        readOnly: true
+      datacenter_id:
+        type: string
+        format: uuid
+        description: Datacenter assigned for this member.
+        x-nullable: true
 
   monitor:
     type: object
@@ -898,6 +1326,7 @@ definitions:
         type: boolean
         description: The administrative state of the resource, which is up (true) or down (false). Default is true.
         default: true
+        x-nullable: true
       created_at:
         type: string
         format: dateTime
@@ -917,6 +1346,13 @@ definitions:
           - ACTIVE
           - ERROR
         readOnly: true
+      project_id:
+        type: string
+        description: The ID of the project owning this resource.
+        example: fa84c217f361441986a220edf9b1e337
+        minLength: 32
+        maxLength: 32
+        x-nullable: true
       type:
         type: string
         description: Type of the health check monitor.
@@ -928,6 +1364,7 @@ definitions:
           - TCP
           - UDP
         example: HTTP
+        x-nullable: true
       interval:
         type: integer
         description: The interval, in seconds, between health checks.
@@ -935,6 +1372,7 @@ definitions:
         minimum: 0
         maximum: 86399
         default: 60
+        x-nullable: true
       timeout:
         type: integer
         description: The time in total, in seconds, after which a health check times out.
@@ -942,10 +1380,12 @@ definitions:
         minimum: 0
         maximum: 86400
         default: 180
+        x-nullable: true
       pool_id:
         type: string
         format: uuid
         description: ID of the pool to check members
+        x-nullable: true
       send:
         type: string
         description: Specifies the text string that the monitor sends to the target member.
@@ -958,6 +1398,100 @@ definitions:
         maxLength: 255
         example: HTTP/1.
         x-nullable: true
+
+  service:
+    type: object
+    properties:
+      id:
+        type: string
+        description: ID of the RPC service.
+        example: andromeda-agent-fbb49979-03f5-4a97-a334-1fd2c9f61e7e
+      host:
+        type: string
+        format: hostname
+        example: example.host
+        description: Hostname of the computer the service is running.
+      type:
+        type: string
+        example: healthcheck
+        description: Type of service.
+      provider:
+        type: string
+        example: akamai
+        description: Provider this service supports.
+      heartbeat:
+        type: string
+        format: dateTime
+        description: The UTC date and timestamp when had the last heartbeat.
+        example: 2020-05-11 17:21:34
+      rpc_address:
+        type: string
+        description: RPC Endpoint Address.
+        example: _INBOX.VEfFxcAzZQ9iM9vwGH49It
+      version:
+        type: string
+        description: Version of the service.
+        example: 1.2.3
+      metadata:
+        type: object
+
+  quota:
+    type: object
+    properties:
+      domain:
+        type: integer
+        description: The configured domain quota limit. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited.
+        example: 5
+        x-nullable: true
+      pool:
+        type: integer
+        description: The configured pool quota limit. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited.
+        example: 5
+        x-nullable: true
+      member:
+        type: integer
+        description: The configured member quota limit. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited.
+        example: 5
+        x-nullable: true
+      monitor:
+        type: integer
+        description: The configured monitor quota limit. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited.
+        example: 5
+        x-nullable: true
+      datacenter:
+        type: integer
+        description: The configured datacenter quota limit. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited.
+        example: 5
+        x-nullable: true
+
+  quota_usage:
+    type: object
+    properties:
+      in_use_domain:
+        type: integer
+        description: The current quota usage of domain.
+        example: 5
+        x-omitempty: false
+      in_use_pool:
+        type: integer
+        description: The current quota usage of pool.
+        example: 5
+        x-omitempty: false
+      in_use_member:
+        type: integer
+        description: The current quota usage of member.
+        example: 5
+        x-omitempty: false
+      in_use_monitor:
+        type: integer
+        description: The current quota usage of monitor.
+        example: 5
+        x-omitempty: false
+      in_use_datacenter:
+        type: integer
+        description: The current quota usage of datacenter.
+        example: 5
+        x-omitempty: false
 
   error:
     type: object
@@ -994,3 +1528,5 @@ tags:
     description: Members are IP/Port endpoints of the applications to be load balanced.
   - name: Monitors
     description: Monitors are health checks that influce load balancing decisions.
+  - name: Administrative
+    description: Administrative API
