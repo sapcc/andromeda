@@ -13,7 +13,7 @@ jobs:
     container:
       image: quay.io/goswagger/swagger
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Build
       run: swagger generate markdown --copyright-file COPYRIGHT.txt --output docs/api.md
     - name: Commit API Doc
