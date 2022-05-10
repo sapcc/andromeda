@@ -11,10 +11,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Copy swagger.yml
       run: cp swagger.yml /tmp
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         ref: gh-pages
     - name: Copy back swagger.yml
