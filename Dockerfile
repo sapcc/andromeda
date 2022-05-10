@@ -1,4 +1,4 @@
-FROM golang:1.17-alpine as builder
+FROM golang:1.18-alpine as builder
 RUN apk add --no-cache make gcc musl-dev protoc git && go get github.com/golang/protobuf/protoc-gen-go && go install github.com/asim/go-micro/cmd/protoc-gen-micro/v3@latest
 
 COPY . /src/github.com/sapcc/andromeda
