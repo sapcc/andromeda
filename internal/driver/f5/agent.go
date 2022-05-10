@@ -23,14 +23,14 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/asim/go-micro/v3/metadata"
+	"go-micro.dev/v4/metadata"
 
 	"github.com/sapcc/andromeda/internal/rpc/server"
 
-	"github.com/asim/go-micro/v3"
+	"go-micro.dev/v4"
 
-	"github.com/asim/go-micro/v3/logger"
 	"github.com/scottdware/go-bigip"
+	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/driver/f5/as3"
 	"github.com/sapcc/andromeda/internal/rpc/worker"

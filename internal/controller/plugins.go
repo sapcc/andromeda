@@ -1,5 +1,5 @@
 /*
- *   Copyright 2020 SAP SE
+ *   Copyright 2022 SAP SE
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -14,25 +14,10 @@
  *   limitations under the License.
  */
 
-package middlewares
+package controller
 
 import (
-	"net/http"
-
-	"go-micro.dev/v4/logger"
+	_ "github.com/asim/go-micro/plugins/broker/nats/v4"
+	_ "github.com/asim/go-micro/plugins/registry/nats/v4"
+	_ "github.com/asim/go-micro/plugins/transport/nats/v4"
 )
-
-//HealthCheckHandler provides the GET /healthcheck endpoint.
-func HealthCheckMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-		if r.URL.Path == "/healthcheck" && r.Method == "GET" {
-			w.WriteHeader(http.StatusOK)
-			if _, err := w.Write([]byte("ok")); err != nil {
-				logger.Error("Error replying health check")
-			}
-		} else {
-			next.ServeHTTP(w, r)
-		}
-	})
-}

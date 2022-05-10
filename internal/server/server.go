@@ -20,8 +20,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/asim/go-micro/v3"
-	"github.com/asim/go-micro/v3/logger"
 	"github.com/go-openapi/loads"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/iancoleman/strcase"
@@ -30,6 +28,8 @@ import (
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/middlewares"
 	"github.com/xo/dburl"
+	"go-micro.dev/v4"
+	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/controller"

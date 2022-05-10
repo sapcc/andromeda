@@ -21,11 +21,11 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/asim/go-micro/v3/logger"
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/utils/openstack/clientconfig"
 	"github.com/sapcc/go-bits/gopherpolicy"
+	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/config"
 )

@@ -19,8 +19,8 @@ package main
 import (
 	"os"
 
-	"github.com/asim/go-micro/v3/logger"
 	"github.com/jessevdk/go-flags"
+	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/db"
 	"github.com/sapcc/andromeda/internal/config"
@@ -30,7 +30,7 @@ import (
 )
 
 func main() {
-	parser := flags.NewParser(&config.Global, flags.Default)
+	parser := flags.NewParser(&config.Global, flags.Default|flags.IgnoreUnknown)
 	parser.ShortDescription = "Andromeda"
 	parser.LongDescription = "Platform agnostic GSLB frontend"
 

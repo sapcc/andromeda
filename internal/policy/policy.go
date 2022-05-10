@@ -19,8 +19,8 @@ package policy
 import (
 	"net/http"
 
-	"github.com/asim/go-micro/v3/logger"
 	openapiMiddleware "github.com/go-openapi/runtime/middleware"
+	"go-micro.dev/v4/logger"
 )
 
 //global policy engine

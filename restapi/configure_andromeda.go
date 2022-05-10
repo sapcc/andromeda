@@ -20,12 +20,12 @@ import (
 	"crypto/tls"
 	"net/http"
 
-	"github.com/asim/go-micro/v3/logger"
 	"github.com/didip/tollbooth"
 	"github.com/dre1080/recovr"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/rs/cors"
+	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/auth"
 	"github.com/sapcc/andromeda/internal/config"

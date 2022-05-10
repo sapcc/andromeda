@@ -15,6 +15,7 @@ message SearchRequest {
   int32 page_number = 3;
   int32 result_per_page = 4;
   bool pending = 5;
+  repeated string ids = 6;
 }
 
 message DomainsResponse {

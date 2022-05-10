@@ -25,10 +25,10 @@ import (
 
 	"github.com/jackc/pgconn"
 
-	"github.com/asim/go-micro/v3"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
+	"go-micro.dev/v4"
 
 	"github.com/sapcc/andromeda/db"
 	"github.com/sapcc/andromeda/internal/auth"

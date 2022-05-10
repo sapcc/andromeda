@@ -23,14 +23,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sapcc/andromeda/internal/rpc/server"
-
-	_ "github.com/asim/go-micro/plugins/broker/nats/v3"
-	_ "github.com/asim/go-micro/plugins/registry/nats/v3"
-	_ "github.com/asim/go-micro/plugins/transport/nats/v3"
-	"github.com/asim/go-micro/v3"
-	"github.com/asim/go-micro/v3/logger"
 	"github.com/scottdware/go-bigip"
+	"go-micro.dev/v4"
+	"go-micro.dev/v4/logger"
+
+	"github.com/sapcc/andromeda/internal/rpc/server"
 )
 
 type StatusController struct {

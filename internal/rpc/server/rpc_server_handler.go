@@ -22,9 +22,8 @@ import (
 	"net"
 	"strings"
 
-	"github.com/asim/go-micro/v3/logger"
-
 	"github.com/jmoiron/sqlx"
+	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/models"
 	"github.com/sapcc/andromeda/internal/utils"

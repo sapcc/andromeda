@@ -21,11 +21,11 @@ import (
 
 	"github.com/sapcc/andromeda/internal/rpc/worker"
 
-	"github.com/asim/go-micro/v3"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/sapcc/andromeda/internal/auth"
 	"github.com/sapcc/andromeda/internal/policy"
 	"github.com/sapcc/andromeda/restapi/operations/administrative"
+	"go-micro.dev/v4"
 )
 
 type SyncController struct {

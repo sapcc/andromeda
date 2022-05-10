@@ -21,9 +21,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/asim/go-micro/v3"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
+	"go-micro.dev/v4"
 
 	"github.com/sapcc/andromeda/db"
 	"github.com/sapcc/andromeda/internal/auth"

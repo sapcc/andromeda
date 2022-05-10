@@ -19,10 +19,10 @@ package cli
 import (
 	"os"
 
-	"github.com/asim/go-micro/v3/logger"
 	"github.com/jedib0t/go-pretty/table"
 	"github.com/jessevdk/go-flags"
 	"github.com/jmoiron/sqlx/reflectx"
+	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/client"
 )

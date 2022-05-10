@@ -19,7 +19,7 @@ package policy
 import (
 	"net/http"
 
-	"github.com/asim/go-micro/v3/logger"
+	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/auth"
 	"github.com/sapcc/andromeda/internal/config"

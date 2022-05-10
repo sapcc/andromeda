@@ -17,8 +17,8 @@
 package controller
 
 import (
-	"github.com/asim/go-micro/v3"
 	"github.com/jmoiron/sqlx"
+	"go-micro.dev/v4"
 )
 
 type Controller struct {
