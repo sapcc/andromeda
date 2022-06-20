@@ -1128,7 +1128,6 @@ definitions:
           type: string
       domains:
         type: array
-        readOnly: true
         description: Array of domains assigned to this pool
         items:
           type: string
