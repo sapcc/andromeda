@@ -33,9 +33,37 @@ type RPCHandler struct {
 	DB *sqlx.DB
 }
 
+//QueryxWithIds run sql query if optional WHERE condition based on IDs
+func (u *RPCHandler) QueryxWithIds(sql string, request *SearchRequest) (*sqlx.Rows, error) {
+	var rows *sqlx.Rows
+	if len(request.Ids) > 0 {
+		if strings.Contains(sql, "WHERE") {
+			sql += ` AND id IN (?)`
+		} else {
+			sql += ` WHERE id IN (?)`
+		}
+		query, args, err := sqlx.In(sql, request.Ids)
+		if err != nil {
+			return nil, err
+		}
+		query = u.DB.Rebind(query)
+		rows, err = u.DB.Queryx(query, args...)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		var err error
+		rows, err = u.DB.Queryx(sql)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return rows, nil
+}
+
 func (u *RPCHandler) GetMembers(ctx context.Context, request *SearchRequest, response *MembersResponse) error {
 	sql := `SELECT id, admin_state_up, address, port FROM member;`
-	rows, err := u.DB.Queryx(sql)
+	rows, err := u.QueryxWithIds(sql, request)
 	if err != nil {
 		return err
 	}
@@ -51,6 +79,56 @@ func (u *RPCHandler) GetMembers(ctx context.Context, request *SearchRequest, res
 			return err
 		}
 		response.Response = append(response.Response, &member)
+	}
+	return nil
+}
+
+func (u *RPCHandler) GetPools(ctx context.Context, request *SearchRequest, response *PoolsResponse) error {
+	sql := `SELECT id, admin_state_up FROM pool;`
+	rows, err := u.QueryxWithIds(sql, request)
+	if err != nil {
+		return err
+	}
+	for rows.Next() {
+		var pool models.Pool
+		if err := rows.Scan(&pool.Id, &pool.AdminStateUp); err != nil {
+			return err
+		}
+		response.Response = append(response.Response, &pool)
+	}
+	return nil
+}
+
+func (u *RPCHandler) GetDatacenters(ctx context.Context, request *SearchRequest, response *DatacentersResponse) error {
+	sql := `SELECT id, admin_state_up, city, state_or_province, continent, country, latitude, longitude, scope, provisioning_status FROM datacenter`
+	rows, err := u.QueryxWithIds(sql, request)
+	if err != nil {
+		return err
+	}
+	for rows.Next() {
+		var datacenter models.Datacenter
+		if err := rows.StructScan(&datacenter); err != nil {
+			logger.Error(err)
+			return err
+		}
+		response.Response = append(response.Response, &datacenter)
+	}
+	return nil
+}
+
+func (u *RPCHandler) GetMonitors(ctx context.Context, request *SearchRequest, response *MonitorsResponse) error {
+	sql := "SELECT id, admin_state_up, `interval`, pool_id, send, receive, timeout, type, provisioning_status FROM monitor;"
+	rows, err := u.QueryxWithIds(sql, request)
+	if err != nil {
+		return err
+	}
+	for rows.Next() {
+		var monitor models.Monitor
+		if err := rows.StructScan(&monitor); err != nil {
+			logger.Error(err)
+			return err
+		}
+		response.Response = append(response.Response, &monitor)
 	}
 	return nil
 }
@@ -113,7 +191,7 @@ func populateMonitors(u *RPCHandler, poolID string) ([]*models.Monitor, error) {
 }
 
 func populateMembers(u *RPCHandler, poolID string) ([]*models.Member, error) {
-	sql := `SELECT id, admin_state_up, address, port FROM member WHERE pool_id = ?`
+	sql := `SELECT id, admin_state_up, address, port, datacenter_id FROM member WHERE pool_id = ?`
 	rows, err := u.DB.Queryx(sql, poolID)
 	if err != nil {
 		return nil, err
@@ -123,7 +201,8 @@ func populateMembers(u *RPCHandler, poolID string) ([]*models.Member, error) {
 	for rows.Next() {
 		var member models.Member
 		var address string
-		if err := rows.Scan(&member.Id, &member.AdminStateUp, &address, &member.Port); err != nil {
+		if err := rows.Scan(&member.Id, &member.AdminStateUp, &address,
+			&member.Port, &member.Datacenter); err != nil {
 			logger.Error(err)
 			return nil, err
 		}
@@ -143,16 +222,16 @@ func (u *RPCHandler) GetDomains(ctx context.Context, request *SearchRequest, res
 	if request.Pending {
 		sql = `
 		SELECT 
-			id, admin_state_up, fqdn, mode, record_type 
-		FROM domain 
+			id, admin_state_up, fqdn, mode, record_type, provisioning_status
+		FROM domain
 		WHERE 
 			provider = ? AND provisioning_status in ('PENDING_CREATE', 'PENDING_UPDATE', 'PENDING_DELETE')
 		`
 	} else {
 		sql = `SELECT id, admin_state_up, fqdn, mode, record_type FROM domain WHERE provider = ?`
 	}
+	rows, err := u.QueryxWithIds(sql, request)
 
-	rows, err := u.DB.Queryx(sql, request.GetProvider())
 	if err != nil {
 		logger.Error(err)
 		return err
@@ -164,11 +243,38 @@ func (u *RPCHandler) GetDomains(ctx context.Context, request *SearchRequest, res
 			return err
 		}
 
+		datacenterIds := []string{}
+
 		if request.GetFullyPopulated() {
 			if domain.Pools, err = populatePools(u, request.GetFullyPopulated(), domain.Id); err != nil {
 				logger.Error(err)
 				return err
 			}
+			for _, pool := range domain.Pools {
+				for _, member := range pool.Members {
+					found := false
+					for _, datacenter := range datacenterIds {
+						if datacenter == member.Datacenter {
+							found = true
+						}
+					}
+					if !found {
+						datacenterIds = append(datacenterIds, member.Datacenter)
+					}
+				}
+			}
+
+			s := SearchRequest{
+				PageNumber:    0,
+				ResultPerPage: 100,
+				Pending:       true,
+				Ids:           datacenterIds,
+			}
+			r := DatacentersResponse{}
+			if err := u.GetDatacenters(nil, &s, &r); err != nil {
+				return err
+			}
+			domain.Datacenters = r.Response
 		}
 
 		response.Response = append(response.Response, &domain)

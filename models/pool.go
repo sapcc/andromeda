@@ -44,7 +44,6 @@ type Pool struct {
 	CreatedAt string `json:"created_at,omitempty"`
 
 	// Array of domains assigned to this pool
-	// Read Only: true
 	Domains []strfmt.UUID `json:"domains"`
 
 	// The id of the resource.
@@ -311,10 +310,6 @@ func (m *Pool) ContextValidate(ctx context.Context, formats strfmt.Registry) err
 		res = append(res, err)
 	}
 
-	if err := m.contextValidateDomains(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.contextValidateID(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -348,15 +343,6 @@ func (m *Pool) ContextValidate(ctx context.Context, formats strfmt.Registry) err
 func (m *Pool) contextValidateCreatedAt(ctx context.Context, formats strfmt.Registry) error {
 
 	if err := validate.ReadOnly(ctx, "created_at", "body", string(m.CreatedAt)); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *Pool) contextValidateDomains(ctx context.Context, formats strfmt.Registry) error {
-
-	if err := validate.ReadOnly(ctx, "domains", "body", []strfmt.UUID(m.Domains)); err != nil {
 		return err
 	}
 

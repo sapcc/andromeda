@@ -40,6 +40,9 @@ type RPCServerService interface {
 	UpdateProvisioningStatus(ctx context.Context, in *ProvisioningStatusRequest, opts ...client.CallOption) (*ProvisioningStatusResponse, error)
 	UpdateMemberStatus(ctx context.Context, in *MemberStatusRequest, opts ...client.CallOption) (*MemberStatusResponse, error)
 	GetDomains(ctx context.Context, in *SearchRequest, opts ...client.CallOption) (*DomainsResponse, error)
+	GetPools(ctx context.Context, in *SearchRequest, opts ...client.CallOption) (*PoolsResponse, error)
+	GetMonitors(ctx context.Context, in *SearchRequest, opts ...client.CallOption) (*MonitorsResponse, error)
+	GetDatacenters(ctx context.Context, in *SearchRequest, opts ...client.CallOption) (*DatacentersResponse, error)
 	GetMembers(ctx context.Context, in *SearchRequest, opts ...client.CallOption) (*MembersResponse, error)
 }
 
@@ -85,6 +88,36 @@ func (c *rPCServerService) GetDomains(ctx context.Context, in *SearchRequest, op
 	return out, nil
 }
 
+func (c *rPCServerService) GetPools(ctx context.Context, in *SearchRequest, opts ...client.CallOption) (*PoolsResponse, error) {
+	req := c.c.NewRequest(c.name, "RPCServer.GetPools", in)
+	out := new(PoolsResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *rPCServerService) GetMonitors(ctx context.Context, in *SearchRequest, opts ...client.CallOption) (*MonitorsResponse, error) {
+	req := c.c.NewRequest(c.name, "RPCServer.GetMonitors", in)
+	out := new(MonitorsResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *rPCServerService) GetDatacenters(ctx context.Context, in *SearchRequest, opts ...client.CallOption) (*DatacentersResponse, error) {
+	req := c.c.NewRequest(c.name, "RPCServer.GetDatacenters", in)
+	out := new(DatacentersResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *rPCServerService) GetMembers(ctx context.Context, in *SearchRequest, opts ...client.CallOption) (*MembersResponse, error) {
 	req := c.c.NewRequest(c.name, "RPCServer.GetMembers", in)
 	out := new(MembersResponse)
@@ -101,6 +134,9 @@ type RPCServerHandler interface {
 	UpdateProvisioningStatus(context.Context, *ProvisioningStatusRequest, *ProvisioningStatusResponse) error
 	UpdateMemberStatus(context.Context, *MemberStatusRequest, *MemberStatusResponse) error
 	GetDomains(context.Context, *SearchRequest, *DomainsResponse) error
+	GetPools(context.Context, *SearchRequest, *PoolsResponse) error
+	GetMonitors(context.Context, *SearchRequest, *MonitorsResponse) error
+	GetDatacenters(context.Context, *SearchRequest, *DatacentersResponse) error
 	GetMembers(context.Context, *SearchRequest, *MembersResponse) error
 }
 
@@ -109,6 +145,9 @@ func RegisterRPCServerHandler(s server.Server, hdlr RPCServerHandler, opts ...se
 		UpdateProvisioningStatus(ctx context.Context, in *ProvisioningStatusRequest, out *ProvisioningStatusResponse) error
 		UpdateMemberStatus(ctx context.Context, in *MemberStatusRequest, out *MemberStatusResponse) error
 		GetDomains(ctx context.Context, in *SearchRequest, out *DomainsResponse) error
+		GetPools(ctx context.Context, in *SearchRequest, out *PoolsResponse) error
+		GetMonitors(ctx context.Context, in *SearchRequest, out *MonitorsResponse) error
+		GetDatacenters(ctx context.Context, in *SearchRequest, out *DatacentersResponse) error
 		GetMembers(ctx context.Context, in *SearchRequest, out *MembersResponse) error
 	}
 	type RPCServer struct {
@@ -132,6 +171,18 @@ func (h *rPCServerHandler) UpdateMemberStatus(ctx context.Context, in *MemberSta
 
 func (h *rPCServerHandler) GetDomains(ctx context.Context, in *SearchRequest, out *DomainsResponse) error {
 	return h.RPCServerHandler.GetDomains(ctx, in, out)
+}
+
+func (h *rPCServerHandler) GetPools(ctx context.Context, in *SearchRequest, out *PoolsResponse) error {
+	return h.RPCServerHandler.GetPools(ctx, in, out)
+}
+
+func (h *rPCServerHandler) GetMonitors(ctx context.Context, in *SearchRequest, out *MonitorsResponse) error {
+	return h.RPCServerHandler.GetMonitors(ctx, in, out)
+}
+
+func (h *rPCServerHandler) GetDatacenters(ctx context.Context, in *SearchRequest, out *DatacentersResponse) error {
+	return h.RPCServerHandler.GetDatacenters(ctx, in, out)
 }
 
 func (h *rPCServerHandler) GetMembers(ctx context.Context, in *SearchRequest, out *MembersResponse) error {

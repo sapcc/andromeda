@@ -8,7 +8,7 @@ build-all: $(PB_FILES) $(PB_MICRO_FILES) bin/andromeda bin/m31ctl
 bin/andromeda: main.go $(PB_FILES) $(PB_MICRO_FILES)
 	go build -o bin/andromeda
 
-bin/m31ctl: cmd/m31ctl.go
+bin/m31ctl: cmd/m31ctl.go internal/cli/*.go
 	go build -o bin/m31ctl cmd/m31ctl.go
 
 swagger:

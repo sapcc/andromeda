@@ -24,6 +24,7 @@ import (
 
 	"github.com/sapcc/andromeda/db"
 	"github.com/sapcc/andromeda/internal/config"
+	"github.com/sapcc/andromeda/internal/driver/akamai"
 	"github.com/sapcc/andromeda/internal/driver/f5"
 	"github.com/sapcc/andromeda/internal/server"
 	"github.com/sapcc/andromeda/restapi"
@@ -44,6 +45,11 @@ func main() {
 	if _, err := parser.AddCommand("f5-agent",
 		"Run andromeda f5 agent",
 		"Runs the andromeda f5 Agent component", &struct{}{}); err != nil {
+		logger.Fatal(err)
+	}
+	if _, err := parser.AddCommand("akamai-agent",
+		"Run andromeda akamai agent",
+		"Runs the andromeda akamai Agent component", &struct{}{}); err != nil {
 		logger.Fatal(err)
 	}
 	if _, err := parser.AddCommand("f5-status-agent",
@@ -90,6 +96,10 @@ func main() {
 		}
 	case "f5-agent":
 		if err := f5.ExecuteF5Agent(); err != nil {
+			logger.Fatal(err)
+		}
+	case "akamai-agent":
+		if err := akamai.ExecuteAkamaiAgent(); err != nil {
 			logger.Fatal(err)
 		}
 	case "migrate":

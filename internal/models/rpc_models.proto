@@ -9,6 +9,8 @@ message Domain {
   string mode = 5;
   repeated Pool pools = 6;
   string record_type = 7;
+  repeated Datacenter datacenters = 8;
+  string provisioning_status = 9;
 }
 
 message Pool {
@@ -16,6 +18,7 @@ message Pool {
   bool admin_state_up = 2;
   repeated Member members = 3;
   repeated Monitor monitors = 4;
+  string provisioning_status = 5;
 }
 
 message Datacenter {
@@ -27,6 +30,8 @@ message Datacenter {
   string city = 6;
   float longitude = 7;
   float latitude = 8;
+  string provisioning_status = 9;
+  string scope = 10;
 }
 
 message Member {
@@ -35,13 +40,14 @@ message Member {
   fixed32 address = 3;
   uint32 port = 4;
   string datacenter = 5;
+  string provisioning_status = 6;
 }
 
 message Monitor {
   string id = 1;
   bool admin_state_up = 2;
   int64 interval = 3;
-  string pool = 4;
+  string pool_id = 4;
   string send = 5;
   string receive = 6;
   int64 timeout = 7;
@@ -53,4 +59,5 @@ message Monitor {
     UDP = 4;
   }
   MonitorType type = 8;
+  string provisioning_status = 9;
 }

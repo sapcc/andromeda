@@ -1963,8 +1963,7 @@ func init() {
             "description": "Domain ID",
             "type": "string",
             "format": "uuid"
-          },
-          "readOnly": true
+          }
         },
         "id": {
           "description": "The id of the resource.",
@@ -4203,8 +4202,7 @@ func init() {
             "description": "Domain ID",
             "type": "string",
             "format": "uuid"
-          },
-          "readOnly": true
+          }
         },
         "id": {
           "description": "The id of the resource.",

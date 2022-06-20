@@ -18,6 +18,7 @@ package akamai
 
 import (
 	"context"
+	"os"
 	"time"
 
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/configgtm-v1_4"
@@ -32,10 +33,17 @@ import (
 )
 
 var DOMAIN_MODE_MAP = map[string]string{
-	models.DomainModeWEIGHTED:     "weighted",
 	models.DomainModeAVAILABILITY: "failover-only",
-	models.DomainModeROUNDROBIN:   "basic",
-	models.DomainModeGEOGRAPHIC:   "full",
+	models.DomainModeGEOGRAPHIC:   "static",
+	models.DomainModeWEIGHTED:     "weighted",
+	models.DomainModeROUNDROBIN:   "weighted",
+}
+
+var PROPERTY_TYPE_MAP = map[string]string{
+	models.DomainModeAVAILABILITY: "failover",
+	models.DomainModeGEOGRAPHIC:   "geographic",
+	models.DomainModeWEIGHTED:     "weighted-round-robin",
+	models.DomainModeROUNDROBIN:   "weighted-round-robin",
 }
 
 type AkamaiAgent struct {
@@ -50,7 +58,8 @@ type Sub struct {
 }
 
 func ExecuteAkamaiAgent() error {
-	config, _ := edgegrid.Init("~/.edgerc", "default")
+	path, _ := os.LookupEnv("AKAMAI_EDGE_RC")
+	config, _ := edgegrid.Init(path, "default")
 	configgtm.Init(config)
 
 	meta := map[string]string{
@@ -82,22 +91,51 @@ func ExecuteAkamaiAgent() error {
 	}
 
 	go akamai.periodicSync()
-	go akamai.fullSync()
+	go func() {
+		if err := akamai.fullSync(); err != nil {
+			logger.Error(err)
+		}
+	}()
 	return service.Run()
 }
 
-func (s *AkamaiAgent) fullSync() {
-	if err := s.Sync(false); err != nil {
-		logger.Error(err)
+func (s *AkamaiAgent) fullSync() error {
+	var pageNumber int32 = 0
+	for true {
+		response, err := s.rpc.GetDomains(context.Background(), &server.SearchRequest{
+			Provider:       "akamai",
+			PageNumber:     pageNumber,
+			ResultPerPage:  100,
+			FullyPopulated: true,
+			Pending:        true,
+		})
+		if err != nil {
+			return err
+		}
+
+		res := response.GetResponse()
+		for _, domain := range res {
+			if err := s.SyncDomain(domain); err != nil {
+				return err
+			}
+		}
+
+		if len(res) < 100 {
+			break
+		} else {
+			pageNumber++
+		}
 	}
+
+	return nil
 }
 
 func (s *AkamaiAgent) periodicSync() {
-	t := time.NewTicker(10 * time.Second)
+	t := time.NewTicker(30 * time.Second)
 	defer t.Stop()
 	for {
 		<-t.C // Activate periodically
-		if err := s.Sync(true); err != nil {
+		if err := s.fullSync(); err != nil {
 			logger.Error(err)
 		}
 	}
@@ -109,49 +147,5 @@ func (s *AkamaiAgent) SyncAll(ctx context.Context, request *worker.SyncRequest) 
 	md, _ := metadata.FromContext(ctx)
 	logger.Info("[pubsub.1] Received event %+v with metadata %+v\n", request, md)
 	// do something with event
-	return nil
-}
-
-func (s *AkamaiAgent) SyncDomains(domainIDs []string) error {
-	for true {
-		response, err := s.rpc.GetDomains(context.Background(), &server.SearchRequest{
-			Provider:       "akamai",
-			PageNumber:     0,
-			ResultPerPage:  100,
-			FullyPopulated: false,
-			Pending:        true,
-			Ids:            domainIDs,
-		})
-		if err != nil {
-			return err
-		}
-		res := response.GetResponse()
-		for _, domain := range res {
-			updateRequired := false
-			akamaiDomain, err := configgtm.GetDomain(domain.Id)
-			if err != nil {
-				//TODO: Handle missing / create new one case
-				return err
-			}
-
-			if akamaiDomain.Name != domain.GetFqdn() {
-				akamaiDomain.Name = domain.GetFqdn()
-				updateRequired = true
-			}
-			if akamaiDomain.Type != DOMAIN_MODE_MAP[domain.GetRecordType()] {
-				akamaiDomain.Type = DOMAIN_MODE_MAP[domain.GetRecordType()]
-				updateRequired = true
-			}
-			if updateRequired {
-				if _, err := akamaiDomain.Update(nil); err != nil {
-					return err
-				}
-			}
-		}
-		if len(res) < 100 {
-			break
-		}
-	}
-
 	return nil
 }

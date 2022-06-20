@@ -89,19 +89,32 @@ func (c PoolController) PostPools(params pools.PostPoolsParams) middleware.Respo
 		panic(err)
 	}
 	pool.Members = []strfmt.UUID{}
-	pool.Domains = []strfmt.UUID{}
 
-	sql := `
-		INSERT INTO pool
-		    (name, admin_state_up, project_id)
-		VALUES
-		    (:name, :admin_state_up, :project_id)
-		RETURNING *
-	`
-	stmt, _ := c.db.PrepareNamed(sql)
-	if err := stmt.Get(pool, pool); err != nil {
+	// Wrap insert and relations into transaction
+	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
+		sql := `
+			INSERT INTO pool
+				(name, admin_state_up, project_id)
+			VALUES
+				(:name, :admin_state_up, :project_id)
+			RETURNING *
+		`
+
+		stmt, _ := tx.PrepareNamed(sql)
+		if err := stmt.Get(pool, pool); err != nil {
+			panic(err)
+		}
+
+		for _, domainId := range params.Pool.Pool.Domains {
+			if _, err := insertDomainPoolRelations(tx, domainId, projectID, []strfmt.UUID{pool.ID}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}); err != nil {
 		panic(err)
 	}
+
 	return pools.NewPostPoolsCreated().WithPayload(&pools.PostPoolsCreatedBody{Pool: pool})
 }
 

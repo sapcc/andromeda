@@ -6,6 +6,9 @@ service RPCServer {
   rpc UpdateProvisioningStatus(ProvisioningStatusRequest) returns (ProvisioningStatusResponse);
   rpc UpdateMemberStatus(MemberStatusRequest) returns (MemberStatusResponse);
   rpc GetDomains(SearchRequest) returns (DomainsResponse);
+  rpc GetPools(SearchRequest) returns (PoolsResponse);
+  rpc GetMonitors(SearchRequest) returns (MonitorsResponse);
+  rpc GetDatacenters(SearchRequest) returns (DatacentersResponse);
   rpc GetMembers(SearchRequest) returns (MembersResponse);
 }
 
@@ -20,6 +23,18 @@ message SearchRequest {
 
 message DomainsResponse {
   repeated Domain response = 1;
+}
+
+message PoolsResponse {
+  repeated Pool response = 1;
+}
+
+message MonitorsResponse {
+  repeated Monitor response = 1;
+}
+
+message DatacentersResponse {
+  repeated Datacenter response = 1;
 }
 
 message MembersResponse {
