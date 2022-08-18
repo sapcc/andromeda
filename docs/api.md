@@ -2326,8 +2326,9 @@ Unexpected Error
 |------|------|---------|:--------:| ------- |-------------|---------|
 | admin_state_up | boolean| `bool` |  | `true`| The administrative state of the resource, which is up (true) or down (false). Default is true. |  |
 | aliases | []string (formatted string)| `[]string` |  | |  |  |
+| cname_target | hostname (formatted string)| `strfmt.Hostname` |  | | If not empty, the backend created a CNAME target to be used for the FQDN. | `example.org.production.gtm.com` |
 | created_at | dateTime (formatted string)| `string` |  | | The UTC date and timestamp when the resource was created. | `2020-05-11T17:21:34` |
-| fqdn | hostname (formatted string)| `strfmt.Hostname` | ✓ | | Fully-Qualified Host Name. | `example.org` |
+| fqdn | hostname (formatted string)| `strfmt.Hostname` | ✓ | | Desired Fully-Qualified Host Name. | `example.org` |
 | id | uuid (formatted string)| `strfmt.UUID` |  | | The id of the resource. |  |
 | mode | string| `string` |  | `"ROUND_ROBIN"`| Load balancing method to use for the references pools. |  |
 | name | string| `string` |  | | Human-readable name of the resource. |  |
