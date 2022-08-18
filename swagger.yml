@@ -1021,9 +1021,16 @@ definitions:
       fqdn:
         type: string
         format: hostname
-        description: Fully-Qualified Host Name.
+        description: Desired Fully-Qualified Host Name.
         example: example.org
         maxLength: 512
+      cname_target:
+        type: string
+        format: hostname
+        readOnly: true
+        description: If not empty, the backend created a CNAME target to be used for the FQDN.
+        example: example.org.production.gtm.com
+        x-nullable: true
       mode:
         type: string
         description: Load balancing method to use for the references pools.
