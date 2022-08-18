@@ -18,26 +18,23 @@ package akamai
 
 import (
 	"context"
+	"net/http"
 	"os"
 	"time"
 
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/configgtm-v1_4"
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/edgegrid"
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/configgtm"
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/edgegrid"
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/session"
+
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/logger"
 	"go-micro.dev/v4/metadata"
 
+	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/rpc/worker"
 	"github.com/sapcc/andromeda/models"
 )
-
-var DOMAIN_MODE_MAP = map[string]string{
-	models.DomainModeAVAILABILITY: "failover-only",
-	models.DomainModeGEOGRAPHIC:   "static",
-	models.DomainModeWEIGHTED:     "weighted",
-	models.DomainModeROUNDROBIN:   "weighted",
-}
 
 var PROPERTY_TYPE_MAP = map[string]string{
 	models.DomainModeAVAILABILITY: "failover",
@@ -47,8 +44,9 @@ var PROPERTY_TYPE_MAP = map[string]string{
 }
 
 type AkamaiAgent struct {
-	config *edgegrid.Config
-	rpc    server.RPCServerService
+	gtm        gtm.GTM
+	domainType string
+	rpc        server.RPCServerService
 }
 
 // All methods of Sub will be executed when
@@ -58,13 +56,53 @@ type Sub struct {
 }
 
 func ExecuteAkamaiAgent() error {
-	path, _ := os.LookupEnv("AKAMAI_EDGE_RC")
-	config, _ := edgegrid.Init(path, "default")
-	configgtm.Init(config)
+	option := edgegrid.WithEnv(true)
+	if env := os.Getenv("AKAMAI_EDGE_RC"); env != "" {
+		option = edgegrid.WithFile(env)
+	} else if config.Global.AkamaiConfig.EdgeRC != "" {
+		option = edgegrid.WithFile(config.Global.AkamaiConfig.EdgeRC)
+	}
+
+	edgerc := edgegrid.Must(edgegrid.New(option))
+	s := session.Must(session.New(
+		session.WithSigner(edgerc),
+	))
+
+	var identity struct {
+		AccountID string `json:"accountId"`
+		Active    bool   `json:"active"`
+		Contracts []struct {
+			ContractID  string   `json:"contractId"`
+			Features    []string `json:"features"`
+			Permissions []string `json:"permissions"`
+		} `json:"contracts"`
+		Email string `json:"email"`
+	}
+
+	req, _ := http.NewRequest(http.MethodGet, "/config-gtm/v1/identity", nil)
+	if _, err := s.Exec(req, &identity); err != nil {
+		panic(err)
+	}
+
+	if len(identity.Contracts) != 1 && config.Global.AkamaiConfig.ContractId == "" {
+		logger.Fatalf("More than one contract detected, specificy contract_id.")
+	}
+
+	var domainType string
+	for _, contract := range identity.Contracts {
+		if config.Global.AkamaiConfig.ContractId != "" && contract.ContractID != config.Global.AkamaiConfig.ContractId {
+			continue
+		}
+
+		domainType = DetectTypeFromFeatures(contract.Features)
+		logger.Infof("Detected Akamai Contract '%s' with best features enabling '%s' domain type.",
+			contract.ContractID, domainType)
+		break
+	}
 
 	meta := map[string]string{
 		"type":    "Akamai",
-		"host":    config.Host,
+		"host":    edgerc.Host,
 		"version": "1.4",
 	}
 	service := micro.NewService(
@@ -77,8 +115,13 @@ func ExecuteAkamaiAgent() error {
 
 	// Create F5 worker instance with Server RPC interface
 	akamai := AkamaiAgent{
-		&config,
+		gtm.Client(s),
+		domainType,
 		server.NewRPCServerService("andromeda.server", service.Client()),
+	}
+
+	if err := akamai.EnsureDomain(); err != nil {
+		panic(err)
 	}
 
 	// Register callbacks
@@ -107,7 +150,7 @@ func (s *AkamaiAgent) fullSync() error {
 			PageNumber:     pageNumber,
 			ResultPerPage:  100,
 			FullyPopulated: true,
-			Pending:        true,
+			Pending:        false,
 		})
 		if err != nil {
 			return err
@@ -115,10 +158,14 @@ func (s *AkamaiAgent) fullSync() error {
 
 		res := response.GetResponse()
 		for _, domain := range res {
-			if err := s.SyncDomain(domain); err != nil {
+			if err := s.SyncProperty(domain); err != nil {
+				return err
+			}
+			if err := s.UpdateStatus(domain); err != nil {
 				return err
 			}
 		}
+		logger.Infof("Sync finished for %d domain(s)", len(res))
 
 		if len(res) < 100 {
 			break

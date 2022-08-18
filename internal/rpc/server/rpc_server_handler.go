@@ -35,34 +35,34 @@ type RPCHandler struct {
 
 //QueryxWithIds run sql query if optional WHERE condition based on IDs
 func (u *RPCHandler) QueryxWithIds(sql string, request *SearchRequest) (*sqlx.Rows, error) {
-	var rows *sqlx.Rows
+	args := []interface{}{request.Provider}
 	if len(request.Ids) > 0 {
 		if strings.Contains(sql, "WHERE") {
 			sql += ` AND id IN (?)`
 		} else {
 			sql += ` WHERE id IN (?)`
 		}
-		query, args, err := sqlx.In(sql, request.Ids)
+
+		query, inArgs, err := sqlx.In(sql, request.Ids)
 		if err != nil {
 			return nil, err
 		}
-		query = u.DB.Rebind(query)
-		rows, err = u.DB.Queryx(query, args...)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		var err error
-		rows, err = u.DB.Queryx(sql)
-		if err != nil {
-			return nil, err
-		}
+		sql = u.DB.Rebind(query)
+		args = append(inArgs, args...)
 	}
-	return rows, nil
+
+	// Provider filter
+	if strings.Contains(sql, "WHERE") {
+		sql += ` AND provider = ?`
+	} else {
+		sql += ` WHERE provider = ?`
+	}
+
+	return u.DB.Queryx(sql, args...)
 }
 
 func (u *RPCHandler) GetMembers(ctx context.Context, request *SearchRequest, response *MembersResponse) error {
-	sql := `SELECT id, admin_state_up, address, port FROM member;`
+	sql := `SELECT id, admin_state_up, address, port, provisioning_status FROM member;`
 	rows, err := u.QueryxWithIds(sql, request)
 	if err != nil {
 		return err
@@ -70,7 +70,8 @@ func (u *RPCHandler) GetMembers(ctx context.Context, request *SearchRequest, res
 	for rows.Next() {
 		var member models.Member
 		var address string
-		if err := rows.Scan(&member.Id, &member.AdminStateUp, &address, &member.Port); err != nil {
+		if err := rows.Scan(&member.Id, &member.AdminStateUp, &address,
+			&member.Port, &member.ProvisioningStatus); err != nil {
 			return err
 		}
 
@@ -100,7 +101,8 @@ func (u *RPCHandler) GetPools(ctx context.Context, request *SearchRequest, respo
 }
 
 func (u *RPCHandler) GetDatacenters(ctx context.Context, request *SearchRequest, response *DatacentersResponse) error {
-	sql := `SELECT id, admin_state_up, city, state_or_province, continent, country, latitude, longitude, scope, provisioning_status FROM datacenter`
+	sql := `SELECT id, admin_state_up, city, state_or_province, continent, country, latitude, longitude, scope, provisioning_status 
+			FROM datacenter`
 	rows, err := u.QueryxWithIds(sql, request)
 	if err != nil {
 		return err
@@ -117,24 +119,14 @@ func (u *RPCHandler) GetDatacenters(ctx context.Context, request *SearchRequest,
 }
 
 func (u *RPCHandler) GetMonitors(ctx context.Context, request *SearchRequest, response *MonitorsResponse) error {
-	sql := "SELECT id, admin_state_up, `interval`, pool_id, send, receive, timeout, type, provisioning_status FROM monitor;"
-	rows, err := u.QueryxWithIds(sql, request)
-	if err != nil {
-		return err
-	}
-	for rows.Next() {
-		var monitor models.Monitor
-		if err := rows.StructScan(&monitor); err != nil {
-			logger.Error(err)
-			return err
-		}
-		response.Response = append(response.Response, &monitor)
-	}
-	return nil
+	panic("Todo")
 }
 
 func populatePools(u *RPCHandler, fullyPopulated bool, domainID string) ([]*models.Pool, error) {
-	sql := `SELECT id, admin_state_up FROM pool p JOIN domain_pool_relation dpr on p.id = dpr.pool_id WHERE dpr.domain_id = ?`
+	sql := `SELECT id, admin_state_up, provisioning_status 
+            FROM pool p 
+            JOIN domain_pool_relation dpr ON p.id = dpr.pool_id
+            WHERE dpr.domain_id = ?`
 	rows, err := u.DB.Queryx(sql, domainID)
 	if err != nil {
 		return nil, err
@@ -163,7 +155,7 @@ func populatePools(u *RPCHandler, fullyPopulated bool, domainID string) ([]*mode
 }
 
 func populateMonitors(u *RPCHandler, poolID string) ([]*models.Monitor, error) {
-	sql := `SELECT id, admin_state_up, "interval", send, receive, timeout, type FROM monitor WHERE pool_id = ?`
+	sql := `SELECT id, admin_state_up, "interval", send, receive, timeout, type, provisioning_status FROM monitor WHERE pool_id = ?`
 	rows, err := u.DB.Queryx(sql, poolID)
 	if err != nil {
 		return nil, err
@@ -174,7 +166,9 @@ func populateMonitors(u *RPCHandler, poolID string) ([]*models.Monitor, error) {
 		var monitor models.Monitor
 		var send, receive *string
 		var monitorType string
-		if err := rows.Scan(&monitor.Id, &monitor.AdminStateUp, &monitor.Interval, &send, &receive, &monitor.Timeout, &monitorType); err != nil {
+
+		if err := rows.Scan(&monitor.Id, &monitor.AdminStateUp, &monitor.Interval, &send,
+			&receive, &monitor.Timeout, &monitorType, &monitor.ProvisioningStatus); err != nil {
 			return nil, err
 		}
 		if send != nil {
@@ -184,14 +178,13 @@ func populateMonitors(u *RPCHandler, poolID string) ([]*models.Monitor, error) {
 			monitor.Receive = *receive
 		}
 		monitor.Type = models.Monitor_MonitorType(models.Monitor_MonitorType_value[monitorType])
-
 		monitors = append(monitors, &monitor)
 	}
 	return monitors, err
 }
 
 func populateMembers(u *RPCHandler, poolID string) ([]*models.Member, error) {
-	sql := `SELECT id, admin_state_up, address, port, datacenter_id FROM member WHERE pool_id = ?`
+	sql := `SELECT id, admin_state_up, address, port, datacenter_id, provisioning_status FROM member WHERE pool_id = ?`
 	rows, err := u.DB.Queryx(sql, poolID)
 	if err != nil {
 		return nil, err
@@ -202,7 +195,7 @@ func populateMembers(u *RPCHandler, poolID string) ([]*models.Member, error) {
 		var member models.Member
 		var address string
 		if err := rows.Scan(&member.Id, &member.AdminStateUp, &address,
-			&member.Port, &member.Datacenter); err != nil {
+			&member.Port, &member.Datacenter, &member.ProvisioningStatus); err != nil {
 			logger.Error(err)
 			return nil, err
 		}
@@ -218,17 +211,10 @@ func populateMembers(u *RPCHandler, poolID string) ([]*models.Member, error) {
 }
 
 func (u *RPCHandler) GetDomains(ctx context.Context, request *SearchRequest, response *DomainsResponse) error {
-	var sql string
+	sql := `SELECT id, admin_state_up, fqdn, mode, record_type, provisioning_status
+               FROM domain`
 	if request.Pending {
-		sql = `
-		SELECT 
-			id, admin_state_up, fqdn, mode, record_type, provisioning_status
-		FROM domain
-		WHERE 
-			provider = ? AND provisioning_status in ('PENDING_CREATE', 'PENDING_UPDATE', 'PENDING_DELETE')
-		`
-	} else {
-		sql = `SELECT id, admin_state_up, fqdn, mode, record_type FROM domain WHERE provider = ?`
+		sql += ` WHERE provisioning_status in ('PENDING_CREATE', 'PENDING_UPDATE', 'PENDING_DELETE')`
 	}
 	rows, err := u.QueryxWithIds(sql, request)
 
@@ -269,6 +255,7 @@ func (u *RPCHandler) GetDomains(ctx context.Context, request *SearchRequest, res
 				ResultPerPage: 100,
 				Pending:       true,
 				Ids:           datacenterIds,
+				Provider:      request.Provider,
 			}
 			r := DatacentersResponse{}
 			if err := u.GetDatacenters(nil, &s, &r); err != nil {

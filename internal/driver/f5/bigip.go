@@ -54,7 +54,7 @@ func (f5 *F5Agent) GetCommonDeclaration() (*as3.Tenant, error) {
 	}
 
 	device := as3.GSLBServerDevice{
-		Address: config.Global.AgentConfig.DNSServerAddress,
+		Address: config.Global.F5Config.DNSServerAddress,
 	}
 
 	gsblServer := as3.GSLBServer{

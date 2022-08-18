@@ -20,6 +20,7 @@ import (
 	dbsql "database/sql"
 	"errors"
 	"fmt"
+	"github.com/sapcc/andromeda/internal/config"
 	"strings"
 
 	"github.com/go-sql-driver/mysql"
@@ -62,6 +63,10 @@ func (c DomainController) GetDomains(params domains.GetDomainsParams) middleware
 		domain := models.Domain{Pools: []strfmt.UUID{}}
 		if err := rows.StructScan(&domain); err != nil {
 			panic(err)
+		}
+		if *domain.Provider == "akamai" {
+			cname := strfmt.Hostname(fmt.Sprintf("%s.%s", domain.Fqdn.String(), config.Global.AkamaiConfig.Domain))
+			domain.CnameTarget = &cname
 		}
 		if err := PopulateDomainPools(c.db, &domain); err != nil {
 			panic(err)

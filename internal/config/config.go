@@ -25,14 +25,15 @@ var (
 )
 
 type Andromeda struct {
-	Verbose     bool                  `short:"v" long:"verbose" description:"Show verbose debug information"`
-	ConfigFile  []string              `short:"c" long:"config-file" description:"Use config file" no-ini:"true"`
-	Default     Default               `group:"DEFAULT"`
-	Database    Database              `group:"database"`
-	ApiSettings ApiSettings           `group:"api_settings"`
-	ServiceAuth clientconfig.AuthInfo `group:"service_auth"`
-	AgentConfig AgentConfig           `group:"agent"`
-	Quota       Quota                 `group:"quota"`
+	Verbose      bool                  `short:"v" long:"verbose" description:"Show verbose debug information"`
+	ConfigFile   []string              `short:"c" long:"config-file" description:"Use config file" no-ini:"true"`
+	Default      Default               `group:"DEFAULT"`
+	Database     Database              `group:"database"`
+	ApiSettings  ApiSettings           `group:"api_settings"`
+	ServiceAuth  clientconfig.AuthInfo `group:"service_auth"`
+	Quota        Quota                 `group:"quota"`
+	F5Config     F5Config              `group:"f5"`
+	AkamaiConfig AkamaiConfig          `group:"akamai"`
 }
 
 type ApiSettings struct {
@@ -64,8 +65,15 @@ type Database struct {
 	Connection string `long:"connection" description:"Connection string to use to connect to the database."`
 }
 
-type AgentConfig struct {
+type F5Config struct {
 	Host             string `long:"host"`
 	DNSServerAddress string `long:"dns_server_address"`
 	ValidateCert     bool   `long:"validate_certificates"`
+}
+
+type AkamaiConfig struct {
+	EdgeRC     string `long:"edgerc" description:"Path to akamai edgerc file, else sourced from AKAMAI_EDGE_RC env variable."`
+	Domain     string `long:"domain" description:"Traffic Management Domain to use (e.g. production.akadns.net)."`
+	DomainType string `long:"domain_type" description:"Indicates the type of domain available based on your contract, defaults to autodetect. Either failover-only, static, weighted, basic, or full."`
+	ContractId string `long:"contract_id" description:"Indicated the contract id to use, autodetects if only one contract is associated."`
 }

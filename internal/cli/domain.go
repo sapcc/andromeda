@@ -55,6 +55,7 @@ type DomainDelete struct {
 
 func (*DomainList) Execute(_ []string) error {
 	resp, err := AndromedaClient.Domains.GetDomains(nil)
+
 	if err != nil {
 		return err
 	}

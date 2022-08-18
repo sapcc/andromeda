@@ -41,12 +41,18 @@ type Domain struct {
 	// aliases
 	Aliases []string `json:"aliases"`
 
+	// If not empty, the backend created a CNAME target to be used for the FQDN.
+	// Example: example.org.production.gtm.com
+	// Read Only: true
+	// Format: hostname
+	CnameTarget *strfmt.Hostname `json:"cname_target,omitempty"`
+
 	// The UTC date and timestamp when the resource was created.
 	// Example: 2020-05-11T17:21:34
 	// Read Only: true
 	CreatedAt string `json:"created_at,omitempty"`
 
-	// Fully-Qualified Host Name.
+	// Desired Fully-Qualified Host Name.
 	// Example: example.org
 	// Required: true
 	// Max Length: 512
@@ -103,6 +109,10 @@ type Domain struct {
 func (m *Domain) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateCnameTarget(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateFqdn(formats); err != nil {
 		res = append(res, err)
 	}
@@ -142,6 +152,18 @@ func (m *Domain) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *Domain) validateCnameTarget(formats strfmt.Registry) error {
+	if swag.IsZero(m.CnameTarget) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("cname_target", "body", "hostname", m.CnameTarget.String(), formats); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -435,6 +457,10 @@ func (m *Domain) validateStatus(formats strfmt.Registry) error {
 func (m *Domain) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.contextValidateCnameTarget(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateCreatedAt(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -458,6 +484,15 @@ func (m *Domain) ContextValidate(ctx context.Context, formats strfmt.Registry) e
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *Domain) contextValidateCnameTarget(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := validate.ReadOnly(ctx, "cname_target", "body", m.CnameTarget); err != nil {
+		return err
+	}
+
 	return nil
 }
 

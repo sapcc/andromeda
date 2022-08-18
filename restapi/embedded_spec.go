@@ -1613,6 +1613,14 @@ func init() {
             "example": "alias.example.com"
           }
         },
+        "cname_target": {
+          "description": "If not empty, the backend created a CNAME target to be used for the FQDN.",
+          "type": "string",
+          "format": "hostname",
+          "x-nullable": true,
+          "readOnly": true,
+          "example": "example.org.production.gtm.com"
+        },
         "created_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
@@ -1621,7 +1629,7 @@ func init() {
           "example": "2020-05-11T17:21:34"
         },
         "fqdn": {
-          "description": "Fully-Qualified Host Name.",
+          "description": "Desired Fully-Qualified Host Name.",
           "type": "string",
           "format": "hostname",
           "maxLength": 512,
@@ -3849,6 +3857,14 @@ func init() {
             "example": "alias.example.com"
           }
         },
+        "cname_target": {
+          "description": "If not empty, the backend created a CNAME target to be used for the FQDN.",
+          "type": "string",
+          "format": "hostname",
+          "x-nullable": true,
+          "readOnly": true,
+          "example": "example.org.production.gtm.com"
+        },
         "created_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
@@ -3857,7 +3873,7 @@ func init() {
           "example": "2020-05-11T17:21:34"
         },
         "fqdn": {
-          "description": "Fully-Qualified Host Name.",
+          "description": "Desired Fully-Qualified Host Name.",
           "type": "string",
           "format": "hostname",
           "maxLength": 512,

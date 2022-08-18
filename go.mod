@@ -10,7 +10,7 @@ require (
 	github.com/Boostport/migration v1.0.1
 	github.com/Boostport/migration/driver/mysql v1.0.0
 	github.com/Boostport/migration/driver/postgres v1.0.0
-	github.com/akamai/AkamaiOPEN-edgegrid-golang v1.1.1
+	github.com/akamai/AkamaiOPEN-edgegrid-golang/v2 v2.14.1
 	github.com/asim/go-micro/plugins/broker/nats/v4 v4.0.0-20220510055908-de0b456b462a
 	github.com/asim/go-micro/plugins/registry/nats/v4 v4.0.0-20220510055908-de0b456b462a
 	github.com/asim/go-micro/plugins/transport/nats/v4 v4.0.0-20220510055908-de0b456b462a
@@ -57,6 +57,7 @@ require (
 	github.com/ProtonMail/go-crypto v0.0.0-20220407094043-a94812496cf5 // indirect
 	github.com/acomagu/bufpipe v1.0.3 // indirect
 	github.com/alexkohler/prealloc v1.0.0 // indirect
+	github.com/apex/log v1.9.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/ashanbrown/forbidigo v1.3.0 // indirect
 	github.com/ashanbrown/makezero v1.1.1 // indirect
@@ -173,12 +174,10 @@ require (
 	github.com/mbilski/exhaustivestruct v1.2.0 // indirect
 	github.com/mgechev/revive v1.2.1 // indirect
 	github.com/miekg/dns v1.1.48 // indirect
-	github.com/minio/highwayhash v1.0.2 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/moricho/tparallel v0.2.1 // indirect
 	github.com/nakabonne/nestif v0.3.1 // indirect
-	github.com/nats-io/jwt/v2 v2.2.1-0.20220113022732-58e87895b296 // indirect
 	github.com/nats-io/nats-server/v2 v2.7.4 // indirect
 	github.com/nats-io/nats.go v1.13.1-0.20220308171302-2f2f6968e98d // indirect
 	github.com/nats-io/nkeys v0.3.0 // indirect

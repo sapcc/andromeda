@@ -20,9 +20,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/configgtm-v1_4"
+	gtm "github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/configgtm"
 	"go-micro.dev/v4/logger"
 
+	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/models"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 )
@@ -46,19 +47,20 @@ func (s *AkamaiAgent) GetDatacenter(datacenterID string) (*models.Datacenter, er
 	return res[0], nil
 }
 
-func (s *AkamaiAgent) SyncDatacenter(domain *models.Domain, datacenter *models.Datacenter) (*configgtm.Datacenter, error) {
+func (s *AkamaiAgent) SyncDatacenter(datacenter *models.Datacenter) (*gtm.Datacenter, error) {
 	logger.Debugf("SyncDatacenter('%s')", datacenter.Id)
 
-	akamaiDatacenter := configgtm.NewDatacenter()
-	akamaiDatacenter.City = datacenter.GetCity()
-	akamaiDatacenter.Continent = datacenter.GetContinent()
-	akamaiDatacenter.Country = datacenter.GetCountry()
-	akamaiDatacenter.StateOrProvince = datacenter.GetStateOrProvince()
-	akamaiDatacenter.Latitude = float64(datacenter.GetLatitude())
-	akamaiDatacenter.Longitude = float64(datacenter.GetLongitude())
-	akamaiDatacenter.Nickname = datacenter.Id
+	akamaiDatacenter := gtm.Datacenter{
+		City:            datacenter.GetCity(),
+		Continent:       datacenter.GetContinent(),
+		Country:         datacenter.GetCountry(),
+		StateOrProvince: datacenter.GetStateOrProvince(),
+		Latitude:        float64(datacenter.GetLatitude()),
+		Longitude:       float64(datacenter.GetLongitude()),
+		Nickname:        datacenter.Id,
+	}
 
-	res, err := akamaiDatacenter.Create(domain.GetFqdn())
+	res, err := s.gtm.CreateDatacenter(context.Background(), &akamaiDatacenter, config.Global.AkamaiConfig.Domain)
 	if err != nil {
 		return nil, err
 	}
