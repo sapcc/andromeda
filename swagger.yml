@@ -1234,14 +1234,14 @@ definitions:
         example: 52.526055
         x-omitempty: false
         x-nullable: true
-        default: .0
+        default: 52.52
       longitude:
         type: number
         format: float
         example: 13.403454
         x-omitempty: false
         x-nullable: true
-        default: .0
+        default: 13.40
   member:
     type: object
     required:

@@ -25,7 +25,6 @@ import (
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/configgtm"
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/edgegrid"
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/session"
-
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/logger"
 	"go-micro.dev/v4/metadata"
@@ -103,7 +102,7 @@ func ExecuteAkamaiAgent() error {
 	meta := map[string]string{
 		"type":    "Akamai",
 		"host":    edgerc.Host,
-		"version": "1.4",
+		"version": "2.0",
 	}
 	service := micro.NewService(
 		micro.Name("andromeda.agent.akamai"),
@@ -150,7 +149,7 @@ func (s *AkamaiAgent) fullSync() error {
 			PageNumber:     pageNumber,
 			ResultPerPage:  100,
 			FullyPopulated: true,
-			Pending:        false,
+			Pending:        true,
 		})
 		if err != nil {
 			return err
