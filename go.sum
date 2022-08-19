@@ -1520,6 +1520,8 @@ github.com/xeipuuv/gojsonschema v1.2.0/go.mod h1:anYRn/JVcOK2ZgGU+IjEV4nwlhoK5sQ
 github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2/go.mod h1:UETIi67q53MR2AWcXfiuqkDkRtnGDLqkBTpCHuJHxtU=
 github.com/xo/dburl v0.9.1 h1:y771capKup7TLEQBbc1NzY+NkHRD5DdHITeswr79JpM=
 github.com/xo/dburl v0.9.1/go.mod h1:7Uupe87dIDxNrbKFRrpw6bAf2l3/rqU42iwlpq1nyjY=
+github.com/xo/dburl v0.11.0 h1:AVtiIKI5VpKdfuEBvTEMsLoY3MW6+uHTm5Eeuvt6Olo=
+github.com/xo/dburl v0.11.0/go.mod h1:3i+BAX1bQngTMtk8dtGUTTUviVymLIViDtYHDP5NTMU=
 github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778/go.mod h1:2MuV+tbUrU1zIOPMxZ5EncGwgmMJsa+9ucAQZXxsObs=
 github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77/go.mod h1:aYKd//L2LvnjZzWKhF00oedf4jCCReLcmhLdhm1A27Q=
 github.com/yagipy/maintidx v1.0.0 h1:h5NvIsCz+nRDapQ0exNv4aJ0yXSI0420omVANTv3GJM=

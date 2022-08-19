@@ -38,7 +38,7 @@ require (
 	github.com/sapcc/go-bits v0.0.0-20220819141629-31b96bd61763
 	github.com/scottdware/go-bigip v0.0.0-20210208194607-e46d557fd6e6
 	github.com/stretchr/testify v1.7.1
-	github.com/xo/dburl v0.9.1
+	github.com/xo/dburl v0.11.0
 	go-micro.dev/v4 v4.6.0
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4
 	google.golang.org/protobuf v1.28.1
