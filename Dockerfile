@@ -6,7 +6,7 @@ RUN make -C /src/github.com/sapcc/andromeda && mkdir -p /pkg/bin && cp /src/gith
 
 ################################################################################
 
-FROM alpine:3.15
+FROM alpine:3.16
 LABEL source_repository="https://github.com/sapcc/andromeda"
 
 RUN apk add --no-cache ca-certificates
