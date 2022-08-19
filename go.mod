@@ -25,7 +25,7 @@ require (
 	github.com/go-openapi/swag v0.21.1
 	github.com/go-openapi/validate v0.21.0
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/gophercloud/gophercloud v0.24.0
+	github.com/gophercloud/gophercloud v0.25.0
 	github.com/gophercloud/utils v0.0.0-20220307143606-8e7800759d16
 	github.com/iancoleman/strcase v0.2.0
 	github.com/jackc/pgconn v1.12.1
@@ -35,13 +35,13 @@ require (
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/rs/cors v1.8.2
-	github.com/sapcc/go-bits v0.0.0-20220506231902-df94414a6255
+	github.com/sapcc/go-bits v0.0.0-20220819141629-31b96bd61763
 	github.com/scottdware/go-bigip v0.0.0-20210208194607-e46d557fd6e6
 	github.com/stretchr/testify v1.7.1
 	github.com/xo/dburl v0.9.1
 	go-micro.dev/v4 v4.6.0
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4
-	google.golang.org/protobuf v1.28.0
+	google.golang.org/protobuf v1.28.1
 )
 
 require (
@@ -157,7 +157,7 @@ require (
 	github.com/ldez/gomoddirectives v0.2.3 // indirect
 	github.com/ldez/tagliatelle v0.3.1 // indirect
 	github.com/leonklingele/grouper v1.1.0 // indirect
-	github.com/lib/pq v1.10.5 // indirect
+	github.com/lib/pq v1.10.6 // indirect
 	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
 	github.com/lufeee/execinquery v1.0.0 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
@@ -197,10 +197,10 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/polyfloyd/go-errorlint v0.0.0-20220405202032-75552f8aa5ed // indirect
-	github.com/prometheus/client_golang v1.12.1 // indirect
+	github.com/prometheus/client_golang v1.13.0 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
-	github.com/prometheus/common v0.34.0 // indirect
-	github.com/prometheus/procfs v0.7.3 // indirect
+	github.com/prometheus/common v0.37.0 // indirect
+	github.com/prometheus/procfs v0.8.0 // indirect
 	github.com/quasilyte/go-ruleguard v0.3.16-0.20220213074421-6aa060fab41a // indirect
 	github.com/quasilyte/gogrep v0.0.0-20220429205452-5e2753ee08f9 // indirect
 	github.com/quasilyte/regex/syntax v0.0.0-20210819130434-b3f0c404a727 // indirect
@@ -249,8 +249,8 @@ require (
 	golang.org/x/crypto v0.0.0-20220507011949-2cf3adece122 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20220428152302-39d4317da171 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
-	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20220503163025-988cb79eb6c6 // indirect
+	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
+	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
 	golang.org/x/term v0.0.0-20220411215600-e5f449aeb171 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220411224347-583f2d630306 // indirect
