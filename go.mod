@@ -14,7 +14,7 @@ require (
 	github.com/asim/go-micro/plugins/broker/nats/v4 v4.0.0-20220510055908-de0b456b462a
 	github.com/asim/go-micro/plugins/registry/nats/v4 v4.0.0-20220510055908-de0b456b462a
 	github.com/asim/go-micro/plugins/transport/nats/v4 v4.0.0-20220510055908-de0b456b462a
-	github.com/cockroachdb/cockroach-go/v2 v2.2.8
+	github.com/cockroachdb/cockroach-go/v2 v2.2.15
 	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/dre1080/recovr v1.0.3
 	github.com/go-openapi/errors v0.20.2
@@ -246,7 +246,7 @@ require (
 	github.com/ztrue/tracerr v0.3.0 // indirect
 	gitlab.com/bosi/decorder v0.2.1 // indirect
 	go.mongodb.org/mongo-driver v1.9.1 // indirect
-	golang.org/x/crypto v0.0.0-20220507011949-2cf3adece122 // indirect
+	golang.org/x/crypto v0.0.0-20220517005047-85d78b3ac167 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20220428152302-39d4317da171 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
