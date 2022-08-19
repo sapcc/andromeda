@@ -37,7 +37,7 @@ require (
 	github.com/rs/cors v1.8.2
 	github.com/sapcc/go-bits v0.0.0-20220819141629-31b96bd61763
 	github.com/scottdware/go-bigip v0.0.0-20220517145708-9fe3e2f9f005
-	github.com/stretchr/testify v1.7.1
+	github.com/stretchr/testify v1.8.0
 	github.com/xo/dburl v0.11.0
 	go-micro.dev/v4 v4.6.0
 	golang.org/x/net v0.0.0-20220812174116-3211cb980234
@@ -260,7 +260,7 @@ require (
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 	honnef.co/go/tools v0.3.1 // indirect
 	mvdan.cc/gofumpt v0.3.1 // indirect
 	mvdan.cc/interfacer v0.0.0-20180901003855-c20040233aed // indirect
