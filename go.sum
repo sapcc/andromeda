@@ -89,6 +89,8 @@ github.com/Azure/go-autorest/tracing v0.5.0/go.mod h1:r/s2XiOKccPW3HrqB+W0TQzfbt
 github.com/Boostport/migration v1.0.0/go.mod h1:+z4e30Jdvz+WpgOuZDAtI0pfxDeP98jBfviR14kQ2RY=
 github.com/Boostport/migration v1.0.1 h1:7fvfxPc01lbYg/nfNg/9WaUgOxmxcW14PE4SKILRbFg=
 github.com/Boostport/migration v1.0.1/go.mod h1:+z4e30Jdvz+WpgOuZDAtI0pfxDeP98jBfviR14kQ2RY=
+github.com/Boostport/migration v1.1.1 h1:YVvDnBmhCQwCv+K2nATRfB2W1DQYrCIr/NUpMaAhODI=
+github.com/Boostport/migration v1.1.1/go.mod h1:YxtlQVL8Dn4aB5FMRJlWvanL3vtST1/vTqF92PopSlc=
 github.com/Boostport/migration/driver/mysql v1.0.0 h1:+nvCnuGibL96V+tz5leKSyzSAPD3Oync728COR7QN3A=
 github.com/Boostport/migration/driver/mysql v1.0.0/go.mod h1:XA1KEl7SUjnsTACVaIY1uWCV6GojhMw6r0B7rK3QC4o=
 github.com/Boostport/migration/driver/postgres v1.0.0 h1:1dXoiYe9ZXbn9+NqgxaYOP3drdlB8m2+1NV0jeYgt+4=

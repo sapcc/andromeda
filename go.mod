@@ -7,7 +7,7 @@ replace github.com/micro/protoc-gen-micro => go-micro.dev/v4/cmd/protoc-gen-micr
 replace github.com/micro/go-micro => go-micro.dev/v4 v4.8.1
 
 require (
-	github.com/Boostport/migration v1.0.1
+	github.com/Boostport/migration v1.1.1
 	github.com/Boostport/migration/driver/mysql v1.0.0
 	github.com/Boostport/migration/driver/postgres v1.0.0
 	github.com/akamai/AkamaiOPEN-edgegrid-golang/v2 v2.14.1
