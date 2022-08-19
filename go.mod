@@ -17,13 +17,13 @@ require (
 	github.com/cockroachdb/cockroach-go/v2 v2.2.15
 	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/dre1080/recovr v1.0.3
-	github.com/go-openapi/errors v0.20.2
-	github.com/go-openapi/loads v0.21.1
+	github.com/go-openapi/errors v0.20.3
+	github.com/go-openapi/loads v0.21.2
 	github.com/go-openapi/runtime v0.24.1
-	github.com/go-openapi/spec v0.20.6
-	github.com/go-openapi/strfmt v0.21.2
-	github.com/go-openapi/swag v0.21.1
-	github.com/go-openapi/validate v0.21.0
+	github.com/go-openapi/spec v0.20.7
+	github.com/go-openapi/strfmt v0.21.3
+	github.com/go-openapi/swag v0.22.3
+	github.com/go-openapi/validate v0.22.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gophercloud/gophercloud v0.25.0
 	github.com/gophercloud/utils v0.0.0-20220704184730-55bdbbaec4ba
@@ -37,7 +37,7 @@ require (
 	github.com/rs/cors v1.8.2
 	github.com/sapcc/go-bits v0.0.0-20220819141629-31b96bd61763
 	github.com/scottdware/go-bigip v0.0.0-20220517145708-9fe3e2f9f005
-	github.com/stretchr/testify v1.7.1
+	github.com/stretchr/testify v1.8.0
 	github.com/xo/dburl v0.11.0
 	go-micro.dev/v4 v4.6.0
 	golang.org/x/net v0.0.0-20220812174116-3211cb980234
@@ -91,7 +91,7 @@ require (
 	github.com/go-git/gcfg v1.5.0 // indirect
 	github.com/go-git/go-billy/v5 v5.3.1 // indirect
 	github.com/go-git/go-git/v5 v5.4.2 // indirect
-	github.com/go-openapi/analysis v0.21.3 // indirect
+	github.com/go-openapi/analysis v0.21.4 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/jsonreference v0.20.0 // indirect
 	github.com/go-stack/stack v1.8.1 // indirect
@@ -245,8 +245,8 @@ require (
 	github.com/yeya24/promlinter v0.2.0 // indirect
 	github.com/ztrue/tracerr v0.3.0 // indirect
 	gitlab.com/bosi/decorder v0.2.1 // indirect
-	go.mongodb.org/mongo-driver v1.9.1 // indirect
-	golang.org/x/crypto v0.0.0-20220517005047-85d78b3ac167 // indirect
+	go.mongodb.org/mongo-driver v1.10.0 // indirect
+	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d // indirect
 	golang.org/x/exp/typeparams v0.0.0-20220428152302-39d4317da171 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
@@ -260,7 +260,7 @@ require (
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 	honnef.co/go/tools v0.3.1 // indirect
 	mvdan.cc/gofumpt v0.3.1 // indirect
 	mvdan.cc/interfacer v0.0.0-20180901003855-c20040233aed // indirect
