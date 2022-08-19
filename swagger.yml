@@ -1206,37 +1206,42 @@ definitions:
         example: EU
         x-omitempty: false
         x-nullable: true
+        default: ""
       country:
         type: string
         maxLength: 255
         example: DE
         x-omitempty: false
         x-nullable: true
+        default: ""
       city:
         type: string
         maxLength: 255
         example: Berlin
         x-omitempty: false
         x-nullable: true
+        default: ""
       state_or_province:
         type: string
         maxLength: 255
         example: Berlin
         x-omitempty: false
         x-nullable: true
+        default: ""
       latitude:
         type: number
         format: float
         example: 52.526055
         x-omitempty: false
         x-nullable: true
+        default: .0
       longitude:
         type: number
         format: float
         example: 13.403454
         x-omitempty: false
         x-nullable: true
-
+        default: .0
   member:
     type: object
     required:
