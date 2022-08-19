@@ -144,7 +144,7 @@ func ExecuteAkamaiAgent() error {
 
 func (s *AkamaiAgent) fullSync() error {
 	var pageNumber int32 = 0
-	for true {
+	for {
 		response, err := s.rpc.GetDomains(context.Background(), &server.SearchRequest{
 			Provider:       "akamai",
 			PageNumber:     pageNumber,

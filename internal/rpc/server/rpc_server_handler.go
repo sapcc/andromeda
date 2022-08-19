@@ -258,7 +258,7 @@ func (u *RPCHandler) GetDomains(ctx context.Context, request *SearchRequest, res
 				Provider:      request.Provider,
 			}
 			r := DatacentersResponse{}
-			if err := u.GetDatacenters(nil, &s, &r); err != nil {
+			if err := u.GetDatacenters(ctx, &s, &r); err != nil {
 				return err
 			}
 			domain.Datacenters = r.Response

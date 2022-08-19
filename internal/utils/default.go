@@ -71,7 +71,7 @@ func SetModelDefaults(s interface{}) error {
 						vp.Elem().Set(reflect.ValueOf(&val))
 					case float64:
 						val := property.Default.(float64)
-						_tmp := int64(val)
+						_tmp := float32(val)
 						vp.Elem().Set(reflect.ValueOf(&_tmp))
 					default:
 						return fmt.Errorf("unexpected type %T for property %s", property.Default, propName)

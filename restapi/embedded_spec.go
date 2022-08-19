@@ -1489,6 +1489,7 @@ func init() {
         },
         "city": {
           "type": "string",
+          "default": "",
           "maxLength": 255,
           "x-nullable": true,
           "x-omitempty": false,
@@ -1496,6 +1497,7 @@ func init() {
         },
         "continent": {
           "type": "string",
+          "default": "",
           "maxLength": 255,
           "x-nullable": true,
           "x-omitempty": false,
@@ -1503,6 +1505,7 @@ func init() {
         },
         "country": {
           "type": "string",
+          "default": "",
           "maxLength": 255,
           "x-nullable": true,
           "x-omitempty": false,
@@ -1524,6 +1527,7 @@ func init() {
         "latitude": {
           "type": "number",
           "format": "float",
+          "default": 0,
           "x-nullable": true,
           "x-omitempty": false,
           "example": 52.526055
@@ -1531,6 +1535,7 @@ func init() {
         "longitude": {
           "type": "number",
           "format": "float",
+          "default": 0,
           "x-nullable": true,
           "x-omitempty": false,
           "example": 13.403454
@@ -1579,6 +1584,7 @@ func init() {
         },
         "state_or_province": {
           "type": "string",
+          "default": "",
           "maxLength": 255,
           "x-nullable": true,
           "x-omitempty": false,
@@ -3733,6 +3739,7 @@ func init() {
         },
         "city": {
           "type": "string",
+          "default": "",
           "maxLength": 255,
           "x-nullable": true,
           "x-omitempty": false,
@@ -3740,6 +3747,7 @@ func init() {
         },
         "continent": {
           "type": "string",
+          "default": "",
           "maxLength": 255,
           "x-nullable": true,
           "x-omitempty": false,
@@ -3747,6 +3755,7 @@ func init() {
         },
         "country": {
           "type": "string",
+          "default": "",
           "maxLength": 255,
           "x-nullable": true,
           "x-omitempty": false,
@@ -3768,6 +3777,7 @@ func init() {
         "latitude": {
           "type": "number",
           "format": "float",
+          "default": 0,
           "x-nullable": true,
           "x-omitempty": false,
           "example": 52.526055
@@ -3775,6 +3785,7 @@ func init() {
         "longitude": {
           "type": "number",
           "format": "float",
+          "default": 0,
           "x-nullable": true,
           "x-omitempty": false,
           "example": 13.403454
@@ -3823,6 +3834,7 @@ func init() {
         },
         "state_or_province": {
           "type": "string",
+          "default": "",
           "maxLength": 255,
           "x-nullable": true,
           "x-omitempty": false,
