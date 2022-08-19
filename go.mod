@@ -4,19 +4,19 @@ go 1.17
 
 replace github.com/micro/protoc-gen-micro => go-micro.dev/v4/cmd/protoc-gen-micro/v4 v4.8.1
 
-replace github.com/micro/go-micro => go-micro.dev/v4 v4.6.0
+replace github.com/micro/go-micro => go-micro.dev/v4 v4.8.1
 
 require (
 	github.com/Boostport/migration v1.0.1
 	github.com/Boostport/migration/driver/mysql v1.0.0
 	github.com/Boostport/migration/driver/postgres v1.0.0
 	github.com/akamai/AkamaiOPEN-edgegrid-golang/v2 v2.14.1
-	github.com/asim/go-micro/plugins/broker/nats/v4 v4.0.0-20220510055908-de0b456b462a
-	github.com/asim/go-micro/plugins/registry/nats/v4 v4.0.0-20220510055908-de0b456b462a
-	github.com/asim/go-micro/plugins/transport/nats/v4 v4.0.0-20220510055908-de0b456b462a
 	github.com/cockroachdb/cockroach-go/v2 v2.2.15
 	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/dre1080/recovr v1.0.3
+	github.com/go-micro/plugins/v4/broker/nats v1.1.0
+	github.com/go-micro/plugins/v4/registry/nats v1.1.0
+	github.com/go-micro/plugins/v4/transport/nats v1.1.0
 	github.com/go-openapi/errors v0.20.3
 	github.com/go-openapi/loads v0.21.2
 	github.com/go-openapi/runtime v0.24.1
@@ -39,7 +39,7 @@ require (
 	github.com/scottdware/go-bigip v0.0.0-20220517145708-9fe3e2f9f005
 	github.com/stretchr/testify v1.8.0
 	github.com/xo/dburl v0.11.0
-	go-micro.dev/v4 v4.6.0
+	go-micro.dev/v4 v4.8.1
 	golang.org/x/net v0.0.0-20220812174116-3211cb980234
 	google.golang.org/protobuf v1.28.1
 )
@@ -82,11 +82,14 @@ require (
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/esimonov/ifshort v1.0.4 // indirect
 	github.com/ettle/strcase v0.1.1 // indirect
+	github.com/evanphx/json-patch/v5 v5.5.0 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/fatih/structtag v1.2.0 // indirect
+	github.com/felixge/httpsnoop v1.0.1 // indirect
 	github.com/firefart/nonamedreturns v1.0.1 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/fzipp/gocyclo v0.5.1 // indirect
+	github.com/go-acme/lego/v4 v4.4.0 // indirect
 	github.com/go-critic/go-critic v0.6.3 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
 	github.com/go-git/go-billy/v5 v5.3.1 // indirect
@@ -94,7 +97,6 @@ require (
 	github.com/go-openapi/analysis v0.21.4 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/jsonreference v0.20.0 // indirect
-	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/go-toolsmith/astcast v1.0.0 // indirect
 	github.com/go-toolsmith/astcopy v1.0.1 // indirect
 	github.com/go-toolsmith/astequal v1.0.2 // indirect
@@ -107,6 +109,9 @@ require (
 	github.com/gobuffalo/packd v1.0.1 // indirect
 	github.com/gobuffalo/packr/v2 v2.8.3 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
+	github.com/gobwas/httphead v0.1.0 // indirect
+	github.com/gobwas/pool v0.2.1 // indirect
+	github.com/gobwas/ws v1.0.4 // indirect
 	github.com/gofrs/flock v0.8.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golangci/check v0.0.0-20180506172741-cfe4005ccda2 // indirect
@@ -122,6 +127,7 @@ require (
 	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gordonklaus/ineffassign v0.0.0-20210914165742-4cc7213b9bc8 // indirect
+	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/gostaticanalysis/analysisutil v0.7.1 // indirect
 	github.com/gostaticanalysis/comment v1.4.2 // indirect
 	github.com/gostaticanalysis/forcetypeassert v0.1.0 // indirect
