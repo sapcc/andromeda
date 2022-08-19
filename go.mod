@@ -4,7 +4,7 @@ go 1.17
 
 replace github.com/micro/protoc-gen-micro => go-micro.dev/v4/cmd/protoc-gen-micro/v4 v4.8.1
 
-replace github.com/micro/go-micro => go-micro.dev/v4 v4.6.0
+replace github.com/micro/go-micro => go-micro.dev/v4 v4.8.1
 
 require (
 	github.com/Boostport/migration v1.0.1
@@ -39,7 +39,7 @@ require (
 	github.com/scottdware/go-bigip v0.0.0-20220517145708-9fe3e2f9f005
 	github.com/stretchr/testify v1.8.0
 	github.com/xo/dburl v0.11.0
-	go-micro.dev/v4 v4.6.0
+	go-micro.dev/v4 v4.8.1
 	golang.org/x/net v0.0.0-20220812174116-3211cb980234
 	google.golang.org/protobuf v1.28.1
 )
