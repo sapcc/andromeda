@@ -1242,6 +1242,10 @@ definitions:
         x-omitempty: false
         x-nullable: true
         default: 13.40
+      meta:
+        type: integer
+        readOnly: true
+
   member:
     type: object
     required:
