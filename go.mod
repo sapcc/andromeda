@@ -10,7 +10,7 @@ require (
 	github.com/Boostport/migration v1.1.1
 	github.com/Boostport/migration/driver/mysql v1.1.1
 	github.com/Boostport/migration/driver/postgres v1.1.1
-	github.com/akamai/AkamaiOPEN-edgegrid-golang/v2 v2.14.1
+	github.com/akamai/AkamaiOPEN-edgegrid-golang/v2 v2.15.0
 	github.com/cockroachdb/cockroach-go/v2 v2.2.15
 	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/dre1080/recovr v1.0.3
