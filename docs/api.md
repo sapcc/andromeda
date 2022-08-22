@@ -2300,6 +2300,7 @@ Unexpected Error
 | id | uuid (formatted string)| `strfmt.UUID` |  | | The id of the resource. |  |
 | latitude | float (formatted number)| `float32` |  | `52.52`|  | `52.526055` |
 | longitude | float (formatted number)| `float32` |  | `13.4`|  | `13.403454` |
+| meta | integer| `int64` |  | |  |  |
 | name | string| `string` |  | | Human-readable name of the resource. |  |
 | project_id | string| `string` |  | | The ID of the project owning this resource. | `fa84c217f361441986a220edf9b1e337` |
 | provider | string| `string` |  | | Provider driver for the backend solution | `akamai` |
