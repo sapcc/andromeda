@@ -68,7 +68,8 @@ CREATE TABLE datacenter
     longitude           FLOAT        NOT NULL   DEFAULT 13.40,
     scope               VARCHAR(8)   NOT NULL   DEFAULT 'private' CHECK ( scope IN ('private', 'public')),
     project_id          VARCHAR(36)  NOT NULL,
-    provider            VARCHAR(64)  NOT NULL
+    provider            VARCHAR(64)  NOT NULL,
+    meta                INT          NOT NULL
 ) ENGINE = InnoDB;
 
 CREATE TABLE member

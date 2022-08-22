@@ -32,6 +32,8 @@ message Datacenter {
   float latitude = 8;
   string provisioning_status = 9;
   string scope = 10;
+  string provider = 11;
+  int32 meta = 12;
 }
 
 message Member {

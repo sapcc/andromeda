@@ -70,6 +70,10 @@ type Datacenter struct {
 	// Example: 13.403454
 	Longitude *float32 `json:"longitude"`
 
+	// meta
+	// Read Only: true
+	Meta *int64 `json:"meta,omitempty"`
+
 	// Human-readable name of the resource.
 	// Max Length: 255
 	Name *string `json:"name,omitempty"`
@@ -384,6 +388,10 @@ func (m *Datacenter) ContextValidate(ctx context.Context, formats strfmt.Registr
 		res = append(res, err)
 	}
 
+	if err := m.contextValidateMeta(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.contextValidateProvisioningStatus(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -410,6 +418,15 @@ func (m *Datacenter) contextValidateCreatedAt(ctx context.Context, formats strfm
 func (m *Datacenter) contextValidateID(ctx context.Context, formats strfmt.Registry) error {
 
 	if err := validate.ReadOnly(ctx, "id", "body", strfmt.UUID(m.ID)); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Datacenter) contextValidateMeta(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := validate.ReadOnly(ctx, "meta", "body", m.Meta); err != nil {
 		return err
 	}
 

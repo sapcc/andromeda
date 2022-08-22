@@ -65,7 +65,9 @@ CREATE TABLE datacenter
     latitude            FLOAT        NOT NULL DEFAULT 52.52,
     longitude           FLOAT        NOT NULL DEFAULT 13.40,
     scope               VARCHAR(8)   NOT NULL DEFAULT 'private' CHECK ( scope IN ('private', 'public')),
-    project_id          VARCHAR(36)  NOT NULL
+    project_id          VARCHAR(36)  NOT NULL,
+    provider            VARCHAR(64)  NOT NULL,
+    meta                INTEGER      NOT NULL
 );
 
 CREATE TABLE member
@@ -100,7 +102,6 @@ CREATE TABLE monitor
     timeout             BIGINT       NULL,
     type                VARCHAR(16)  NULL,
     project_id          VARCHAR(36)  NOT NULL
-
 );
 
 CREATE TABLE quota

@@ -1527,7 +1527,7 @@ func init() {
         "latitude": {
           "type": "number",
           "format": "float",
-          "default": 0,
+          "default": 52.52,
           "x-nullable": true,
           "x-omitempty": false,
           "example": 52.526055
@@ -1535,10 +1535,16 @@ func init() {
         "longitude": {
           "type": "number",
           "format": "float",
-          "default": 0,
+          "default": 13.4,
           "x-nullable": true,
           "x-omitempty": false,
           "example": 13.403454
+        },
+        "meta": {
+          "type": "integer",
+          "format": "int64",
+          "x-nullable": true,
+          "readOnly": true
         },
         "name": {
           "description": "Human-readable name of the resource.",
@@ -3777,7 +3783,7 @@ func init() {
         "latitude": {
           "type": "number",
           "format": "float",
-          "default": 0,
+          "default": 52.52,
           "x-nullable": true,
           "x-omitempty": false,
           "example": 52.526055
@@ -3785,10 +3791,16 @@ func init() {
         "longitude": {
           "type": "number",
           "format": "float",
-          "default": 0,
+          "default": 13.4,
           "x-nullable": true,
           "x-omitempty": false,
           "example": 13.403454
+        },
+        "meta": {
+          "type": "integer",
+          "format": "int64",
+          "x-nullable": true,
+          "readOnly": true
         },
         "name": {
           "description": "Human-readable name of the resource.",

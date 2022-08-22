@@ -25,6 +25,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"go-micro.dev/v4/logger"
 
+	"github.com/sapcc/andromeda/db"
 	"github.com/sapcc/andromeda/internal/models"
 	"github.com/sapcc/andromeda/internal/utils"
 )
@@ -101,7 +102,8 @@ func (u *RPCHandler) GetPools(ctx context.Context, request *SearchRequest, respo
 }
 
 func (u *RPCHandler) GetDatacenters(ctx context.Context, request *SearchRequest, response *DatacentersResponse) error {
-	sql := `SELECT id, admin_state_up, city, state_or_province, continent, country, latitude, longitude, scope, provisioning_status 
+	sql := `SELECT id, admin_state_up, city, state_or_province, continent, country, 
+            latitude, longitude, scope, provisioning_status, provider, meta
 			FROM datacenter`
 	rows, err := u.QueryxWithIds(sql, request)
 	if err != nil {
@@ -120,6 +122,26 @@ func (u *RPCHandler) GetDatacenters(ctx context.Context, request *SearchRequest,
 
 func (u *RPCHandler) GetMonitors(ctx context.Context, request *SearchRequest, response *MonitorsResponse) error {
 	panic("Todo")
+}
+
+func (u *RPCHandler) UpdateDatacenterMeta(ctx context.Context, req *DatacenterMetaRequest, res *models.Datacenter) error {
+	if err := db.TxExecute(u.DB, func(tx *sqlx.Tx) error {
+		sql := `UPDATE datacenter SET meta = ? WHERE id = ?`
+		if _, err := tx.Exec(sql, req.GetMeta(), req.GetId()); err != nil {
+			return err
+		}
+
+		sql = `SELECT id, admin_state_up, city, state_or_province, continent, country, 
+               latitude, longitude, scope, provisioning_status, provider, meta FROM datacenter WHERE id = ?`
+		if err := tx.Get(res, sql, req.GetId()); err != nil {
+			return err
+		}
+
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func populatePools(u *RPCHandler, fullyPopulated bool, domainID string) ([]*models.Pool, error) {

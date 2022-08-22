@@ -18,6 +18,7 @@ package akamai
 
 import (
 	"context"
+	"go-micro.dev/v4/logger"
 
 	gtm "github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/configgtm"
 
@@ -39,12 +40,6 @@ func (s *AkamaiAgent) SyncProperty(domain *models.Domain) error {
 		}
 	}
 
-	var datacenters []*gtm.Datacenter
-	datacenters, err := s.gtm.ListDatacenters(context.Background(), config.Global.AkamaiConfig.Domain)
-	if err != nil {
-		return err
-	}
-
 	// Create property
 	property := gtm.Property{
 		Name:                 domain.GetFqdn(),
@@ -64,30 +59,26 @@ func (s *AkamaiAgent) SyncProperty(domain *models.Domain) error {
 			Servers: []string{utils.InetNtoa(member.Address).String()},
 			Weight:  50,
 		}
-		datacenterID := member.GetDatacenter()
+		datacenterUUID := member.GetDatacenter()
 
-		if len(datacenterID) > 0 {
-			found := false
-			for _, datacenter := range datacenters {
-				if datacenter.Nickname == datacenterID {
-					trafficTarget.DatacenterId = datacenter.DatacenterId
-					found = true
+		if len(datacenterUUID) > 0 {
+			var aDatacenter *models.Datacenter
+			for _, datacenter := range domain.Datacenters {
+				if datacenter.GetId() == datacenterUUID {
+					aDatacenter = datacenter
+					break
 				}
 			}
 
-			if !found {
-				// Create Datacenter
-				aDatacenter, err := s.GetDatacenter(datacenterID)
-				if err != nil {
-					return err
-				}
-				datacenter, err := s.SyncDatacenter(aDatacenter)
-				if err != nil {
-					return err
-				}
-				trafficTarget.DatacenterId = datacenter.DatacenterId
-				datacenters = append(datacenters, datacenter)
+			// Sync datacenter first
+			var err error
+			aDatacenter, err = s.SyncDatacenter(aDatacenter, false)
+			if err != nil {
+				return err
 			}
+
+			// DatacenterId is a unique number for an akamai datacenter
+			trafficTarget.DatacenterId = int(aDatacenter.GetMeta())
 		}
 		property.TrafficTargets = append(property.TrafficTargets, &trafficTarget)
 	}
@@ -116,8 +107,34 @@ func (s *AkamaiAgent) SyncProperty(domain *models.Domain) error {
 		property.LivenessTests = append(property.LivenessTests, &livenessTest)
 	}
 
-	if _, err := s.gtm.UpdateProperty(context.Background(), &property, config.Global.AkamaiConfig.Domain); err != nil {
-		return err
+	existingProperty, err := s.gtm.GetProperty(context.Background(), property.Name, config.Global.AkamaiConfig.Domain)
+	if err != nil {
+		logger.Warnf("Property %s doesn't exist, creating...", property.Name)
+	}
+
+	fieldsToCompare := []string{
+		"Name",
+		"Type",
+		"Comments",
+		"TrafficTargets.DatacenterId",
+		"TrafficTargets.Enabled",
+		"TrafficTargets.Weight",
+		"TrafficTargets.Servers",
+		"TrafficTargets.Name",
+		"LivenessTests.Name",
+		"LivenessTests.TestObject",
+		"LivenessTests.TestInterval",
+		"LivenessTests.TestTimeout",
+		"LivenessTests.RequestString",
+		"LivenessTests.ResponseString",
+		"LivenessTests.TestObjectProtocol",
+	}
+	if !utils.DeepEqualFields(&property, existingProperty, fieldsToCompare) {
+		// Update
+		logger.Infof("UpdateProperty(%s) of domain %s", property.Name, config.Global.AkamaiConfig.Domain)
+		if _, err := s.gtm.UpdateProperty(context.Background(), &property, config.Global.AkamaiConfig.Domain); err != nil {
+			return err
+		}
 	}
 
 	return nil

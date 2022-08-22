@@ -47,9 +47,19 @@ func (s *AkamaiAgent) GetDatacenter(datacenterID string) (*models.Datacenter, er
 	return res[0], nil
 }
 
-func (s *AkamaiAgent) SyncDatacenter(datacenter *models.Datacenter) (*gtm.Datacenter, error) {
-	logger.Debugf("SyncDatacenter('%s')", datacenter.Id)
+func (s *AkamaiAgent) fetchOrCreateDatacenter(datacenter *models.Datacenter) (*gtm.Datacenter, error) {
+	datacenters, err := s.gtm.ListDatacenters(context.Background(), config.Global.AkamaiConfig.Domain)
+	if err != nil {
+		return nil, err
+	}
 
+	for _, d := range datacenters {
+		if d.Nickname == datacenter.Id {
+			return d, nil
+		}
+	}
+
+	// Create datacenter
 	akamaiDatacenter := gtm.Datacenter{
 		City:            datacenter.GetCity(),
 		Continent:       datacenter.GetContinent(),
@@ -62,8 +72,35 @@ func (s *AkamaiAgent) SyncDatacenter(datacenter *models.Datacenter) (*gtm.Datace
 
 	res, err := s.gtm.CreateDatacenter(context.Background(), &akamaiDatacenter, config.Global.AkamaiConfig.Domain)
 	if err != nil {
+		logger.Errorf("CreateDatacenter(%s) for domain %s failed", akamaiDatacenter.Nickname,
+			config.Global.AkamaiConfig.Domain)
+		return nil, err
+	} else {
+		logger.Infof("CreateDatacenter(%s) for domain %s", akamaiDatacenter.Nickname,
+			config.Global.AkamaiConfig.Domain)
+	}
+	return res.Resource, nil
+}
+
+func (s *AkamaiAgent) SyncDatacenter(datacenter *models.Datacenter, force bool) (*models.Datacenter, error) {
+	logger.Debugf("SyncDatacenter('%s')", datacenter.Id)
+
+	// akamai datacenterId is a unique numeric reference to a domain specific datacenter
+	meta := int(datacenter.GetMeta())
+
+	// Consider synced
+	if !force && meta != 0 {
+		return datacenter, nil
+	}
+
+	backendDatacenter, err := s.fetchOrCreateDatacenter(datacenter)
+	if err != nil {
 		return nil, err
 	}
 
-	return res.Resource, nil
+	if backendDatacenter.DatacenterId != meta {
+		req := &server.DatacenterMetaRequest{Id: datacenter.Id, Meta: int32(backendDatacenter.DatacenterId)}
+		return s.rpc.UpdateDatacenterMeta(context.Background(), req)
+	}
+	return datacenter, nil
 }
