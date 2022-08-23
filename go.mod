@@ -40,7 +40,7 @@ require (
 	github.com/stretchr/testify v1.8.0
 	github.com/xo/dburl v0.11.0
 	go-micro.dev/v4 v4.8.1
-	golang.org/x/net v0.0.0-20220812174116-3211cb980234
+	golang.org/x/net v0.0.0-20220822230855-b0a4917ee28c
 	google.golang.org/protobuf v1.28.1
 )
 
