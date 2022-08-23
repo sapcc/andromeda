@@ -35,7 +35,7 @@ require (
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/rs/cors v1.8.2
-	github.com/sapcc/go-bits v0.0.0-20220819141629-31b96bd61763
+	github.com/sapcc/go-bits v0.0.0-20220823141731-fd7850ce8cb7
 	github.com/scottdware/go-bigip v0.0.0-20220517145708-9fe3e2f9f005
 	github.com/stretchr/testify v1.8.0
 	github.com/xo/dburl v0.11.0
