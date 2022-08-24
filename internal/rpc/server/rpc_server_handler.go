@@ -309,14 +309,55 @@ func (u *RPCHandler) UpdateProvisioningStatus(ctx context.Context, req *Provisio
 	return nil
 }
 
+//UpdateMemberStatus Updates member status according to the requests, also updates dependend pool and domain status.
 func (u *RPCHandler) UpdateMemberStatus(ctx context.Context, req *MemberStatusRequest, res *MemberStatusResponse) error {
 	var statusResult []*StatusResult
 	for _, memberStatusReq := range req.GetMemberStatus() {
-		sql := `UPDATE member SET status = ? WHERE id = ?`
-		_, err := u.DB.Exec(sql, memberStatusReq.GetStatus().String(), memberStatusReq.GetId())
-		if err != nil {
-			logger.Error(err)
+		status := memberStatusReq.GetStatus().String()
+		var err error
+		if status == "ONLINE" {
+			// Set all related objects to Online
+			sql := `UPDATE member m
+                    INNER JOIN pool p ON m.pool_id = p.id
+                    INNER JOIN domain_pool_relation dpr ON p.id = dpr.pool_id
+                    INNER JOIN domain d ON dpr.domain_id = d.id
+                    SET m.status = 'ONLINE', p.status = 'ONLINE', d.status = 'ONLINE' WHERE m.id = ?`
+			if _, err = u.DB.Exec(sql, memberStatusReq.GetId()); err != nil {
+				logger.Error(err)
+			}
+		} else {
+			if err = db.TxExecute(u.DB, func(tx *sqlx.Tx) error {
+				// Select count all members from the same pool that are online
+				sql := `SELECT COUNT(m2.id)
+                        FROM member m
+                        INNER JOIN member m2 ON m2.pool_id = m.pool_id
+                        WHERE m.id = ? AND m2.id != m.id AND m2.status = 'ONLINE';`
+				var members_online int
+				if err := tx.Get(&members_online, sql, memberStatusReq.GetId()); err != nil {
+					return err
+				}
+
+				if members_online > 0 {
+					sql := `UPDATE member SET status = 'OFFLINE' WHERE id = ?`
+					if _, err := tx.Exec(sql, memberStatusReq.GetId()); err != nil {
+						return err
+					}
+				} else {
+					sql := `UPDATE member m
+                            INNER JOIN pool p ON m.pool_id = p.id
+                            INNER JOIN domain_pool_relation dpr ON p.id = dpr.pool_id
+                            INNER JOIN domain d ON dpr.domain_id = d.id
+                            SET m.status = 'OFFLINE', p.status = 'OFFLINE', d.status = 'OFFLINE' WHERE m.id = ?`
+					if _, err := tx.Exec(sql, memberStatusReq.GetId()); err != nil {
+						return err
+					}
+				}
+				return nil
+			}); err != nil {
+				logger.Error(err)
+			}
 		}
+
 		statusResult = append(statusResult, &StatusResult{
 			Id:      memberStatusReq.GetId(),
 			Success: err == nil,

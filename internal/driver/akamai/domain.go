@@ -42,21 +42,3 @@ func (s *AkamaiAgent) EnsureDomain() error {
 	}
 	return nil
 }
-
-func (s *AkamaiAgent) SyncDomain(domain *models.Domain) error {
-	/*
-		fieldsToCompare := []string{
-			"Type",
-			"Datacenters",
-			"Datacenters.City",
-			"Datacenters.Continent",
-			"Datacenters.Country"}
-		if !utils.DeepEqualFields(expectedDomain, akamaiDomain, fieldsToCompare) {
-			// Update
-			if _, err := expectedDomain.Update(nil); err != nil {
-				return err
-			}
-		}
-	*/
-	return nil
-}

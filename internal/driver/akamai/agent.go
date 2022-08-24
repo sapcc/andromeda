@@ -30,6 +30,7 @@ import (
 	"go-micro.dev/v4/metadata"
 
 	"github.com/sapcc/andromeda/internal/config"
+	rpcmodels "github.com/sapcc/andromeda/internal/models"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/rpc/worker"
 	"github.com/sapcc/andromeda/models"
@@ -124,55 +125,65 @@ func ExecuteAkamaiAgent() error {
 	}
 
 	// Register callbacks
-	/*if err := worker.RegisterRPCWorkerHandler(service.Server(), &f5); err != nil {
-		return err
-	}*/
-	if err := micro.RegisterSubscriber("andromeda.sync_all",
+	if err := micro.RegisterSubscriber("andromeda.force_sync",
 		service.Server(), &Sub{&akamai}); err != nil {
 		logger.Error(err)
 	}
 
 	go akamai.periodicSync()
 	go func() {
-		if err := akamai.fullSync(); err != nil {
+		if err := akamai.pendingSync(); err != nil {
 			logger.Error(err)
 		}
 	}()
 	return service.Run()
 }
 
-func (s *AkamaiAgent) fullSync() error {
-	var pageNumber int32 = 0
-	for {
-		response, err := s.rpc.GetDomains(context.Background(), &server.SearchRequest{
-			Provider:       "akamai",
-			PageNumber:     pageNumber,
-			ResultPerPage:  100,
-			FullyPopulated: true,
-			Pending:        true,
-		})
+func (s *AkamaiAgent) pendingSync() error {
+	// Akamai backend can only process one change at a time
+	response, err := s.rpc.GetDomains(context.Background(), &server.SearchRequest{
+		Provider:       "akamai",
+		PageNumber:     0,
+		ResultPerPage:  1,
+		FullyPopulated: true,
+		Pending:        true,
+	})
+	if err != nil {
+		return err
+	}
+
+	res := response.GetResponse()
+	for _, domain := range res {
+		// Run Sync
+		if err := s.SyncProperty(domain); err != nil {
+			return err
+		}
+
+		// Check for running domain's propagation state
+		status, err := s.gtm.GetDomainStatus(context.Background(), config.Global.AkamaiConfig.Domain)
 		if err != nil {
 			return err
 		}
 
-		res := response.GetResponse()
-		for _, domain := range res {
-			if err := s.SyncProperty(domain); err != nil {
+		// Tracks the status of the domain's propagation state. Either PENDING, COMPLETE, or DENIED.
+		// A DENIED value indicates that the domain configuration is invalid,
+		// and doesn't propagate until the validation errors are resolved.
+		switch status.PropagationStatus {
+		case "PENDING":
+			logger.Debug("Backend has pending configuration change")
+		case "DENIED":
+			logger.Errorf("Domain %s failed syncing: %s", domain.Id, status.Message)
+			if err := s.UpdateDomainProvisioningStatus(domain, "ERROR"); err != nil {
 				return err
 			}
-			if err := s.UpdateStatus(domain); err != nil {
+		case "COMPLETE":
+			logger.Infof("Domain %s is in sync", domain.Id)
+			if err := s.UpdateDomainProvisioningStatus(domain, "ACTIVE"); err != nil {
 				return err
 			}
-		}
-		logger.Infof("Sync finished for %d domain(s)", len(res))
-
-		if len(res) < 100 {
-			break
-		} else {
-			pageNumber++
+			// Ready for new Changes
 		}
 	}
-
 	return nil
 }
 
@@ -181,17 +192,54 @@ func (s *AkamaiAgent) periodicSync() {
 	defer t.Stop()
 	for {
 		<-t.C // Activate periodically
-		if err := s.fullSync(); err != nil {
+		if err := s.pendingSync(); err != nil {
 			logger.Error(err)
 		}
 	}
 
 }
 
-func (s *AkamaiAgent) SyncAll(ctx context.Context, request *worker.SyncRequest) error {
-	logger.Info("Sync invoked!")
+func (s *AkamaiAgent) ForceSync(ctx context.Context, request *worker.SyncRequest) error {
 	md, _ := metadata.FromContext(ctx)
-	logger.Info("[pubsub.1] Received event %+v with metadata %+v\n", request, md)
-	// do something with event
+	var searchIds []string
+	if domainId, ok := md.Get("domain"); ok {
+		searchIds = []string{domainId}
+		logger.Infof("Sync invoked for domain %s", md["domain"])
+	} else {
+		logger.Infof("Sync invoked for all domains")
+	}
+
+	var pageNumber int32 = 0
+	var domains []*rpcmodels.Domain
+	for {
+		response, err := s.rpc.GetDomains(context.Background(), &server.SearchRequest{
+			Provider:       "akamai",
+			PageNumber:     pageNumber,
+			ResultPerPage:  10,
+			FullyPopulated: true,
+			Pending:        false,
+			Ids:            searchIds,
+		})
+		if err != nil {
+			return err
+		}
+
+		domains = append(domains, response.Response...)
+
+		if len(response.Response) < 100 {
+			break
+		} else {
+			pageNumber++
+		}
+	}
+
+	go func() {
+		for i, domain := range domains {
+			logger.Infof("Syncing Domain %d/%d: %s", i, len(domains), domain.Id)
+			if err := s.SyncProperty(domain); err != nil {
+				logger.Error(err)
+			}
+		}
+	}()
 	return nil
 }
