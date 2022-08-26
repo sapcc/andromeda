@@ -27,7 +27,7 @@ import (
 
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/driver/f5/as3"
-	"github.com/sapcc/andromeda/internal/models"
+	"github.com/sapcc/andromeda/internal/rpcmodels"
 	"github.com/sapcc/andromeda/internal/utils"
 )
 
@@ -99,7 +99,7 @@ func getPoolLbMode(mode string) string {
 	}
 }
 
-func (f5 *F5Agent) GetTenantDeclaration(domains []*models.Domain) (*as3.Tenant, error) {
+func (f5 *F5Agent) GetTenantDeclaration(domains []*rpcmodels.Domain) (*as3.Tenant, error) {
 	application := as3.Application{}
 	for _, domain := range domains {
 		var as3poolsPtr []as3.PointerGSLBPool
@@ -141,21 +141,21 @@ func (f5 *F5Agent) GetTenantDeclaration(domains []*models.Domain) (*as3.Tenant, 
 					Timeout:  monitor.GetTimeout(),
 				}
 				switch monitor.Type {
-				case models.Monitor_ICMP:
+				case rpcmodels.Monitor_ICMP:
 					as3Monitor.MonitorType = "gateway-icmp"
-				case models.Monitor_HTTP:
+				case rpcmodels.Monitor_HTTP:
 					as3Monitor.MonitorType = "http"
 					as3Monitor.Send = monitor.GetSend()
 					as3Monitor.Receive = monitor.GetReceive()
-				case models.Monitor_HTTPS:
+				case rpcmodels.Monitor_HTTPS:
 					as3Monitor.MonitorType = "https"
 					as3Monitor.Send = monitor.GetSend()
 					as3Monitor.Receive = monitor.GetReceive()
-				case models.Monitor_TCP:
+				case rpcmodels.Monitor_TCP:
 					as3Monitor.MonitorType = "tcp"
 					as3Monitor.Send = monitor.GetSend()
 					as3Monitor.Receive = monitor.GetReceive()
-				case models.Monitor_UDP:
+				case rpcmodels.Monitor_UDP:
 					as3Monitor.MonitorType = "udp"
 					as3Monitor.Send = monitor.GetSend()
 					as3Monitor.Receive = monitor.GetReceive()

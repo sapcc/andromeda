@@ -24,11 +24,11 @@ import (
 	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/config"
-	"github.com/sapcc/andromeda/internal/models"
 	"github.com/sapcc/andromeda/internal/rpc/server"
+	"github.com/sapcc/andromeda/internal/rpcmodels"
 )
 
-func (s *AkamaiAgent) GetDatacenter(datacenterID string) (*models.Datacenter, error) {
+func (s *AkamaiAgent) GetDatacenter(datacenterID string) (*rpcmodels.Datacenter, error) {
 	response, err := s.rpc.GetDatacenters(context.Background(), &server.SearchRequest{
 		Provider:      "akamai",
 		PageNumber:    0,
@@ -47,7 +47,7 @@ func (s *AkamaiAgent) GetDatacenter(datacenterID string) (*models.Datacenter, er
 	return res[0], nil
 }
 
-func (s *AkamaiAgent) fetchOrCreateDatacenter(datacenter *models.Datacenter) (*gtm.Datacenter, error) {
+func (s *AkamaiAgent) fetchOrCreateDatacenter(datacenter *rpcmodels.Datacenter) (*gtm.Datacenter, error) {
 	datacenters, err := s.gtm.ListDatacenters(context.Background(), config.Global.AkamaiConfig.Domain)
 	if err != nil {
 		return nil, err
@@ -82,7 +82,7 @@ func (s *AkamaiAgent) fetchOrCreateDatacenter(datacenter *models.Datacenter) (*g
 	return res.Resource, nil
 }
 
-func (s *AkamaiAgent) SyncDatacenter(datacenter *models.Datacenter, force bool) (*models.Datacenter, error) {
+func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force bool) (*rpcmodels.Datacenter, error) {
 	logger.Debugf("SyncDatacenter('%s')", datacenter.Id)
 
 	// akamai datacenterId is a unique numeric reference to a domain specific datacenter

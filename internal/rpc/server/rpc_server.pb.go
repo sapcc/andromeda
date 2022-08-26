@@ -7,7 +7,7 @@
 package server
 
 import (
-	models "github.com/sapcc/andromeda/internal/models"
+	models "github.com/sapcc/andromeda/internal/rpcmodels"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"

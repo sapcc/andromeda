@@ -2,14 +2,13 @@
 PROTOC_FILES = $(shell find . -type f -name '*.proto')
 PB_FILES = $(patsubst %.proto, %.pb.go, $(PROTOC_FILES))
 PB_MICRO_FILES = $(patsubst %.proto, %.pb.micro.go, $(PROTOC_FILES))
+GO_CMD_FILES = $(shell find cmd -type f -name '*.go')
+BIN = $(basename $(GO_CMD_FILES))
 
-build-all: $(PB_FILES) $(PB_MICRO_FILES) bin/andromeda bin/m31ctl
+build-all: $(PB_FILES) $(PB_MICRO_FILES) $(BIN)
 
-bin/andromeda: main.go $(PB_FILES) $(PB_MICRO_FILES)
-	go build -o bin/andromeda
-
-bin/m31ctl: cmd/m31ctl.go internal/cli/*.go
-	go build -o bin/m31ctl cmd/m31ctl.go
+$(BIN): $(GO_CMD_FILES)
+	go build -o bin $@.go
 
 swagger:
 	swagger generate server --exclude-main --copyright-file COPYRIGHT.txt

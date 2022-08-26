@@ -5,7 +5,7 @@ package server
 
 import (
 	fmt "fmt"
-	models "github.com/sapcc/andromeda/internal/models"
+	models "github.com/sapcc/andromeda/internal/rpcmodels"
 	proto "google.golang.org/protobuf/proto"
 	math "math"
 )

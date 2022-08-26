@@ -22,13 +22,13 @@ import (
 	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/config"
-	"github.com/sapcc/andromeda/internal/models"
+	"github.com/sapcc/andromeda/internal/rpcmodels"
 )
 
-var MONITOR_LIVENESS_TYPE_MAP = map[models.Monitor_MonitorType]string{
-	models.Monitor_HTTP:  "HTTP",
-	models.Monitor_HTTPS: "HTTPS",
-	models.Monitor_TCP:   "TCP",
+var MONITOR_LIVENESS_TYPE_MAP = map[rpcmodels.Monitor_MonitorType]string{
+	rpcmodels.Monitor_HTTP:  "HTTP",
+	rpcmodels.Monitor_HTTPS: "HTTPS",
+	rpcmodels.Monitor_TCP:   "TCP",
 }
 
 func (s *AkamaiAgent) EnsureDomain() error {

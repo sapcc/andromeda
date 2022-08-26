@@ -23,13 +23,13 @@ import (
 	gtm "github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/configgtm"
 
 	"github.com/sapcc/andromeda/internal/config"
-	"github.com/sapcc/andromeda/internal/models"
+	"github.com/sapcc/andromeda/internal/rpcmodels"
 	"github.com/sapcc/andromeda/internal/utils"
 )
 
-func (s *AkamaiAgent) SyncProperty(domain *models.Domain) error {
-	var members []*models.Member
-	var monitors []*models.Monitor
+func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain) error {
+	var members []*rpcmodels.Member
+	var monitors []*rpcmodels.Monitor
 
 	pools := domain.GetPools()
 	if len(pools) > 0 {
@@ -62,7 +62,7 @@ func (s *AkamaiAgent) SyncProperty(domain *models.Domain) error {
 		datacenterUUID := member.GetDatacenter()
 
 		if len(datacenterUUID) > 0 {
-			var aDatacenter *models.Datacenter
+			var aDatacenter *rpcmodels.Datacenter
 			for _, datacenter := range domain.Datacenters {
 				if datacenter.GetId() == datacenterUUID {
 					aDatacenter = datacenter
@@ -94,13 +94,13 @@ func (s *AkamaiAgent) SyncProperty(domain *models.Domain) error {
 		}
 
 		switch monitor.GetType() {
-		case models.Monitor_HTTP:
+		case rpcmodels.Monitor_HTTP:
 			if monitor.GetSend() == "" {
 				livenessTest.TestObject = "/"
 			} else {
 				livenessTest.TestObject = monitor.GetSend()
 			}
-		case models.Monitor_TCP:
+		case rpcmodels.Monitor_TCP:
 			livenessTest.RequestString = monitor.GetSend()
 			livenessTest.ResponseString = monitor.GetReceive()
 		}

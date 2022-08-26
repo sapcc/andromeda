@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package controller
+package plugins
 
 import (
 	_ "github.com/go-micro/plugins/v4/broker/nats"

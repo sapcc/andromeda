@@ -18,11 +18,11 @@ package akamai
 
 import (
 	"github.com/sapcc/andromeda/internal/driver"
-	"github.com/sapcc/andromeda/internal/models"
 	"github.com/sapcc/andromeda/internal/rpc/server"
+	"github.com/sapcc/andromeda/internal/rpcmodels"
 )
 
-func (s *AkamaiAgent) UpdateDomainProvisioningStatus(domain *models.Domain, value string) error {
+func (s *AkamaiAgent) UpdateDomainProvisioningStatus(domain *rpcmodels.Domain, value string) error {
 	provisioningStatusRequests := []*server.ProvisioningStatusRequest_ProvisioningStatus{
 		driver.GetProvisioningStatusRequest(domain.Id, "DOMAIN", value),
 	}

@@ -15,6 +15,7 @@ require (
 	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/dre1080/recovr v1.0.3
 	github.com/go-micro/plugins/v4/broker/nats v1.1.0
+	github.com/go-micro/plugins/v4/config/encoder/yaml v1.1.0
 	github.com/go-micro/plugins/v4/registry/nats v1.1.0
 	github.com/go-micro/plugins/v4/transport/nats v1.1.0
 	github.com/go-openapi/errors v0.20.3
@@ -38,6 +39,7 @@ require (
 	github.com/sapcc/go-bits v0.0.0-20220823141731-fd7850ce8cb7
 	github.com/scottdware/go-bigip v0.0.0-20220517145708-9fe3e2f9f005
 	github.com/stretchr/testify v1.8.0
+	github.com/urfave/cli/v2 v2.6.0
 	github.com/xo/dburl v0.11.0
 	go-micro.dev/v4 v4.8.1
 	golang.org/x/net v0.0.0-20220822230855-b0a4917ee28c
@@ -59,6 +61,7 @@ require (
 	github.com/evanphx/json-patch/v5 v5.5.0 // indirect
 	github.com/felixge/httpsnoop v1.0.1 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
+	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-acme/lego/v4 v4.4.0 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
 	github.com/go-git/go-billy/v5 v5.3.1 // indirect
@@ -117,7 +120,6 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
-	github.com/urfave/cli/v2 v2.6.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.1 // indirect
 	github.com/ztrue/tracerr v0.3.0 // indirect
 	go.mongodb.org/mongo-driver v1.10.0 // indirect
@@ -130,7 +132,7 @@ require (
 	golang.org/x/time v0.0.0-20220411224347-583f2d630306 // indirect
 	golang.org/x/tools v0.1.11-0.20220316014157-77aa08bb151a // indirect
 	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect
-	gopkg.in/ini.v1 v1.66.4 // indirect
+	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

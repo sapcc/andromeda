@@ -26,7 +26,7 @@ import (
 	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/db"
-	"github.com/sapcc/andromeda/internal/models"
+	"github.com/sapcc/andromeda/internal/rpcmodels"
 	"github.com/sapcc/andromeda/internal/utils"
 )
 
@@ -69,7 +69,7 @@ func (u *RPCHandler) GetMembers(ctx context.Context, request *SearchRequest, res
 		return err
 	}
 	for rows.Next() {
-		var member models.Member
+		var member rpcmodels.Member
 		var address string
 		if err := rows.Scan(&member.Id, &member.AdminStateUp, &address,
 			&member.Port, &member.ProvisioningStatus); err != nil {
@@ -92,7 +92,7 @@ func (u *RPCHandler) GetPools(ctx context.Context, request *SearchRequest, respo
 		return err
 	}
 	for rows.Next() {
-		var pool models.Pool
+		var pool rpcmodels.Pool
 		if err := rows.Scan(&pool.Id, &pool.AdminStateUp); err != nil {
 			return err
 		}
@@ -110,7 +110,7 @@ func (u *RPCHandler) GetDatacenters(ctx context.Context, request *SearchRequest,
 		return err
 	}
 	for rows.Next() {
-		var datacenter models.Datacenter
+		var datacenter rpcmodels.Datacenter
 		if err := rows.StructScan(&datacenter); err != nil {
 			logger.Error(err)
 			return err
@@ -124,7 +124,7 @@ func (u *RPCHandler) GetMonitors(ctx context.Context, request *SearchRequest, re
 	panic("Todo")
 }
 
-func (u *RPCHandler) UpdateDatacenterMeta(ctx context.Context, req *DatacenterMetaRequest, res *models.Datacenter) error {
+func (u *RPCHandler) UpdateDatacenterMeta(ctx context.Context, req *DatacenterMetaRequest, res *rpcmodels.Datacenter) error {
 	if err := db.TxExecute(u.DB, func(tx *sqlx.Tx) error {
 		sql := `UPDATE datacenter SET meta = ? WHERE id = ?`
 		if _, err := tx.Exec(sql, req.GetMeta(), req.GetId()); err != nil {
@@ -144,7 +144,7 @@ func (u *RPCHandler) UpdateDatacenterMeta(ctx context.Context, req *DatacenterMe
 	return nil
 }
 
-func populatePools(u *RPCHandler, fullyPopulated bool, domainID string) ([]*models.Pool, error) {
+func populatePools(u *RPCHandler, fullyPopulated bool, domainID string) ([]*rpcmodels.Pool, error) {
 	sql := `SELECT id, admin_state_up, provisioning_status 
             FROM pool p 
             JOIN domain_pool_relation dpr ON p.id = dpr.pool_id
@@ -154,9 +154,9 @@ func populatePools(u *RPCHandler, fullyPopulated bool, domainID string) ([]*mode
 		return nil, err
 	}
 
-	var pools []*models.Pool
+	var pools []*rpcmodels.Pool
 	for rows.Next() {
-		var pool models.Pool
+		var pool rpcmodels.Pool
 		if err := rows.StructScan(&pool); err != nil {
 			logger.Error(err)
 			return nil, err
@@ -176,16 +176,16 @@ func populatePools(u *RPCHandler, fullyPopulated bool, domainID string) ([]*mode
 	return pools, nil
 }
 
-func populateMonitors(u *RPCHandler, poolID string) ([]*models.Monitor, error) {
+func populateMonitors(u *RPCHandler, poolID string) ([]*rpcmodels.Monitor, error) {
 	sql := `SELECT id, admin_state_up, "interval", send, receive, timeout, type, provisioning_status FROM monitor WHERE pool_id = ?`
 	rows, err := u.DB.Queryx(sql, poolID)
 	if err != nil {
 		return nil, err
 	}
 
-	var monitors []*models.Monitor
+	var monitors []*rpcmodels.Monitor
 	for rows.Next() {
-		var monitor models.Monitor
+		var monitor rpcmodels.Monitor
 		var send, receive *string
 		var monitorType string
 
@@ -199,22 +199,22 @@ func populateMonitors(u *RPCHandler, poolID string) ([]*models.Monitor, error) {
 		if receive != nil {
 			monitor.Receive = *receive
 		}
-		monitor.Type = models.Monitor_MonitorType(models.Monitor_MonitorType_value[monitorType])
+		monitor.Type = rpcmodels.Monitor_MonitorType(rpcmodels.Monitor_MonitorType_value[monitorType])
 		monitors = append(monitors, &monitor)
 	}
 	return monitors, err
 }
 
-func populateMembers(u *RPCHandler, poolID string) ([]*models.Member, error) {
+func populateMembers(u *RPCHandler, poolID string) ([]*rpcmodels.Member, error) {
 	sql := `SELECT id, admin_state_up, address, port, datacenter_id, provisioning_status FROM member WHERE pool_id = ?`
 	rows, err := u.DB.Queryx(sql, poolID)
 	if err != nil {
 		return nil, err
 	}
 
-	var members []*models.Member
+	var members []*rpcmodels.Member
 	for rows.Next() {
-		var member models.Member
+		var member rpcmodels.Member
 		var address string
 		if err := rows.Scan(&member.Id, &member.AdminStateUp, &address,
 			&member.Port, &member.Datacenter, &member.ProvisioningStatus); err != nil {
@@ -245,7 +245,7 @@ func (u *RPCHandler) GetDomains(ctx context.Context, request *SearchRequest, res
 		return err
 	}
 	for rows.Next() {
-		var domain models.Domain
+		var domain rpcmodels.Domain
 		if err := rows.StructScan(&domain); err != nil {
 			logger.Error(err)
 			return err

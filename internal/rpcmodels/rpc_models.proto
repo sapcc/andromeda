@@ -1,5 +1,5 @@
 syntax = "proto3";
-option go_package = "github.com/sapcc/andromeda/internal/models";
+option go_package = "github.com/sapcc/andromeda/internal/rpcmodels";
 
 message Domain {
   string id = 1;

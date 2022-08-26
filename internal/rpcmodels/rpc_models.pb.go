@@ -2,9 +2,9 @@
 // versions:
 // 	protoc-gen-go v1.28.1
 // 	protoc        v3.21.5
-// source: internal/models/rpc_models.proto
+// source: internal/rpcmodels/rpc_models.proto
 
-package models
+package rpcmodels
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"

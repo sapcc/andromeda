@@ -311,11 +311,11 @@ func (o GetQuotasOKBodyQuotasItems0) MarshalJSON() ([]byte, error) {
 func (o *GetQuotasOKBodyQuotasItems0) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	// validation for a type composition with models.Quota
+	// validation for a type composition with rpcmodels.Quota
 	if err := o.Quota.Validate(formats); err != nil {
 		res = append(res, err)
 	}
-	// validation for a type composition with models.QuotaUsage
+	// validation for a type composition with rpcmodels.QuotaUsage
 	if err := o.QuotaUsage.Validate(formats); err != nil {
 		res = append(res, err)
 	}
@@ -351,11 +351,11 @@ func (o *GetQuotasOKBodyQuotasItems0) validateProjectID(formats strfmt.Registry)
 func (o *GetQuotasOKBodyQuotasItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
-	// validation for a type composition with models.Quota
+	// validation for a type composition with rpcmodels.Quota
 	if err := o.Quota.ContextValidate(ctx, formats); err != nil {
 		res = append(res, err)
 	}
-	// validation for a type composition with models.QuotaUsage
+	// validation for a type composition with rpcmodels.QuotaUsage
 	if err := o.QuotaUsage.ContextValidate(ctx, formats); err != nil {
 		res = append(res, err)
 	}

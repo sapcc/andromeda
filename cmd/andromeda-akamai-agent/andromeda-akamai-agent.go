@@ -1,5 +1,5 @@
 /*
- *   Copyright 2020 SAP SE
+ *   Copyright 2022 SAP SE
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -16,11 +16,14 @@
 
 package main
 
-import "github.com/sapcc/andromeda/internal/cli"
+import (
+	"go-micro.dev/v4/logger"
+
+	"github.com/sapcc/andromeda/internal/driver/akamai"
+)
 
 func main() {
-	/*
-		This is an example CLI cli, it needs to be extended to support all CRUD commands.
-	*/
-	cli.SetupClient()
+	if err := akamai.ExecuteAkamaiAgent(); err != nil {
+		logger.Fatal(err)
+	}
 }
