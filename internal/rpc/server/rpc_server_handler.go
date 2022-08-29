@@ -59,7 +59,7 @@ func (u *RPCHandler) QueryxWithIds(sql string, request *SearchRequest) (*sqlx.Ro
 		sql += ` WHERE provider = ?`
 	}
 
-	return u.DB.Queryx(sql, args...)
+	return u.DB.Queryx(u.DB.Rebind(sql), args...)
 }
 
 func (u *RPCHandler) GetMembers(ctx context.Context, request *SearchRequest, response *MembersResponse) error {

@@ -39,6 +39,7 @@ import (
 	flags "github.com/jessevdk/go-flags"
 	"golang.org/x/net/netutil"
 
+	_ "github.com/sapcc/andromeda/internal/plugins"
 	"github.com/sapcc/andromeda/restapi/operations"
 )
 

@@ -112,11 +112,11 @@ CREATE TABLE quota
     member            BIGINT NOT NULL,
     monitor           BIGINT NOT NULL,
     datacenter        BIGINT NOT NULL,
-    in_use_domain     BIGINT NOT NULL DEFAULT 0 CHECK (`in_use_domain` >= 0),
-    in_use_pool       BIGINT NOT NULL DEFAULT 0 CHECK (`in_use_pool` >= 0),
-    in_use_member     BIGINT NOT NULL DEFAULT 0 CHECK (`in_use_member` >= 0),
-    in_use_monitor    BIGINT NOT NULL DEFAULT 0 CHECK (`in_use_monitor` >= 0),
-    in_use_datacenter BIGINT NOT NULL DEFAULT 0 CHECK (`in_use_datacenter` >= 0)
+    in_use_domain     BIGINT NOT NULL DEFAULT 0 CHECK (in_use_domain >= 0),
+    in_use_pool       BIGINT NOT NULL DEFAULT 0 CHECK (in_use_pool >= 0),
+    in_use_member     BIGINT NOT NULL DEFAULT 0 CHECK (in_use_member >= 0),
+    in_use_monitor    BIGINT NOT NULL DEFAULT 0 CHECK (in_use_monitor >= 0),
+    in_use_datacenter BIGINT NOT NULL DEFAULT 0 CHECK (in_use_datacenter >= 0)
 );
 
 CREATE TABLE agent

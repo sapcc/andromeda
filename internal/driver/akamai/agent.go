@@ -18,6 +18,7 @@ package akamai
 
 import (
 	"context"
+	"github.com/sapcc/andromeda/internal/utils"
 	"net/http"
 	"os"
 	"time"
@@ -25,14 +26,7 @@ import (
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/configgtm"
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/edgegrid"
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/session"
-	"github.com/go-micro/plugins/v4/config/encoder/yaml"
-	"github.com/urfave/cli/v2"
 	"go-micro.dev/v4"
-	mconfig "go-micro.dev/v4/config"
-	"go-micro.dev/v4/config/reader"
-	"go-micro.dev/v4/config/reader/json"
-	"go-micro.dev/v4/config/source"
-	"go-micro.dev/v4/config/source/file"
 	"go-micro.dev/v4/logger"
 	"go-micro.dev/v4/metadata"
 
@@ -66,7 +60,6 @@ type Sub struct {
 func ExecuteAkamaiAgent() error {
 	meta := map[string]string{
 		"type":    "Akamai",
-		"host":    "",
 		"version": "2.0",
 	}
 	service := micro.NewService(
@@ -74,44 +67,10 @@ func ExecuteAkamaiAgent() error {
 		micro.Metadata(meta),
 		micro.RegisterTTL(time.Second*60),
 		micro.RegisterInterval(time.Second*30),
-		micro.Flags(
-			&cli.StringSliceFlag{
-				Name:  "config-file",
-				Usage: "Use config file",
-			},
-		),
+		utils.ConfigureTransport(),
 	)
 
-	// new toml encoder
-	enc := yaml.NewEncoder()
-
-	// new config
-	conf, _ := mconfig.NewConfig(
-		mconfig.WithReader(
-			json.NewReader( // json reader for internal config merge
-				reader.WithEncoder(enc),
-			),
-		),
-	)
-
-	service.Init(
-		micro.Action(func(c *cli.Context) error {
-			logger.Infof("Config files: %s", c.String("config-file"))
-			for _, path := range c.StringSlice("config-file") {
-				if err := conf.Load(file.NewSource(
-					file.WithPath(path),
-					source.WithEncoder(enc),
-				)); err != nil {
-					return err
-				}
-			}
-
-			if err := conf.Scan(&config.Global); err != nil {
-				return err
-			}
-			return nil
-		}),
-	)
+	service.Init()
 
 	option := edgegrid.WithEnv(true)
 	if env := os.Getenv("AKAMAI_EDGE_RC"); env != "" {

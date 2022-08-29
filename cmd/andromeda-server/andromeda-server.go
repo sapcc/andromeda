@@ -17,15 +17,23 @@
 package main
 
 import (
-	"go-micro.dev/v4/logger"
-
+	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/server"
 	"github.com/sapcc/andromeda/restapi"
+	"github.com/urfave/cli/v2"
 )
 
 func main() {
-	API := restapi.NewServer(nil)
-	if err := server.ExecuteServer(API); err != nil {
-		logger.Fatal(err)
-	}
+	config.ParseArgsAndRun("andromeda", "andromeda api server",
+		func(c *cli.Context) error {
+			API := restapi.NewServer(nil)
+			API.Port = c.Int("port")
+			return server.ExecuteServer(API)
+		},
+		&cli.IntFlag{
+			Name:  "port",
+			Usage: "Port to listen",
+			Value: 8080,
+		},
+	)
 }

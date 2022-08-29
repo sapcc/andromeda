@@ -17,13 +17,15 @@
 package main
 
 import (
-	"go-micro.dev/v4/logger"
+	"github.com/urfave/cli/v2"
 
+	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/driver/akamai"
 )
 
 func main() {
-	if err := akamai.ExecuteAkamaiAgent(); err != nil {
-		logger.Fatal(err)
-	}
+	config.ParseArgsAndRun("andromeda-akamai-agent", "andromeda akamai agent",
+		func(c *cli.Context) error {
+			return akamai.ExecuteAkamaiAgent()
+		})
 }

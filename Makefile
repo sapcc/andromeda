@@ -8,7 +8,7 @@ BIN = $(basename $(GO_CMD_FILES))
 build-all: $(PB_FILES) $(PB_MICRO_FILES) $(BIN)
 
 $(BIN): $(GO_CMD_FILES)
-	go build -o bin $@.go
+	go build -o bin/ $@.go
 
 swagger:
 	swagger generate server --exclude-main --copyright-file COPYRIGHT.txt

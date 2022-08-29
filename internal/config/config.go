@@ -17,12 +17,110 @@
 package config
 
 import (
+	"errors"
+	"os"
+	"strings"
+
+	"github.com/go-micro/plugins/v4/config/encoder/yaml"
 	"github.com/gophercloud/utils/openstack/clientconfig"
+	"github.com/urfave/cli/v2"
+	"go-micro.dev/v4/config"
+	"go-micro.dev/v4/config/reader"
+	"go-micro.dev/v4/config/reader/json"
+	"go-micro.dev/v4/config/source"
+	"go-micro.dev/v4/config/source/file"
+	"go-micro.dev/v4/logger"
 )
 
 var (
 	Global Andromeda
 )
+
+//ParseArgsAndRun Evaluate --config-file flags and remove them from env
+func ParseArgsAndRun(name string, usage string, action cli.ActionFunc, flags ...cli.Flag) {
+	// Append --config-file
+	flags = append(flags, &cli.StringSliceFlag{
+		Name:  "config-file",
+		Usage: "Use config file",
+	})
+
+	app := &cli.App{
+		Name:   name,
+		Usage:  usage,
+		Flags:  flags,
+		Action: action,
+		Before: func(c *cli.Context) error {
+			if !c.IsSet("config-file") {
+				return errors.New("No config files specified")
+			}
+
+			// Parse config flags
+			if err := parseConfigFlags(c.StringSlice("config-file")); err != nil {
+				return err
+			}
+
+			// Ugly workaround, remove flags from osArgs
+			// because micro wants to parse them and fails miserably
+			i := 0
+			newOsArgs := []string{}
+			for {
+				if i >= len(os.Args) {
+					break
+				}
+
+				reaped := false
+
+				for _, flagName := range c.FlagNames() {
+					if strings.HasSuffix(os.Args[i], flagName) {
+						// Reap the flag from osArgs
+						reaped = true
+						i++
+						break
+					}
+				}
+				if !reaped {
+					newOsArgs = append(newOsArgs, os.Args[i])
+				}
+				i++
+			}
+			os.Args = newOsArgs
+			return nil
+		},
+	}
+
+	if err := app.Run(os.Args); err != nil {
+		logger.Fatal(err)
+	}
+}
+
+func parseConfigFlags(flags []string) error {
+	// new yaml encoder
+	enc := yaml.NewEncoder()
+
+	// new config
+	conf, _ := config.NewConfig(
+		config.WithReader(
+			json.NewReader( // json reader for internal config merge
+				reader.WithEncoder(enc),
+			),
+		),
+	)
+
+	logger.Infof("Config files: %s", flags)
+	for _, path := range flags {
+		if err := conf.Load(file.NewSource(
+			file.WithPath(path),
+			source.WithEncoder(enc),
+		)); err != nil {
+			return err
+		}
+	}
+
+	if err := conf.Scan(&Global); err != nil {
+		return err
+	}
+	return nil
+}
 
 type Andromeda struct {
 	Verbose      bool                  `short:"v" long:"verbose" description:"Show verbose debug information"`

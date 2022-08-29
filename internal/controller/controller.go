@@ -18,7 +18,10 @@ package controller
 
 import (
 	"github.com/jmoiron/sqlx"
+	"github.com/sapcc/andromeda/internal/utils"
 	"go-micro.dev/v4"
+	"os"
+	"time"
 )
 
 type Controller struct {
@@ -33,8 +36,20 @@ type Controller struct {
 }
 
 func New(db *sqlx.DB) *Controller {
+	host, err := os.Hostname()
+	if err != nil {
+		panic(err)
+	}
+
 	sv := micro.NewService(
 		micro.Name("andromeda-api"),
+		micro.Metadata(map[string]string{
+			"type": "andromeda",
+			"host": host,
+		}),
+		micro.RegisterTTL(time.Second*60),
+		micro.RegisterInterval(time.Second*30),
+		utils.ConfigureTransport(),
 	)
 	sv.Init()
 

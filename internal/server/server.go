@@ -169,6 +169,7 @@ func RPCServer(db *sqlx.DB) {
 		}),
 		micro.RegisterTTL(time.Second*60),
 		micro.RegisterInterval(time.Second*30),
+		utils.ConfigureTransport(),
 	)
 	service.Init()
 

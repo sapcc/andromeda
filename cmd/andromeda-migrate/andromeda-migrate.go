@@ -17,15 +17,16 @@
 package main
 
 import (
-	"go-micro.dev/v4/logger"
+	"github.com/urfave/cli/v2"
 
 	"github.com/sapcc/andromeda/db"
 	"github.com/sapcc/andromeda/internal/config"
 )
 
 func main() {
-	dbUrl := config.Global.Database.Connection
-	if err := db.Migrate(dbUrl); err != nil {
-		logger.Fatal(err)
-	}
+	config.ParseArgsAndRun("andromeda-migrate", "database migration tool",
+		func(c *cli.Context) error {
+			dbUrl := config.Global.Database.Connection
+			return db.Migrate(dbUrl)
+		})
 }

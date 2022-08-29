@@ -18,6 +18,7 @@ jobs:
       run: swagger generate markdown --copyright-file COPYRIGHT.txt --output docs/api.md
     - name: Commit API Doc
       run: |
+        git config --global --add safe.directory /__w/andromeda/andromeda
         git config --global user.name 'GitHub Action'
         git config --global user.email 'markdown-generator@users.noreply.github.com'
         git commit -am "Update docs/api.md" || true
