@@ -295,7 +295,7 @@ func insertDomainPoolRelations(tx *sqlx.Tx, domainID strfmt.UUID, projectID stri
 //PopulateDomainPools populates a domain instance with associated pools
 func PopulateDomainPools(db *sqlx.DB, domain *models.Domain) error {
 	// Get pool_ids associated
-	sql := `SELECT pool_id FROM domain_pool_relation WHERE domain_id = ?`
+	sql := db.Rebind(`SELECT pool_id FROM domain_pool_relation WHERE domain_id = ?`)
 	if err := db.Select(&domain.Pools, sql, domain.ID); err != nil {
 		return err
 	}

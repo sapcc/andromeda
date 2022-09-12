@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package cli
+package client
 
 import (
 	"github.com/jedib0t/go-pretty/table"
@@ -41,5 +41,5 @@ func (*ServiceList) Execute(_ []string) error {
 }
 
 func init() {
-	_, _ = Parser.AddCommand("service", "Services", "Service Commands.", &ServiceOptions)
+	/*_, _ = Parser.AddCommand("service", "Services", "Service Commands.", &ServiceOptions)*/
 }

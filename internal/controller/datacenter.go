@@ -87,10 +87,10 @@ func (c DatacenterController) PostDatacenters(params datacenters.PostDatacenters
 	sql := `
 		INSERT INTO datacenter 
     		(name, admin_state_up, continent, country, state_or_province, 
-    		 city, latitude, longitude, scope, project_id) 
+    		 city, latitude, longitude, scope, project_id, provider)
 		VALUES 
 		    (:name, :admin_state_up, :continent, :country, :state_or_province, 
-		     :city, :latitude, :longitude, :scope, :project_id)
+		     :city, :latitude, :longitude, :scope, :project_id, :provider)
 		RETURNING *
 	`
 	stmt, _ := c.db.PrepareNamed(sql)
@@ -164,7 +164,7 @@ func (c DatacenterController) DeleteDatacentersDatacenterID(params datacenters.D
 		return GetPolicyForbiddenResponse()
 	}
 
-	sql := `DELETE FROM datacenter WHERE id = ?`
+	sql := c.db.Rebind(`DELETE FROM datacenter WHERE id = ?`)
 	res := c.db.MustExec(sql, params.DatacenterID)
 	if deleted, _ := res.RowsAffected(); deleted != 1 {
 		return datacenters.NewDeleteDatacentersDatacenterIDNotFound().WithPayload(NotFound)
@@ -174,7 +174,7 @@ func (c DatacenterController) DeleteDatacentersDatacenterID(params datacenters.D
 
 //PopulateDatacenter populates attributes of a datacenter instance based on it's ID
 func PopulateDatacenter(db *sqlx.DB, datacenter *models.Datacenter, fields []string) error {
-	sql := fmt.Sprintf(`SELECT %s FROM datacenter WHERE id = ?`, strings.Join(fields, ", "))
+	sql := db.Rebind(fmt.Sprintf(`SELECT %s FROM datacenter WHERE id = ?`, strings.Join(fields, ", ")))
 	if err := db.Get(datacenter, sql, datacenter.ID); err != nil {
 		return err
 	}

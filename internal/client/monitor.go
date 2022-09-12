@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package cli
+package client
 
 import (
 	"github.com/go-openapi/strfmt"
@@ -107,8 +107,8 @@ func (*MonitorDelete) Execute(_ []string) error {
 }
 
 func init() {
-	_, err := Parser.AddCommand("monitor", "Monitors", "Monitor Commands.", &MonitorOptions)
+	/*_, err := Parser.AddCommand("monitor", "Monitors", "Monitor Commands.", &MonitorOptions)
 	if err != nil {
 		panic(err)
-	}
+	}*/
 }

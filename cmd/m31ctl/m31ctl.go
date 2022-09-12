@@ -16,8 +16,8 @@
 
 package main
 
-import "github.com/sapcc/andromeda/internal/cli"
+import "github.com/sapcc/andromeda/internal/client"
 
 func main() {
-	cli.SetupClient()
+	client.SetupClient()
 }

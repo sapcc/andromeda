@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package cli
+package client
 
 import (
 	"github.com/go-openapi/strfmt"
@@ -100,8 +100,8 @@ func (*PoolDelete) Execute(_ []string) error {
 }
 
 func init() {
-	_, err := Parser.AddCommand("pool", "Pools", "Pool Commands.", &PoolOptions)
+	/*_, err := Parser.AddCommand("pool", "Pools", "Pool Commands.", &PoolOptions)
 	if err != nil {
 		panic(err)
-	}
+	}*/
 }

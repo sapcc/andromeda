@@ -174,7 +174,7 @@ func (c PoolController) DeletePoolsPoolID(params pools.DeletePoolsPoolIDParams) 
 		return GetPolicyForbiddenResponse()
 	}
 
-	sql := `DELETE FROM pool WHERE id = ?`
+	sql := c.db.Rebind(`DELETE FROM pool WHERE id = ?`)
 	res := c.db.MustExec(sql, params.PoolID)
 	if deleted, _ := res.RowsAffected(); deleted != 1 {
 		return pools.NewDeletePoolsPoolIDNotFound().WithPayload(NotFound)
@@ -185,7 +185,7 @@ func (c PoolController) DeletePoolsPoolID(params pools.DeletePoolsPoolIDParams) 
 //PopulatePoolMembers populates a pool instance with associated members
 func PopulatePoolMembers(db *sqlx.DB, pool *models.Pool) error {
 	// Get datacenter_id's associated
-	sql := `SELECT id FROM member WHERE pool_id = ?`
+	sql := db.Rebind(`SELECT id FROM member WHERE pool_id = ?`)
 	if err := db.Select(&pool.Members, sql, pool.ID); err != nil {
 		return err
 	}
@@ -195,7 +195,7 @@ func PopulatePoolMembers(db *sqlx.DB, pool *models.Pool) error {
 //PopulatePoolDomains populates a pool instance with associated domains
 func PopulatePoolDomains(db *sqlx.DB, pool *models.Pool) error {
 	//Get domain_id's associated
-	sql := `SELECT domain_id FROM domain_pool_relation WHERE pool_id = ?`
+	sql := db.Rebind(`SELECT domain_id FROM domain_pool_relation WHERE pool_id = ?`)
 	err := db.Select(&pool.Domains, sql, pool.ID)
 	if err != nil {
 		return err
@@ -206,7 +206,7 @@ func PopulatePoolDomains(db *sqlx.DB, pool *models.Pool) error {
 //PopulatePoolMonitors populates a pool instance with associated monitors
 func PopulatePoolMonitors(db *sqlx.DB, pool *models.Pool) error {
 	//Get domain_id's associated
-	sql := `SELECT id FROM monitor WHERE pool_id = ?`
+	sql := db.Rebind(`SELECT id FROM monitor WHERE pool_id = ?`)
 	err := db.Select(&pool.Monitors, sql, pool.ID)
 	if err != nil {
 		return err
@@ -217,7 +217,7 @@ func PopulatePoolMonitors(db *sqlx.DB, pool *models.Pool) error {
 //PopulatePool populates attributes of a pool instance based on it's ID
 func PopulatePool(db *sqlx.DB, pool *models.Pool, fields []string, fullyPopulate bool) error {
 	//Get pool
-	sql := fmt.Sprintf(`SELECT %s FROM pool WHERE id = ?`, strings.Join(fields, ", "))
+	sql := db.Rebind(fmt.Sprintf(`SELECT %s FROM pool WHERE id = ?`, strings.Join(fields, ", ")))
 	if err := db.Get(pool, sql, pool.ID); err != nil {
 		return err
 	}

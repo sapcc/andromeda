@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package cli
+package client
 
 import (
 	"github.com/go-openapi/strfmt"
@@ -112,8 +112,8 @@ func (*MemberDelete) Execute(_ []string) error {
 }
 
 func init() {
-	_, err := Parser.AddCommand("member", "Members", "Member Commands.", &MemberOptions)
+	/*_, err := Parser.AddCommand("member", "Members", "Member Commands.", &MemberOptions)
 	if err != nil {
 		panic(err)
-	}
+	}*/
 }

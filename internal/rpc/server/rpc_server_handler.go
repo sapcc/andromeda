@@ -63,7 +63,7 @@ func (u *RPCHandler) QueryxWithIds(sql string, request *SearchRequest) (*sqlx.Ro
 }
 
 func (u *RPCHandler) GetMembers(ctx context.Context, request *SearchRequest, response *MembersResponse) error {
-	sql := `SELECT id, admin_state_up, address, port, provisioning_status FROM member;`
+	sql := u.DB.Rebind(`SELECT id, admin_state_up, address, port, provisioning_status FROM member;`)
 	rows, err := u.QueryxWithIds(sql, request)
 	if err != nil {
 		return err
@@ -86,7 +86,7 @@ func (u *RPCHandler) GetMembers(ctx context.Context, request *SearchRequest, res
 }
 
 func (u *RPCHandler) GetPools(ctx context.Context, request *SearchRequest, response *PoolsResponse) error {
-	sql := `SELECT id, admin_state_up FROM pool;`
+	sql := u.DB.Rebind(`SELECT id, admin_state_up FROM pool;`)
 	rows, err := u.QueryxWithIds(sql, request)
 	if err != nil {
 		return err
@@ -102,9 +102,9 @@ func (u *RPCHandler) GetPools(ctx context.Context, request *SearchRequest, respo
 }
 
 func (u *RPCHandler) GetDatacenters(ctx context.Context, request *SearchRequest, response *DatacentersResponse) error {
-	sql := `SELECT id, admin_state_up, city, state_or_province, continent, country, 
+	sql := u.DB.Rebind(`SELECT id, admin_state_up, city, state_or_province, continent, country, 
             latitude, longitude, scope, provisioning_status, provider, meta
-			FROM datacenter`
+			FROM datacenter`)
 	rows, err := u.QueryxWithIds(sql, request)
 	if err != nil {
 		return err
@@ -126,13 +126,13 @@ func (u *RPCHandler) GetMonitors(ctx context.Context, request *SearchRequest, re
 
 func (u *RPCHandler) UpdateDatacenterMeta(ctx context.Context, req *DatacenterMetaRequest, res *rpcmodels.Datacenter) error {
 	if err := db.TxExecute(u.DB, func(tx *sqlx.Tx) error {
-		sql := `UPDATE datacenter SET meta = ? WHERE id = ?`
+		sql := tx.Rebind(`UPDATE datacenter SET meta = ? WHERE id = ?`)
 		if _, err := tx.Exec(sql, req.GetMeta(), req.GetId()); err != nil {
 			return err
 		}
 
-		sql = `SELECT id, admin_state_up, city, state_or_province, continent, country, 
-               latitude, longitude, scope, provisioning_status, provider, meta FROM datacenter WHERE id = ?`
+		sql = tx.Rebind(`SELECT id, admin_state_up, city, state_or_province, continent, country, 
+               latitude, longitude, scope, provisioning_status, provider, meta FROM datacenter WHERE id = ?`)
 		if err := tx.Get(res, sql, req.GetId()); err != nil {
 			return err
 		}
@@ -145,10 +145,10 @@ func (u *RPCHandler) UpdateDatacenterMeta(ctx context.Context, req *DatacenterMe
 }
 
 func populatePools(u *RPCHandler, fullyPopulated bool, domainID string) ([]*rpcmodels.Pool, error) {
-	sql := `SELECT id, admin_state_up, provisioning_status 
+	sql := u.DB.Rebind(`SELECT id, admin_state_up, provisioning_status 
             FROM pool p 
             JOIN domain_pool_relation dpr ON p.id = dpr.pool_id
-            WHERE dpr.domain_id = ?`
+            WHERE dpr.domain_id = ?`)
 	rows, err := u.DB.Queryx(sql, domainID)
 	if err != nil {
 		return nil, err
@@ -177,7 +177,8 @@ func populatePools(u *RPCHandler, fullyPopulated bool, domainID string) ([]*rpcm
 }
 
 func populateMonitors(u *RPCHandler, poolID string) ([]*rpcmodels.Monitor, error) {
-	sql := `SELECT id, admin_state_up, "interval", send, receive, timeout, type, provisioning_status FROM monitor WHERE pool_id = ?`
+	sql := u.DB.Rebind(`SELECT id, admin_state_up, "interval", send, receive, timeout, type, provisioning_status 
+		FROM monitor WHERE pool_id = ?`)
 	rows, err := u.DB.Queryx(sql, poolID)
 	if err != nil {
 		return nil, err
@@ -206,7 +207,8 @@ func populateMonitors(u *RPCHandler, poolID string) ([]*rpcmodels.Monitor, error
 }
 
 func populateMembers(u *RPCHandler, poolID string) ([]*rpcmodels.Member, error) {
-	sql := `SELECT id, admin_state_up, address, port, datacenter_id, provisioning_status FROM member WHERE pool_id = ?`
+	sql := u.DB.Rebind(`SELECT id, admin_state_up, address, port, datacenter_id, provisioning_status 
+		FROM member WHERE pool_id = ?`)
 	rows, err := u.DB.Queryx(sql, poolID)
 	if err != nil {
 		return nil, err
@@ -238,6 +240,7 @@ func (u *RPCHandler) GetDomains(ctx context.Context, request *SearchRequest, res
 	if request.Pending {
 		sql += ` WHERE provisioning_status in ('PENDING_CREATE', 'PENDING_UPDATE', 'PENDING_DELETE')`
 	}
+	sql = u.DB.Rebind(sql)
 	rows, err := u.QueryxWithIds(sql, request)
 
 	if err != nil {
@@ -295,7 +298,7 @@ func (u *RPCHandler) UpdateProvisioningStatus(ctx context.Context, req *Provisio
 	var statusResult []*StatusResult
 	for _, provStatusReq := range req.GetProvisioningStatus() {
 		table := strings.ToLower(provStatusReq.GetModel().String())
-		sql := fmt.Sprintf(`UPDATE %s SET provisioning_status = ? WHERE id = ?`, table)
+		sql := u.DB.Rebind(fmt.Sprintf(`UPDATE %s SET provisioning_status = ? WHERE id = ?`, table))
 		_, err := u.DB.Exec(sql, provStatusReq.GetStatus().String(), provStatusReq.GetId())
 		if err != nil {
 			logger.Error(err)
@@ -317,37 +320,37 @@ func (u *RPCHandler) UpdateMemberStatus(ctx context.Context, req *MemberStatusRe
 		var err error
 		if status == "ONLINE" {
 			// Set all related objects to Online
-			sql := `UPDATE member m
+			sql := u.DB.Rebind(`UPDATE member m
                     INNER JOIN pool p ON m.pool_id = p.id
                     INNER JOIN domain_pool_relation dpr ON p.id = dpr.pool_id
                     INNER JOIN domain d ON dpr.domain_id = d.id
-                    SET m.status = 'ONLINE', p.status = 'ONLINE', d.status = 'ONLINE' WHERE m.id = ?`
+                    SET m.status = 'ONLINE', p.status = 'ONLINE', d.status = 'ONLINE' WHERE m.id = ?`)
 			if _, err = u.DB.Exec(sql, memberStatusReq.GetId()); err != nil {
 				logger.Error(err)
 			}
 		} else {
 			if err = db.TxExecute(u.DB, func(tx *sqlx.Tx) error {
 				// Select count all members from the same pool that are online
-				sql := `SELECT COUNT(m2.id)
+				sql := tx.Rebind(`SELECT COUNT(m2.id)
                         FROM member m
                         INNER JOIN member m2 ON m2.pool_id = m.pool_id
-                        WHERE m.id = ? AND m2.id != m.id AND m2.status = 'ONLINE';`
+                        WHERE m.id = ? AND m2.id != m.id AND m2.status = 'ONLINE';`)
 				var members_online int
 				if err := tx.Get(&members_online, sql, memberStatusReq.GetId()); err != nil {
 					return err
 				}
 
 				if members_online > 0 {
-					sql := `UPDATE member SET status = 'OFFLINE' WHERE id = ?`
+					sql := tx.Rebind(`UPDATE member SET status = 'OFFLINE' WHERE id = ?`)
 					if _, err := tx.Exec(sql, memberStatusReq.GetId()); err != nil {
 						return err
 					}
 				} else {
-					sql := `UPDATE member m
+					sql := tx.Rebind(`UPDATE member m
                             INNER JOIN pool p ON m.pool_id = p.id
                             INNER JOIN domain_pool_relation dpr ON p.id = dpr.pool_id
                             INNER JOIN domain d ON dpr.domain_id = d.id
-                            SET m.status = 'OFFLINE', p.status = 'OFFLINE', d.status = 'OFFLINE' WHERE m.id = ?`
+                            SET m.status = 'OFFLINE', p.status = 'OFFLINE', d.status = 'OFFLINE' WHERE m.id = ?`)
 					if _, err := tx.Exec(sql, memberStatusReq.GetId()); err != nil {
 						return err
 					}

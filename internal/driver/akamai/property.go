@@ -49,6 +49,8 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain) error {
 		HandoutMode:          "normal",
 		FailbackDelay:        0,
 		FailoverDelay:        0,
+		TrafficTargets:       []*gtm.TrafficTarget{},
+		LivenessTests:        []*gtm.LivenessTest{},
 	}
 
 	// Add new Members
@@ -105,6 +107,12 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain) error {
 			livenessTest.ResponseString = monitor.GetReceive()
 		}
 		property.LivenessTests = append(property.LivenessTests, &livenessTest)
+	}
+
+	// Pre-Validation
+	if len(property.TrafficTargets) == 0 {
+		// Need traffictargets with datacenters
+		return nil
 	}
 
 	existingProperty, err := s.gtm.GetProperty(context.Background(), property.Name, config.Global.AkamaiConfig.Domain)

@@ -69,7 +69,7 @@ CREATE TABLE datacenter
     scope               VARCHAR(8)   NOT NULL   DEFAULT 'private' CHECK ( scope IN ('private', 'public')),
     project_id          VARCHAR(36)  NOT NULL,
     provider            VARCHAR(64)  NOT NULL,
-    meta                INT          NOT NULL
+    meta                INT          NOT NULL   DEFAULT 0
 ) ENGINE = InnoDB;
 
 CREATE TABLE member

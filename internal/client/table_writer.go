@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package cli
+package client
 
 import (
 	"fmt"
@@ -189,6 +189,8 @@ func WriteTable(data interface{}) error {
 			Options: table.OptionsNoBorders,
 		})
 		Table.Render()
+	default:
+		return fmt.Errorf("format option %s is not supported.", opts.Formatters.Format)
 	}
 
 	return nil
