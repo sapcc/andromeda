@@ -41,5 +41,5 @@ func (*ServiceList) Execute(_ []string) error {
 }
 
 func init() {
-	/*_, _ = Parser.AddCommand("service", "Services", "Service Commands.", &ServiceOptions)*/
+	_, _ = Parser.AddCommand("service", "Services", "Service Commands.", &ServiceOptions)
 }

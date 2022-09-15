@@ -100,8 +100,8 @@ func (*PoolDelete) Execute(_ []string) error {
 }
 
 func init() {
-	/*_, err := Parser.AddCommand("pool", "Pools", "Pool Commands.", &PoolOptions)
+	_, err := Parser.AddCommand("pool", "Pools", "Pool Commands.", &PoolOptions)
 	if err != nil {
 		panic(err)
-	}*/
+	}
 }

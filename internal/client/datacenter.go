@@ -108,8 +108,8 @@ func (*DatacenterDelete) Execute(_ []string) error {
 }
 
 func init() {
-	/*_, err := Parser.AddCommand("datacenter", "Datacenters", "Datacenter Commands.", &DatacenterOptions)
+	_, err := Parser.AddCommand("datacenter", "Datacenters", "Datacenter Commands.", &DatacenterOptions)
 	if err != nil {
 		panic(err)
-	}*/
+	}
 }
