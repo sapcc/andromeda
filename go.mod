@@ -39,7 +39,7 @@ require (
 	github.com/sapcc/go-bits v0.0.0-20220823141731-fd7850ce8cb7
 	github.com/scottdware/go-bigip v0.0.0-20220517145708-9fe3e2f9f005
 	github.com/stretchr/testify v1.8.0
-	github.com/urfave/cli/v2 v2.6.0
+	github.com/urfave/cli/v2 v2.16.3
 	github.com/xo/dburl v0.11.0
 	go-micro.dev/v4 v4.8.1
 	golang.org/x/net v0.0.0-20220822230855-b0a4917ee28c
@@ -121,6 +121,7 @@ require (
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/xanzy/ssh-agent v0.3.1 // indirect
+	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	github.com/ztrue/tracerr v0.3.0 // indirect
 	go.mongodb.org/mongo-driver v1.10.0 // indirect
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
