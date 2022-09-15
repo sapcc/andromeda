@@ -42,7 +42,7 @@ require (
 	github.com/urfave/cli/v2 v2.16.3
 	github.com/xo/dburl v0.11.0
 	go-micro.dev/v4 v4.8.1
-	golang.org/x/net v0.0.0-20220822230855-b0a4917ee28c
+	golang.org/x/net v0.0.0-20220909164309-bea034e7d591
 	google.golang.org/protobuf v1.28.1
 )
 
