@@ -39,6 +39,11 @@ func GetPolicyForbiddenResponse() middleware.Responder {
 	return middleware.Error(403, PolicyForbidden)
 }
 
+func GetQuotaMetResponse(resource string) *models.Error {
+	return &models.Error{Code: 403, Message: fmt.Sprintf(
+		"Quota has been met for resource: %s", resource)}
+}
+
 func GetErrorPoolNotFound(poolID *strfmt.UUID) *models.Error {
 	return &models.Error{Code: 404, Message: fmt.Sprintf(
 		"invalid value for 'pool_id': Pool '%s' not found", poolID)}

@@ -925,7 +925,7 @@ paths:
       tags:
         - Administrative
       summary: Update Quota
-      x-policy: andromeda:quota:get_one
+      x-policy: andromeda:quota:put
       parameters:
         - in: body
           name: quota

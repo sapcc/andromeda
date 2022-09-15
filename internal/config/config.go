@@ -146,11 +146,11 @@ type ApiSettings struct {
 
 type Quota struct {
 	Enabled                bool  `json:"enabled" description:"Enable quotas."`
-	DefaultQuotaDomain     int64 `json:"default_quota_domain" default:"0" description:"Default quota of domain per project."`
-	DefaultQuotaPool       int64 `json:"default_quota_pool" default:"0" description:"Default quota of pool per project."`
-	DefaultQuotaMember     int64 `json:"default_quota_member" default:"0" description:"Default quota of member per project."`
-	DefaultQuotaMonitor    int64 `json:"default_quota_monitor" default:"0" description:"Default quota of monitor per project."`
-	DefaultQuotaDatacenter int64 `json:"default_quota_datacenter" default:"0" description:"Default quota of datacenter per project."`
+	DefaultQuotaDomain     int64 `json:"domains" default:"0" description:"Default quota of domain per project."`
+	DefaultQuotaPool       int64 `json:"pools" default:"0" description:"Default quota of pool per project."`
+	DefaultQuotaMember     int64 `json:"members" default:"0" description:"Default quota of member per project."`
+	DefaultQuotaMonitor    int64 `json:"monitors" default:"0" description:"Default quota of monitor per project."`
+	DefaultQuotaDatacenter int64 `json:"datacenters" default:"0" description:"Default quota of datacenter per project."`
 }
 
 type Default struct {

@@ -18,6 +18,7 @@ package middlewares
 
 import (
 	"fmt"
+	"github.com/sapcc/andromeda/internal/controller"
 	"net/http"
 	"strings"
 
@@ -68,6 +69,7 @@ func (qrw *quotaResponseWriter) WriteHeader(code int) {
 					pool = ?,
 					member = ?,
 					monitor = ?,
+					datacenter = ?,
                     project_id = ?
                 ON DUPLICATE KEY UPDATE 
 					in_use_%s = in_use_%s %c 1`,
@@ -78,6 +80,7 @@ func (qrw *quotaResponseWriter) WriteHeader(code int) {
 			config.Global.Quota.DefaultQuotaPool,
 			config.Global.Quota.DefaultQuotaMember,
 			config.Global.Quota.DefaultQuotaMonitor,
+			config.Global.Quota.DefaultQuotaDatacenter,
 			qrw.projectID); err != nil {
 			logger.Error(err)
 		}
@@ -117,8 +120,12 @@ func (qc *quotaController) QuotaHandler(next http.Handler) http.Handler {
 			} else {
 				logger.Debug("Quota is ", quotaAvailable)
 				if quotaAvailable < 1 {
-					err := fmt.Sprintf("Quota has been met for resources: %s", resource)
-					http.Error(w, err, http.StatusForbidden)
+					ret, _ := controller.GetQuotaMetResponse(resource).MarshalBinary()
+					w.Header().Set("Content-Type", "application/json; charset=utf-8")
+					w.WriteHeader(403)
+					if _, err := w.Write(ret); err != nil {
+						panic(err)
+					}
 					return
 				}
 			}

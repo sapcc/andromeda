@@ -117,15 +117,17 @@ func ExecuteServer(server *restapi.Server) error {
 	api.AdministrativeGetServicesHandler = administrative.GetServicesHandlerFunc(c.Services.GetServices)
 	api.AdministrativePostSyncHandler = administrative.PostSyncHandlerFunc(c.Sync.PostSync)
 
-	// Quotas
-	api.AdministrativeGetQuotasHandler = administrative.GetQuotasHandlerFunc(c.Quotas.GetQuotas)
-	api.AdministrativeGetQuotasProjectIDHandler = administrative.GetQuotasProjectIDHandlerFunc(c.Quotas.GetQuotasProjectID)
-	api.AdministrativeGetQuotasDefaultsHandler = administrative.GetQuotasDefaultsHandlerFunc(c.Quotas.GetQuotasDefaults)
-	api.AdministrativePutQuotasProjectIDHandler = administrative.PutQuotasProjectIDHandlerFunc(c.Quotas.PutQuotasProjectID)
-	api.AdministrativeDeleteQuotasProjectIDHandler = administrative.DeleteQuotasProjectIDHandlerFunc(c.Quotas.DeleteQuotasProjectID)
-
 	// Quota Middleware
 	if config.Global.Quota.Enabled {
+		logger.Info("Initializing quota middleware")
+
+		// Admin handler
+		api.AdministrativeGetQuotasHandler = administrative.GetQuotasHandlerFunc(c.Quotas.GetQuotas)
+		api.AdministrativeGetQuotasProjectIDHandler = administrative.GetQuotasProjectIDHandlerFunc(c.Quotas.GetQuotasProjectID)
+		api.AdministrativeGetQuotasDefaultsHandler = administrative.GetQuotasDefaultsHandlerFunc(c.Quotas.GetQuotasDefaults)
+		api.AdministrativePutQuotasProjectIDHandler = administrative.PutQuotasProjectIDHandlerFunc(c.Quotas.PutQuotasProjectID)
+		api.AdministrativeDeleteQuotasProjectIDHandler = administrative.DeleteQuotasProjectIDHandlerFunc(c.Quotas.DeleteQuotasProjectID)
+
 		qc := middlewares.NewQuotaController(db)
 		api.AddMiddlewareFor("POST", "/datacenters", qc.QuotaHandler)
 		api.AddMiddlewareFor("POST", "/domains", qc.QuotaHandler)
