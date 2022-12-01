@@ -17,11 +17,13 @@
 package controller
 
 import (
-	"github.com/jmoiron/sqlx"
-	"github.com/sapcc/andromeda/internal/utils"
-	"go-micro.dev/v4"
 	"os"
 	"time"
+
+	"github.com/jmoiron/sqlx"
+	"go-micro.dev/v4"
+
+	"github.com/sapcc/andromeda/internal/utils"
 )
 
 type Controller struct {

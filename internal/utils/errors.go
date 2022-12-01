@@ -1,5 +1,5 @@
 /*
- *   Copyright 2021 SAP SE
+ *   Copyright 2022 SAP SE
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package controller
+package utils
 
 import (
 	"fmt"
@@ -41,7 +41,7 @@ func GetPolicyForbiddenResponse() middleware.Responder {
 
 func GetQuotaMetResponse(resource string) *models.Error {
 	return &models.Error{Code: 403, Message: fmt.Sprintf(
-		"Quota has been met for resource: %s", resource)}
+		"Quota has been met for Resource: %s", resource)}
 }
 
 func GetErrorPoolNotFound(poolID *strfmt.UUID) *models.Error {
@@ -55,16 +55,16 @@ func GetErrorPoolHasAlreadyAMonitor(poolID *strfmt.UUID) *models.Error {
 }
 
 type ResourcesNotFoundError struct {
-	ids      []strfmt.UUID
-	resource string
+	Ids      []strfmt.UUID
+	Resource string
 }
 
 func (rnf ResourcesNotFoundError) Error() string {
 	var err strings.Builder
-	err.WriteString(rnf.resource + "(s) not found: [")
-	for i, id := range rnf.ids {
+	err.WriteString(rnf.Resource + "(s) not found: [")
+	for i, id := range rnf.Ids {
 		err.WriteString(id.String())
-		if i < len(rnf.ids)-1 {
+		if i < len(rnf.Ids)-1 {
 			err.WriteString(", ")
 		}
 	}

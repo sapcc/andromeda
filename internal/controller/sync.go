@@ -18,6 +18,7 @@ package controller
 
 import (
 	"context"
+	"github.com/sapcc/andromeda/internal/utils"
 
 	"github.com/sapcc/andromeda/internal/rpc/worker"
 
@@ -39,7 +40,7 @@ func (c SyncController) PostSync(params administrative.PostSyncParams) middlewar
 		panic(err)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
-		return GetPolicyForbiddenResponse()
+		return utils.GetPolicyForbiddenResponse()
 	}
 
 	pub1 := micro.NewEvent("andromeda.sync_all", c.sv.Client())

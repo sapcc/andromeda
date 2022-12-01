@@ -18,7 +18,6 @@ package middlewares
 
 import (
 	"fmt"
-	"github.com/sapcc/andromeda/internal/controller"
 	"net/http"
 	"strings"
 
@@ -28,6 +27,7 @@ import (
 	"github.com/sapcc/andromeda/internal/auth"
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/policy"
+	"github.com/sapcc/andromeda/internal/utils"
 )
 
 type quotaController struct {
@@ -120,7 +120,7 @@ func (qc *quotaController) QuotaHandler(next http.Handler) http.Handler {
 			} else {
 				logger.Debug("Quota is ", quotaAvailable)
 				if quotaAvailable < 1 {
-					ret, _ := controller.GetQuotaMetResponse(resource).MarshalBinary()
+					ret, _ := utils.GetQuotaMetResponse(resource).MarshalBinary()
 					w.Header().Set("Content-Type", "application/json; charset=utf-8")
 					w.WriteHeader(403)
 					if _, err := w.Write(ret); err != nil {

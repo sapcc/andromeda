@@ -44,10 +44,10 @@ func (c DatacenterController) GetDatacenters(params datacenters.GetDatacentersPa
 	rows, err := pagination.Query(c.db, params.HTTPRequest, nil)
 	if err != nil {
 		if errors.Is(err, db.ErrInvalidMarker) {
-			return datacenters.NewGetDatacentersBadRequest().WithPayload(InvalidMarker)
+			return datacenters.NewGetDatacentersBadRequest().WithPayload(utils.InvalidMarker)
 		}
 		if errors.Is(err, db.ErrPolicyForbidden) {
-			return GetPolicyForbiddenResponse()
+			return utils.GetPolicyForbiddenResponse()
 		}
 		panic(err)
 	}
@@ -75,7 +75,7 @@ func (c DatacenterController) PostDatacenters(params datacenters.PostDatacenters
 		panic(err)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
-		return GetPolicyForbiddenResponse()
+		return utils.GetPolicyForbiddenResponse()
 	}
 	datacenter.ProjectID = &projectID
 
@@ -106,11 +106,11 @@ func (c DatacenterController) GetDatacentersDatacenterID(params datacenters.GetD
 	datacenter := models.Datacenter{ID: params.DatacenterID}
 	err := PopulateDatacenter(c.db, &datacenter, []string{"*"})
 	if err != nil {
-		return datacenters.NewGetDatacentersDatacenterIDNotFound().WithPayload(NotFound)
+		return datacenters.NewGetDatacentersDatacenterIDNotFound().WithPayload(utils.NotFound)
 	}
 
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *datacenter.ProjectID) {
-		return GetPolicyForbiddenResponse()
+		return utils.GetPolicyForbiddenResponse()
 	}
 	return datacenters.NewGetDatacentersDatacenterIDOK().WithPayload(&datacenters.GetDatacentersDatacenterIDOKBody{Datacenter: &datacenter})
 }
@@ -120,10 +120,10 @@ func (c DatacenterController) PutDatacentersDatacenterID(params datacenters.PutD
 	datacenter := models.Datacenter{ID: params.DatacenterID}
 	err := PopulateDatacenter(c.db, &datacenter, []string{"project_id"})
 	if err != nil {
-		return datacenters.NewPutDatacentersDatacenterIDNotFound().WithPayload(NotFound)
+		return datacenters.NewPutDatacentersDatacenterIDNotFound().WithPayload(utils.NotFound)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *datacenter.ProjectID) {
-		return GetPolicyForbiddenResponse()
+		return utils.GetPolicyForbiddenResponse()
 	}
 
 	params.Datacenter.Datacenter.ID = params.DatacenterID
@@ -158,16 +158,16 @@ func (c DatacenterController) PutDatacentersDatacenterID(params datacenters.PutD
 func (c DatacenterController) DeleteDatacentersDatacenterID(params datacenters.DeleteDatacentersDatacenterIDParams) middleware.Responder {
 	datacenter := models.Datacenter{ID: params.DatacenterID}
 	if err := PopulateDatacenter(c.db, &datacenter, []string{"project_id"}); err != nil {
-		return datacenters.NewDeleteDatacentersDatacenterIDNotFound().WithPayload(NotFound)
+		return datacenters.NewDeleteDatacentersDatacenterIDNotFound().WithPayload(utils.NotFound)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *datacenter.ProjectID) {
-		return GetPolicyForbiddenResponse()
+		return utils.GetPolicyForbiddenResponse()
 	}
 
 	sql := c.db.Rebind(`DELETE FROM datacenter WHERE id = ?`)
 	res := c.db.MustExec(sql, params.DatacenterID)
 	if deleted, _ := res.RowsAffected(); deleted != 1 {
-		return datacenters.NewDeleteDatacentersDatacenterIDNotFound().WithPayload(NotFound)
+		return datacenters.NewDeleteDatacentersDatacenterIDNotFound().WithPayload(utils.NotFound)
 	}
 	return datacenters.NewDeleteDatacentersDatacenterIDNoContent()
 }

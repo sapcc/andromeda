@@ -50,10 +50,10 @@ func (c MemberController) GetMembers(params members.GetPoolsPoolIDMembersParams)
 	rows, err := pagination.Query(c.db, params.HTTPRequest, filter)
 	if err != nil {
 		if errors.Is(err, db.ErrInvalidMarker) {
-			return members.NewGetPoolsPoolIDMembersBadRequest().WithPayload(InvalidMarker)
+			return members.NewGetPoolsPoolIDMembersBadRequest().WithPayload(utils.InvalidMarker)
 		}
 		if errors.Is(err, db.ErrPolicyForbidden) {
-			return GetPolicyForbiddenResponse()
+			return utils.GetPolicyForbiddenResponse()
 		}
 		panic(err)
 	}
@@ -80,12 +80,12 @@ func (c MemberController) PostMembers(params members.PostPoolsPoolIDMembersParam
 		panic(err)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
-		return GetPolicyForbiddenResponse()
+		return utils.GetPolicyForbiddenResponse()
 	}
 
 	pool := models.Pool{ID: params.PoolID}
 	if err := PopulatePool(c.db, &pool, []string{"project_id"}, false); err != nil || *pool.ProjectID != projectID {
-		return members.NewPostPoolsPoolIDMembersNotFound().WithPayload(GetErrorPoolNotFound(&params.PoolID))
+		return members.NewPostPoolsPoolIDMembersNotFound().WithPayload(utils.GetErrorPoolNotFound(&params.PoolID))
 	}
 	member.PoolID = params.PoolID
 	member.ProjectID = &projectID
@@ -109,11 +109,11 @@ func (c MemberController) PostMembers(params members.PostPoolsPoolIDMembersParam
 	if err := stmt.Get(member, member); err != nil {
 		var pe *pq.Error
 		if errors.As(err, &pe) && pe.Code == pgerrcode.UniqueViolation {
-			return members.NewPostPoolsPoolIDMembersDefault(409).WithPayload(DuplicateMember)
+			return members.NewPostPoolsPoolIDMembersDefault(409).WithPayload(utils.DuplicateMember)
 		}
 		var me *mysql.MySQLError
 		if errors.As(err, &me) && me.Number == 1062 {
-			return members.NewPostPoolsPoolIDMembersDefault(409).WithPayload(DuplicateMember)
+			return members.NewPostPoolsPoolIDMembersDefault(409).WithPayload(utils.DuplicateMember)
 		}
 		panic(err)
 	}
@@ -125,11 +125,11 @@ func (c MemberController) PostMembers(params members.PostPoolsPoolIDMembersParam
 func (c MemberController) GetMembersMemberID(params members.GetPoolsPoolIDMembersMemberIDParams) middleware.Responder {
 	member := models.Member{ID: params.MemberID, PoolID: params.PoolID}
 	if err := PopulateMember(c.db, &member, []string{"*"}); err != nil {
-		return members.NewGetPoolsPoolIDMembersMemberIDNotFound().WithPayload(NotFound)
+		return members.NewGetPoolsPoolIDMembersMemberIDNotFound().WithPayload(utils.NotFound)
 	}
 
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *member.ProjectID) {
-		return GetPolicyForbiddenResponse()
+		return utils.GetPolicyForbiddenResponse()
 	}
 	return members.NewGetPoolsPoolIDMembersMemberIDOK().
 		WithPayload(&members.GetPoolsPoolIDMembersMemberIDOKBody{Member: &member})
@@ -139,10 +139,10 @@ func (c MemberController) GetMembersMemberID(params members.GetPoolsPoolIDMember
 func (c MemberController) PutMembersMemberID(params members.PutPoolsPoolIDMembersMemberIDParams) middleware.Responder {
 	member := models.Member{ID: params.MemberID, PoolID: params.PoolID}
 	if err := PopulateMember(c.db, &member, []string{"project_id"}); err != nil {
-		return members.NewPutPoolsPoolIDMembersMemberIDNotFound().WithPayload(NotFound)
+		return members.NewPutPoolsPoolIDMembersMemberIDNotFound().WithPayload(utils.NotFound)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *member.ProjectID) {
-		return GetPolicyForbiddenResponse()
+		return utils.GetPolicyForbiddenResponse()
 	}
 
 	params.Member.Member.ID = params.MemberID
@@ -173,16 +173,16 @@ func (c MemberController) PutMembersMemberID(params members.PutPoolsPoolIDMember
 func (c MemberController) DeleteMembersMemberID(params members.DeletePoolsPoolIDMembersMemberIDParams) middleware.Responder {
 	member := models.Member{ID: params.MemberID, PoolID: params.PoolID}
 	if err := PopulateMember(c.db, &member, []string{"project_id"}); err != nil {
-		return members.NewDeletePoolsPoolIDMembersMemberIDNotFound().WithPayload(NotFound)
+		return members.NewDeletePoolsPoolIDMembersMemberIDNotFound().WithPayload(utils.NotFound)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *member.ProjectID) {
-		return GetPolicyForbiddenResponse()
+		return utils.GetPolicyForbiddenResponse()
 	}
 
 	sql := c.db.Rebind(`DELETE FROM member WHERE id = ?`)
 	res := c.db.MustExec(sql, params.MemberID)
 	if deleted, _ := res.RowsAffected(); deleted != 1 {
-		members.NewDeletePoolsPoolIDMembersMemberIDNotFound().WithPayload(NotFound)
+		members.NewDeletePoolsPoolIDMembersMemberIDNotFound().WithPayload(utils.NotFound)
 	}
 
 	return members.NewDeletePoolsPoolIDMembersMemberIDNoContent()

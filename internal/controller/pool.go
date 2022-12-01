@@ -45,10 +45,10 @@ func (c PoolController) GetPools(params pools.GetPoolsParams) middleware.Respond
 	rows, err := pagination.Query(c.db, params.HTTPRequest, nil)
 	if err != nil {
 		if errors.Is(err, db.ErrInvalidMarker) {
-			return pools.NewGetPoolsBadRequest().WithPayload(InvalidMarker)
+			return pools.NewGetPoolsBadRequest().WithPayload(utils.InvalidMarker)
 		}
 		if errors.Is(err, db.ErrPolicyForbidden) {
-			return GetPolicyForbiddenResponse()
+			return utils.GetPolicyForbiddenResponse()
 		}
 		panic(err)
 	}
@@ -80,7 +80,7 @@ func (c PoolController) PostPools(params pools.PostPoolsParams) middleware.Respo
 	}
 
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
-		return GetPolicyForbiddenResponse()
+		return utils.GetPolicyForbiddenResponse()
 	}
 	pool.ProjectID = &projectID
 
@@ -123,11 +123,11 @@ func (c PoolController) GetPoolsPoolID(params pools.GetPoolsPoolIDParams) middle
 	//zero-length slice used because we want [] via json encoder, nil encodes null
 	pool := models.Pool{ID: params.PoolID, Members: []strfmt.UUID{}, Domains: []strfmt.UUID{}}
 	if err := PopulatePool(c.db, &pool, []string{"*"}, true); err != nil {
-		return pools.NewGetPoolsPoolIDNotFound().WithPayload(NotFound)
+		return pools.NewGetPoolsPoolIDNotFound().WithPayload(utils.NotFound)
 	}
 
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *pool.ProjectID) {
-		return GetPolicyForbiddenResponse()
+		return utils.GetPolicyForbiddenResponse()
 	}
 	return pools.NewGetPoolsPoolIDOK().WithPayload(&pools.GetPoolsPoolIDOKBody{Pool: &pool})
 }
@@ -137,10 +137,10 @@ func (c PoolController) PutPoolsPoolID(params pools.PutPoolsPoolIDParams) middle
 	//zero-length slice used because we want [] via json encoder, nil encodes null
 	pool := models.Pool{ID: params.PoolID, Members: []strfmt.UUID{}, Domains: []strfmt.UUID{}}
 	if err := PopulatePool(c.db, &pool, []string{"id", "project_id"}, false); err != nil {
-		return pools.NewPutPoolsPoolIDNotFound().WithPayload(NotFound)
+		return pools.NewPutPoolsPoolIDNotFound().WithPayload(utils.NotFound)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *pool.ProjectID) {
-		return GetPolicyForbiddenResponse()
+		return utils.GetPolicyForbiddenResponse()
 	}
 
 	params.Pool.Pool.ID = params.PoolID
@@ -168,16 +168,16 @@ func (c PoolController) DeletePoolsPoolID(params pools.DeletePoolsPoolIDParams) 
 	//zero-length slice used because we want [] via json encoder, nil encodes null
 	pool := models.Pool{ID: params.PoolID, Members: []strfmt.UUID{}, Domains: []strfmt.UUID{}}
 	if err := PopulatePool(c.db, &pool, []string{"id", "project_id"}, false); err != nil {
-		return pools.NewDeletePoolsPoolIDNotFound().WithPayload(NotFound)
+		return pools.NewDeletePoolsPoolIDNotFound().WithPayload(utils.NotFound)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *pool.ProjectID) {
-		return GetPolicyForbiddenResponse()
+		return utils.GetPolicyForbiddenResponse()
 	}
 
 	sql := c.db.Rebind(`DELETE FROM pool WHERE id = ?`)
 	res := c.db.MustExec(sql, params.PoolID)
 	if deleted, _ := res.RowsAffected(); deleted != 1 {
-		return pools.NewDeletePoolsPoolIDNotFound().WithPayload(NotFound)
+		return pools.NewDeletePoolsPoolIDNotFound().WithPayload(utils.NotFound)
 	}
 	return pools.NewDeletePoolsPoolIDNoContent()
 }

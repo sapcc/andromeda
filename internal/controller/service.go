@@ -20,6 +20,7 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 	"github.com/jmoiron/sqlx"
+	"github.com/sapcc/andromeda/internal/utils"
 	"go-micro.dev/v4"
 
 	"github.com/sapcc/andromeda/internal/auth"
@@ -48,7 +49,7 @@ func (c ServiceController) GetServices(params administrative.GetServicesParams) 
 		panic(err)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
-		return GetPolicyForbiddenResponse()
+		return utils.GetPolicyForbiddenResponse()
 	}
 
 	//goland:noinspection GoPreferNilSlice

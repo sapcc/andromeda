@@ -51,10 +51,10 @@ func (c DomainController) GetDomains(params domains.GetDomainsParams) middleware
 	rows, err := pagination.Query(c.db, params.HTTPRequest, nil)
 	if err != nil {
 		if errors.Is(err, db.ErrInvalidMarker) {
-			return domains.NewGetDomainsDefault(400).WithPayload(InvalidMarker)
+			return domains.NewGetDomainsDefault(400).WithPayload(utils.InvalidMarker)
 		}
 		if errors.Is(err, db.ErrPolicyForbidden) {
-			return GetPolicyForbiddenResponse()
+			return utils.GetPolicyForbiddenResponse()
 		}
 		panic(err)
 	}
@@ -88,7 +88,7 @@ func (c DomainController) PostDomains(params domains.PostDomainsParams) middlewa
 		panic(err)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
-		return GetPolicyForbiddenResponse()
+		return utils.GetPolicyForbiddenResponse()
 	}
 	domain.ProjectID = &projectID
 	if domain.Pools == nil {
@@ -125,7 +125,7 @@ func (c DomainController) PostDomains(params domains.PostDomainsParams) middlewa
 		}
 		return nil
 	}); err != nil {
-		var rnfError *ResourcesNotFoundError
+		var rnfError *utils.ResourcesNotFoundError
 		if errors.As(err, &rnfError) {
 			errMsg := "Invalid value for 'pools': " + rnfError.Error()
 			return domains.NewPostDomainsDefault(400).WithPayload(
@@ -133,11 +133,11 @@ func (c DomainController) PostDomains(params domains.PostDomainsParams) middlewa
 		}
 		var pe *pq.Error
 		if errors.As(err, &pe) && pe.Code == pgerrcode.UniqueViolation {
-			return domains.NewPostDomainsDefault(409).WithPayload(DuplicateDomain)
+			return domains.NewPostDomainsDefault(409).WithPayload(utils.DuplicateDomain)
 		}
 		var me *mysql.MySQLError
 		if errors.As(err, &me) && me.Number == 1062 {
-			return domains.NewPostDomainsDefault(409).WithPayload(DuplicateDomain)
+			return domains.NewPostDomainsDefault(409).WithPayload(utils.DuplicateDomain)
 		}
 		panic(err)
 	}
@@ -150,11 +150,11 @@ func (c DomainController) GetDomainsDomainID(params domains.GetDomainsDomainIDPa
 	// Get domain
 	domain := models.Domain{ID: params.DomainID, Pools: []strfmt.UUID{}}
 	if err := PopulateDomain(c.db, &domain, []string{"*"}); err != nil {
-		return domains.NewGetDomainsDefault(404).WithPayload(NotFound)
+		return domains.NewGetDomainsDefault(404).WithPayload(utils.NotFound)
 	}
 
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *domain.ProjectID) {
-		return GetPolicyForbiddenResponse()
+		return utils.GetPolicyForbiddenResponse()
 	}
 	return domains.NewGetDomainsDomainIDOK().WithPayload(&domains.GetDomainsDomainIDOKBody{Domain: &domain})
 }
@@ -163,15 +163,15 @@ func (c DomainController) GetDomainsDomainID(params domains.GetDomainsDomainIDPa
 func (c DomainController) PutDomainsDomainID(params domains.PutDomainsDomainIDParams) middleware.Responder {
 	domain := models.Domain{Pools: []strfmt.UUID{}, ID: params.DomainID}
 	if err := PopulateDomain(c.db, &domain, []string{"*"}); err != nil {
-		return domains.NewGetDomainsDefault(404).WithPayload(NotFound)
+		return domains.NewGetDomainsDefault(404).WithPayload(utils.NotFound)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *domain.ProjectID) {
-		return GetPolicyForbiddenResponse()
+		return utils.GetPolicyForbiddenResponse()
 	}
 
 	if params.Domain.Domain.Provider != nil && *params.Domain.Domain.Provider != *domain.Provider {
 		// cannot change provider
-		return domains.NewGetDomainsDefault(404).WithPayload(ProviderUnchangeable)
+		return domains.NewGetDomainsDefault(404).WithPayload(utils.ProviderUnchangeable)
 	}
 
 	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
@@ -216,14 +216,14 @@ func (c DomainController) PutDomainsDomainID(params domains.PutDomainsDomainIDPa
 
 		return nil
 	}); err != nil {
-		var rnfError *ResourcesNotFoundError
+		var rnfError *utils.ResourcesNotFoundError
 		if errors.As(err, &rnfError) {
 			errMsg := "Invalid value for 'pools': " + rnfError.Error()
 			return domains.NewGetDomainsDefault(400).WithPayload(
 				&models.Error{Code: 400, Message: errMsg})
 		}
 		if errors.Is(err, dbsql.ErrNoRows) {
-			return domains.NewGetDomainsDefault(404).WithPayload(NotFound)
+			return domains.NewGetDomainsDefault(404).WithPayload(utils.NotFound)
 		}
 		// Unknown Error
 		panic(err)
@@ -241,16 +241,16 @@ func (c DomainController) PutDomainsDomainID(params domains.PutDomainsDomainIDPa
 func (c DomainController) DeleteDomainsDomainID(params domains.DeleteDomainsDomainIDParams) middleware.Responder {
 	domain := models.Domain{ID: params.DomainID}
 	if err := PopulateDomain(c.db, &domain, []string{"id", "project_id"}); err != nil {
-		return domains.NewGetDomainsDefault(404).WithPayload(NotFound)
+		return domains.NewGetDomainsDefault(404).WithPayload(utils.NotFound)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *domain.ProjectID) {
-		return GetPolicyForbiddenResponse()
+		return utils.GetPolicyForbiddenResponse()
 	}
 
 	sql := c.db.Rebind(`DELETE FROM domain WHERE id = ?`)
 	res := c.db.MustExec(sql, params.DomainID)
 	if deleted, _ := res.RowsAffected(); deleted != 1 {
-		return domains.NewGetDomainsDefault(404).WithPayload(NotFound)
+		return domains.NewGetDomainsDefault(404).WithPayload(utils.NotFound)
 	}
 	return domains.NewDeleteDomainsDomainIDNoContent()
 }
@@ -281,7 +281,7 @@ func insertDomainPoolRelations(tx *sqlx.Tx, domainID strfmt.UUID, projectID stri
 	}
 	if len(validPoolsFound) != len(poolIDs) {
 		missingPools := utils.UUIDsDifference(poolIDs, validPoolsFound)
-		return nil, &ResourcesNotFoundError{ids: missingPools, resource: "Pool"}
+		return nil, &utils.ResourcesNotFoundError{Ids: missingPools, Resource: "Pool"}
 	}
 
 	for _, poolID := range poolIDs {

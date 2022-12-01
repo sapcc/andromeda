@@ -49,10 +49,10 @@ func (c MonitorController) GetMonitors(params monitors.GetMonitorsParams) middle
 	rows, err := pagination.Query(c.db, params.HTTPRequest, nil)
 	if err != nil {
 		if errors.Is(err, db.ErrInvalidMarker) {
-			return monitors.NewGetMonitorsBadRequest().WithPayload(InvalidMarker)
+			return monitors.NewGetMonitorsBadRequest().WithPayload(utils.InvalidMarker)
 		}
 		if errors.Is(err, db.ErrPolicyForbidden) {
-			return GetPolicyForbiddenResponse()
+			return utils.GetPolicyForbiddenResponse()
 		}
 		panic(err)
 	}
@@ -79,13 +79,13 @@ func (c MonitorController) PostMonitors(params monitors.PostMonitorsParams) midd
 		panic(err)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
-		return GetPolicyForbiddenResponse()
+		return utils.GetPolicyForbiddenResponse()
 	}
 	monitor.ProjectID = &projectID
 
 	pool := models.Pool{ID: *monitor.PoolID}
 	if err := PopulatePool(c.db, &pool, []string{"project_id"}, false); err != nil || *pool.ProjectID != projectID {
-		return monitors.NewPostMonitorsNotFound().WithPayload(GetErrorPoolNotFound(monitor.PoolID))
+		return monitors.NewPostMonitorsNotFound().WithPayload(utils.GetErrorPoolNotFound(monitor.PoolID))
 	}
 
 	// Set default values
@@ -128,11 +128,11 @@ func (c MonitorController) PostMonitors(params monitors.PostMonitorsParams) midd
 	}); err != nil {
 		var pe *pgconn.PgError
 		if errors.As(err, &pe) && pe.Code == pgerrcode.UniqueViolation {
-			return monitors.NewPostMonitorsBadRequest().WithPayload(GetErrorPoolHasAlreadyAMonitor(monitor.PoolID))
+			return monitors.NewPostMonitorsBadRequest().WithPayload(utils.GetErrorPoolHasAlreadyAMonitor(monitor.PoolID))
 		}
 		var me *mysql.MySQLError
 		if errors.As(err, &me) && me.Number == 1062 {
-			return monitors.NewPostMonitorsBadRequest().WithPayload(GetErrorPoolHasAlreadyAMonitor(monitor.PoolID))
+			return monitors.NewPostMonitorsBadRequest().WithPayload(utils.GetErrorPoolHasAlreadyAMonitor(monitor.PoolID))
 		}
 		panic(err)
 	}
@@ -144,11 +144,11 @@ func (c MonitorController) PostMonitors(params monitors.PostMonitorsParams) midd
 func (c MonitorController) GetMonitorsMonitorID(params monitors.GetMonitorsMonitorIDParams) middleware.Responder {
 	monitor := models.Monitor{ID: params.MonitorID}
 	if err := PopulateMonitor(c.db, &monitor, []string{"*"}); err != nil {
-		return monitors.NewGetMonitorsMonitorIDNotFound().WithPayload(NotFound)
+		return monitors.NewGetMonitorsMonitorIDNotFound().WithPayload(utils.NotFound)
 	}
 
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *monitor.ProjectID) {
-		return GetPolicyForbiddenResponse()
+		return utils.GetPolicyForbiddenResponse()
 	}
 	return monitors.NewGetMonitorsMonitorIDOK().WithPayload(&monitors.GetMonitorsMonitorIDOKBody{Monitor: &monitor})
 }
@@ -157,14 +157,14 @@ func (c MonitorController) GetMonitorsMonitorID(params monitors.GetMonitorsMonit
 func (c MonitorController) PutMonitorsMonitorID(params monitors.PutMonitorsMonitorIDParams) middleware.Responder {
 	monitor := models.Monitor{ID: params.MonitorID}
 	if err := PopulateMonitor(c.db, &monitor, []string{"project_id", "pool_id"}); err != nil {
-		return monitors.NewPutMonitorsMonitorIDNotFound().WithPayload(NotFound)
+		return monitors.NewPutMonitorsMonitorIDNotFound().WithPayload(utils.NotFound)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *monitor.ProjectID) {
-		return GetPolicyForbiddenResponse()
+		return utils.GetPolicyForbiddenResponse()
 	}
 
 	if *params.Monitor.Monitor.PoolID != *monitor.PoolID {
-		return monitors.NewPutMonitorsMonitorIDBadRequest().WithPayload(PoolIDImmutable)
+		return monitors.NewPutMonitorsMonitorIDBadRequest().WithPayload(utils.PoolIDImmutable)
 	}
 
 	params.Monitor.Monitor.ID = params.MonitorID
@@ -195,16 +195,16 @@ func (c MonitorController) PutMonitorsMonitorID(params monitors.PutMonitorsMonit
 func (c MonitorController) DeleteMonitorsMonitorID(params monitors.DeleteMonitorsMonitorIDParams) middleware.Responder {
 	monitor := models.Monitor{ID: params.MonitorID}
 	if err := PopulateMonitor(c.db, &monitor, []string{"project_id"}); err != nil {
-		return monitors.NewDeleteMonitorsMonitorIDNotFound().WithPayload(NotFound)
+		return monitors.NewDeleteMonitorsMonitorIDNotFound().WithPayload(utils.NotFound)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *monitor.ProjectID) {
-		return GetPolicyForbiddenResponse()
+		return utils.GetPolicyForbiddenResponse()
 	}
 
 	sql := `DELETE FROM monitor WHERE id = ?`
 	res := c.db.MustExec(sql, params.MonitorID)
 	if deleted, _ := res.RowsAffected(); deleted != 1 {
-		monitors.NewDeleteMonitorsMonitorIDNotFound().WithPayload(NotFound)
+		monitors.NewDeleteMonitorsMonitorIDNotFound().WithPayload(utils.NotFound)
 	}
 	return monitors.NewDeleteMonitorsMonitorIDNoContent()
 }
