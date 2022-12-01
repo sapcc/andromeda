@@ -43,10 +43,10 @@ func NewPostSync(ctx *middleware.Context, handler PostSyncHandler) *PostSync {
 	return &PostSync{Context: ctx, Handler: handler}
 }
 
-/* PostSync swagger:route POST /sync Administrative postSync
+/*
+	PostSync swagger:route POST /sync Administrative postSync
 
 Enqueue a full sync
-
 */
 type PostSync struct {
 	Context *middleware.Context

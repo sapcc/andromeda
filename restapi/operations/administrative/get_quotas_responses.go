@@ -30,7 +30,8 @@ import (
 // GetQuotasOKCode is the HTTP code returned for type GetQuotasOK
 const GetQuotasOKCode int = 200
 
-/*GetQuotasOK A JSON array of quotas
+/*
+GetQuotasOK A JSON array of quotas
 
 swagger:response getQuotasOK
 */
@@ -71,7 +72,8 @@ func (o *GetQuotasOK) WriteResponse(rw http.ResponseWriter, producer runtime.Pro
 	}
 }
 
-/*GetQuotasDefault Unexpected Error
+/*
+GetQuotasDefault Unexpected Error
 
 swagger:response getQuotasDefault
 */

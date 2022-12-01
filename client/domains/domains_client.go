@@ -56,7 +56,7 @@ type ClientService interface {
 }
 
 /*
-  DeleteDomainsDomainID deletes a domain
+DeleteDomainsDomainID deletes a domain
 */
 func (a *Client) DeleteDomainsDomainID(params *DeleteDomainsDomainIDParams, opts ...ClientOption) (*DeleteDomainsDomainIDNoContent, error) {
 	// TODO: Validate the params before sending
@@ -93,7 +93,7 @@ func (a *Client) DeleteDomainsDomainID(params *DeleteDomainsDomainIDParams, opts
 }
 
 /*
-  GetDomains lists domains
+GetDomains lists domains
 */
 func (a *Client) GetDomains(params *GetDomainsParams, opts ...ClientOption) (*GetDomainsOK, error) {
 	// TODO: Validate the params before sending
@@ -130,7 +130,7 @@ func (a *Client) GetDomains(params *GetDomainsParams, opts ...ClientOption) (*Ge
 }
 
 /*
-  GetDomainsDomainID shows domain detail
+GetDomainsDomainID shows domain detail
 */
 func (a *Client) GetDomainsDomainID(params *GetDomainsDomainIDParams, opts ...ClientOption) (*GetDomainsDomainIDOK, error) {
 	// TODO: Validate the params before sending
@@ -167,7 +167,7 @@ func (a *Client) GetDomainsDomainID(params *GetDomainsDomainIDParams, opts ...Cl
 }
 
 /*
-  PostDomains creates new domain
+PostDomains creates new domain
 */
 func (a *Client) PostDomains(params *PostDomainsParams, opts ...ClientOption) (*PostDomainsCreated, error) {
 	// TODO: Validate the params before sending
@@ -204,7 +204,7 @@ func (a *Client) PostDomains(params *PostDomainsParams, opts ...ClientOption) (*
 }
 
 /*
-  PutDomainsDomainID updates a domain
+PutDomainsDomainID updates a domain
 */
 func (a *Client) PutDomainsDomainID(params *PutDomainsDomainIDParams, opts ...ClientOption) (*PutDomainsDomainIDAccepted, error) {
 	// TODO: Validate the params before sending

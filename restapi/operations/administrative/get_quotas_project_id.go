@@ -49,10 +49,10 @@ func NewGetQuotasProjectID(ctx *middleware.Context, handler GetQuotasProjectIDHa
 	return &GetQuotasProjectID{Context: ctx, Handler: handler}
 }
 
-/* GetQuotasProjectID swagger:route GET /quotas/{project_id} Administrative getQuotasProjectId
+/*
+	GetQuotasProjectID swagger:route GET /quotas/{project_id} Administrative getQuotasProjectId
 
 Show Quota detail
-
 */
 type GetQuotasProjectID struct {
 	Context *middleware.Context

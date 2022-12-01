@@ -50,10 +50,10 @@ func NewGetMonitors(ctx *middleware.Context, handler GetMonitorsHandler) *GetMon
 	return &GetMonitors{Context: ctx, Handler: handler}
 }
 
-/* GetMonitors swagger:route GET /monitors Monitors getMonitors
+/*
+	GetMonitors swagger:route GET /monitors Monitors getMonitors
 
 List monitors
-
 */
 type GetMonitors struct {
 	Context *middleware.Context

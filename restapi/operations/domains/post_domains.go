@@ -50,10 +50,10 @@ func NewPostDomains(ctx *middleware.Context, handler PostDomainsHandler) *PostDo
 	return &PostDomains{Context: ctx, Handler: handler}
 }
 
-/* PostDomains swagger:route POST /domains Domains postDomains
+/*
+	PostDomains swagger:route POST /domains Domains postDomains
 
 Create new domain
-
 */
 type PostDomains struct {
 	Context *middleware.Context

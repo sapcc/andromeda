@@ -66,10 +66,12 @@ func NewPutMonitorsMonitorIDParamsWithHTTPClient(client *http.Client) *PutMonito
 	}
 }
 
-/* PutMonitorsMonitorIDParams contains all the parameters to send to the API endpoint
-   for the put monitors monitor ID operation.
+/*
+PutMonitorsMonitorIDParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the put monitors monitor ID operation.
+
+	Typically these are written to a http.Request.
 */
 type PutMonitorsMonitorIDParams struct {
 

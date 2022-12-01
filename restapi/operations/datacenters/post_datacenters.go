@@ -50,10 +50,10 @@ func NewPostDatacenters(ctx *middleware.Context, handler PostDatacentersHandler)
 	return &PostDatacenters{Context: ctx, Handler: handler}
 }
 
-/* PostDatacenters swagger:route POST /datacenters Datacenters postDatacenters
+/*
+	PostDatacenters swagger:route POST /datacenters Datacenters postDatacenters
 
 Create new datacenter
-
 */
 type PostDatacenters struct {
 	Context *middleware.Context

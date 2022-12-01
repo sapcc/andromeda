@@ -30,7 +30,8 @@ import (
 // PostPoolsPoolIDMembersCreatedCode is the HTTP code returned for type PostPoolsPoolIDMembersCreated
 const PostPoolsPoolIDMembersCreatedCode int = 201
 
-/*PostPoolsPoolIDMembersCreated Created member.
+/*
+PostPoolsPoolIDMembersCreated Created member.
 
 swagger:response postPoolsPoolIdMembersCreated
 */
@@ -74,7 +75,8 @@ func (o *PostPoolsPoolIDMembersCreated) WriteResponse(rw http.ResponseWriter, pr
 // PostPoolsPoolIDMembersBadRequestCode is the HTTP code returned for type PostPoolsPoolIDMembersBadRequest
 const PostPoolsPoolIDMembersBadRequestCode int = 400
 
-/*PostPoolsPoolIDMembersBadRequest Bad request
+/*
+PostPoolsPoolIDMembersBadRequest Bad request
 
 swagger:response postPoolsPoolIdMembersBadRequest
 */
@@ -118,7 +120,8 @@ func (o *PostPoolsPoolIDMembersBadRequest) WriteResponse(rw http.ResponseWriter,
 // PostPoolsPoolIDMembersNotFoundCode is the HTTP code returned for type PostPoolsPoolIDMembersNotFound
 const PostPoolsPoolIDMembersNotFoundCode int = 404
 
-/*PostPoolsPoolIDMembersNotFound Not Found
+/*
+PostPoolsPoolIDMembersNotFound Not Found
 
 swagger:response postPoolsPoolIdMembersNotFound
 */
@@ -159,7 +162,8 @@ func (o *PostPoolsPoolIDMembersNotFound) WriteResponse(rw http.ResponseWriter, p
 	}
 }
 
-/*PostPoolsPoolIDMembersDefault Unexpected Error
+/*
+PostPoolsPoolIDMembersDefault Unexpected Error
 
 swagger:response postPoolsPoolIdMembersDefault
 */

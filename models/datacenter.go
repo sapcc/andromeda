@@ -72,7 +72,7 @@ type Datacenter struct {
 
 	// meta
 	// Read Only: true
-	Meta *int64 `json:"meta,omitempty"`
+	Meta int64 `json:"meta,omitempty"`
 
 	// Human-readable name of the resource.
 	// Max Length: 255
@@ -426,7 +426,7 @@ func (m *Datacenter) contextValidateID(ctx context.Context, formats strfmt.Regis
 
 func (m *Datacenter) contextValidateMeta(ctx context.Context, formats strfmt.Registry) error {
 
-	if err := validate.ReadOnly(ctx, "meta", "body", m.Meta); err != nil {
+	if err := validate.ReadOnly(ctx, "meta", "body", int64(m.Meta)); err != nil {
 		return err
 	}
 

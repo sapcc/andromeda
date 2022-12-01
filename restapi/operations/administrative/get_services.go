@@ -50,10 +50,10 @@ func NewGetServices(ctx *middleware.Context, handler GetServicesHandler) *GetSer
 	return &GetServices{Context: ctx, Handler: handler}
 }
 
-/* GetServices swagger:route GET /services Administrative getServices
+/*
+	GetServices swagger:route GET /services Administrative getServices
 
 List Services
-
 */
 type GetServices struct {
 	Context *middleware.Context

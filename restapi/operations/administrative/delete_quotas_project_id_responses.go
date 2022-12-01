@@ -30,7 +30,8 @@ import (
 // DeleteQuotasProjectIDNoContentCode is the HTTP code returned for type DeleteQuotasProjectIDNoContent
 const DeleteQuotasProjectIDNoContentCode int = 204
 
-/*DeleteQuotasProjectIDNoContent Resource successfully reseted.
+/*
+DeleteQuotasProjectIDNoContent Resource successfully reseted.
 
 swagger:response deleteQuotasProjectIdNoContent
 */
@@ -54,7 +55,8 @@ func (o *DeleteQuotasProjectIDNoContent) WriteResponse(rw http.ResponseWriter, p
 // DeleteQuotasProjectIDNotFoundCode is the HTTP code returned for type DeleteQuotasProjectIDNotFound
 const DeleteQuotasProjectIDNotFoundCode int = 404
 
-/*DeleteQuotasProjectIDNotFound Not Found
+/*
+DeleteQuotasProjectIDNotFound Not Found
 
 swagger:response deleteQuotasProjectIdNotFound
 */
@@ -95,7 +97,8 @@ func (o *DeleteQuotasProjectIDNotFound) WriteResponse(rw http.ResponseWriter, pr
 	}
 }
 
-/*DeleteQuotasProjectIDDefault Unexpected Error
+/*
+DeleteQuotasProjectIDDefault Unexpected Error
 
 swagger:response deleteQuotasProjectIdDefault
 */

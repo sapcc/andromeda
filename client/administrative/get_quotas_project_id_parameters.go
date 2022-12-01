@@ -66,10 +66,12 @@ func NewGetQuotasProjectIDParamsWithHTTPClient(client *http.Client) *GetQuotasPr
 	}
 }
 
-/* GetQuotasProjectIDParams contains all the parameters to send to the API endpoint
-   for the get quotas project ID operation.
+/*
+GetQuotasProjectIDParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the get quotas project ID operation.
+
+	Typically these are written to a http.Request.
 */
 type GetQuotasProjectIDParams struct {
 

@@ -66,10 +66,12 @@ func NewPostPoolsPoolIDMembersParamsWithHTTPClient(client *http.Client) *PostPoo
 	}
 }
 
-/* PostPoolsPoolIDMembersParams contains all the parameters to send to the API endpoint
-   for the post pools pool ID members operation.
+/*
+PostPoolsPoolIDMembersParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the post pools pool ID members operation.
+
+	Typically these are written to a http.Request.
 */
 type PostPoolsPoolIDMembersParams struct {
 

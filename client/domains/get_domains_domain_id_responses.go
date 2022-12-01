@@ -69,7 +69,8 @@ func NewGetDomainsDomainIDOK() *GetDomainsDomainIDOK {
 	return &GetDomainsDomainIDOK{}
 }
 
-/* GetDomainsDomainIDOK describes a response with status code 200, with default header values.
+/*
+GetDomainsDomainIDOK describes a response with status code 200, with default header values.
 
 Shows the details of a specific domain.
 */
@@ -77,9 +78,39 @@ type GetDomainsDomainIDOK struct {
 	Payload *GetDomainsDomainIDOKBody
 }
 
+// IsSuccess returns true when this get domains domain Id o k response has a 2xx status code
+func (o *GetDomainsDomainIDOK) IsSuccess() bool {
+	return true
+}
+
+// IsRedirect returns true when this get domains domain Id o k response has a 3xx status code
+func (o *GetDomainsDomainIDOK) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this get domains domain Id o k response has a 4xx status code
+func (o *GetDomainsDomainIDOK) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this get domains domain Id o k response has a 5xx status code
+func (o *GetDomainsDomainIDOK) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this get domains domain Id o k response a status code equal to that given
+func (o *GetDomainsDomainIDOK) IsCode(code int) bool {
+	return code == 200
+}
+
 func (o *GetDomainsDomainIDOK) Error() string {
 	return fmt.Sprintf("[GET /domains/{domain_id}][%d] getDomainsDomainIdOK  %+v", 200, o.Payload)
 }
+
+func (o *GetDomainsDomainIDOK) String() string {
+	return fmt.Sprintf("[GET /domains/{domain_id}][%d] getDomainsDomainIdOK  %+v", 200, o.Payload)
+}
+
 func (o *GetDomainsDomainIDOK) GetPayload() *GetDomainsDomainIDOKBody {
 	return o.Payload
 }
@@ -101,7 +132,8 @@ func NewGetDomainsDomainIDNotFound() *GetDomainsDomainIDNotFound {
 	return &GetDomainsDomainIDNotFound{}
 }
 
-/* GetDomainsDomainIDNotFound describes a response with status code 404, with default header values.
+/*
+GetDomainsDomainIDNotFound describes a response with status code 404, with default header values.
 
 Not Found
 */
@@ -109,9 +141,39 @@ type GetDomainsDomainIDNotFound struct {
 	Payload *models.Error
 }
 
+// IsSuccess returns true when this get domains domain Id not found response has a 2xx status code
+func (o *GetDomainsDomainIDNotFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this get domains domain Id not found response has a 3xx status code
+func (o *GetDomainsDomainIDNotFound) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this get domains domain Id not found response has a 4xx status code
+func (o *GetDomainsDomainIDNotFound) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this get domains domain Id not found response has a 5xx status code
+func (o *GetDomainsDomainIDNotFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this get domains domain Id not found response a status code equal to that given
+func (o *GetDomainsDomainIDNotFound) IsCode(code int) bool {
+	return code == 404
+}
+
 func (o *GetDomainsDomainIDNotFound) Error() string {
 	return fmt.Sprintf("[GET /domains/{domain_id}][%d] getDomainsDomainIdNotFound  %+v", 404, o.Payload)
 }
+
+func (o *GetDomainsDomainIDNotFound) String() string {
+	return fmt.Sprintf("[GET /domains/{domain_id}][%d] getDomainsDomainIdNotFound  %+v", 404, o.Payload)
+}
+
 func (o *GetDomainsDomainIDNotFound) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -135,7 +197,8 @@ func NewGetDomainsDomainIDDefault(code int) *GetDomainsDomainIDDefault {
 	}
 }
 
-/* GetDomainsDomainIDDefault describes a response with status code -1, with default header values.
+/*
+GetDomainsDomainIDDefault describes a response with status code -1, with default header values.
 
 Unexpected Error
 */
@@ -150,9 +213,39 @@ func (o *GetDomainsDomainIDDefault) Code() int {
 	return o._statusCode
 }
 
+// IsSuccess returns true when this get domains domain ID default response has a 2xx status code
+func (o *GetDomainsDomainIDDefault) IsSuccess() bool {
+	return o._statusCode/100 == 2
+}
+
+// IsRedirect returns true when this get domains domain ID default response has a 3xx status code
+func (o *GetDomainsDomainIDDefault) IsRedirect() bool {
+	return o._statusCode/100 == 3
+}
+
+// IsClientError returns true when this get domains domain ID default response has a 4xx status code
+func (o *GetDomainsDomainIDDefault) IsClientError() bool {
+	return o._statusCode/100 == 4
+}
+
+// IsServerError returns true when this get domains domain ID default response has a 5xx status code
+func (o *GetDomainsDomainIDDefault) IsServerError() bool {
+	return o._statusCode/100 == 5
+}
+
+// IsCode returns true when this get domains domain ID default response a status code equal to that given
+func (o *GetDomainsDomainIDDefault) IsCode(code int) bool {
+	return o._statusCode == code
+}
+
 func (o *GetDomainsDomainIDDefault) Error() string {
 	return fmt.Sprintf("[GET /domains/{domain_id}][%d] GetDomainsDomainID default  %+v", o._statusCode, o.Payload)
 }
+
+func (o *GetDomainsDomainIDDefault) String() string {
+	return fmt.Sprintf("[GET /domains/{domain_id}][%d] GetDomainsDomainID default  %+v", o._statusCode, o.Payload)
+}
+
 func (o *GetDomainsDomainIDDefault) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -169,7 +262,8 @@ func (o *GetDomainsDomainIDDefault) readResponse(response runtime.ClientResponse
 	return nil
 }
 
-/*GetDomainsDomainIDOKBody get domains domain ID o k body
+/*
+GetDomainsDomainIDOKBody get domains domain ID o k body
 swagger:model GetDomainsDomainIDOKBody
 */
 type GetDomainsDomainIDOKBody struct {

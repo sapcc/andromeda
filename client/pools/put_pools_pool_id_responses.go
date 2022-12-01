@@ -70,7 +70,8 @@ func NewPutPoolsPoolIDAccepted() *PutPoolsPoolIDAccepted {
 	return &PutPoolsPoolIDAccepted{}
 }
 
-/* PutPoolsPoolIDAccepted describes a response with status code 202, with default header values.
+/*
+PutPoolsPoolIDAccepted describes a response with status code 202, with default header values.
 
 Updated pool.
 */
@@ -78,9 +79,39 @@ type PutPoolsPoolIDAccepted struct {
 	Payload *PutPoolsPoolIDAcceptedBody
 }
 
+// IsSuccess returns true when this put pools pool Id accepted response has a 2xx status code
+func (o *PutPoolsPoolIDAccepted) IsSuccess() bool {
+	return true
+}
+
+// IsRedirect returns true when this put pools pool Id accepted response has a 3xx status code
+func (o *PutPoolsPoolIDAccepted) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this put pools pool Id accepted response has a 4xx status code
+func (o *PutPoolsPoolIDAccepted) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this put pools pool Id accepted response has a 5xx status code
+func (o *PutPoolsPoolIDAccepted) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this put pools pool Id accepted response a status code equal to that given
+func (o *PutPoolsPoolIDAccepted) IsCode(code int) bool {
+	return code == 202
+}
+
 func (o *PutPoolsPoolIDAccepted) Error() string {
 	return fmt.Sprintf("[PUT /pools/{pool_id}][%d] putPoolsPoolIdAccepted  %+v", 202, o.Payload)
 }
+
+func (o *PutPoolsPoolIDAccepted) String() string {
+	return fmt.Sprintf("[PUT /pools/{pool_id}][%d] putPoolsPoolIdAccepted  %+v", 202, o.Payload)
+}
+
 func (o *PutPoolsPoolIDAccepted) GetPayload() *PutPoolsPoolIDAcceptedBody {
 	return o.Payload
 }
@@ -102,7 +133,8 @@ func NewPutPoolsPoolIDNotFound() *PutPoolsPoolIDNotFound {
 	return &PutPoolsPoolIDNotFound{}
 }
 
-/* PutPoolsPoolIDNotFound describes a response with status code 404, with default header values.
+/*
+PutPoolsPoolIDNotFound describes a response with status code 404, with default header values.
 
 Not Found
 */
@@ -110,9 +142,39 @@ type PutPoolsPoolIDNotFound struct {
 	Payload *models.Error
 }
 
+// IsSuccess returns true when this put pools pool Id not found response has a 2xx status code
+func (o *PutPoolsPoolIDNotFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this put pools pool Id not found response has a 3xx status code
+func (o *PutPoolsPoolIDNotFound) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this put pools pool Id not found response has a 4xx status code
+func (o *PutPoolsPoolIDNotFound) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this put pools pool Id not found response has a 5xx status code
+func (o *PutPoolsPoolIDNotFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this put pools pool Id not found response a status code equal to that given
+func (o *PutPoolsPoolIDNotFound) IsCode(code int) bool {
+	return code == 404
+}
+
 func (o *PutPoolsPoolIDNotFound) Error() string {
 	return fmt.Sprintf("[PUT /pools/{pool_id}][%d] putPoolsPoolIdNotFound  %+v", 404, o.Payload)
 }
+
+func (o *PutPoolsPoolIDNotFound) String() string {
+	return fmt.Sprintf("[PUT /pools/{pool_id}][%d] putPoolsPoolIdNotFound  %+v", 404, o.Payload)
+}
+
 func (o *PutPoolsPoolIDNotFound) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -136,7 +198,8 @@ func NewPutPoolsPoolIDDefault(code int) *PutPoolsPoolIDDefault {
 	}
 }
 
-/* PutPoolsPoolIDDefault describes a response with status code -1, with default header values.
+/*
+PutPoolsPoolIDDefault describes a response with status code -1, with default header values.
 
 Unexpected Error
 */
@@ -151,9 +214,39 @@ func (o *PutPoolsPoolIDDefault) Code() int {
 	return o._statusCode
 }
 
+// IsSuccess returns true when this put pools pool ID default response has a 2xx status code
+func (o *PutPoolsPoolIDDefault) IsSuccess() bool {
+	return o._statusCode/100 == 2
+}
+
+// IsRedirect returns true when this put pools pool ID default response has a 3xx status code
+func (o *PutPoolsPoolIDDefault) IsRedirect() bool {
+	return o._statusCode/100 == 3
+}
+
+// IsClientError returns true when this put pools pool ID default response has a 4xx status code
+func (o *PutPoolsPoolIDDefault) IsClientError() bool {
+	return o._statusCode/100 == 4
+}
+
+// IsServerError returns true when this put pools pool ID default response has a 5xx status code
+func (o *PutPoolsPoolIDDefault) IsServerError() bool {
+	return o._statusCode/100 == 5
+}
+
+// IsCode returns true when this put pools pool ID default response a status code equal to that given
+func (o *PutPoolsPoolIDDefault) IsCode(code int) bool {
+	return o._statusCode == code
+}
+
 func (o *PutPoolsPoolIDDefault) Error() string {
 	return fmt.Sprintf("[PUT /pools/{pool_id}][%d] PutPoolsPoolID default  %+v", o._statusCode, o.Payload)
 }
+
+func (o *PutPoolsPoolIDDefault) String() string {
+	return fmt.Sprintf("[PUT /pools/{pool_id}][%d] PutPoolsPoolID default  %+v", o._statusCode, o.Payload)
+}
+
 func (o *PutPoolsPoolIDDefault) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -170,7 +263,8 @@ func (o *PutPoolsPoolIDDefault) readResponse(response runtime.ClientResponse, co
 	return nil
 }
 
-/*PutPoolsPoolIDAcceptedBody put pools pool ID accepted body
+/*
+PutPoolsPoolIDAcceptedBody put pools pool ID accepted body
 swagger:model PutPoolsPoolIDAcceptedBody
 */
 type PutPoolsPoolIDAcceptedBody struct {
@@ -260,7 +354,8 @@ func (o *PutPoolsPoolIDAcceptedBody) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*PutPoolsPoolIDBody put pools pool ID body
+/*
+PutPoolsPoolIDBody put pools pool ID body
 swagger:model PutPoolsPoolIDBody
 */
 type PutPoolsPoolIDBody struct {

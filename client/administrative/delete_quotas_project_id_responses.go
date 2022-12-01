@@ -66,14 +66,44 @@ func NewDeleteQuotasProjectIDNoContent() *DeleteQuotasProjectIDNoContent {
 	return &DeleteQuotasProjectIDNoContent{}
 }
 
-/* DeleteQuotasProjectIDNoContent describes a response with status code 204, with default header values.
+/*
+DeleteQuotasProjectIDNoContent describes a response with status code 204, with default header values.
 
 Resource successfully reseted.
 */
 type DeleteQuotasProjectIDNoContent struct {
 }
 
+// IsSuccess returns true when this delete quotas project Id no content response has a 2xx status code
+func (o *DeleteQuotasProjectIDNoContent) IsSuccess() bool {
+	return true
+}
+
+// IsRedirect returns true when this delete quotas project Id no content response has a 3xx status code
+func (o *DeleteQuotasProjectIDNoContent) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this delete quotas project Id no content response has a 4xx status code
+func (o *DeleteQuotasProjectIDNoContent) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this delete quotas project Id no content response has a 5xx status code
+func (o *DeleteQuotasProjectIDNoContent) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this delete quotas project Id no content response a status code equal to that given
+func (o *DeleteQuotasProjectIDNoContent) IsCode(code int) bool {
+	return code == 204
+}
+
 func (o *DeleteQuotasProjectIDNoContent) Error() string {
+	return fmt.Sprintf("[DELETE /quotas/{project_id}][%d] deleteQuotasProjectIdNoContent ", 204)
+}
+
+func (o *DeleteQuotasProjectIDNoContent) String() string {
 	return fmt.Sprintf("[DELETE /quotas/{project_id}][%d] deleteQuotasProjectIdNoContent ", 204)
 }
 
@@ -87,7 +117,8 @@ func NewDeleteQuotasProjectIDNotFound() *DeleteQuotasProjectIDNotFound {
 	return &DeleteQuotasProjectIDNotFound{}
 }
 
-/* DeleteQuotasProjectIDNotFound describes a response with status code 404, with default header values.
+/*
+DeleteQuotasProjectIDNotFound describes a response with status code 404, with default header values.
 
 Not Found
 */
@@ -95,9 +126,39 @@ type DeleteQuotasProjectIDNotFound struct {
 	Payload *models.Error
 }
 
+// IsSuccess returns true when this delete quotas project Id not found response has a 2xx status code
+func (o *DeleteQuotasProjectIDNotFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this delete quotas project Id not found response has a 3xx status code
+func (o *DeleteQuotasProjectIDNotFound) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this delete quotas project Id not found response has a 4xx status code
+func (o *DeleteQuotasProjectIDNotFound) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this delete quotas project Id not found response has a 5xx status code
+func (o *DeleteQuotasProjectIDNotFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this delete quotas project Id not found response a status code equal to that given
+func (o *DeleteQuotasProjectIDNotFound) IsCode(code int) bool {
+	return code == 404
+}
+
 func (o *DeleteQuotasProjectIDNotFound) Error() string {
 	return fmt.Sprintf("[DELETE /quotas/{project_id}][%d] deleteQuotasProjectIdNotFound  %+v", 404, o.Payload)
 }
+
+func (o *DeleteQuotasProjectIDNotFound) String() string {
+	return fmt.Sprintf("[DELETE /quotas/{project_id}][%d] deleteQuotasProjectIdNotFound  %+v", 404, o.Payload)
+}
+
 func (o *DeleteQuotasProjectIDNotFound) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -121,7 +182,8 @@ func NewDeleteQuotasProjectIDDefault(code int) *DeleteQuotasProjectIDDefault {
 	}
 }
 
-/* DeleteQuotasProjectIDDefault describes a response with status code -1, with default header values.
+/*
+DeleteQuotasProjectIDDefault describes a response with status code -1, with default header values.
 
 Unexpected Error
 */
@@ -136,9 +198,39 @@ func (o *DeleteQuotasProjectIDDefault) Code() int {
 	return o._statusCode
 }
 
+// IsSuccess returns true when this delete quotas project ID default response has a 2xx status code
+func (o *DeleteQuotasProjectIDDefault) IsSuccess() bool {
+	return o._statusCode/100 == 2
+}
+
+// IsRedirect returns true when this delete quotas project ID default response has a 3xx status code
+func (o *DeleteQuotasProjectIDDefault) IsRedirect() bool {
+	return o._statusCode/100 == 3
+}
+
+// IsClientError returns true when this delete quotas project ID default response has a 4xx status code
+func (o *DeleteQuotasProjectIDDefault) IsClientError() bool {
+	return o._statusCode/100 == 4
+}
+
+// IsServerError returns true when this delete quotas project ID default response has a 5xx status code
+func (o *DeleteQuotasProjectIDDefault) IsServerError() bool {
+	return o._statusCode/100 == 5
+}
+
+// IsCode returns true when this delete quotas project ID default response a status code equal to that given
+func (o *DeleteQuotasProjectIDDefault) IsCode(code int) bool {
+	return o._statusCode == code
+}
+
 func (o *DeleteQuotasProjectIDDefault) Error() string {
 	return fmt.Sprintf("[DELETE /quotas/{project_id}][%d] DeleteQuotasProjectID default  %+v", o._statusCode, o.Payload)
 }
+
+func (o *DeleteQuotasProjectIDDefault) String() string {
+	return fmt.Sprintf("[DELETE /quotas/{project_id}][%d] DeleteQuotasProjectID default  %+v", o._statusCode, o.Payload)
+}
+
 func (o *DeleteQuotasProjectIDDefault) GetPayload() *models.Error {
 	return o.Payload
 }

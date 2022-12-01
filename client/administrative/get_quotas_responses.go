@@ -65,7 +65,8 @@ func NewGetQuotasOK() *GetQuotasOK {
 	return &GetQuotasOK{}
 }
 
-/* GetQuotasOK describes a response with status code 200, with default header values.
+/*
+GetQuotasOK describes a response with status code 200, with default header values.
 
 A JSON array of quotas
 */
@@ -73,9 +74,39 @@ type GetQuotasOK struct {
 	Payload *GetQuotasOKBody
 }
 
+// IsSuccess returns true when this get quotas o k response has a 2xx status code
+func (o *GetQuotasOK) IsSuccess() bool {
+	return true
+}
+
+// IsRedirect returns true when this get quotas o k response has a 3xx status code
+func (o *GetQuotasOK) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this get quotas o k response has a 4xx status code
+func (o *GetQuotasOK) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this get quotas o k response has a 5xx status code
+func (o *GetQuotasOK) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this get quotas o k response a status code equal to that given
+func (o *GetQuotasOK) IsCode(code int) bool {
+	return code == 200
+}
+
 func (o *GetQuotasOK) Error() string {
 	return fmt.Sprintf("[GET /quotas][%d] getQuotasOK  %+v", 200, o.Payload)
 }
+
+func (o *GetQuotasOK) String() string {
+	return fmt.Sprintf("[GET /quotas][%d] getQuotasOK  %+v", 200, o.Payload)
+}
+
 func (o *GetQuotasOK) GetPayload() *GetQuotasOKBody {
 	return o.Payload
 }
@@ -99,7 +130,8 @@ func NewGetQuotasDefault(code int) *GetQuotasDefault {
 	}
 }
 
-/* GetQuotasDefault describes a response with status code -1, with default header values.
+/*
+GetQuotasDefault describes a response with status code -1, with default header values.
 
 Unexpected Error
 */
@@ -114,9 +146,39 @@ func (o *GetQuotasDefault) Code() int {
 	return o._statusCode
 }
 
+// IsSuccess returns true when this get quotas default response has a 2xx status code
+func (o *GetQuotasDefault) IsSuccess() bool {
+	return o._statusCode/100 == 2
+}
+
+// IsRedirect returns true when this get quotas default response has a 3xx status code
+func (o *GetQuotasDefault) IsRedirect() bool {
+	return o._statusCode/100 == 3
+}
+
+// IsClientError returns true when this get quotas default response has a 4xx status code
+func (o *GetQuotasDefault) IsClientError() bool {
+	return o._statusCode/100 == 4
+}
+
+// IsServerError returns true when this get quotas default response has a 5xx status code
+func (o *GetQuotasDefault) IsServerError() bool {
+	return o._statusCode/100 == 5
+}
+
+// IsCode returns true when this get quotas default response a status code equal to that given
+func (o *GetQuotasDefault) IsCode(code int) bool {
+	return o._statusCode == code
+}
+
 func (o *GetQuotasDefault) Error() string {
 	return fmt.Sprintf("[GET /quotas][%d] GetQuotas default  %+v", o._statusCode, o.Payload)
 }
+
+func (o *GetQuotasDefault) String() string {
+	return fmt.Sprintf("[GET /quotas][%d] GetQuotas default  %+v", o._statusCode, o.Payload)
+}
+
 func (o *GetQuotasDefault) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -133,7 +195,8 @@ func (o *GetQuotasDefault) readResponse(response runtime.ClientResponse, consume
 	return nil
 }
 
-/*GetQuotasOKBody get quotas o k body
+/*
+GetQuotasOKBody get quotas o k body
 swagger:model GetQuotasOKBody
 */
 type GetQuotasOKBody struct {
@@ -234,7 +297,8 @@ func (o *GetQuotasOKBody) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*GetQuotasOKBodyQuotasItems0 get quotas o k body quotas items0
+/*
+GetQuotasOKBodyQuotasItems0 get quotas o k body quotas items0
 swagger:model GetQuotasOKBodyQuotasItems0
 */
 type GetQuotasOKBodyQuotasItems0 struct {
@@ -311,11 +375,11 @@ func (o GetQuotasOKBodyQuotasItems0) MarshalJSON() ([]byte, error) {
 func (o *GetQuotasOKBodyQuotasItems0) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	// validation for a type composition with rpcmodels.Quota
+	// validation for a type composition with models.Quota
 	if err := o.Quota.Validate(formats); err != nil {
 		res = append(res, err)
 	}
-	// validation for a type composition with rpcmodels.QuotaUsage
+	// validation for a type composition with models.QuotaUsage
 	if err := o.QuotaUsage.Validate(formats); err != nil {
 		res = append(res, err)
 	}
@@ -351,11 +415,11 @@ func (o *GetQuotasOKBodyQuotasItems0) validateProjectID(formats strfmt.Registry)
 func (o *GetQuotasOKBodyQuotasItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
-	// validation for a type composition with rpcmodels.Quota
+	// validation for a type composition with models.Quota
 	if err := o.Quota.ContextValidate(ctx, formats); err != nil {
 		res = append(res, err)
 	}
-	// validation for a type composition with rpcmodels.QuotaUsage
+	// validation for a type composition with models.QuotaUsage
 	if err := o.QuotaUsage.ContextValidate(ctx, formats); err != nil {
 		res = append(res, err)
 	}

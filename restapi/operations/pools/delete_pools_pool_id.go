@@ -43,10 +43,10 @@ func NewDeletePoolsPoolID(ctx *middleware.Context, handler DeletePoolsPoolIDHand
 	return &DeletePoolsPoolID{Context: ctx, Handler: handler}
 }
 
-/* DeletePoolsPoolID swagger:route DELETE /pools/{pool_id} Pools deletePoolsPoolId
+/*
+	DeletePoolsPoolID swagger:route DELETE /pools/{pool_id} Pools deletePoolsPoolId
 
 Delete a pool
-
 */
 type DeletePoolsPoolID struct {
 	Context *middleware.Context

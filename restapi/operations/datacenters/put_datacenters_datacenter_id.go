@@ -50,10 +50,10 @@ func NewPutDatacentersDatacenterID(ctx *middleware.Context, handler PutDatacente
 	return &PutDatacentersDatacenterID{Context: ctx, Handler: handler}
 }
 
-/* PutDatacentersDatacenterID swagger:route PUT /datacenters/{datacenter_id} Datacenters putDatacentersDatacenterId
+/*
+	PutDatacentersDatacenterID swagger:route PUT /datacenters/{datacenter_id} Datacenters putDatacentersDatacenterId
 
 Update a datacenter
-
 */
 type PutDatacentersDatacenterID struct {
 	Context *middleware.Context

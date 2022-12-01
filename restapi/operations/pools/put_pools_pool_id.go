@@ -50,10 +50,10 @@ func NewPutPoolsPoolID(ctx *middleware.Context, handler PutPoolsPoolIDHandler) *
 	return &PutPoolsPoolID{Context: ctx, Handler: handler}
 }
 
-/* PutPoolsPoolID swagger:route PUT /pools/{pool_id} Pools putPoolsPoolId
+/*
+	PutPoolsPoolID swagger:route PUT /pools/{pool_id} Pools putPoolsPoolId
 
 Update a pool
-
 */
 type PutPoolsPoolID struct {
 	Context *middleware.Context

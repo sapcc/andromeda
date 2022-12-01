@@ -66,10 +66,12 @@ func NewPutDomainsDomainIDParamsWithHTTPClient(client *http.Client) *PutDomainsD
 	}
 }
 
-/* PutDomainsDomainIDParams contains all the parameters to send to the API endpoint
-   for the put domains domain ID operation.
+/*
+PutDomainsDomainIDParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the put domains domain ID operation.
+
+	Typically these are written to a http.Request.
 */
 type PutDomainsDomainIDParams struct {
 

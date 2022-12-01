@@ -76,7 +76,8 @@ func NewPutMonitorsMonitorIDAccepted() *PutMonitorsMonitorIDAccepted {
 	return &PutMonitorsMonitorIDAccepted{}
 }
 
-/* PutMonitorsMonitorIDAccepted describes a response with status code 202, with default header values.
+/*
+PutMonitorsMonitorIDAccepted describes a response with status code 202, with default header values.
 
 Updated monitor.
 */
@@ -84,9 +85,39 @@ type PutMonitorsMonitorIDAccepted struct {
 	Payload *PutMonitorsMonitorIDAcceptedBody
 }
 
+// IsSuccess returns true when this put monitors monitor Id accepted response has a 2xx status code
+func (o *PutMonitorsMonitorIDAccepted) IsSuccess() bool {
+	return true
+}
+
+// IsRedirect returns true when this put monitors monitor Id accepted response has a 3xx status code
+func (o *PutMonitorsMonitorIDAccepted) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this put monitors monitor Id accepted response has a 4xx status code
+func (o *PutMonitorsMonitorIDAccepted) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this put monitors monitor Id accepted response has a 5xx status code
+func (o *PutMonitorsMonitorIDAccepted) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this put monitors monitor Id accepted response a status code equal to that given
+func (o *PutMonitorsMonitorIDAccepted) IsCode(code int) bool {
+	return code == 202
+}
+
 func (o *PutMonitorsMonitorIDAccepted) Error() string {
 	return fmt.Sprintf("[PUT /monitors/{monitor_id}][%d] putMonitorsMonitorIdAccepted  %+v", 202, o.Payload)
 }
+
+func (o *PutMonitorsMonitorIDAccepted) String() string {
+	return fmt.Sprintf("[PUT /monitors/{monitor_id}][%d] putMonitorsMonitorIdAccepted  %+v", 202, o.Payload)
+}
+
 func (o *PutMonitorsMonitorIDAccepted) GetPayload() *PutMonitorsMonitorIDAcceptedBody {
 	return o.Payload
 }
@@ -108,7 +139,8 @@ func NewPutMonitorsMonitorIDBadRequest() *PutMonitorsMonitorIDBadRequest {
 	return &PutMonitorsMonitorIDBadRequest{}
 }
 
-/* PutMonitorsMonitorIDBadRequest describes a response with status code 400, with default header values.
+/*
+PutMonitorsMonitorIDBadRequest describes a response with status code 400, with default header values.
 
 Bad request
 */
@@ -116,9 +148,39 @@ type PutMonitorsMonitorIDBadRequest struct {
 	Payload *models.Error
 }
 
+// IsSuccess returns true when this put monitors monitor Id bad request response has a 2xx status code
+func (o *PutMonitorsMonitorIDBadRequest) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this put monitors monitor Id bad request response has a 3xx status code
+func (o *PutMonitorsMonitorIDBadRequest) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this put monitors monitor Id bad request response has a 4xx status code
+func (o *PutMonitorsMonitorIDBadRequest) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this put monitors monitor Id bad request response has a 5xx status code
+func (o *PutMonitorsMonitorIDBadRequest) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this put monitors monitor Id bad request response a status code equal to that given
+func (o *PutMonitorsMonitorIDBadRequest) IsCode(code int) bool {
+	return code == 400
+}
+
 func (o *PutMonitorsMonitorIDBadRequest) Error() string {
 	return fmt.Sprintf("[PUT /monitors/{monitor_id}][%d] putMonitorsMonitorIdBadRequest  %+v", 400, o.Payload)
 }
+
+func (o *PutMonitorsMonitorIDBadRequest) String() string {
+	return fmt.Sprintf("[PUT /monitors/{monitor_id}][%d] putMonitorsMonitorIdBadRequest  %+v", 400, o.Payload)
+}
+
 func (o *PutMonitorsMonitorIDBadRequest) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -140,7 +202,8 @@ func NewPutMonitorsMonitorIDNotFound() *PutMonitorsMonitorIDNotFound {
 	return &PutMonitorsMonitorIDNotFound{}
 }
 
-/* PutMonitorsMonitorIDNotFound describes a response with status code 404, with default header values.
+/*
+PutMonitorsMonitorIDNotFound describes a response with status code 404, with default header values.
 
 Not Found
 */
@@ -148,9 +211,39 @@ type PutMonitorsMonitorIDNotFound struct {
 	Payload *models.Error
 }
 
+// IsSuccess returns true when this put monitors monitor Id not found response has a 2xx status code
+func (o *PutMonitorsMonitorIDNotFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this put monitors monitor Id not found response has a 3xx status code
+func (o *PutMonitorsMonitorIDNotFound) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this put monitors monitor Id not found response has a 4xx status code
+func (o *PutMonitorsMonitorIDNotFound) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this put monitors monitor Id not found response has a 5xx status code
+func (o *PutMonitorsMonitorIDNotFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this put monitors monitor Id not found response a status code equal to that given
+func (o *PutMonitorsMonitorIDNotFound) IsCode(code int) bool {
+	return code == 404
+}
+
 func (o *PutMonitorsMonitorIDNotFound) Error() string {
 	return fmt.Sprintf("[PUT /monitors/{monitor_id}][%d] putMonitorsMonitorIdNotFound  %+v", 404, o.Payload)
 }
+
+func (o *PutMonitorsMonitorIDNotFound) String() string {
+	return fmt.Sprintf("[PUT /monitors/{monitor_id}][%d] putMonitorsMonitorIdNotFound  %+v", 404, o.Payload)
+}
+
 func (o *PutMonitorsMonitorIDNotFound) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -174,7 +267,8 @@ func NewPutMonitorsMonitorIDDefault(code int) *PutMonitorsMonitorIDDefault {
 	}
 }
 
-/* PutMonitorsMonitorIDDefault describes a response with status code -1, with default header values.
+/*
+PutMonitorsMonitorIDDefault describes a response with status code -1, with default header values.
 
 Unexpected Error
 */
@@ -189,9 +283,39 @@ func (o *PutMonitorsMonitorIDDefault) Code() int {
 	return o._statusCode
 }
 
+// IsSuccess returns true when this put monitors monitor ID default response has a 2xx status code
+func (o *PutMonitorsMonitorIDDefault) IsSuccess() bool {
+	return o._statusCode/100 == 2
+}
+
+// IsRedirect returns true when this put monitors monitor ID default response has a 3xx status code
+func (o *PutMonitorsMonitorIDDefault) IsRedirect() bool {
+	return o._statusCode/100 == 3
+}
+
+// IsClientError returns true when this put monitors monitor ID default response has a 4xx status code
+func (o *PutMonitorsMonitorIDDefault) IsClientError() bool {
+	return o._statusCode/100 == 4
+}
+
+// IsServerError returns true when this put monitors monitor ID default response has a 5xx status code
+func (o *PutMonitorsMonitorIDDefault) IsServerError() bool {
+	return o._statusCode/100 == 5
+}
+
+// IsCode returns true when this put monitors monitor ID default response a status code equal to that given
+func (o *PutMonitorsMonitorIDDefault) IsCode(code int) bool {
+	return o._statusCode == code
+}
+
 func (o *PutMonitorsMonitorIDDefault) Error() string {
 	return fmt.Sprintf("[PUT /monitors/{monitor_id}][%d] PutMonitorsMonitorID default  %+v", o._statusCode, o.Payload)
 }
+
+func (o *PutMonitorsMonitorIDDefault) String() string {
+	return fmt.Sprintf("[PUT /monitors/{monitor_id}][%d] PutMonitorsMonitorID default  %+v", o._statusCode, o.Payload)
+}
+
 func (o *PutMonitorsMonitorIDDefault) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -208,7 +332,8 @@ func (o *PutMonitorsMonitorIDDefault) readResponse(response runtime.ClientRespon
 	return nil
 }
 
-/*PutMonitorsMonitorIDAcceptedBody put monitors monitor ID accepted body
+/*
+PutMonitorsMonitorIDAcceptedBody put monitors monitor ID accepted body
 swagger:model PutMonitorsMonitorIDAcceptedBody
 */
 type PutMonitorsMonitorIDAcceptedBody struct {
@@ -298,7 +423,8 @@ func (o *PutMonitorsMonitorIDAcceptedBody) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*PutMonitorsMonitorIDBody put monitors monitor ID body
+/*
+PutMonitorsMonitorIDBody put monitors monitor ID body
 swagger:model PutMonitorsMonitorIDBody
 */
 type PutMonitorsMonitorIDBody struct {

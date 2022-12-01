@@ -66,10 +66,12 @@ func NewGetQuotasParamsWithHTTPClient(client *http.Client) *GetQuotasParams {
 	}
 }
 
-/* GetQuotasParams contains all the parameters to send to the API endpoint
-   for the get quotas operation.
+/*
+GetQuotasParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the get quotas operation.
+
+	Typically these are written to a http.Request.
 */
 type GetQuotasParams struct {
 

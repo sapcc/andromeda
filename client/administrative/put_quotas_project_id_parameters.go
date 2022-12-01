@@ -66,10 +66,12 @@ func NewPutQuotasProjectIDParamsWithHTTPClient(client *http.Client) *PutQuotasPr
 	}
 }
 
-/* PutQuotasProjectIDParams contains all the parameters to send to the API endpoint
-   for the put quotas project ID operation.
+/*
+PutQuotasProjectIDParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the put quotas project ID operation.
+
+	Typically these are written to a http.Request.
 */
 type PutQuotasProjectIDParams struct {
 

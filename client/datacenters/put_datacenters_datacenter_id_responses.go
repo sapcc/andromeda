@@ -70,7 +70,8 @@ func NewPutDatacentersDatacenterIDAccepted() *PutDatacentersDatacenterIDAccepted
 	return &PutDatacentersDatacenterIDAccepted{}
 }
 
-/* PutDatacentersDatacenterIDAccepted describes a response with status code 202, with default header values.
+/*
+PutDatacentersDatacenterIDAccepted describes a response with status code 202, with default header values.
 
 Updated datacenter.
 */
@@ -78,9 +79,39 @@ type PutDatacentersDatacenterIDAccepted struct {
 	Payload *PutDatacentersDatacenterIDAcceptedBody
 }
 
+// IsSuccess returns true when this put datacenters datacenter Id accepted response has a 2xx status code
+func (o *PutDatacentersDatacenterIDAccepted) IsSuccess() bool {
+	return true
+}
+
+// IsRedirect returns true when this put datacenters datacenter Id accepted response has a 3xx status code
+func (o *PutDatacentersDatacenterIDAccepted) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this put datacenters datacenter Id accepted response has a 4xx status code
+func (o *PutDatacentersDatacenterIDAccepted) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this put datacenters datacenter Id accepted response has a 5xx status code
+func (o *PutDatacentersDatacenterIDAccepted) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this put datacenters datacenter Id accepted response a status code equal to that given
+func (o *PutDatacentersDatacenterIDAccepted) IsCode(code int) bool {
+	return code == 202
+}
+
 func (o *PutDatacentersDatacenterIDAccepted) Error() string {
 	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] putDatacentersDatacenterIdAccepted  %+v", 202, o.Payload)
 }
+
+func (o *PutDatacentersDatacenterIDAccepted) String() string {
+	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] putDatacentersDatacenterIdAccepted  %+v", 202, o.Payload)
+}
+
 func (o *PutDatacentersDatacenterIDAccepted) GetPayload() *PutDatacentersDatacenterIDAcceptedBody {
 	return o.Payload
 }
@@ -102,7 +133,8 @@ func NewPutDatacentersDatacenterIDNotFound() *PutDatacentersDatacenterIDNotFound
 	return &PutDatacentersDatacenterIDNotFound{}
 }
 
-/* PutDatacentersDatacenterIDNotFound describes a response with status code 404, with default header values.
+/*
+PutDatacentersDatacenterIDNotFound describes a response with status code 404, with default header values.
 
 Not Found
 */
@@ -110,9 +142,39 @@ type PutDatacentersDatacenterIDNotFound struct {
 	Payload *models.Error
 }
 
+// IsSuccess returns true when this put datacenters datacenter Id not found response has a 2xx status code
+func (o *PutDatacentersDatacenterIDNotFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this put datacenters datacenter Id not found response has a 3xx status code
+func (o *PutDatacentersDatacenterIDNotFound) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this put datacenters datacenter Id not found response has a 4xx status code
+func (o *PutDatacentersDatacenterIDNotFound) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this put datacenters datacenter Id not found response has a 5xx status code
+func (o *PutDatacentersDatacenterIDNotFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this put datacenters datacenter Id not found response a status code equal to that given
+func (o *PutDatacentersDatacenterIDNotFound) IsCode(code int) bool {
+	return code == 404
+}
+
 func (o *PutDatacentersDatacenterIDNotFound) Error() string {
 	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] putDatacentersDatacenterIdNotFound  %+v", 404, o.Payload)
 }
+
+func (o *PutDatacentersDatacenterIDNotFound) String() string {
+	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] putDatacentersDatacenterIdNotFound  %+v", 404, o.Payload)
+}
+
 func (o *PutDatacentersDatacenterIDNotFound) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -136,7 +198,8 @@ func NewPutDatacentersDatacenterIDDefault(code int) *PutDatacentersDatacenterIDD
 	}
 }
 
-/* PutDatacentersDatacenterIDDefault describes a response with status code -1, with default header values.
+/*
+PutDatacentersDatacenterIDDefault describes a response with status code -1, with default header values.
 
 Unexpected Error
 */
@@ -151,9 +214,39 @@ func (o *PutDatacentersDatacenterIDDefault) Code() int {
 	return o._statusCode
 }
 
+// IsSuccess returns true when this put datacenters datacenter ID default response has a 2xx status code
+func (o *PutDatacentersDatacenterIDDefault) IsSuccess() bool {
+	return o._statusCode/100 == 2
+}
+
+// IsRedirect returns true when this put datacenters datacenter ID default response has a 3xx status code
+func (o *PutDatacentersDatacenterIDDefault) IsRedirect() bool {
+	return o._statusCode/100 == 3
+}
+
+// IsClientError returns true when this put datacenters datacenter ID default response has a 4xx status code
+func (o *PutDatacentersDatacenterIDDefault) IsClientError() bool {
+	return o._statusCode/100 == 4
+}
+
+// IsServerError returns true when this put datacenters datacenter ID default response has a 5xx status code
+func (o *PutDatacentersDatacenterIDDefault) IsServerError() bool {
+	return o._statusCode/100 == 5
+}
+
+// IsCode returns true when this put datacenters datacenter ID default response a status code equal to that given
+func (o *PutDatacentersDatacenterIDDefault) IsCode(code int) bool {
+	return o._statusCode == code
+}
+
 func (o *PutDatacentersDatacenterIDDefault) Error() string {
 	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] PutDatacentersDatacenterID default  %+v", o._statusCode, o.Payload)
 }
+
+func (o *PutDatacentersDatacenterIDDefault) String() string {
+	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] PutDatacentersDatacenterID default  %+v", o._statusCode, o.Payload)
+}
+
 func (o *PutDatacentersDatacenterIDDefault) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -170,7 +263,8 @@ func (o *PutDatacentersDatacenterIDDefault) readResponse(response runtime.Client
 	return nil
 }
 
-/*PutDatacentersDatacenterIDAcceptedBody put datacenters datacenter ID accepted body
+/*
+PutDatacentersDatacenterIDAcceptedBody put datacenters datacenter ID accepted body
 swagger:model PutDatacentersDatacenterIDAcceptedBody
 */
 type PutDatacentersDatacenterIDAcceptedBody struct {
@@ -260,7 +354,8 @@ func (o *PutDatacentersDatacenterIDAcceptedBody) UnmarshalBinary(b []byte) error
 	return nil
 }
 
-/*PutDatacentersDatacenterIDBody put datacenters datacenter ID body
+/*
+PutDatacentersDatacenterIDBody put datacenters datacenter ID body
 swagger:model PutDatacentersDatacenterIDBody
 */
 type PutDatacentersDatacenterIDBody struct {

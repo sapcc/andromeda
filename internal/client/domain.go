@@ -31,6 +31,7 @@ var DomainOptions struct {
 }
 
 type DomainList struct {
+	Long bool `long:"long" description:"List additional fields in output"`
 }
 
 type DomainShow struct {
@@ -59,6 +60,9 @@ func (*DomainList) Execute(_ []string) error {
 
 	if err != nil {
 		return err
+	}
+	if !DomainOptions.Long && len(opts.Formatters.Columns) == 0 {
+		opts.Formatters.Columns = []string{"id", "name", "admin_state_up", "fqdn", "project_id", "provisioning_status"}
 	}
 	return WriteTable(resp.GetPayload().Domains)
 }

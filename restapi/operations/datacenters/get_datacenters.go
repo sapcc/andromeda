@@ -50,10 +50,10 @@ func NewGetDatacenters(ctx *middleware.Context, handler GetDatacentersHandler) *
 	return &GetDatacenters{Context: ctx, Handler: handler}
 }
 
-/* GetDatacenters swagger:route GET /datacenters Datacenters getDatacenters
+/*
+	GetDatacenters swagger:route GET /datacenters Datacenters getDatacenters
 
 List datacenters
-
 */
 type GetDatacenters struct {
 	Context *middleware.Context

@@ -30,7 +30,8 @@ import (
 // PostSyncAcceptedCode is the HTTP code returned for type PostSyncAccepted
 const PostSyncAcceptedCode int = 202
 
-/*PostSyncAccepted Full sync has been enqueued.
+/*
+PostSyncAccepted Full sync has been enqueued.
 
 swagger:response postSyncAccepted
 */
@@ -51,7 +52,8 @@ func (o *PostSyncAccepted) WriteResponse(rw http.ResponseWriter, producer runtim
 	rw.WriteHeader(202)
 }
 
-/*PostSyncDefault Unexpected Error
+/*
+PostSyncDefault Unexpected Error
 
 swagger:response postSyncDefault
 */

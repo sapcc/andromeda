@@ -66,10 +66,12 @@ func NewDeleteMonitorsMonitorIDParamsWithHTTPClient(client *http.Client) *Delete
 	}
 }
 
-/* DeleteMonitorsMonitorIDParams contains all the parameters to send to the API endpoint
-   for the delete monitors monitor ID operation.
+/*
+DeleteMonitorsMonitorIDParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the delete monitors monitor ID operation.
+
+	Typically these are written to a http.Request.
 */
 type DeleteMonitorsMonitorIDParams struct {
 

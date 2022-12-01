@@ -46,10 +46,11 @@ type MemberCreate struct {
 	PositionalMemberCreate struct {
 		PoolID strfmt.UUID `description:"UUID of the pool"`
 	} `positional-args:"yes" required:"yes"`
-	Name    string      `short:"n" long:"name" description:"Name of the Member"`
-	Address strfmt.IPv4 `short:"a" long:"address" description:"Address of the Member" required:"true"`
-	Port    int64       `short:"p" long:"port" description:"Port of the Member" required:"true"`
-	Disable bool        `short:"d" long:"disable" description:"Disable Member" optional:"true" optional-value:"false"`
+	Name         string      `short:"n" long:"name" description:"Name of the Member"`
+	Address      strfmt.IPv4 `short:"a" long:"address" description:"Address of the Member" required:"true"`
+	Port         int64       `short:"p" long:"port" description:"Port of the Member" required:"true"`
+	Disable      bool        `short:"d" long:"disable" description:"Disable Member" optional:"true" optional-value:"false"`
+	DatacenterID strfmt.UUID `short:"i" long:"datacenter" description:"Datacenter ID"`
 }
 
 type MemberDelete struct {
@@ -76,6 +77,7 @@ func (*MemberCreate) Execute(_ []string) error {
 		Name:         &MemberOptions.Name,
 		Address:      &MemberOptions.Address,
 		Port:         &MemberOptions.Port,
+		DatacenterID: &MemberOptions.DatacenterID,
 	}}
 	resp, err := AndromedaClient.Members.PostPoolsPoolIDMembers(members.
 		NewPostPoolsPoolIDMembersParams().

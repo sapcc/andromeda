@@ -30,7 +30,8 @@ import (
 // DeletePoolsPoolIDNoContentCode is the HTTP code returned for type DeletePoolsPoolIDNoContent
 const DeletePoolsPoolIDNoContentCode int = 204
 
-/*DeletePoolsPoolIDNoContent Resource successfully deleted.
+/*
+DeletePoolsPoolIDNoContent Resource successfully deleted.
 
 swagger:response deletePoolsPoolIdNoContent
 */
@@ -54,7 +55,8 @@ func (o *DeletePoolsPoolIDNoContent) WriteResponse(rw http.ResponseWriter, produ
 // DeletePoolsPoolIDNotFoundCode is the HTTP code returned for type DeletePoolsPoolIDNotFound
 const DeletePoolsPoolIDNotFoundCode int = 404
 
-/*DeletePoolsPoolIDNotFound Not Found
+/*
+DeletePoolsPoolIDNotFound Not Found
 
 swagger:response deletePoolsPoolIdNotFound
 */
@@ -95,7 +97,8 @@ func (o *DeletePoolsPoolIDNotFound) WriteResponse(rw http.ResponseWriter, produc
 	}
 }
 
-/*DeletePoolsPoolIDDefault Unexpected Error
+/*
+DeletePoolsPoolIDDefault Unexpected Error
 
 swagger:response deletePoolsPoolIdDefault
 */

@@ -66,10 +66,12 @@ func NewGetQuotasDefaultsParamsWithHTTPClient(client *http.Client) *GetQuotasDef
 	}
 }
 
-/* GetQuotasDefaultsParams contains all the parameters to send to the API endpoint
-   for the get quotas defaults operation.
+/*
+GetQuotasDefaultsParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the get quotas defaults operation.
+
+	Typically these are written to a http.Request.
 */
 type GetQuotasDefaultsParams struct {
 	timeout    time.Duration

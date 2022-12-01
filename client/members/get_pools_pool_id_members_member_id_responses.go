@@ -69,7 +69,8 @@ func NewGetPoolsPoolIDMembersMemberIDOK() *GetPoolsPoolIDMembersMemberIDOK {
 	return &GetPoolsPoolIDMembersMemberIDOK{}
 }
 
-/* GetPoolsPoolIDMembersMemberIDOK describes a response with status code 200, with default header values.
+/*
+GetPoolsPoolIDMembersMemberIDOK describes a response with status code 200, with default header values.
 
 Shows the details of a specific member.
 */
@@ -77,9 +78,39 @@ type GetPoolsPoolIDMembersMemberIDOK struct {
 	Payload *GetPoolsPoolIDMembersMemberIDOKBody
 }
 
+// IsSuccess returns true when this get pools pool Id members member Id o k response has a 2xx status code
+func (o *GetPoolsPoolIDMembersMemberIDOK) IsSuccess() bool {
+	return true
+}
+
+// IsRedirect returns true when this get pools pool Id members member Id o k response has a 3xx status code
+func (o *GetPoolsPoolIDMembersMemberIDOK) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this get pools pool Id members member Id o k response has a 4xx status code
+func (o *GetPoolsPoolIDMembersMemberIDOK) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this get pools pool Id members member Id o k response has a 5xx status code
+func (o *GetPoolsPoolIDMembersMemberIDOK) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this get pools pool Id members member Id o k response a status code equal to that given
+func (o *GetPoolsPoolIDMembersMemberIDOK) IsCode(code int) bool {
+	return code == 200
+}
+
 func (o *GetPoolsPoolIDMembersMemberIDOK) Error() string {
 	return fmt.Sprintf("[GET /pools/{pool_id}/members/{member_id}][%d] getPoolsPoolIdMembersMemberIdOK  %+v", 200, o.Payload)
 }
+
+func (o *GetPoolsPoolIDMembersMemberIDOK) String() string {
+	return fmt.Sprintf("[GET /pools/{pool_id}/members/{member_id}][%d] getPoolsPoolIdMembersMemberIdOK  %+v", 200, o.Payload)
+}
+
 func (o *GetPoolsPoolIDMembersMemberIDOK) GetPayload() *GetPoolsPoolIDMembersMemberIDOKBody {
 	return o.Payload
 }
@@ -101,7 +132,8 @@ func NewGetPoolsPoolIDMembersMemberIDNotFound() *GetPoolsPoolIDMembersMemberIDNo
 	return &GetPoolsPoolIDMembersMemberIDNotFound{}
 }
 
-/* GetPoolsPoolIDMembersMemberIDNotFound describes a response with status code 404, with default header values.
+/*
+GetPoolsPoolIDMembersMemberIDNotFound describes a response with status code 404, with default header values.
 
 Not Found
 */
@@ -109,9 +141,39 @@ type GetPoolsPoolIDMembersMemberIDNotFound struct {
 	Payload *models.Error
 }
 
+// IsSuccess returns true when this get pools pool Id members member Id not found response has a 2xx status code
+func (o *GetPoolsPoolIDMembersMemberIDNotFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this get pools pool Id members member Id not found response has a 3xx status code
+func (o *GetPoolsPoolIDMembersMemberIDNotFound) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this get pools pool Id members member Id not found response has a 4xx status code
+func (o *GetPoolsPoolIDMembersMemberIDNotFound) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this get pools pool Id members member Id not found response has a 5xx status code
+func (o *GetPoolsPoolIDMembersMemberIDNotFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this get pools pool Id members member Id not found response a status code equal to that given
+func (o *GetPoolsPoolIDMembersMemberIDNotFound) IsCode(code int) bool {
+	return code == 404
+}
+
 func (o *GetPoolsPoolIDMembersMemberIDNotFound) Error() string {
 	return fmt.Sprintf("[GET /pools/{pool_id}/members/{member_id}][%d] getPoolsPoolIdMembersMemberIdNotFound  %+v", 404, o.Payload)
 }
+
+func (o *GetPoolsPoolIDMembersMemberIDNotFound) String() string {
+	return fmt.Sprintf("[GET /pools/{pool_id}/members/{member_id}][%d] getPoolsPoolIdMembersMemberIdNotFound  %+v", 404, o.Payload)
+}
+
 func (o *GetPoolsPoolIDMembersMemberIDNotFound) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -135,7 +197,8 @@ func NewGetPoolsPoolIDMembersMemberIDDefault(code int) *GetPoolsPoolIDMembersMem
 	}
 }
 
-/* GetPoolsPoolIDMembersMemberIDDefault describes a response with status code -1, with default header values.
+/*
+GetPoolsPoolIDMembersMemberIDDefault describes a response with status code -1, with default header values.
 
 Unexpected Error
 */
@@ -150,9 +213,39 @@ func (o *GetPoolsPoolIDMembersMemberIDDefault) Code() int {
 	return o._statusCode
 }
 
+// IsSuccess returns true when this get pools pool ID members member ID default response has a 2xx status code
+func (o *GetPoolsPoolIDMembersMemberIDDefault) IsSuccess() bool {
+	return o._statusCode/100 == 2
+}
+
+// IsRedirect returns true when this get pools pool ID members member ID default response has a 3xx status code
+func (o *GetPoolsPoolIDMembersMemberIDDefault) IsRedirect() bool {
+	return o._statusCode/100 == 3
+}
+
+// IsClientError returns true when this get pools pool ID members member ID default response has a 4xx status code
+func (o *GetPoolsPoolIDMembersMemberIDDefault) IsClientError() bool {
+	return o._statusCode/100 == 4
+}
+
+// IsServerError returns true when this get pools pool ID members member ID default response has a 5xx status code
+func (o *GetPoolsPoolIDMembersMemberIDDefault) IsServerError() bool {
+	return o._statusCode/100 == 5
+}
+
+// IsCode returns true when this get pools pool ID members member ID default response a status code equal to that given
+func (o *GetPoolsPoolIDMembersMemberIDDefault) IsCode(code int) bool {
+	return o._statusCode == code
+}
+
 func (o *GetPoolsPoolIDMembersMemberIDDefault) Error() string {
 	return fmt.Sprintf("[GET /pools/{pool_id}/members/{member_id}][%d] GetPoolsPoolIDMembersMemberID default  %+v", o._statusCode, o.Payload)
 }
+
+func (o *GetPoolsPoolIDMembersMemberIDDefault) String() string {
+	return fmt.Sprintf("[GET /pools/{pool_id}/members/{member_id}][%d] GetPoolsPoolIDMembersMemberID default  %+v", o._statusCode, o.Payload)
+}
+
 func (o *GetPoolsPoolIDMembersMemberIDDefault) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -169,7 +262,8 @@ func (o *GetPoolsPoolIDMembersMemberIDDefault) readResponse(response runtime.Cli
 	return nil
 }
 
-/*GetPoolsPoolIDMembersMemberIDOKBody get pools pool ID members member ID o k body
+/*
+GetPoolsPoolIDMembersMemberIDOKBody get pools pool ID members member ID o k body
 swagger:model GetPoolsPoolIDMembersMemberIDOKBody
 */
 type GetPoolsPoolIDMembersMemberIDOKBody struct {

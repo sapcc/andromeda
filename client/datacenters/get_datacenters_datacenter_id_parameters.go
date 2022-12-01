@@ -66,10 +66,12 @@ func NewGetDatacentersDatacenterIDParamsWithHTTPClient(client *http.Client) *Get
 	}
 }
 
-/* GetDatacentersDatacenterIDParams contains all the parameters to send to the API endpoint
-   for the get datacenters datacenter ID operation.
+/*
+GetDatacentersDatacenterIDParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the get datacenters datacenter ID operation.
+
+	Typically these are written to a http.Request.
 */
 type GetDatacentersDatacenterIDParams struct {
 

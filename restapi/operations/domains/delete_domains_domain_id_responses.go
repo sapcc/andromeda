@@ -30,7 +30,8 @@ import (
 // DeleteDomainsDomainIDNoContentCode is the HTTP code returned for type DeleteDomainsDomainIDNoContent
 const DeleteDomainsDomainIDNoContentCode int = 204
 
-/*DeleteDomainsDomainIDNoContent Resource successfully deleted.
+/*
+DeleteDomainsDomainIDNoContent Resource successfully deleted.
 
 swagger:response deleteDomainsDomainIdNoContent
 */
@@ -54,7 +55,8 @@ func (o *DeleteDomainsDomainIDNoContent) WriteResponse(rw http.ResponseWriter, p
 // DeleteDomainsDomainIDNotFoundCode is the HTTP code returned for type DeleteDomainsDomainIDNotFound
 const DeleteDomainsDomainIDNotFoundCode int = 404
 
-/*DeleteDomainsDomainIDNotFound Not Found
+/*
+DeleteDomainsDomainIDNotFound Not Found
 
 swagger:response deleteDomainsDomainIdNotFound
 */
@@ -95,7 +97,8 @@ func (o *DeleteDomainsDomainIDNotFound) WriteResponse(rw http.ResponseWriter, pr
 	}
 }
 
-/*DeleteDomainsDomainIDDefault Unexpected Error
+/*
+DeleteDomainsDomainIDDefault Unexpected Error
 
 swagger:response deleteDomainsDomainIdDefault
 */

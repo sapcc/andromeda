@@ -30,7 +30,8 @@ import (
 // PostPoolsCreatedCode is the HTTP code returned for type PostPoolsCreated
 const PostPoolsCreatedCode int = 201
 
-/*PostPoolsCreated Created pool.
+/*
+PostPoolsCreated Created pool.
 
 swagger:response postPoolsCreated
 */
@@ -74,7 +75,8 @@ func (o *PostPoolsCreated) WriteResponse(rw http.ResponseWriter, producer runtim
 // PostPoolsBadRequestCode is the HTTP code returned for type PostPoolsBadRequest
 const PostPoolsBadRequestCode int = 400
 
-/*PostPoolsBadRequest Bad request
+/*
+PostPoolsBadRequest Bad request
 
 swagger:response postPoolsBadRequest
 */
@@ -115,7 +117,8 @@ func (o *PostPoolsBadRequest) WriteResponse(rw http.ResponseWriter, producer run
 	}
 }
 
-/*PostPoolsDefault Unexpected Error
+/*
+PostPoolsDefault Unexpected Error
 
 swagger:response postPoolsDefault
 */

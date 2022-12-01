@@ -43,10 +43,10 @@ func NewDeleteDomainsDomainID(ctx *middleware.Context, handler DeleteDomainsDoma
 	return &DeleteDomainsDomainID{Context: ctx, Handler: handler}
 }
 
-/* DeleteDomainsDomainID swagger:route DELETE /domains/{domain_id} Domains deleteDomainsDomainId
+/*
+	DeleteDomainsDomainID swagger:route DELETE /domains/{domain_id} Domains deleteDomainsDomainId
 
 Delete a domain
-
 */
 type DeleteDomainsDomainID struct {
 	Context *middleware.Context

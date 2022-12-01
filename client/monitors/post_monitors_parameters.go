@@ -66,10 +66,12 @@ func NewPostMonitorsParamsWithHTTPClient(client *http.Client) *PostMonitorsParam
 	}
 }
 
-/* PostMonitorsParams contains all the parameters to send to the API endpoint
-   for the post monitors operation.
+/*
+PostMonitorsParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the post monitors operation.
+
+	Typically these are written to a http.Request.
 */
 type PostMonitorsParams struct {
 

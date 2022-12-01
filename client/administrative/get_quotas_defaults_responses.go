@@ -63,7 +63,8 @@ func NewGetQuotasDefaultsOK() *GetQuotasDefaultsOK {
 	return &GetQuotasDefaultsOK{}
 }
 
-/* GetQuotasDefaultsOK describes a response with status code 200, with default header values.
+/*
+GetQuotasDefaultsOK describes a response with status code 200, with default header values.
 
 Show the quota defaults configured for new projects.
 */
@@ -71,9 +72,39 @@ type GetQuotasDefaultsOK struct {
 	Payload *GetQuotasDefaultsOKBody
 }
 
+// IsSuccess returns true when this get quotas defaults o k response has a 2xx status code
+func (o *GetQuotasDefaultsOK) IsSuccess() bool {
+	return true
+}
+
+// IsRedirect returns true when this get quotas defaults o k response has a 3xx status code
+func (o *GetQuotasDefaultsOK) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this get quotas defaults o k response has a 4xx status code
+func (o *GetQuotasDefaultsOK) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this get quotas defaults o k response has a 5xx status code
+func (o *GetQuotasDefaultsOK) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this get quotas defaults o k response a status code equal to that given
+func (o *GetQuotasDefaultsOK) IsCode(code int) bool {
+	return code == 200
+}
+
 func (o *GetQuotasDefaultsOK) Error() string {
 	return fmt.Sprintf("[GET /quotas/defaults][%d] getQuotasDefaultsOK  %+v", 200, o.Payload)
 }
+
+func (o *GetQuotasDefaultsOK) String() string {
+	return fmt.Sprintf("[GET /quotas/defaults][%d] getQuotasDefaultsOK  %+v", 200, o.Payload)
+}
+
 func (o *GetQuotasDefaultsOK) GetPayload() *GetQuotasDefaultsOKBody {
 	return o.Payload
 }
@@ -97,7 +128,8 @@ func NewGetQuotasDefaultsDefault(code int) *GetQuotasDefaultsDefault {
 	}
 }
 
-/* GetQuotasDefaultsDefault describes a response with status code -1, with default header values.
+/*
+GetQuotasDefaultsDefault describes a response with status code -1, with default header values.
 
 Unexpected Error
 */
@@ -112,9 +144,39 @@ func (o *GetQuotasDefaultsDefault) Code() int {
 	return o._statusCode
 }
 
+// IsSuccess returns true when this get quotas defaults default response has a 2xx status code
+func (o *GetQuotasDefaultsDefault) IsSuccess() bool {
+	return o._statusCode/100 == 2
+}
+
+// IsRedirect returns true when this get quotas defaults default response has a 3xx status code
+func (o *GetQuotasDefaultsDefault) IsRedirect() bool {
+	return o._statusCode/100 == 3
+}
+
+// IsClientError returns true when this get quotas defaults default response has a 4xx status code
+func (o *GetQuotasDefaultsDefault) IsClientError() bool {
+	return o._statusCode/100 == 4
+}
+
+// IsServerError returns true when this get quotas defaults default response has a 5xx status code
+func (o *GetQuotasDefaultsDefault) IsServerError() bool {
+	return o._statusCode/100 == 5
+}
+
+// IsCode returns true when this get quotas defaults default response a status code equal to that given
+func (o *GetQuotasDefaultsDefault) IsCode(code int) bool {
+	return o._statusCode == code
+}
+
 func (o *GetQuotasDefaultsDefault) Error() string {
 	return fmt.Sprintf("[GET /quotas/defaults][%d] GetQuotasDefaults default  %+v", o._statusCode, o.Payload)
 }
+
+func (o *GetQuotasDefaultsDefault) String() string {
+	return fmt.Sprintf("[GET /quotas/defaults][%d] GetQuotasDefaults default  %+v", o._statusCode, o.Payload)
+}
+
 func (o *GetQuotasDefaultsDefault) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -131,7 +193,8 @@ func (o *GetQuotasDefaultsDefault) readResponse(response runtime.ClientResponse,
 	return nil
 }
 
-/*GetQuotasDefaultsOKBody get quotas defaults o k body
+/*
+GetQuotasDefaultsOKBody get quotas defaults o k body
 swagger:model GetQuotasDefaultsOKBody
 */
 type GetQuotasDefaultsOKBody struct {

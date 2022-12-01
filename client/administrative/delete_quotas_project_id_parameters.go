@@ -66,10 +66,12 @@ func NewDeleteQuotasProjectIDParamsWithHTTPClient(client *http.Client) *DeleteQu
 	}
 }
 
-/* DeleteQuotasProjectIDParams contains all the parameters to send to the API endpoint
-   for the delete quotas project ID operation.
+/*
+DeleteQuotasProjectIDParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the delete quotas project ID operation.
+
+	Typically these are written to a http.Request.
 */
 type DeleteQuotasProjectIDParams struct {
 

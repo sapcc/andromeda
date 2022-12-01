@@ -49,10 +49,10 @@ func NewGetDomainsDomainID(ctx *middleware.Context, handler GetDomainsDomainIDHa
 	return &GetDomainsDomainID{Context: ctx, Handler: handler}
 }
 
-/* GetDomainsDomainID swagger:route GET /domains/{domain_id} Domains getDomainsDomainId
+/*
+	GetDomainsDomainID swagger:route GET /domains/{domain_id} Domains getDomainsDomainId
 
 Show domain detail
-
 */
 type GetDomainsDomainID struct {
 	Context *middleware.Context

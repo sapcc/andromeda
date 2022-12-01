@@ -30,7 +30,8 @@ import (
 // PostMonitorsCreatedCode is the HTTP code returned for type PostMonitorsCreated
 const PostMonitorsCreatedCode int = 201
 
-/*PostMonitorsCreated Created monitor.
+/*
+PostMonitorsCreated Created monitor.
 
 swagger:response postMonitorsCreated
 */
@@ -74,7 +75,8 @@ func (o *PostMonitorsCreated) WriteResponse(rw http.ResponseWriter, producer run
 // PostMonitorsBadRequestCode is the HTTP code returned for type PostMonitorsBadRequest
 const PostMonitorsBadRequestCode int = 400
 
-/*PostMonitorsBadRequest Bad request
+/*
+PostMonitorsBadRequest Bad request
 
 swagger:response postMonitorsBadRequest
 */
@@ -118,7 +120,8 @@ func (o *PostMonitorsBadRequest) WriteResponse(rw http.ResponseWriter, producer 
 // PostMonitorsNotFoundCode is the HTTP code returned for type PostMonitorsNotFound
 const PostMonitorsNotFoundCode int = 404
 
-/*PostMonitorsNotFound Not Found
+/*
+PostMonitorsNotFound Not Found
 
 swagger:response postMonitorsNotFound
 */
@@ -159,7 +162,8 @@ func (o *PostMonitorsNotFound) WriteResponse(rw http.ResponseWriter, producer ru
 	}
 }
 
-/*PostMonitorsDefault Unexpected Error
+/*
+PostMonitorsDefault Unexpected Error
 
 swagger:response postMonitorsDefault
 */

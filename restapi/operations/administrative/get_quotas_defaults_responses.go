@@ -30,7 +30,8 @@ import (
 // GetQuotasDefaultsOKCode is the HTTP code returned for type GetQuotasDefaultsOK
 const GetQuotasDefaultsOKCode int = 200
 
-/*GetQuotasDefaultsOK Show the quota defaults configured for new projects.
+/*
+GetQuotasDefaultsOK Show the quota defaults configured for new projects.
 
 swagger:response getQuotasDefaultsOK
 */
@@ -71,7 +72,8 @@ func (o *GetQuotasDefaultsOK) WriteResponse(rw http.ResponseWriter, producer run
 	}
 }
 
-/*GetQuotasDefaultsDefault Unexpected Error
+/*
+GetQuotasDefaultsDefault Unexpected Error
 
 swagger:response getQuotasDefaultsDefault
 */

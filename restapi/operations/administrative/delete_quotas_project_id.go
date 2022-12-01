@@ -43,10 +43,10 @@ func NewDeleteQuotasProjectID(ctx *middleware.Context, handler DeleteQuotasProje
 	return &DeleteQuotasProjectID{Context: ctx, Handler: handler}
 }
 
-/* DeleteQuotasProjectID swagger:route DELETE /quotas/{project_id} Administrative deleteQuotasProjectId
+/*
+	DeleteQuotasProjectID swagger:route DELETE /quotas/{project_id} Administrative deleteQuotasProjectId
 
 Reset all Quota of a project
-
 */
 type DeleteQuotasProjectID struct {
 	Context *middleware.Context

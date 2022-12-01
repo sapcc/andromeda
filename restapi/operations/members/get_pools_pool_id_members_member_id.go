@@ -49,10 +49,10 @@ func NewGetPoolsPoolIDMembersMemberID(ctx *middleware.Context, handler GetPoolsP
 	return &GetPoolsPoolIDMembersMemberID{Context: ctx, Handler: handler}
 }
 
-/* GetPoolsPoolIDMembersMemberID swagger:route GET /pools/{pool_id}/members/{member_id} Members getPoolsPoolIdMembersMemberId
+/*
+	GetPoolsPoolIDMembersMemberID swagger:route GET /pools/{pool_id}/members/{member_id} Members getPoolsPoolIdMembersMemberId
 
 Show member detail
-
 */
 type GetPoolsPoolIDMembersMemberID struct {
 	Context *middleware.Context

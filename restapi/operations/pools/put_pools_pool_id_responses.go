@@ -30,7 +30,8 @@ import (
 // PutPoolsPoolIDAcceptedCode is the HTTP code returned for type PutPoolsPoolIDAccepted
 const PutPoolsPoolIDAcceptedCode int = 202
 
-/*PutPoolsPoolIDAccepted Updated pool.
+/*
+PutPoolsPoolIDAccepted Updated pool.
 
 swagger:response putPoolsPoolIdAccepted
 */
@@ -74,7 +75,8 @@ func (o *PutPoolsPoolIDAccepted) WriteResponse(rw http.ResponseWriter, producer 
 // PutPoolsPoolIDNotFoundCode is the HTTP code returned for type PutPoolsPoolIDNotFound
 const PutPoolsPoolIDNotFoundCode int = 404
 
-/*PutPoolsPoolIDNotFound Not Found
+/*
+PutPoolsPoolIDNotFound Not Found
 
 swagger:response putPoolsPoolIdNotFound
 */
@@ -115,7 +117,8 @@ func (o *PutPoolsPoolIDNotFound) WriteResponse(rw http.ResponseWriter, producer 
 	}
 }
 
-/*PutPoolsPoolIDDefault Unexpected Error
+/*
+PutPoolsPoolIDDefault Unexpected Error
 
 swagger:response putPoolsPoolIdDefault
 */

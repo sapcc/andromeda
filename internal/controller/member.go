@@ -19,11 +19,10 @@ package controller
 import (
 	"errors"
 	"fmt"
+	"github.com/lib/pq"
 	"strings"
 
 	"github.com/go-sql-driver/mysql"
-
-	"github.com/jackc/pgconn"
 
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jackc/pgerrcode"
@@ -108,7 +107,7 @@ func (c MemberController) PostMembers(params members.PostPoolsPoolIDMembersParam
 		panic(err)
 	}
 	if err := stmt.Get(member, member); err != nil {
-		var pe *pgconn.PgError
+		var pe *pq.Error
 		if errors.As(err, &pe) && pe.Code == pgerrcode.UniqueViolation {
 			return members.NewPostPoolsPoolIDMembersDefault(409).WithPayload(DuplicateMember)
 		}
@@ -180,7 +179,7 @@ func (c MemberController) DeleteMembersMemberID(params members.DeletePoolsPoolID
 		return GetPolicyForbiddenResponse()
 	}
 
-	sql := `DELETE FROM member WHERE id = ?`
+	sql := c.db.Rebind(`DELETE FROM member WHERE id = ?`)
 	res := c.db.MustExec(sql, params.MemberID)
 	if deleted, _ := res.RowsAffected(); deleted != 1 {
 		members.NewDeletePoolsPoolIDMembersMemberIDNotFound().WithPayload(NotFound)
@@ -190,7 +189,7 @@ func (c MemberController) DeleteMembersMemberID(params members.DeletePoolsPoolID
 }
 
 func PopulateMember(db *sqlx.DB, member *models.Member, fields []string) error {
-	sql := fmt.Sprintf(`SELECT %s FROM member WHERE pool_id = ? AND id = ?`, strings.Join(fields, ", "))
+	sql := db.Rebind(fmt.Sprintf(`SELECT %s FROM member WHERE pool_id = ? AND id = ?`, strings.Join(fields, ", ")))
 	if err := db.Get(member, sql, member.PoolID, member.ID); err != nil {
 		return err
 	}

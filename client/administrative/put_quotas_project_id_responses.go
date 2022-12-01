@@ -64,7 +64,8 @@ func NewPutQuotasProjectIDAccepted() *PutQuotasProjectIDAccepted {
 	return &PutQuotasProjectIDAccepted{}
 }
 
-/* PutQuotasProjectIDAccepted describes a response with status code 202, with default header values.
+/*
+PutQuotasProjectIDAccepted describes a response with status code 202, with default header values.
 
 Updated quota for a project.
 */
@@ -72,9 +73,39 @@ type PutQuotasProjectIDAccepted struct {
 	Payload *PutQuotasProjectIDAcceptedBody
 }
 
+// IsSuccess returns true when this put quotas project Id accepted response has a 2xx status code
+func (o *PutQuotasProjectIDAccepted) IsSuccess() bool {
+	return true
+}
+
+// IsRedirect returns true when this put quotas project Id accepted response has a 3xx status code
+func (o *PutQuotasProjectIDAccepted) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this put quotas project Id accepted response has a 4xx status code
+func (o *PutQuotasProjectIDAccepted) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this put quotas project Id accepted response has a 5xx status code
+func (o *PutQuotasProjectIDAccepted) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this put quotas project Id accepted response a status code equal to that given
+func (o *PutQuotasProjectIDAccepted) IsCode(code int) bool {
+	return code == 202
+}
+
 func (o *PutQuotasProjectIDAccepted) Error() string {
 	return fmt.Sprintf("[PUT /quotas/{project_id}][%d] putQuotasProjectIdAccepted  %+v", 202, o.Payload)
 }
+
+func (o *PutQuotasProjectIDAccepted) String() string {
+	return fmt.Sprintf("[PUT /quotas/{project_id}][%d] putQuotasProjectIdAccepted  %+v", 202, o.Payload)
+}
+
 func (o *PutQuotasProjectIDAccepted) GetPayload() *PutQuotasProjectIDAcceptedBody {
 	return o.Payload
 }
@@ -98,7 +129,8 @@ func NewPutQuotasProjectIDDefault(code int) *PutQuotasProjectIDDefault {
 	}
 }
 
-/* PutQuotasProjectIDDefault describes a response with status code -1, with default header values.
+/*
+PutQuotasProjectIDDefault describes a response with status code -1, with default header values.
 
 Unexpected Error
 */
@@ -113,9 +145,39 @@ func (o *PutQuotasProjectIDDefault) Code() int {
 	return o._statusCode
 }
 
+// IsSuccess returns true when this put quotas project ID default response has a 2xx status code
+func (o *PutQuotasProjectIDDefault) IsSuccess() bool {
+	return o._statusCode/100 == 2
+}
+
+// IsRedirect returns true when this put quotas project ID default response has a 3xx status code
+func (o *PutQuotasProjectIDDefault) IsRedirect() bool {
+	return o._statusCode/100 == 3
+}
+
+// IsClientError returns true when this put quotas project ID default response has a 4xx status code
+func (o *PutQuotasProjectIDDefault) IsClientError() bool {
+	return o._statusCode/100 == 4
+}
+
+// IsServerError returns true when this put quotas project ID default response has a 5xx status code
+func (o *PutQuotasProjectIDDefault) IsServerError() bool {
+	return o._statusCode/100 == 5
+}
+
+// IsCode returns true when this put quotas project ID default response a status code equal to that given
+func (o *PutQuotasProjectIDDefault) IsCode(code int) bool {
+	return o._statusCode == code
+}
+
 func (o *PutQuotasProjectIDDefault) Error() string {
 	return fmt.Sprintf("[PUT /quotas/{project_id}][%d] PutQuotasProjectID default  %+v", o._statusCode, o.Payload)
 }
+
+func (o *PutQuotasProjectIDDefault) String() string {
+	return fmt.Sprintf("[PUT /quotas/{project_id}][%d] PutQuotasProjectID default  %+v", o._statusCode, o.Payload)
+}
+
 func (o *PutQuotasProjectIDDefault) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -132,7 +194,8 @@ func (o *PutQuotasProjectIDDefault) readResponse(response runtime.ClientResponse
 	return nil
 }
 
-/*PutQuotasProjectIDAcceptedBody put quotas project ID accepted body
+/*
+PutQuotasProjectIDAcceptedBody put quotas project ID accepted body
 swagger:model PutQuotasProjectIDAcceptedBody
 */
 type PutQuotasProjectIDAcceptedBody struct {
@@ -222,7 +285,8 @@ func (o *PutQuotasProjectIDAcceptedBody) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*PutQuotasProjectIDBody put quotas project ID body
+/*
+PutQuotasProjectIDBody put quotas project ID body
 swagger:model PutQuotasProjectIDBody
 */
 type PutQuotasProjectIDBody struct {

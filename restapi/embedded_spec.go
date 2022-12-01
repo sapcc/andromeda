@@ -1389,7 +1389,7 @@ func init() {
             }
           }
         },
-        "x-policy": "andromeda:quota:get_one"
+        "x-policy": "andromeda:quota:put"
       },
       "delete": {
         "tags": [
@@ -1542,8 +1542,6 @@ func init() {
         },
         "meta": {
           "type": "integer",
-          "format": "int64",
-          "x-nullable": true,
           "readOnly": true
         },
         "name": {
@@ -3623,7 +3621,7 @@ func init() {
             }
           }
         },
-        "x-policy": "andromeda:quota:get_one"
+        "x-policy": "andromeda:quota:put"
       },
       "delete": {
         "tags": [
@@ -3798,8 +3796,6 @@ func init() {
         },
         "meta": {
           "type": "integer",
-          "format": "int64",
-          "x-nullable": true,
           "readOnly": true
         },
         "name": {

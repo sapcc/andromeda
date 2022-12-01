@@ -30,7 +30,8 @@ import (
 // GetServicesOKCode is the HTTP code returned for type GetServicesOK
 const GetServicesOKCode int = 200
 
-/*GetServicesOK A JSON array of services
+/*
+GetServicesOK A JSON array of services
 
 swagger:response getServicesOK
 */
@@ -71,7 +72,8 @@ func (o *GetServicesOK) WriteResponse(rw http.ResponseWriter, producer runtime.P
 	}
 }
 
-/*GetServicesDefault Unexpected Error
+/*
+GetServicesDefault Unexpected Error
 
 swagger:response getServicesDefault
 */

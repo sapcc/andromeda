@@ -66,10 +66,12 @@ func NewPutDatacentersDatacenterIDParamsWithHTTPClient(client *http.Client) *Put
 	}
 }
 
-/* PutDatacentersDatacenterIDParams contains all the parameters to send to the API endpoint
-   for the put datacenters datacenter ID operation.
+/*
+PutDatacentersDatacenterIDParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the put datacenters datacenter ID operation.
+
+	Typically these are written to a http.Request.
 */
 type PutDatacentersDatacenterIDParams struct {
 

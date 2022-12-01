@@ -66,10 +66,12 @@ func NewGetPoolsPoolIDParamsWithHTTPClient(client *http.Client) *GetPoolsPoolIDP
 	}
 }
 
-/* GetPoolsPoolIDParams contains all the parameters to send to the API endpoint
-   for the get pools pool ID operation.
+/*
+GetPoolsPoolIDParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the get pools pool ID operation.
+
+	Typically these are written to a http.Request.
 */
 type GetPoolsPoolIDParams struct {
 

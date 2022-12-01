@@ -20,6 +20,8 @@ import (
 	dbsql "database/sql"
 	"errors"
 	"fmt"
+	"github.com/jackc/pgerrcode"
+	"github.com/lib/pq"
 	"github.com/sapcc/andromeda/internal/config"
 	"strings"
 
@@ -129,6 +131,10 @@ func (c DomainController) PostDomains(params domains.PostDomainsParams) middlewa
 			return domains.NewPostDomainsDefault(400).WithPayload(
 				&models.Error{Code: 400, Message: errMsg})
 		}
+		var pe *pq.Error
+		if errors.As(err, &pe) && pe.Code == pgerrcode.UniqueViolation {
+			return domains.NewPostDomainsDefault(409).WithPayload(DuplicateDomain)
+		}
 		var me *mysql.MySQLError
 		if errors.As(err, &me) && me.Number == 1062 {
 			return domains.NewPostDomainsDefault(409).WithPayload(DuplicateDomain)
@@ -172,7 +178,7 @@ func (c DomainController) PutDomainsDomainID(params domains.PutDomainsDomainIDPa
 		// Populate args
 		if params.Domain.Domain.Pools != nil {
 			var existingPoolRefs []strfmt.UUID
-			sql := `SELECT pool_id FROM domain_pool_relation WHERE domain_id = ? FOR UPDATE`
+			sql := tx.Rebind(`SELECT pool_id FROM domain_pool_relation WHERE domain_id = ? FOR UPDATE`)
 			if err := tx.Select(&existingPoolRefs, sql, params.DomainID); err != nil {
 				return err
 			}
@@ -241,7 +247,7 @@ func (c DomainController) DeleteDomainsDomainID(params domains.DeleteDomainsDoma
 		return GetPolicyForbiddenResponse()
 	}
 
-	sql := `DELETE FROM domain WHERE id = ?`
+	sql := c.db.Rebind(`DELETE FROM domain WHERE id = ?`)
 	res := c.db.MustExec(sql, params.DomainID)
 	if deleted, _ := res.RowsAffected(); deleted != 1 {
 		return domains.NewGetDomainsDefault(404).WithPayload(NotFound)
@@ -251,7 +257,7 @@ func (c DomainController) DeleteDomainsDomainID(params domains.DeleteDomainsDoma
 
 //removeDomainPoolRelations removes pools associated to a domain inside a transaction
 func removeDomainPoolRelations(tx *sqlx.Tx, domainID strfmt.UUID, poolIDs []strfmt.UUID) (*strfmt.UUID, error) {
-	sql := `DELETE FROM domain_pool_relation WHERE domain_id = ? and pool_id = ?`
+	sql := tx.Rebind(`DELETE FROM domain_pool_relation WHERE domain_id = ? and pool_id = ?`)
 	for _, poolID := range poolIDs {
 		if _, err := tx.Exec(sql, domainID, poolID); err != nil {
 			return &poolID, err
@@ -306,7 +312,7 @@ func PopulateDomainPools(db *sqlx.DB, domain *models.Domain) error {
 func PopulateDomain(db *sqlx.DB, domain *models.Domain, fields []string) error {
 	// Get domain
 	// zero-length slice used because we want [] via json encoder, nil encodes null
-	sql := fmt.Sprintf(`SELECT %s FROM domain WHERE id = ?`, strings.Join(fields, ", "))
+	sql := db.Rebind(fmt.Sprintf(`SELECT %s FROM domain WHERE id = ?`, strings.Join(fields, ", ")))
 	if err := db.Get(domain, sql, domain.ID); err != nil {
 		return err
 	}

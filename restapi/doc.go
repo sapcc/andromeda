@@ -15,18 +15,18 @@
 
 // Package restapi Andromeda
 //
-//  Platform agnostic GSLB frontend
-//  Schemes:
-//    http
-//  Host: localhost
-//  BasePath: /v1
-//  Version: 1.0.0
+//	Platform agnostic GSLB frontend
+//	Schemes:
+//	  http
+//	Host: localhost
+//	BasePath: /v1
+//	Version: 1.0.0
 //
-//  Consumes:
-//    - application/json
+//	Consumes:
+//	  - application/json
 //
-//  Produces:
-//    - application/json
+//	Produces:
+//	  - application/json
 //
 // swagger:meta
 package restapi

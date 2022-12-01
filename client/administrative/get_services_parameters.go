@@ -66,10 +66,12 @@ func NewGetServicesParamsWithHTTPClient(client *http.Client) *GetServicesParams 
 	}
 }
 
-/* GetServicesParams contains all the parameters to send to the API endpoint
-   for the get services operation.
+/*
+GetServicesParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the get services operation.
+
+	Typically these are written to a http.Request.
 */
 type GetServicesParams struct {
 	timeout    time.Duration

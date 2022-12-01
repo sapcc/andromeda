@@ -69,7 +69,8 @@ func NewGetDatacentersDatacenterIDOK() *GetDatacentersDatacenterIDOK {
 	return &GetDatacentersDatacenterIDOK{}
 }
 
-/* GetDatacentersDatacenterIDOK describes a response with status code 200, with default header values.
+/*
+GetDatacentersDatacenterIDOK describes a response with status code 200, with default header values.
 
 Shows the details of a specific datacenter.
 */
@@ -77,9 +78,39 @@ type GetDatacentersDatacenterIDOK struct {
 	Payload *GetDatacentersDatacenterIDOKBody
 }
 
+// IsSuccess returns true when this get datacenters datacenter Id o k response has a 2xx status code
+func (o *GetDatacentersDatacenterIDOK) IsSuccess() bool {
+	return true
+}
+
+// IsRedirect returns true when this get datacenters datacenter Id o k response has a 3xx status code
+func (o *GetDatacentersDatacenterIDOK) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this get datacenters datacenter Id o k response has a 4xx status code
+func (o *GetDatacentersDatacenterIDOK) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this get datacenters datacenter Id o k response has a 5xx status code
+func (o *GetDatacentersDatacenterIDOK) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this get datacenters datacenter Id o k response a status code equal to that given
+func (o *GetDatacentersDatacenterIDOK) IsCode(code int) bool {
+	return code == 200
+}
+
 func (o *GetDatacentersDatacenterIDOK) Error() string {
 	return fmt.Sprintf("[GET /datacenters/{datacenter_id}][%d] getDatacentersDatacenterIdOK  %+v", 200, o.Payload)
 }
+
+func (o *GetDatacentersDatacenterIDOK) String() string {
+	return fmt.Sprintf("[GET /datacenters/{datacenter_id}][%d] getDatacentersDatacenterIdOK  %+v", 200, o.Payload)
+}
+
 func (o *GetDatacentersDatacenterIDOK) GetPayload() *GetDatacentersDatacenterIDOKBody {
 	return o.Payload
 }
@@ -101,7 +132,8 @@ func NewGetDatacentersDatacenterIDNotFound() *GetDatacentersDatacenterIDNotFound
 	return &GetDatacentersDatacenterIDNotFound{}
 }
 
-/* GetDatacentersDatacenterIDNotFound describes a response with status code 404, with default header values.
+/*
+GetDatacentersDatacenterIDNotFound describes a response with status code 404, with default header values.
 
 Not Found
 */
@@ -109,9 +141,39 @@ type GetDatacentersDatacenterIDNotFound struct {
 	Payload *models.Error
 }
 
+// IsSuccess returns true when this get datacenters datacenter Id not found response has a 2xx status code
+func (o *GetDatacentersDatacenterIDNotFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this get datacenters datacenter Id not found response has a 3xx status code
+func (o *GetDatacentersDatacenterIDNotFound) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this get datacenters datacenter Id not found response has a 4xx status code
+func (o *GetDatacentersDatacenterIDNotFound) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this get datacenters datacenter Id not found response has a 5xx status code
+func (o *GetDatacentersDatacenterIDNotFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this get datacenters datacenter Id not found response a status code equal to that given
+func (o *GetDatacentersDatacenterIDNotFound) IsCode(code int) bool {
+	return code == 404
+}
+
 func (o *GetDatacentersDatacenterIDNotFound) Error() string {
 	return fmt.Sprintf("[GET /datacenters/{datacenter_id}][%d] getDatacentersDatacenterIdNotFound  %+v", 404, o.Payload)
 }
+
+func (o *GetDatacentersDatacenterIDNotFound) String() string {
+	return fmt.Sprintf("[GET /datacenters/{datacenter_id}][%d] getDatacentersDatacenterIdNotFound  %+v", 404, o.Payload)
+}
+
 func (o *GetDatacentersDatacenterIDNotFound) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -135,7 +197,8 @@ func NewGetDatacentersDatacenterIDDefault(code int) *GetDatacentersDatacenterIDD
 	}
 }
 
-/* GetDatacentersDatacenterIDDefault describes a response with status code -1, with default header values.
+/*
+GetDatacentersDatacenterIDDefault describes a response with status code -1, with default header values.
 
 Unexpected Error
 */
@@ -150,9 +213,39 @@ func (o *GetDatacentersDatacenterIDDefault) Code() int {
 	return o._statusCode
 }
 
+// IsSuccess returns true when this get datacenters datacenter ID default response has a 2xx status code
+func (o *GetDatacentersDatacenterIDDefault) IsSuccess() bool {
+	return o._statusCode/100 == 2
+}
+
+// IsRedirect returns true when this get datacenters datacenter ID default response has a 3xx status code
+func (o *GetDatacentersDatacenterIDDefault) IsRedirect() bool {
+	return o._statusCode/100 == 3
+}
+
+// IsClientError returns true when this get datacenters datacenter ID default response has a 4xx status code
+func (o *GetDatacentersDatacenterIDDefault) IsClientError() bool {
+	return o._statusCode/100 == 4
+}
+
+// IsServerError returns true when this get datacenters datacenter ID default response has a 5xx status code
+func (o *GetDatacentersDatacenterIDDefault) IsServerError() bool {
+	return o._statusCode/100 == 5
+}
+
+// IsCode returns true when this get datacenters datacenter ID default response a status code equal to that given
+func (o *GetDatacentersDatacenterIDDefault) IsCode(code int) bool {
+	return o._statusCode == code
+}
+
 func (o *GetDatacentersDatacenterIDDefault) Error() string {
 	return fmt.Sprintf("[GET /datacenters/{datacenter_id}][%d] GetDatacentersDatacenterID default  %+v", o._statusCode, o.Payload)
 }
+
+func (o *GetDatacentersDatacenterIDDefault) String() string {
+	return fmt.Sprintf("[GET /datacenters/{datacenter_id}][%d] GetDatacentersDatacenterID default  %+v", o._statusCode, o.Payload)
+}
+
 func (o *GetDatacentersDatacenterIDDefault) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -169,7 +262,8 @@ func (o *GetDatacentersDatacenterIDDefault) readResponse(response runtime.Client
 	return nil
 }
 
-/*GetDatacentersDatacenterIDOKBody get datacenters datacenter ID o k body
+/*
+GetDatacentersDatacenterIDOKBody get datacenters datacenter ID o k body
 swagger:model GetDatacentersDatacenterIDOKBody
 */
 type GetDatacentersDatacenterIDOKBody struct {

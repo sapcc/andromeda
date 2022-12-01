@@ -56,7 +56,7 @@ type ClientService interface {
 }
 
 /*
-  DeleteMonitorsMonitorID deletes a monitor
+DeleteMonitorsMonitorID deletes a monitor
 */
 func (a *Client) DeleteMonitorsMonitorID(params *DeleteMonitorsMonitorIDParams, opts ...ClientOption) (*DeleteMonitorsMonitorIDNoContent, error) {
 	// TODO: Validate the params before sending
@@ -93,7 +93,7 @@ func (a *Client) DeleteMonitorsMonitorID(params *DeleteMonitorsMonitorIDParams, 
 }
 
 /*
-  GetMonitors lists monitors
+GetMonitors lists monitors
 */
 func (a *Client) GetMonitors(params *GetMonitorsParams, opts ...ClientOption) (*GetMonitorsOK, error) {
 	// TODO: Validate the params before sending
@@ -130,7 +130,7 @@ func (a *Client) GetMonitors(params *GetMonitorsParams, opts ...ClientOption) (*
 }
 
 /*
-  GetMonitorsMonitorID shows monitor detail
+GetMonitorsMonitorID shows monitor detail
 */
 func (a *Client) GetMonitorsMonitorID(params *GetMonitorsMonitorIDParams, opts ...ClientOption) (*GetMonitorsMonitorIDOK, error) {
 	// TODO: Validate the params before sending
@@ -167,7 +167,7 @@ func (a *Client) GetMonitorsMonitorID(params *GetMonitorsMonitorIDParams, opts .
 }
 
 /*
-  PostMonitors creates new monitor
+PostMonitors creates new monitor
 */
 func (a *Client) PostMonitors(params *PostMonitorsParams, opts ...ClientOption) (*PostMonitorsCreated, error) {
 	// TODO: Validate the params before sending
@@ -204,7 +204,7 @@ func (a *Client) PostMonitors(params *PostMonitorsParams, opts ...ClientOption) 
 }
 
 /*
-  PutMonitorsMonitorID updates a monitor
+PutMonitorsMonitorID updates a monitor
 */
 func (a *Client) PutMonitorsMonitorID(params *PutMonitorsMonitorIDParams, opts ...ClientOption) (*PutMonitorsMonitorIDAccepted, error) {
 	// TODO: Validate the params before sending

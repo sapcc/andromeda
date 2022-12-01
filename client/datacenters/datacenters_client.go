@@ -56,7 +56,7 @@ type ClientService interface {
 }
 
 /*
-  DeleteDatacentersDatacenterID deletes a datacenter
+DeleteDatacentersDatacenterID deletes a datacenter
 */
 func (a *Client) DeleteDatacentersDatacenterID(params *DeleteDatacentersDatacenterIDParams, opts ...ClientOption) (*DeleteDatacentersDatacenterIDNoContent, error) {
 	// TODO: Validate the params before sending
@@ -93,7 +93,7 @@ func (a *Client) DeleteDatacentersDatacenterID(params *DeleteDatacentersDatacent
 }
 
 /*
-  GetDatacenters lists datacenters
+GetDatacenters lists datacenters
 */
 func (a *Client) GetDatacenters(params *GetDatacentersParams, opts ...ClientOption) (*GetDatacentersOK, error) {
 	// TODO: Validate the params before sending
@@ -130,7 +130,7 @@ func (a *Client) GetDatacenters(params *GetDatacentersParams, opts ...ClientOpti
 }
 
 /*
-  GetDatacentersDatacenterID shows datacenter detail
+GetDatacentersDatacenterID shows datacenter detail
 */
 func (a *Client) GetDatacentersDatacenterID(params *GetDatacentersDatacenterIDParams, opts ...ClientOption) (*GetDatacentersDatacenterIDOK, error) {
 	// TODO: Validate the params before sending
@@ -167,7 +167,7 @@ func (a *Client) GetDatacentersDatacenterID(params *GetDatacentersDatacenterIDPa
 }
 
 /*
-  PostDatacenters creates new datacenter
+PostDatacenters creates new datacenter
 */
 func (a *Client) PostDatacenters(params *PostDatacentersParams, opts ...ClientOption) (*PostDatacentersCreated, error) {
 	// TODO: Validate the params before sending
@@ -204,7 +204,7 @@ func (a *Client) PostDatacenters(params *PostDatacentersParams, opts ...ClientOp
 }
 
 /*
-  PutDatacentersDatacenterID updates a datacenter
+PutDatacentersDatacenterID updates a datacenter
 */
 func (a *Client) PutDatacentersDatacenterID(params *PutDatacentersDatacenterIDParams, opts ...ClientOption) (*PutDatacentersDatacenterIDAccepted, error) {
 	// TODO: Validate the params before sending

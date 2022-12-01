@@ -50,10 +50,10 @@ func NewPostPools(ctx *middleware.Context, handler PostPoolsHandler) *PostPools 
 	return &PostPools{Context: ctx, Handler: handler}
 }
 
-/* PostPools swagger:route POST /pools Pools postPools
+/*
+	PostPools swagger:route POST /pools Pools postPools
 
 Create new pool
-
 */
 type PostPools struct {
 	Context *middleware.Context

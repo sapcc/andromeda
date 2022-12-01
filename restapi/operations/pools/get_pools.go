@@ -50,10 +50,10 @@ func NewGetPools(ctx *middleware.Context, handler GetPoolsHandler) *GetPools {
 	return &GetPools{Context: ctx, Handler: handler}
 }
 
-/* GetPools swagger:route GET /pools Pools getPools
+/*
+	GetPools swagger:route GET /pools Pools getPools
 
 List pools
-
 */
 type GetPools struct {
 	Context *middleware.Context

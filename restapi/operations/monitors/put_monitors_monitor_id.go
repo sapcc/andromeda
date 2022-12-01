@@ -50,10 +50,10 @@ func NewPutMonitorsMonitorID(ctx *middleware.Context, handler PutMonitorsMonitor
 	return &PutMonitorsMonitorID{Context: ctx, Handler: handler}
 }
 
-/* PutMonitorsMonitorID swagger:route PUT /monitors/{monitor_id} Monitors putMonitorsMonitorId
+/*
+	PutMonitorsMonitorID swagger:route PUT /monitors/{monitor_id} Monitors putMonitorsMonitorId
 
 Update a monitor
-
 */
 type PutMonitorsMonitorID struct {
 	Context *middleware.Context

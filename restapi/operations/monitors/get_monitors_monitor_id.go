@@ -49,10 +49,10 @@ func NewGetMonitorsMonitorID(ctx *middleware.Context, handler GetMonitorsMonitor
 	return &GetMonitorsMonitorID{Context: ctx, Handler: handler}
 }
 
-/* GetMonitorsMonitorID swagger:route GET /monitors/{monitor_id} Monitors getMonitorsMonitorId
+/*
+	GetMonitorsMonitorID swagger:route GET /monitors/{monitor_id} Monitors getMonitorsMonitorId
 
 Show monitor detail
-
 */
 type GetMonitorsMonitorID struct {
 	Context *middleware.Context

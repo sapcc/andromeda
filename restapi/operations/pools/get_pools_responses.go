@@ -30,7 +30,8 @@ import (
 // GetPoolsOKCode is the HTTP code returned for type GetPoolsOK
 const GetPoolsOKCode int = 200
 
-/*GetPoolsOK A JSON array of pools
+/*
+GetPoolsOK A JSON array of pools
 
 swagger:response getPoolsOK
 */
@@ -74,7 +75,8 @@ func (o *GetPoolsOK) WriteResponse(rw http.ResponseWriter, producer runtime.Prod
 // GetPoolsBadRequestCode is the HTTP code returned for type GetPoolsBadRequest
 const GetPoolsBadRequestCode int = 400
 
-/*GetPoolsBadRequest Bad request
+/*
+GetPoolsBadRequest Bad request
 
 swagger:response getPoolsBadRequest
 */
@@ -115,7 +117,8 @@ func (o *GetPoolsBadRequest) WriteResponse(rw http.ResponseWriter, producer runt
 	}
 }
 
-/*GetPoolsDefault Unexpected Error
+/*
+GetPoolsDefault Unexpected Error
 
 swagger:response getPoolsDefault
 */

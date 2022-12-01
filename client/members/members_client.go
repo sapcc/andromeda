@@ -56,7 +56,7 @@ type ClientService interface {
 }
 
 /*
-  DeletePoolsPoolIDMembersMemberID deletes a member
+DeletePoolsPoolIDMembersMemberID deletes a member
 */
 func (a *Client) DeletePoolsPoolIDMembersMemberID(params *DeletePoolsPoolIDMembersMemberIDParams, opts ...ClientOption) (*DeletePoolsPoolIDMembersMemberIDNoContent, error) {
 	// TODO: Validate the params before sending
@@ -93,7 +93,7 @@ func (a *Client) DeletePoolsPoolIDMembersMemberID(params *DeletePoolsPoolIDMembe
 }
 
 /*
-  GetPoolsPoolIDMembers lists members
+GetPoolsPoolIDMembers lists members
 */
 func (a *Client) GetPoolsPoolIDMembers(params *GetPoolsPoolIDMembersParams, opts ...ClientOption) (*GetPoolsPoolIDMembersOK, error) {
 	// TODO: Validate the params before sending
@@ -130,7 +130,7 @@ func (a *Client) GetPoolsPoolIDMembers(params *GetPoolsPoolIDMembersParams, opts
 }
 
 /*
-  GetPoolsPoolIDMembersMemberID shows member detail
+GetPoolsPoolIDMembersMemberID shows member detail
 */
 func (a *Client) GetPoolsPoolIDMembersMemberID(params *GetPoolsPoolIDMembersMemberIDParams, opts ...ClientOption) (*GetPoolsPoolIDMembersMemberIDOK, error) {
 	// TODO: Validate the params before sending
@@ -167,7 +167,7 @@ func (a *Client) GetPoolsPoolIDMembersMemberID(params *GetPoolsPoolIDMembersMemb
 }
 
 /*
-  PostPoolsPoolIDMembers creates new member
+PostPoolsPoolIDMembers creates new member
 */
 func (a *Client) PostPoolsPoolIDMembers(params *PostPoolsPoolIDMembersParams, opts ...ClientOption) (*PostPoolsPoolIDMembersCreated, error) {
 	// TODO: Validate the params before sending
@@ -204,7 +204,7 @@ func (a *Client) PostPoolsPoolIDMembers(params *PostPoolsPoolIDMembersParams, op
 }
 
 /*
-  PutPoolsPoolIDMembersMemberID updates a member
+PutPoolsPoolIDMembersMemberID updates a member
 */
 func (a *Client) PutPoolsPoolIDMembersMemberID(params *PutPoolsPoolIDMembersMemberIDParams, opts ...ClientOption) (*PutPoolsPoolIDMembersMemberIDAccepted, error) {
 	// TODO: Validate the params before sending

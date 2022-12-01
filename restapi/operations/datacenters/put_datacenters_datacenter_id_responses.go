@@ -30,7 +30,8 @@ import (
 // PutDatacentersDatacenterIDAcceptedCode is the HTTP code returned for type PutDatacentersDatacenterIDAccepted
 const PutDatacentersDatacenterIDAcceptedCode int = 202
 
-/*PutDatacentersDatacenterIDAccepted Updated datacenter.
+/*
+PutDatacentersDatacenterIDAccepted Updated datacenter.
 
 swagger:response putDatacentersDatacenterIdAccepted
 */
@@ -74,7 +75,8 @@ func (o *PutDatacentersDatacenterIDAccepted) WriteResponse(rw http.ResponseWrite
 // PutDatacentersDatacenterIDNotFoundCode is the HTTP code returned for type PutDatacentersDatacenterIDNotFound
 const PutDatacentersDatacenterIDNotFoundCode int = 404
 
-/*PutDatacentersDatacenterIDNotFound Not Found
+/*
+PutDatacentersDatacenterIDNotFound Not Found
 
 swagger:response putDatacentersDatacenterIdNotFound
 */
@@ -115,7 +117,8 @@ func (o *PutDatacentersDatacenterIDNotFound) WriteResponse(rw http.ResponseWrite
 	}
 }
 
-/*PutDatacentersDatacenterIDDefault Unexpected Error
+/*
+PutDatacentersDatacenterIDDefault Unexpected Error
 
 swagger:response putDatacentersDatacenterIdDefault
 */

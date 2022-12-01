@@ -76,7 +76,8 @@ func NewPutDomainsDomainIDAccepted() *PutDomainsDomainIDAccepted {
 	return &PutDomainsDomainIDAccepted{}
 }
 
-/* PutDomainsDomainIDAccepted describes a response with status code 202, with default header values.
+/*
+PutDomainsDomainIDAccepted describes a response with status code 202, with default header values.
 
 Updated domain.
 */
@@ -84,9 +85,39 @@ type PutDomainsDomainIDAccepted struct {
 	Payload *PutDomainsDomainIDAcceptedBody
 }
 
+// IsSuccess returns true when this put domains domain Id accepted response has a 2xx status code
+func (o *PutDomainsDomainIDAccepted) IsSuccess() bool {
+	return true
+}
+
+// IsRedirect returns true when this put domains domain Id accepted response has a 3xx status code
+func (o *PutDomainsDomainIDAccepted) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this put domains domain Id accepted response has a 4xx status code
+func (o *PutDomainsDomainIDAccepted) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this put domains domain Id accepted response has a 5xx status code
+func (o *PutDomainsDomainIDAccepted) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this put domains domain Id accepted response a status code equal to that given
+func (o *PutDomainsDomainIDAccepted) IsCode(code int) bool {
+	return code == 202
+}
+
 func (o *PutDomainsDomainIDAccepted) Error() string {
 	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdAccepted  %+v", 202, o.Payload)
 }
+
+func (o *PutDomainsDomainIDAccepted) String() string {
+	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdAccepted  %+v", 202, o.Payload)
+}
+
 func (o *PutDomainsDomainIDAccepted) GetPayload() *PutDomainsDomainIDAcceptedBody {
 	return o.Payload
 }
@@ -108,7 +139,8 @@ func NewPutDomainsDomainIDBadRequest() *PutDomainsDomainIDBadRequest {
 	return &PutDomainsDomainIDBadRequest{}
 }
 
-/* PutDomainsDomainIDBadRequest describes a response with status code 400, with default header values.
+/*
+PutDomainsDomainIDBadRequest describes a response with status code 400, with default header values.
 
 Bad request
 */
@@ -116,9 +148,39 @@ type PutDomainsDomainIDBadRequest struct {
 	Payload *models.Error
 }
 
+// IsSuccess returns true when this put domains domain Id bad request response has a 2xx status code
+func (o *PutDomainsDomainIDBadRequest) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this put domains domain Id bad request response has a 3xx status code
+func (o *PutDomainsDomainIDBadRequest) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this put domains domain Id bad request response has a 4xx status code
+func (o *PutDomainsDomainIDBadRequest) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this put domains domain Id bad request response has a 5xx status code
+func (o *PutDomainsDomainIDBadRequest) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this put domains domain Id bad request response a status code equal to that given
+func (o *PutDomainsDomainIDBadRequest) IsCode(code int) bool {
+	return code == 400
+}
+
 func (o *PutDomainsDomainIDBadRequest) Error() string {
 	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdBadRequest  %+v", 400, o.Payload)
 }
+
+func (o *PutDomainsDomainIDBadRequest) String() string {
+	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdBadRequest  %+v", 400, o.Payload)
+}
+
 func (o *PutDomainsDomainIDBadRequest) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -140,7 +202,8 @@ func NewPutDomainsDomainIDNotFound() *PutDomainsDomainIDNotFound {
 	return &PutDomainsDomainIDNotFound{}
 }
 
-/* PutDomainsDomainIDNotFound describes a response with status code 404, with default header values.
+/*
+PutDomainsDomainIDNotFound describes a response with status code 404, with default header values.
 
 Not Found
 */
@@ -148,9 +211,39 @@ type PutDomainsDomainIDNotFound struct {
 	Payload *models.Error
 }
 
+// IsSuccess returns true when this put domains domain Id not found response has a 2xx status code
+func (o *PutDomainsDomainIDNotFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this put domains domain Id not found response has a 3xx status code
+func (o *PutDomainsDomainIDNotFound) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this put domains domain Id not found response has a 4xx status code
+func (o *PutDomainsDomainIDNotFound) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this put domains domain Id not found response has a 5xx status code
+func (o *PutDomainsDomainIDNotFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this put domains domain Id not found response a status code equal to that given
+func (o *PutDomainsDomainIDNotFound) IsCode(code int) bool {
+	return code == 404
+}
+
 func (o *PutDomainsDomainIDNotFound) Error() string {
 	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdNotFound  %+v", 404, o.Payload)
 }
+
+func (o *PutDomainsDomainIDNotFound) String() string {
+	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdNotFound  %+v", 404, o.Payload)
+}
+
 func (o *PutDomainsDomainIDNotFound) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -174,7 +267,8 @@ func NewPutDomainsDomainIDDefault(code int) *PutDomainsDomainIDDefault {
 	}
 }
 
-/* PutDomainsDomainIDDefault describes a response with status code -1, with default header values.
+/*
+PutDomainsDomainIDDefault describes a response with status code -1, with default header values.
 
 Unexpected Error
 */
@@ -189,9 +283,39 @@ func (o *PutDomainsDomainIDDefault) Code() int {
 	return o._statusCode
 }
 
+// IsSuccess returns true when this put domains domain ID default response has a 2xx status code
+func (o *PutDomainsDomainIDDefault) IsSuccess() bool {
+	return o._statusCode/100 == 2
+}
+
+// IsRedirect returns true when this put domains domain ID default response has a 3xx status code
+func (o *PutDomainsDomainIDDefault) IsRedirect() bool {
+	return o._statusCode/100 == 3
+}
+
+// IsClientError returns true when this put domains domain ID default response has a 4xx status code
+func (o *PutDomainsDomainIDDefault) IsClientError() bool {
+	return o._statusCode/100 == 4
+}
+
+// IsServerError returns true when this put domains domain ID default response has a 5xx status code
+func (o *PutDomainsDomainIDDefault) IsServerError() bool {
+	return o._statusCode/100 == 5
+}
+
+// IsCode returns true when this put domains domain ID default response a status code equal to that given
+func (o *PutDomainsDomainIDDefault) IsCode(code int) bool {
+	return o._statusCode == code
+}
+
 func (o *PutDomainsDomainIDDefault) Error() string {
 	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] PutDomainsDomainID default  %+v", o._statusCode, o.Payload)
 }
+
+func (o *PutDomainsDomainIDDefault) String() string {
+	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] PutDomainsDomainID default  %+v", o._statusCode, o.Payload)
+}
+
 func (o *PutDomainsDomainIDDefault) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -208,7 +332,8 @@ func (o *PutDomainsDomainIDDefault) readResponse(response runtime.ClientResponse
 	return nil
 }
 
-/*PutDomainsDomainIDAcceptedBody put domains domain ID accepted body
+/*
+PutDomainsDomainIDAcceptedBody put domains domain ID accepted body
 swagger:model PutDomainsDomainIDAcceptedBody
 */
 type PutDomainsDomainIDAcceptedBody struct {
@@ -298,7 +423,8 @@ func (o *PutDomainsDomainIDAcceptedBody) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*PutDomainsDomainIDBody put domains domain ID body
+/*
+PutDomainsDomainIDBody put domains domain ID body
 swagger:model PutDomainsDomainIDBody
 */
 type PutDomainsDomainIDBody struct {

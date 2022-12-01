@@ -62,18 +62,18 @@ func (qrw *quotaResponseWriter) WriteHeader(code int) {
 		operator = '-'
 	}
 
-	sql := fmt.Sprintf(
-		`INSERT INTO quota 
-                SET in_use_%s = 1,
-					domain = ?,
-					pool = ?,
-					member = ?,
-					monitor = ?,
-					datacenter = ?,
-                    project_id = ?
-                ON DUPLICATE KEY UPDATE 
-					in_use_%s = in_use_%s %c 1`,
-		qrw.resource, qrw.resource, qrw.resource, operator)
+	var conflictStatement string
+	if qrw.db.DriverName() == "postgres" {
+		conflictStatement = fmt.Sprintf("ON CONFLICT (project_id) DO UPDATE SET in_use_%s = quota.in_use_%s %c 1",
+			qrw.resource, qrw.resource, operator)
+	} else {
+		conflictStatement = fmt.Sprintf("ON DUPLICATE KEY UPDATE in_use_%s = in_use_%s %c 1",
+			qrw.resource, qrw.resource, operator)
+	}
+	sql := qrw.db.Rebind(fmt.Sprintf(
+		`INSERT INTO quota (in_use_%s, domain, pool, member, monitor, datacenter, project_id)
+                VALUES (1, ?, ?, ?, ?, ?, ?)
+                %s`, qrw.resource, conflictStatement))
 	if 200 < code && 205 > code {
 		if _, err := qrw.db.Exec(sql,
 			config.Global.Quota.DefaultQuotaDomain,
@@ -82,7 +82,7 @@ func (qrw *quotaResponseWriter) WriteHeader(code int) {
 			config.Global.Quota.DefaultQuotaMonitor,
 			config.Global.Quota.DefaultQuotaDatacenter,
 			qrw.projectID); err != nil {
-			logger.Error(err)
+			panic(err)
 		}
 	}
 }
@@ -114,7 +114,7 @@ func (qc *quotaController) QuotaHandler(next http.Handler) http.Handler {
 		// Check Quota increase possible before processing request
 		if action == "post" {
 			var quotaAvailable int
-			sql := fmt.Sprintf(`SELECT %s - in_use_%s FROM quota WHERE project_id = ?`, resource, resource)
+			sql := qc.db.Rebind(fmt.Sprintf(`SELECT %s - in_use_%s FROM quota WHERE project_id = ?`, resource, resource))
 			if err := qc.db.Get(&quotaAvailable, sql, project); err != nil {
 				logger.Debug(err)
 			} else {

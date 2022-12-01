@@ -66,14 +66,44 @@ func NewDeletePoolsPoolIDMembersMemberIDNoContent() *DeletePoolsPoolIDMembersMem
 	return &DeletePoolsPoolIDMembersMemberIDNoContent{}
 }
 
-/* DeletePoolsPoolIDMembersMemberIDNoContent describes a response with status code 204, with default header values.
+/*
+DeletePoolsPoolIDMembersMemberIDNoContent describes a response with status code 204, with default header values.
 
 Resource successfully deleted.
 */
 type DeletePoolsPoolIDMembersMemberIDNoContent struct {
 }
 
+// IsSuccess returns true when this delete pools pool Id members member Id no content response has a 2xx status code
+func (o *DeletePoolsPoolIDMembersMemberIDNoContent) IsSuccess() bool {
+	return true
+}
+
+// IsRedirect returns true when this delete pools pool Id members member Id no content response has a 3xx status code
+func (o *DeletePoolsPoolIDMembersMemberIDNoContent) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this delete pools pool Id members member Id no content response has a 4xx status code
+func (o *DeletePoolsPoolIDMembersMemberIDNoContent) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this delete pools pool Id members member Id no content response has a 5xx status code
+func (o *DeletePoolsPoolIDMembersMemberIDNoContent) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this delete pools pool Id members member Id no content response a status code equal to that given
+func (o *DeletePoolsPoolIDMembersMemberIDNoContent) IsCode(code int) bool {
+	return code == 204
+}
+
 func (o *DeletePoolsPoolIDMembersMemberIDNoContent) Error() string {
+	return fmt.Sprintf("[DELETE /pools/{pool_id}/members/{member_id}][%d] deletePoolsPoolIdMembersMemberIdNoContent ", 204)
+}
+
+func (o *DeletePoolsPoolIDMembersMemberIDNoContent) String() string {
 	return fmt.Sprintf("[DELETE /pools/{pool_id}/members/{member_id}][%d] deletePoolsPoolIdMembersMemberIdNoContent ", 204)
 }
 
@@ -87,7 +117,8 @@ func NewDeletePoolsPoolIDMembersMemberIDNotFound() *DeletePoolsPoolIDMembersMemb
 	return &DeletePoolsPoolIDMembersMemberIDNotFound{}
 }
 
-/* DeletePoolsPoolIDMembersMemberIDNotFound describes a response with status code 404, with default header values.
+/*
+DeletePoolsPoolIDMembersMemberIDNotFound describes a response with status code 404, with default header values.
 
 Not Found
 */
@@ -95,9 +126,39 @@ type DeletePoolsPoolIDMembersMemberIDNotFound struct {
 	Payload *models.Error
 }
 
+// IsSuccess returns true when this delete pools pool Id members member Id not found response has a 2xx status code
+func (o *DeletePoolsPoolIDMembersMemberIDNotFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this delete pools pool Id members member Id not found response has a 3xx status code
+func (o *DeletePoolsPoolIDMembersMemberIDNotFound) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this delete pools pool Id members member Id not found response has a 4xx status code
+func (o *DeletePoolsPoolIDMembersMemberIDNotFound) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this delete pools pool Id members member Id not found response has a 5xx status code
+func (o *DeletePoolsPoolIDMembersMemberIDNotFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this delete pools pool Id members member Id not found response a status code equal to that given
+func (o *DeletePoolsPoolIDMembersMemberIDNotFound) IsCode(code int) bool {
+	return code == 404
+}
+
 func (o *DeletePoolsPoolIDMembersMemberIDNotFound) Error() string {
 	return fmt.Sprintf("[DELETE /pools/{pool_id}/members/{member_id}][%d] deletePoolsPoolIdMembersMemberIdNotFound  %+v", 404, o.Payload)
 }
+
+func (o *DeletePoolsPoolIDMembersMemberIDNotFound) String() string {
+	return fmt.Sprintf("[DELETE /pools/{pool_id}/members/{member_id}][%d] deletePoolsPoolIdMembersMemberIdNotFound  %+v", 404, o.Payload)
+}
+
 func (o *DeletePoolsPoolIDMembersMemberIDNotFound) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -121,7 +182,8 @@ func NewDeletePoolsPoolIDMembersMemberIDDefault(code int) *DeletePoolsPoolIDMemb
 	}
 }
 
-/* DeletePoolsPoolIDMembersMemberIDDefault describes a response with status code -1, with default header values.
+/*
+DeletePoolsPoolIDMembersMemberIDDefault describes a response with status code -1, with default header values.
 
 Unexpected Error
 */
@@ -136,9 +198,39 @@ func (o *DeletePoolsPoolIDMembersMemberIDDefault) Code() int {
 	return o._statusCode
 }
 
+// IsSuccess returns true when this delete pools pool ID members member ID default response has a 2xx status code
+func (o *DeletePoolsPoolIDMembersMemberIDDefault) IsSuccess() bool {
+	return o._statusCode/100 == 2
+}
+
+// IsRedirect returns true when this delete pools pool ID members member ID default response has a 3xx status code
+func (o *DeletePoolsPoolIDMembersMemberIDDefault) IsRedirect() bool {
+	return o._statusCode/100 == 3
+}
+
+// IsClientError returns true when this delete pools pool ID members member ID default response has a 4xx status code
+func (o *DeletePoolsPoolIDMembersMemberIDDefault) IsClientError() bool {
+	return o._statusCode/100 == 4
+}
+
+// IsServerError returns true when this delete pools pool ID members member ID default response has a 5xx status code
+func (o *DeletePoolsPoolIDMembersMemberIDDefault) IsServerError() bool {
+	return o._statusCode/100 == 5
+}
+
+// IsCode returns true when this delete pools pool ID members member ID default response a status code equal to that given
+func (o *DeletePoolsPoolIDMembersMemberIDDefault) IsCode(code int) bool {
+	return o._statusCode == code
+}
+
 func (o *DeletePoolsPoolIDMembersMemberIDDefault) Error() string {
 	return fmt.Sprintf("[DELETE /pools/{pool_id}/members/{member_id}][%d] DeletePoolsPoolIDMembersMemberID default  %+v", o._statusCode, o.Payload)
 }
+
+func (o *DeletePoolsPoolIDMembersMemberIDDefault) String() string {
+	return fmt.Sprintf("[DELETE /pools/{pool_id}/members/{member_id}][%d] DeletePoolsPoolIDMembersMemberID default  %+v", o._statusCode, o.Payload)
+}
+
 func (o *DeletePoolsPoolIDMembersMemberIDDefault) GetPayload() *models.Error {
 	return o.Payload
 }

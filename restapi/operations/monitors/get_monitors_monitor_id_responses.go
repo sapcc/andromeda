@@ -30,7 +30,8 @@ import (
 // GetMonitorsMonitorIDOKCode is the HTTP code returned for type GetMonitorsMonitorIDOK
 const GetMonitorsMonitorIDOKCode int = 200
 
-/*GetMonitorsMonitorIDOK Shows the details of a specific monitor.
+/*
+GetMonitorsMonitorIDOK Shows the details of a specific monitor.
 
 swagger:response getMonitorsMonitorIdOK
 */
@@ -74,7 +75,8 @@ func (o *GetMonitorsMonitorIDOK) WriteResponse(rw http.ResponseWriter, producer 
 // GetMonitorsMonitorIDNotFoundCode is the HTTP code returned for type GetMonitorsMonitorIDNotFound
 const GetMonitorsMonitorIDNotFoundCode int = 404
 
-/*GetMonitorsMonitorIDNotFound Not Found
+/*
+GetMonitorsMonitorIDNotFound Not Found
 
 swagger:response getMonitorsMonitorIdNotFound
 */
@@ -115,7 +117,8 @@ func (o *GetMonitorsMonitorIDNotFound) WriteResponse(rw http.ResponseWriter, pro
 	}
 }
 
-/*GetMonitorsMonitorIDDefault Unexpected Error
+/*
+GetMonitorsMonitorIDDefault Unexpected Error
 
 swagger:response getMonitorsMonitorIdDefault
 */

@@ -67,10 +67,12 @@ func NewGetMonitorsParamsWithHTTPClient(client *http.Client) *GetMonitorsParams 
 	}
 }
 
-/* GetMonitorsParams contains all the parameters to send to the API endpoint
-   for the get monitors operation.
+/*
+GetMonitorsParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the get monitors operation.
+
+	Typically these are written to a http.Request.
 */
 type GetMonitorsParams struct {
 

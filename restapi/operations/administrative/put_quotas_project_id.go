@@ -50,10 +50,10 @@ func NewPutQuotasProjectID(ctx *middleware.Context, handler PutQuotasProjectIDHa
 	return &PutQuotasProjectID{Context: ctx, Handler: handler}
 }
 
-/* PutQuotasProjectID swagger:route PUT /quotas/{project_id} Administrative putQuotasProjectId
+/*
+	PutQuotasProjectID swagger:route PUT /quotas/{project_id} Administrative putQuotasProjectId
 
 Update Quota
-
 */
 type PutQuotasProjectID struct {
 	Context *middleware.Context

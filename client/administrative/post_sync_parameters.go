@@ -66,10 +66,12 @@ func NewPostSyncParamsWithHTTPClient(client *http.Client) *PostSyncParams {
 	}
 }
 
-/* PostSyncParams contains all the parameters to send to the API endpoint
-   for the post sync operation.
+/*
+PostSyncParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the post sync operation.
+
+	Typically these are written to a http.Request.
 */
 type PostSyncParams struct {
 	timeout    time.Duration

@@ -30,7 +30,8 @@ import (
 // GetMonitorsOKCode is the HTTP code returned for type GetMonitorsOK
 const GetMonitorsOKCode int = 200
 
-/*GetMonitorsOK A JSON array of monitors
+/*
+GetMonitorsOK A JSON array of monitors
 
 swagger:response getMonitorsOK
 */
@@ -74,7 +75,8 @@ func (o *GetMonitorsOK) WriteResponse(rw http.ResponseWriter, producer runtime.P
 // GetMonitorsBadRequestCode is the HTTP code returned for type GetMonitorsBadRequest
 const GetMonitorsBadRequestCode int = 400
 
-/*GetMonitorsBadRequest Bad request
+/*
+GetMonitorsBadRequest Bad request
 
 swagger:response getMonitorsBadRequest
 */
@@ -115,7 +117,8 @@ func (o *GetMonitorsBadRequest) WriteResponse(rw http.ResponseWriter, producer r
 	}
 }
 
-/*GetMonitorsDefault Unexpected Error
+/*
+GetMonitorsDefault Unexpected Error
 
 swagger:response getMonitorsDefault
 */

@@ -66,10 +66,12 @@ func NewDeletePoolsPoolIDParamsWithHTTPClient(client *http.Client) *DeletePoolsP
 	}
 }
 
-/* DeletePoolsPoolIDParams contains all the parameters to send to the API endpoint
-   for the delete pools pool ID operation.
+/*
+DeletePoolsPoolIDParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the delete pools pool ID operation.
+
+	Typically these are written to a http.Request.
 */
 type DeletePoolsPoolIDParams struct {
 

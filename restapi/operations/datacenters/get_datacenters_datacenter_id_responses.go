@@ -30,7 +30,8 @@ import (
 // GetDatacentersDatacenterIDOKCode is the HTTP code returned for type GetDatacentersDatacenterIDOK
 const GetDatacentersDatacenterIDOKCode int = 200
 
-/*GetDatacentersDatacenterIDOK Shows the details of a specific datacenter.
+/*
+GetDatacentersDatacenterIDOK Shows the details of a specific datacenter.
 
 swagger:response getDatacentersDatacenterIdOK
 */
@@ -74,7 +75,8 @@ func (o *GetDatacentersDatacenterIDOK) WriteResponse(rw http.ResponseWriter, pro
 // GetDatacentersDatacenterIDNotFoundCode is the HTTP code returned for type GetDatacentersDatacenterIDNotFound
 const GetDatacentersDatacenterIDNotFoundCode int = 404
 
-/*GetDatacentersDatacenterIDNotFound Not Found
+/*
+GetDatacentersDatacenterIDNotFound Not Found
 
 swagger:response getDatacentersDatacenterIdNotFound
 */
@@ -115,7 +117,8 @@ func (o *GetDatacentersDatacenterIDNotFound) WriteResponse(rw http.ResponseWrite
 	}
 }
 
-/*GetDatacentersDatacenterIDDefault Unexpected Error
+/*
+GetDatacentersDatacenterIDDefault Unexpected Error
 
 swagger:response getDatacentersDatacenterIdDefault
 */

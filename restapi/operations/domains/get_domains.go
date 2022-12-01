@@ -50,10 +50,10 @@ func NewGetDomains(ctx *middleware.Context, handler GetDomainsHandler) *GetDomai
 	return &GetDomains{Context: ctx, Handler: handler}
 }
 
-/* GetDomains swagger:route GET /domains Domains getDomains
+/*
+	GetDomains swagger:route GET /domains Domains getDomains
 
 List domains
-
 */
 type GetDomains struct {
 	Context *middleware.Context

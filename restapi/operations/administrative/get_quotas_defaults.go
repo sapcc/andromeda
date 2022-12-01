@@ -49,10 +49,10 @@ func NewGetQuotasDefaults(ctx *middleware.Context, handler GetQuotasDefaultsHand
 	return &GetQuotasDefaults{Context: ctx, Handler: handler}
 }
 
-/* GetQuotasDefaults swagger:route GET /quotas/defaults Administrative getQuotasDefaults
+/*
+	GetQuotasDefaults swagger:route GET /quotas/defaults Administrative getQuotasDefaults
 
 Show Quota Defaults
-
 */
 type GetQuotasDefaults struct {
 	Context *middleware.Context

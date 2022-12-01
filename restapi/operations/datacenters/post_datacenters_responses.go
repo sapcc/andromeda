@@ -30,7 +30,8 @@ import (
 // PostDatacentersCreatedCode is the HTTP code returned for type PostDatacentersCreated
 const PostDatacentersCreatedCode int = 201
 
-/*PostDatacentersCreated Created datacenter.
+/*
+PostDatacentersCreated Created datacenter.
 
 swagger:response postDatacentersCreated
 */
@@ -74,7 +75,8 @@ func (o *PostDatacentersCreated) WriteResponse(rw http.ResponseWriter, producer 
 // PostDatacentersNotFoundCode is the HTTP code returned for type PostDatacentersNotFound
 const PostDatacentersNotFoundCode int = 404
 
-/*PostDatacentersNotFound Not Found
+/*
+PostDatacentersNotFound Not Found
 
 swagger:response postDatacentersNotFound
 */
@@ -115,7 +117,8 @@ func (o *PostDatacentersNotFound) WriteResponse(rw http.ResponseWriter, producer
 	}
 }
 
-/*PostDatacentersDefault Unexpected Error
+/*
+PostDatacentersDefault Unexpected Error
 
 swagger:response postDatacentersDefault
 */

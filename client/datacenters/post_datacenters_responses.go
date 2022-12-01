@@ -70,7 +70,8 @@ func NewPostDatacentersCreated() *PostDatacentersCreated {
 	return &PostDatacentersCreated{}
 }
 
-/* PostDatacentersCreated describes a response with status code 201, with default header values.
+/*
+PostDatacentersCreated describes a response with status code 201, with default header values.
 
 Created datacenter.
 */
@@ -78,9 +79,39 @@ type PostDatacentersCreated struct {
 	Payload *PostDatacentersCreatedBody
 }
 
+// IsSuccess returns true when this post datacenters created response has a 2xx status code
+func (o *PostDatacentersCreated) IsSuccess() bool {
+	return true
+}
+
+// IsRedirect returns true when this post datacenters created response has a 3xx status code
+func (o *PostDatacentersCreated) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this post datacenters created response has a 4xx status code
+func (o *PostDatacentersCreated) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this post datacenters created response has a 5xx status code
+func (o *PostDatacentersCreated) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this post datacenters created response a status code equal to that given
+func (o *PostDatacentersCreated) IsCode(code int) bool {
+	return code == 201
+}
+
 func (o *PostDatacentersCreated) Error() string {
 	return fmt.Sprintf("[POST /datacenters][%d] postDatacentersCreated  %+v", 201, o.Payload)
 }
+
+func (o *PostDatacentersCreated) String() string {
+	return fmt.Sprintf("[POST /datacenters][%d] postDatacentersCreated  %+v", 201, o.Payload)
+}
+
 func (o *PostDatacentersCreated) GetPayload() *PostDatacentersCreatedBody {
 	return o.Payload
 }
@@ -102,7 +133,8 @@ func NewPostDatacentersNotFound() *PostDatacentersNotFound {
 	return &PostDatacentersNotFound{}
 }
 
-/* PostDatacentersNotFound describes a response with status code 404, with default header values.
+/*
+PostDatacentersNotFound describes a response with status code 404, with default header values.
 
 Not Found
 */
@@ -110,9 +142,39 @@ type PostDatacentersNotFound struct {
 	Payload *models.Error
 }
 
+// IsSuccess returns true when this post datacenters not found response has a 2xx status code
+func (o *PostDatacentersNotFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this post datacenters not found response has a 3xx status code
+func (o *PostDatacentersNotFound) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this post datacenters not found response has a 4xx status code
+func (o *PostDatacentersNotFound) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this post datacenters not found response has a 5xx status code
+func (o *PostDatacentersNotFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this post datacenters not found response a status code equal to that given
+func (o *PostDatacentersNotFound) IsCode(code int) bool {
+	return code == 404
+}
+
 func (o *PostDatacentersNotFound) Error() string {
 	return fmt.Sprintf("[POST /datacenters][%d] postDatacentersNotFound  %+v", 404, o.Payload)
 }
+
+func (o *PostDatacentersNotFound) String() string {
+	return fmt.Sprintf("[POST /datacenters][%d] postDatacentersNotFound  %+v", 404, o.Payload)
+}
+
 func (o *PostDatacentersNotFound) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -136,7 +198,8 @@ func NewPostDatacentersDefault(code int) *PostDatacentersDefault {
 	}
 }
 
-/* PostDatacentersDefault describes a response with status code -1, with default header values.
+/*
+PostDatacentersDefault describes a response with status code -1, with default header values.
 
 Unexpected Error
 */
@@ -151,9 +214,39 @@ func (o *PostDatacentersDefault) Code() int {
 	return o._statusCode
 }
 
+// IsSuccess returns true when this post datacenters default response has a 2xx status code
+func (o *PostDatacentersDefault) IsSuccess() bool {
+	return o._statusCode/100 == 2
+}
+
+// IsRedirect returns true when this post datacenters default response has a 3xx status code
+func (o *PostDatacentersDefault) IsRedirect() bool {
+	return o._statusCode/100 == 3
+}
+
+// IsClientError returns true when this post datacenters default response has a 4xx status code
+func (o *PostDatacentersDefault) IsClientError() bool {
+	return o._statusCode/100 == 4
+}
+
+// IsServerError returns true when this post datacenters default response has a 5xx status code
+func (o *PostDatacentersDefault) IsServerError() bool {
+	return o._statusCode/100 == 5
+}
+
+// IsCode returns true when this post datacenters default response a status code equal to that given
+func (o *PostDatacentersDefault) IsCode(code int) bool {
+	return o._statusCode == code
+}
+
 func (o *PostDatacentersDefault) Error() string {
 	return fmt.Sprintf("[POST /datacenters][%d] PostDatacenters default  %+v", o._statusCode, o.Payload)
 }
+
+func (o *PostDatacentersDefault) String() string {
+	return fmt.Sprintf("[POST /datacenters][%d] PostDatacenters default  %+v", o._statusCode, o.Payload)
+}
+
 func (o *PostDatacentersDefault) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -170,7 +263,8 @@ func (o *PostDatacentersDefault) readResponse(response runtime.ClientResponse, c
 	return nil
 }
 
-/*PostDatacentersBody post datacenters body
+/*
+PostDatacentersBody post datacenters body
 swagger:model PostDatacentersBody
 */
 type PostDatacentersBody struct {
@@ -262,7 +356,8 @@ func (o *PostDatacentersBody) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*PostDatacentersCreatedBody post datacenters created body
+/*
+PostDatacentersCreatedBody post datacenters created body
 swagger:model PostDatacentersCreatedBody
 */
 type PostDatacentersCreatedBody struct {

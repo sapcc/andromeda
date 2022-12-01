@@ -76,7 +76,8 @@ func NewPostPoolsPoolIDMembersCreated() *PostPoolsPoolIDMembersCreated {
 	return &PostPoolsPoolIDMembersCreated{}
 }
 
-/* PostPoolsPoolIDMembersCreated describes a response with status code 201, with default header values.
+/*
+PostPoolsPoolIDMembersCreated describes a response with status code 201, with default header values.
 
 Created member.
 */
@@ -84,9 +85,39 @@ type PostPoolsPoolIDMembersCreated struct {
 	Payload *PostPoolsPoolIDMembersCreatedBody
 }
 
+// IsSuccess returns true when this post pools pool Id members created response has a 2xx status code
+func (o *PostPoolsPoolIDMembersCreated) IsSuccess() bool {
+	return true
+}
+
+// IsRedirect returns true when this post pools pool Id members created response has a 3xx status code
+func (o *PostPoolsPoolIDMembersCreated) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this post pools pool Id members created response has a 4xx status code
+func (o *PostPoolsPoolIDMembersCreated) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this post pools pool Id members created response has a 5xx status code
+func (o *PostPoolsPoolIDMembersCreated) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this post pools pool Id members created response a status code equal to that given
+func (o *PostPoolsPoolIDMembersCreated) IsCode(code int) bool {
+	return code == 201
+}
+
 func (o *PostPoolsPoolIDMembersCreated) Error() string {
 	return fmt.Sprintf("[POST /pools/{pool_id}/members][%d] postPoolsPoolIdMembersCreated  %+v", 201, o.Payload)
 }
+
+func (o *PostPoolsPoolIDMembersCreated) String() string {
+	return fmt.Sprintf("[POST /pools/{pool_id}/members][%d] postPoolsPoolIdMembersCreated  %+v", 201, o.Payload)
+}
+
 func (o *PostPoolsPoolIDMembersCreated) GetPayload() *PostPoolsPoolIDMembersCreatedBody {
 	return o.Payload
 }
@@ -108,7 +139,8 @@ func NewPostPoolsPoolIDMembersBadRequest() *PostPoolsPoolIDMembersBadRequest {
 	return &PostPoolsPoolIDMembersBadRequest{}
 }
 
-/* PostPoolsPoolIDMembersBadRequest describes a response with status code 400, with default header values.
+/*
+PostPoolsPoolIDMembersBadRequest describes a response with status code 400, with default header values.
 
 Bad request
 */
@@ -116,9 +148,39 @@ type PostPoolsPoolIDMembersBadRequest struct {
 	Payload *models.Error
 }
 
+// IsSuccess returns true when this post pools pool Id members bad request response has a 2xx status code
+func (o *PostPoolsPoolIDMembersBadRequest) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this post pools pool Id members bad request response has a 3xx status code
+func (o *PostPoolsPoolIDMembersBadRequest) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this post pools pool Id members bad request response has a 4xx status code
+func (o *PostPoolsPoolIDMembersBadRequest) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this post pools pool Id members bad request response has a 5xx status code
+func (o *PostPoolsPoolIDMembersBadRequest) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this post pools pool Id members bad request response a status code equal to that given
+func (o *PostPoolsPoolIDMembersBadRequest) IsCode(code int) bool {
+	return code == 400
+}
+
 func (o *PostPoolsPoolIDMembersBadRequest) Error() string {
 	return fmt.Sprintf("[POST /pools/{pool_id}/members][%d] postPoolsPoolIdMembersBadRequest  %+v", 400, o.Payload)
 }
+
+func (o *PostPoolsPoolIDMembersBadRequest) String() string {
+	return fmt.Sprintf("[POST /pools/{pool_id}/members][%d] postPoolsPoolIdMembersBadRequest  %+v", 400, o.Payload)
+}
+
 func (o *PostPoolsPoolIDMembersBadRequest) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -140,7 +202,8 @@ func NewPostPoolsPoolIDMembersNotFound() *PostPoolsPoolIDMembersNotFound {
 	return &PostPoolsPoolIDMembersNotFound{}
 }
 
-/* PostPoolsPoolIDMembersNotFound describes a response with status code 404, with default header values.
+/*
+PostPoolsPoolIDMembersNotFound describes a response with status code 404, with default header values.
 
 Not Found
 */
@@ -148,9 +211,39 @@ type PostPoolsPoolIDMembersNotFound struct {
 	Payload *models.Error
 }
 
+// IsSuccess returns true when this post pools pool Id members not found response has a 2xx status code
+func (o *PostPoolsPoolIDMembersNotFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this post pools pool Id members not found response has a 3xx status code
+func (o *PostPoolsPoolIDMembersNotFound) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this post pools pool Id members not found response has a 4xx status code
+func (o *PostPoolsPoolIDMembersNotFound) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this post pools pool Id members not found response has a 5xx status code
+func (o *PostPoolsPoolIDMembersNotFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this post pools pool Id members not found response a status code equal to that given
+func (o *PostPoolsPoolIDMembersNotFound) IsCode(code int) bool {
+	return code == 404
+}
+
 func (o *PostPoolsPoolIDMembersNotFound) Error() string {
 	return fmt.Sprintf("[POST /pools/{pool_id}/members][%d] postPoolsPoolIdMembersNotFound  %+v", 404, o.Payload)
 }
+
+func (o *PostPoolsPoolIDMembersNotFound) String() string {
+	return fmt.Sprintf("[POST /pools/{pool_id}/members][%d] postPoolsPoolIdMembersNotFound  %+v", 404, o.Payload)
+}
+
 func (o *PostPoolsPoolIDMembersNotFound) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -174,7 +267,8 @@ func NewPostPoolsPoolIDMembersDefault(code int) *PostPoolsPoolIDMembersDefault {
 	}
 }
 
-/* PostPoolsPoolIDMembersDefault describes a response with status code -1, with default header values.
+/*
+PostPoolsPoolIDMembersDefault describes a response with status code -1, with default header values.
 
 Unexpected Error
 */
@@ -189,9 +283,39 @@ func (o *PostPoolsPoolIDMembersDefault) Code() int {
 	return o._statusCode
 }
 
+// IsSuccess returns true when this post pools pool ID members default response has a 2xx status code
+func (o *PostPoolsPoolIDMembersDefault) IsSuccess() bool {
+	return o._statusCode/100 == 2
+}
+
+// IsRedirect returns true when this post pools pool ID members default response has a 3xx status code
+func (o *PostPoolsPoolIDMembersDefault) IsRedirect() bool {
+	return o._statusCode/100 == 3
+}
+
+// IsClientError returns true when this post pools pool ID members default response has a 4xx status code
+func (o *PostPoolsPoolIDMembersDefault) IsClientError() bool {
+	return o._statusCode/100 == 4
+}
+
+// IsServerError returns true when this post pools pool ID members default response has a 5xx status code
+func (o *PostPoolsPoolIDMembersDefault) IsServerError() bool {
+	return o._statusCode/100 == 5
+}
+
+// IsCode returns true when this post pools pool ID members default response a status code equal to that given
+func (o *PostPoolsPoolIDMembersDefault) IsCode(code int) bool {
+	return o._statusCode == code
+}
+
 func (o *PostPoolsPoolIDMembersDefault) Error() string {
 	return fmt.Sprintf("[POST /pools/{pool_id}/members][%d] PostPoolsPoolIDMembers default  %+v", o._statusCode, o.Payload)
 }
+
+func (o *PostPoolsPoolIDMembersDefault) String() string {
+	return fmt.Sprintf("[POST /pools/{pool_id}/members][%d] PostPoolsPoolIDMembers default  %+v", o._statusCode, o.Payload)
+}
+
 func (o *PostPoolsPoolIDMembersDefault) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -208,7 +332,8 @@ func (o *PostPoolsPoolIDMembersDefault) readResponse(response runtime.ClientResp
 	return nil
 }
 
-/*PostPoolsPoolIDMembersBody post pools pool ID members body
+/*
+PostPoolsPoolIDMembersBody post pools pool ID members body
 swagger:model PostPoolsPoolIDMembersBody
 */
 type PostPoolsPoolIDMembersBody struct {
@@ -300,7 +425,8 @@ func (o *PostPoolsPoolIDMembersBody) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-/*PostPoolsPoolIDMembersCreatedBody post pools pool ID members created body
+/*
+PostPoolsPoolIDMembersCreatedBody post pools pool ID members created body
 swagger:model PostPoolsPoolIDMembersCreatedBody
 */
 type PostPoolsPoolIDMembersCreatedBody struct {

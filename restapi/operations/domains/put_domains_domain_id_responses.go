@@ -30,7 +30,8 @@ import (
 // PutDomainsDomainIDAcceptedCode is the HTTP code returned for type PutDomainsDomainIDAccepted
 const PutDomainsDomainIDAcceptedCode int = 202
 
-/*PutDomainsDomainIDAccepted Updated domain.
+/*
+PutDomainsDomainIDAccepted Updated domain.
 
 swagger:response putDomainsDomainIdAccepted
 */
@@ -74,7 +75,8 @@ func (o *PutDomainsDomainIDAccepted) WriteResponse(rw http.ResponseWriter, produ
 // PutDomainsDomainIDBadRequestCode is the HTTP code returned for type PutDomainsDomainIDBadRequest
 const PutDomainsDomainIDBadRequestCode int = 400
 
-/*PutDomainsDomainIDBadRequest Bad request
+/*
+PutDomainsDomainIDBadRequest Bad request
 
 swagger:response putDomainsDomainIdBadRequest
 */
@@ -118,7 +120,8 @@ func (o *PutDomainsDomainIDBadRequest) WriteResponse(rw http.ResponseWriter, pro
 // PutDomainsDomainIDNotFoundCode is the HTTP code returned for type PutDomainsDomainIDNotFound
 const PutDomainsDomainIDNotFoundCode int = 404
 
-/*PutDomainsDomainIDNotFound Not Found
+/*
+PutDomainsDomainIDNotFound Not Found
 
 swagger:response putDomainsDomainIdNotFound
 */
@@ -159,7 +162,8 @@ func (o *PutDomainsDomainIDNotFound) WriteResponse(rw http.ResponseWriter, produ
 	}
 }
 
-/*PutDomainsDomainIDDefault Unexpected Error
+/*
+PutDomainsDomainIDDefault Unexpected Error
 
 swagger:response putDomainsDomainIdDefault
 */

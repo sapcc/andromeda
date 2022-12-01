@@ -30,7 +30,8 @@ import (
 // GetPoolsPoolIDOKCode is the HTTP code returned for type GetPoolsPoolIDOK
 const GetPoolsPoolIDOKCode int = 200
 
-/*GetPoolsPoolIDOK Shows the details of a specific pool.
+/*
+GetPoolsPoolIDOK Shows the details of a specific pool.
 
 swagger:response getPoolsPoolIdOK
 */
@@ -74,7 +75,8 @@ func (o *GetPoolsPoolIDOK) WriteResponse(rw http.ResponseWriter, producer runtim
 // GetPoolsPoolIDNotFoundCode is the HTTP code returned for type GetPoolsPoolIDNotFound
 const GetPoolsPoolIDNotFoundCode int = 404
 
-/*GetPoolsPoolIDNotFound Not Found
+/*
+GetPoolsPoolIDNotFound Not Found
 
 swagger:response getPoolsPoolIdNotFound
 */
@@ -115,7 +117,8 @@ func (o *GetPoolsPoolIDNotFound) WriteResponse(rw http.ResponseWriter, producer 
 	}
 }
 
-/*GetPoolsPoolIDDefault Unexpected Error
+/*
+GetPoolsPoolIDDefault Unexpected Error
 
 swagger:response getPoolsPoolIdDefault
 */

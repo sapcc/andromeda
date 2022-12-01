@@ -66,10 +66,12 @@ func NewPostPoolsParamsWithHTTPClient(client *http.Client) *PostPoolsParams {
 	}
 }
 
-/* PostPoolsParams contains all the parameters to send to the API endpoint
-   for the post pools operation.
+/*
+PostPoolsParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the post pools operation.
+
+	Typically these are written to a http.Request.
 */
 type PostPoolsParams struct {
 

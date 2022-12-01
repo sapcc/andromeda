@@ -30,7 +30,8 @@ import (
 // GetPoolsPoolIDMembersMemberIDOKCode is the HTTP code returned for type GetPoolsPoolIDMembersMemberIDOK
 const GetPoolsPoolIDMembersMemberIDOKCode int = 200
 
-/*GetPoolsPoolIDMembersMemberIDOK Shows the details of a specific member.
+/*
+GetPoolsPoolIDMembersMemberIDOK Shows the details of a specific member.
 
 swagger:response getPoolsPoolIdMembersMemberIdOK
 */
@@ -74,7 +75,8 @@ func (o *GetPoolsPoolIDMembersMemberIDOK) WriteResponse(rw http.ResponseWriter, 
 // GetPoolsPoolIDMembersMemberIDNotFoundCode is the HTTP code returned for type GetPoolsPoolIDMembersMemberIDNotFound
 const GetPoolsPoolIDMembersMemberIDNotFoundCode int = 404
 
-/*GetPoolsPoolIDMembersMemberIDNotFound Not Found
+/*
+GetPoolsPoolIDMembersMemberIDNotFound Not Found
 
 swagger:response getPoolsPoolIdMembersMemberIdNotFound
 */
@@ -115,7 +117,8 @@ func (o *GetPoolsPoolIDMembersMemberIDNotFound) WriteResponse(rw http.ResponseWr
 	}
 }
 
-/*GetPoolsPoolIDMembersMemberIDDefault Unexpected Error
+/*
+GetPoolsPoolIDMembersMemberIDDefault Unexpected Error
 
 swagger:response getPoolsPoolIdMembersMemberIdDefault
 */

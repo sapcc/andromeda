@@ -30,7 +30,8 @@ import (
 // PutQuotasProjectIDAcceptedCode is the HTTP code returned for type PutQuotasProjectIDAccepted
 const PutQuotasProjectIDAcceptedCode int = 202
 
-/*PutQuotasProjectIDAccepted Updated quota for a project.
+/*
+PutQuotasProjectIDAccepted Updated quota for a project.
 
 swagger:response putQuotasProjectIdAccepted
 */
@@ -71,7 +72,8 @@ func (o *PutQuotasProjectIDAccepted) WriteResponse(rw http.ResponseWriter, produ
 	}
 }
 
-/*PutQuotasProjectIDDefault Unexpected Error
+/*
+PutQuotasProjectIDDefault Unexpected Error
 
 swagger:response putQuotasProjectIdDefault
 */

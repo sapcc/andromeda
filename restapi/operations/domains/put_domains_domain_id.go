@@ -50,10 +50,10 @@ func NewPutDomainsDomainID(ctx *middleware.Context, handler PutDomainsDomainIDHa
 	return &PutDomainsDomainID{Context: ctx, Handler: handler}
 }
 
-/* PutDomainsDomainID swagger:route PUT /domains/{domain_id} Domains putDomainsDomainId
+/*
+	PutDomainsDomainID swagger:route PUT /domains/{domain_id} Domains putDomainsDomainId
 
 Update a domain
-
 */
 type PutDomainsDomainID struct {
 	Context *middleware.Context

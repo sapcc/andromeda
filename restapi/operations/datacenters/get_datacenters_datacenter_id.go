@@ -49,10 +49,10 @@ func NewGetDatacentersDatacenterID(ctx *middleware.Context, handler GetDatacente
 	return &GetDatacentersDatacenterID{Context: ctx, Handler: handler}
 }
 
-/* GetDatacentersDatacenterID swagger:route GET /datacenters/{datacenter_id} Datacenters getDatacentersDatacenterId
+/*
+	GetDatacentersDatacenterID swagger:route GET /datacenters/{datacenter_id} Datacenters getDatacentersDatacenterId
 
 Show datacenter detail
-
 */
 type GetDatacentersDatacenterID struct {
 	Context *middleware.Context

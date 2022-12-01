@@ -30,7 +30,8 @@ import (
 // DeleteDatacentersDatacenterIDNoContentCode is the HTTP code returned for type DeleteDatacentersDatacenterIDNoContent
 const DeleteDatacentersDatacenterIDNoContentCode int = 204
 
-/*DeleteDatacentersDatacenterIDNoContent Resource successfully deleted.
+/*
+DeleteDatacentersDatacenterIDNoContent Resource successfully deleted.
 
 swagger:response deleteDatacentersDatacenterIdNoContent
 */
@@ -54,7 +55,8 @@ func (o *DeleteDatacentersDatacenterIDNoContent) WriteResponse(rw http.ResponseW
 // DeleteDatacentersDatacenterIDNotFoundCode is the HTTP code returned for type DeleteDatacentersDatacenterIDNotFound
 const DeleteDatacentersDatacenterIDNotFoundCode int = 404
 
-/*DeleteDatacentersDatacenterIDNotFound Not Found
+/*
+DeleteDatacentersDatacenterIDNotFound Not Found
 
 swagger:response deleteDatacentersDatacenterIdNotFound
 */
@@ -95,7 +97,8 @@ func (o *DeleteDatacentersDatacenterIDNotFound) WriteResponse(rw http.ResponseWr
 	}
 }
 
-/*DeleteDatacentersDatacenterIDDefault Unexpected Error
+/*
+DeleteDatacentersDatacenterIDDefault Unexpected Error
 
 swagger:response deleteDatacentersDatacenterIdDefault
 */

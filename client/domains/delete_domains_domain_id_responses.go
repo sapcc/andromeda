@@ -66,14 +66,44 @@ func NewDeleteDomainsDomainIDNoContent() *DeleteDomainsDomainIDNoContent {
 	return &DeleteDomainsDomainIDNoContent{}
 }
 
-/* DeleteDomainsDomainIDNoContent describes a response with status code 204, with default header values.
+/*
+DeleteDomainsDomainIDNoContent describes a response with status code 204, with default header values.
 
 Resource successfully deleted.
 */
 type DeleteDomainsDomainIDNoContent struct {
 }
 
+// IsSuccess returns true when this delete domains domain Id no content response has a 2xx status code
+func (o *DeleteDomainsDomainIDNoContent) IsSuccess() bool {
+	return true
+}
+
+// IsRedirect returns true when this delete domains domain Id no content response has a 3xx status code
+func (o *DeleteDomainsDomainIDNoContent) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this delete domains domain Id no content response has a 4xx status code
+func (o *DeleteDomainsDomainIDNoContent) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this delete domains domain Id no content response has a 5xx status code
+func (o *DeleteDomainsDomainIDNoContent) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this delete domains domain Id no content response a status code equal to that given
+func (o *DeleteDomainsDomainIDNoContent) IsCode(code int) bool {
+	return code == 204
+}
+
 func (o *DeleteDomainsDomainIDNoContent) Error() string {
+	return fmt.Sprintf("[DELETE /domains/{domain_id}][%d] deleteDomainsDomainIdNoContent ", 204)
+}
+
+func (o *DeleteDomainsDomainIDNoContent) String() string {
 	return fmt.Sprintf("[DELETE /domains/{domain_id}][%d] deleteDomainsDomainIdNoContent ", 204)
 }
 
@@ -87,7 +117,8 @@ func NewDeleteDomainsDomainIDNotFound() *DeleteDomainsDomainIDNotFound {
 	return &DeleteDomainsDomainIDNotFound{}
 }
 
-/* DeleteDomainsDomainIDNotFound describes a response with status code 404, with default header values.
+/*
+DeleteDomainsDomainIDNotFound describes a response with status code 404, with default header values.
 
 Not Found
 */
@@ -95,9 +126,39 @@ type DeleteDomainsDomainIDNotFound struct {
 	Payload *models.Error
 }
 
+// IsSuccess returns true when this delete domains domain Id not found response has a 2xx status code
+func (o *DeleteDomainsDomainIDNotFound) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this delete domains domain Id not found response has a 3xx status code
+func (o *DeleteDomainsDomainIDNotFound) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this delete domains domain Id not found response has a 4xx status code
+func (o *DeleteDomainsDomainIDNotFound) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this delete domains domain Id not found response has a 5xx status code
+func (o *DeleteDomainsDomainIDNotFound) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this delete domains domain Id not found response a status code equal to that given
+func (o *DeleteDomainsDomainIDNotFound) IsCode(code int) bool {
+	return code == 404
+}
+
 func (o *DeleteDomainsDomainIDNotFound) Error() string {
 	return fmt.Sprintf("[DELETE /domains/{domain_id}][%d] deleteDomainsDomainIdNotFound  %+v", 404, o.Payload)
 }
+
+func (o *DeleteDomainsDomainIDNotFound) String() string {
+	return fmt.Sprintf("[DELETE /domains/{domain_id}][%d] deleteDomainsDomainIdNotFound  %+v", 404, o.Payload)
+}
+
 func (o *DeleteDomainsDomainIDNotFound) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -121,7 +182,8 @@ func NewDeleteDomainsDomainIDDefault(code int) *DeleteDomainsDomainIDDefault {
 	}
 }
 
-/* DeleteDomainsDomainIDDefault describes a response with status code -1, with default header values.
+/*
+DeleteDomainsDomainIDDefault describes a response with status code -1, with default header values.
 
 Unexpected Error
 */
@@ -136,9 +198,39 @@ func (o *DeleteDomainsDomainIDDefault) Code() int {
 	return o._statusCode
 }
 
+// IsSuccess returns true when this delete domains domain ID default response has a 2xx status code
+func (o *DeleteDomainsDomainIDDefault) IsSuccess() bool {
+	return o._statusCode/100 == 2
+}
+
+// IsRedirect returns true when this delete domains domain ID default response has a 3xx status code
+func (o *DeleteDomainsDomainIDDefault) IsRedirect() bool {
+	return o._statusCode/100 == 3
+}
+
+// IsClientError returns true when this delete domains domain ID default response has a 4xx status code
+func (o *DeleteDomainsDomainIDDefault) IsClientError() bool {
+	return o._statusCode/100 == 4
+}
+
+// IsServerError returns true when this delete domains domain ID default response has a 5xx status code
+func (o *DeleteDomainsDomainIDDefault) IsServerError() bool {
+	return o._statusCode/100 == 5
+}
+
+// IsCode returns true when this delete domains domain ID default response a status code equal to that given
+func (o *DeleteDomainsDomainIDDefault) IsCode(code int) bool {
+	return o._statusCode == code
+}
+
 func (o *DeleteDomainsDomainIDDefault) Error() string {
 	return fmt.Sprintf("[DELETE /domains/{domain_id}][%d] DeleteDomainsDomainID default  %+v", o._statusCode, o.Payload)
 }
+
+func (o *DeleteDomainsDomainIDDefault) String() string {
+	return fmt.Sprintf("[DELETE /domains/{domain_id}][%d] DeleteDomainsDomainID default  %+v", o._statusCode, o.Payload)
+}
+
 func (o *DeleteDomainsDomainIDDefault) GetPayload() *models.Error {
 	return o.Payload
 }

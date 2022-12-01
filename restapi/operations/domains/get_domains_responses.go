@@ -30,7 +30,8 @@ import (
 // GetDomainsOKCode is the HTTP code returned for type GetDomainsOK
 const GetDomainsOKCode int = 200
 
-/*GetDomainsOK A JSON array of domains
+/*
+GetDomainsOK A JSON array of domains
 
 swagger:response getDomainsOK
 */
@@ -74,7 +75,8 @@ func (o *GetDomainsOK) WriteResponse(rw http.ResponseWriter, producer runtime.Pr
 // GetDomainsBadRequestCode is the HTTP code returned for type GetDomainsBadRequest
 const GetDomainsBadRequestCode int = 400
 
-/*GetDomainsBadRequest Bad request
+/*
+GetDomainsBadRequest Bad request
 
 swagger:response getDomainsBadRequest
 */
@@ -115,7 +117,8 @@ func (o *GetDomainsBadRequest) WriteResponse(rw http.ResponseWriter, producer ru
 	}
 }
 
-/*GetDomainsDefault Unexpected Error
+/*
+GetDomainsDefault Unexpected Error
 
 swagger:response getDomainsDefault
 */

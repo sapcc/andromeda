@@ -30,7 +30,8 @@ import (
 // DeleteMonitorsMonitorIDNoContentCode is the HTTP code returned for type DeleteMonitorsMonitorIDNoContent
 const DeleteMonitorsMonitorIDNoContentCode int = 204
 
-/*DeleteMonitorsMonitorIDNoContent Resource successfully deleted.
+/*
+DeleteMonitorsMonitorIDNoContent Resource successfully deleted.
 
 swagger:response deleteMonitorsMonitorIdNoContent
 */
@@ -54,7 +55,8 @@ func (o *DeleteMonitorsMonitorIDNoContent) WriteResponse(rw http.ResponseWriter,
 // DeleteMonitorsMonitorIDNotFoundCode is the HTTP code returned for type DeleteMonitorsMonitorIDNotFound
 const DeleteMonitorsMonitorIDNotFoundCode int = 404
 
-/*DeleteMonitorsMonitorIDNotFound Not Found
+/*
+DeleteMonitorsMonitorIDNotFound Not Found
 
 swagger:response deleteMonitorsMonitorIdNotFound
 */
@@ -95,7 +97,8 @@ func (o *DeleteMonitorsMonitorIDNotFound) WriteResponse(rw http.ResponseWriter, 
 	}
 }
 
-/*DeleteMonitorsMonitorIDDefault Unexpected Error
+/*
+DeleteMonitorsMonitorIDDefault Unexpected Error
 
 swagger:response deleteMonitorsMonitorIdDefault
 */

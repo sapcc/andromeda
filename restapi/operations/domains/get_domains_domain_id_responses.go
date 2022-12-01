@@ -30,7 +30,8 @@ import (
 // GetDomainsDomainIDOKCode is the HTTP code returned for type GetDomainsDomainIDOK
 const GetDomainsDomainIDOKCode int = 200
 
-/*GetDomainsDomainIDOK Shows the details of a specific domain.
+/*
+GetDomainsDomainIDOK Shows the details of a specific domain.
 
 swagger:response getDomainsDomainIdOK
 */
@@ -74,7 +75,8 @@ func (o *GetDomainsDomainIDOK) WriteResponse(rw http.ResponseWriter, producer ru
 // GetDomainsDomainIDNotFoundCode is the HTTP code returned for type GetDomainsDomainIDNotFound
 const GetDomainsDomainIDNotFoundCode int = 404
 
-/*GetDomainsDomainIDNotFound Not Found
+/*
+GetDomainsDomainIDNotFound Not Found
 
 swagger:response getDomainsDomainIdNotFound
 */
@@ -115,7 +117,8 @@ func (o *GetDomainsDomainIDNotFound) WriteResponse(rw http.ResponseWriter, produ
 	}
 }
 
-/*GetDomainsDomainIDDefault Unexpected Error
+/*
+GetDomainsDomainIDDefault Unexpected Error
 
 swagger:response getDomainsDomainIdDefault
 */

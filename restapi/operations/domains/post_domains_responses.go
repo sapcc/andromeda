@@ -30,7 +30,8 @@ import (
 // PostDomainsCreatedCode is the HTTP code returned for type PostDomainsCreated
 const PostDomainsCreatedCode int = 201
 
-/*PostDomainsCreated Created domain.
+/*
+PostDomainsCreated Created domain.
 
 swagger:response postDomainsCreated
 */
@@ -74,7 +75,8 @@ func (o *PostDomainsCreated) WriteResponse(rw http.ResponseWriter, producer runt
 // PostDomainsBadRequestCode is the HTTP code returned for type PostDomainsBadRequest
 const PostDomainsBadRequestCode int = 400
 
-/*PostDomainsBadRequest Bad request
+/*
+PostDomainsBadRequest Bad request
 
 swagger:response postDomainsBadRequest
 */
@@ -115,7 +117,8 @@ func (o *PostDomainsBadRequest) WriteResponse(rw http.ResponseWriter, producer r
 	}
 }
 
-/*PostDomainsDefault Unexpected Error
+/*
+PostDomainsDefault Unexpected Error
 
 swagger:response postDomainsDefault
 */

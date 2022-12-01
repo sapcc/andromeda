@@ -50,10 +50,10 @@ func NewPutPoolsPoolIDMembersMemberID(ctx *middleware.Context, handler PutPoolsP
 	return &PutPoolsPoolIDMembersMemberID{Context: ctx, Handler: handler}
 }
 
-/* PutPoolsPoolIDMembersMemberID swagger:route PUT /pools/{pool_id}/members/{member_id} Members putPoolsPoolIdMembersMemberId
+/*
+	PutPoolsPoolIDMembersMemberID swagger:route PUT /pools/{pool_id}/members/{member_id} Members putPoolsPoolIdMembersMemberId
 
 Update a member
-
 */
 type PutPoolsPoolIDMembersMemberID struct {
 	Context *middleware.Context

@@ -43,10 +43,10 @@ func NewDeleteMonitorsMonitorID(ctx *middleware.Context, handler DeleteMonitorsM
 	return &DeleteMonitorsMonitorID{Context: ctx, Handler: handler}
 }
 
-/* DeleteMonitorsMonitorID swagger:route DELETE /monitors/{monitor_id} Monitors deleteMonitorsMonitorId
+/*
+	DeleteMonitorsMonitorID swagger:route DELETE /monitors/{monitor_id} Monitors deleteMonitorsMonitorId
 
 Delete a monitor
-
 */
 type DeleteMonitorsMonitorID struct {
 	Context *middleware.Context

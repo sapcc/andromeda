@@ -50,10 +50,10 @@ func NewPostMonitors(ctx *middleware.Context, handler PostMonitorsHandler) *Post
 	return &PostMonitors{Context: ctx, Handler: handler}
 }
 
-/* PostMonitors swagger:route POST /monitors Monitors postMonitors
+/*
+	PostMonitors swagger:route POST /monitors Monitors postMonitors
 
 Create new monitor
-
 */
 type PostMonitors struct {
 	Context *middleware.Context

@@ -43,10 +43,10 @@ func NewDeleteDatacentersDatacenterID(ctx *middleware.Context, handler DeleteDat
 	return &DeleteDatacentersDatacenterID{Context: ctx, Handler: handler}
 }
 
-/* DeleteDatacentersDatacenterID swagger:route DELETE /datacenters/{datacenter_id} Datacenters deleteDatacentersDatacenterId
+/*
+	DeleteDatacentersDatacenterID swagger:route DELETE /datacenters/{datacenter_id} Datacenters deleteDatacentersDatacenterId
 
 Delete a datacenter
-
 */
 type DeleteDatacentersDatacenterID struct {
 	Context *middleware.Context

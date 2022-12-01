@@ -30,7 +30,8 @@ import (
 // GetQuotasProjectIDOKCode is the HTTP code returned for type GetQuotasProjectIDOK
 const GetQuotasProjectIDOKCode int = 200
 
-/*GetQuotasProjectIDOK Shows the details of a specific monitor.
+/*
+GetQuotasProjectIDOK Shows the details of a specific monitor.
 
 swagger:response getQuotasProjectIdOK
 */
@@ -74,7 +75,8 @@ func (o *GetQuotasProjectIDOK) WriteResponse(rw http.ResponseWriter, producer ru
 // GetQuotasProjectIDNotFoundCode is the HTTP code returned for type GetQuotasProjectIDNotFound
 const GetQuotasProjectIDNotFoundCode int = 404
 
-/*GetQuotasProjectIDNotFound Not Found
+/*
+GetQuotasProjectIDNotFound Not Found
 
 swagger:response getQuotasProjectIdNotFound
 */
@@ -115,7 +117,8 @@ func (o *GetQuotasProjectIDNotFound) WriteResponse(rw http.ResponseWriter, produ
 	}
 }
 
-/*GetQuotasProjectIDDefault Unexpected Error
+/*
+GetQuotasProjectIDDefault Unexpected Error
 
 swagger:response getQuotasProjectIdDefault
 */

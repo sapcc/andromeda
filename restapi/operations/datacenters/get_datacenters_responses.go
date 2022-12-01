@@ -30,7 +30,8 @@ import (
 // GetDatacentersOKCode is the HTTP code returned for type GetDatacentersOK
 const GetDatacentersOKCode int = 200
 
-/*GetDatacentersOK A JSON array of datacenters
+/*
+GetDatacentersOK A JSON array of datacenters
 
 swagger:response getDatacentersOK
 */
@@ -74,7 +75,8 @@ func (o *GetDatacentersOK) WriteResponse(rw http.ResponseWriter, producer runtim
 // GetDatacentersBadRequestCode is the HTTP code returned for type GetDatacentersBadRequest
 const GetDatacentersBadRequestCode int = 400
 
-/*GetDatacentersBadRequest Bad request
+/*
+GetDatacentersBadRequest Bad request
 
 swagger:response getDatacentersBadRequest
 */
@@ -115,7 +117,8 @@ func (o *GetDatacentersBadRequest) WriteResponse(rw http.ResponseWriter, produce
 	}
 }
 
-/*GetDatacentersDefault Unexpected Error
+/*
+GetDatacentersDefault Unexpected Error
 
 swagger:response getDatacentersDefault
 */

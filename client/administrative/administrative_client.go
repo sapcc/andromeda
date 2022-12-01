@@ -60,7 +60,7 @@ type ClientService interface {
 }
 
 /*
-  DeleteQuotasProjectID resets all quota of a project
+DeleteQuotasProjectID resets all quota of a project
 */
 func (a *Client) DeleteQuotasProjectID(params *DeleteQuotasProjectIDParams, opts ...ClientOption) (*DeleteQuotasProjectIDNoContent, error) {
 	// TODO: Validate the params before sending
@@ -97,7 +97,7 @@ func (a *Client) DeleteQuotasProjectID(params *DeleteQuotasProjectIDParams, opts
 }
 
 /*
-  GetQuotas lists quotas
+GetQuotas lists quotas
 */
 func (a *Client) GetQuotas(params *GetQuotasParams, opts ...ClientOption) (*GetQuotasOK, error) {
 	// TODO: Validate the params before sending
@@ -134,7 +134,7 @@ func (a *Client) GetQuotas(params *GetQuotasParams, opts ...ClientOption) (*GetQ
 }
 
 /*
-  GetQuotasDefaults shows quota defaults
+GetQuotasDefaults shows quota defaults
 */
 func (a *Client) GetQuotasDefaults(params *GetQuotasDefaultsParams, opts ...ClientOption) (*GetQuotasDefaultsOK, error) {
 	// TODO: Validate the params before sending
@@ -171,7 +171,7 @@ func (a *Client) GetQuotasDefaults(params *GetQuotasDefaultsParams, opts ...Clie
 }
 
 /*
-  GetQuotasProjectID shows quota detail
+GetQuotasProjectID shows quota detail
 */
 func (a *Client) GetQuotasProjectID(params *GetQuotasProjectIDParams, opts ...ClientOption) (*GetQuotasProjectIDOK, error) {
 	// TODO: Validate the params before sending
@@ -208,7 +208,7 @@ func (a *Client) GetQuotasProjectID(params *GetQuotasProjectIDParams, opts ...Cl
 }
 
 /*
-  GetServices lists services
+GetServices lists services
 */
 func (a *Client) GetServices(params *GetServicesParams, opts ...ClientOption) (*GetServicesOK, error) {
 	// TODO: Validate the params before sending
@@ -245,7 +245,7 @@ func (a *Client) GetServices(params *GetServicesParams, opts ...ClientOption) (*
 }
 
 /*
-  PostSync enqueues a full sync
+PostSync enqueues a full sync
 */
 func (a *Client) PostSync(params *PostSyncParams, opts ...ClientOption) (*PostSyncAccepted, error) {
 	// TODO: Validate the params before sending
@@ -282,7 +282,7 @@ func (a *Client) PostSync(params *PostSyncParams, opts ...ClientOption) (*PostSy
 }
 
 /*
-  PutQuotasProjectID updates quota
+PutQuotasProjectID updates quota
 */
 func (a *Client) PutQuotasProjectID(params *PutQuotasProjectIDParams, opts ...ClientOption) (*PutQuotasProjectIDAccepted, error) {
 	// TODO: Validate the params before sending

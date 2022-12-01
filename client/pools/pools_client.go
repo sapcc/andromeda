@@ -56,7 +56,7 @@ type ClientService interface {
 }
 
 /*
-  DeletePoolsPoolID deletes a pool
+DeletePoolsPoolID deletes a pool
 */
 func (a *Client) DeletePoolsPoolID(params *DeletePoolsPoolIDParams, opts ...ClientOption) (*DeletePoolsPoolIDNoContent, error) {
 	// TODO: Validate the params before sending
@@ -93,7 +93,7 @@ func (a *Client) DeletePoolsPoolID(params *DeletePoolsPoolIDParams, opts ...Clie
 }
 
 /*
-  GetPools lists pools
+GetPools lists pools
 */
 func (a *Client) GetPools(params *GetPoolsParams, opts ...ClientOption) (*GetPoolsOK, error) {
 	// TODO: Validate the params before sending
@@ -130,7 +130,7 @@ func (a *Client) GetPools(params *GetPoolsParams, opts ...ClientOption) (*GetPoo
 }
 
 /*
-  GetPoolsPoolID shows pool detail
+GetPoolsPoolID shows pool detail
 */
 func (a *Client) GetPoolsPoolID(params *GetPoolsPoolIDParams, opts ...ClientOption) (*GetPoolsPoolIDOK, error) {
 	// TODO: Validate the params before sending
@@ -167,7 +167,7 @@ func (a *Client) GetPoolsPoolID(params *GetPoolsPoolIDParams, opts ...ClientOpti
 }
 
 /*
-  PostPools creates new pool
+PostPools creates new pool
 */
 func (a *Client) PostPools(params *PostPoolsParams, opts ...ClientOption) (*PostPoolsCreated, error) {
 	// TODO: Validate the params before sending
@@ -204,7 +204,7 @@ func (a *Client) PostPools(params *PostPoolsParams, opts ...ClientOption) (*Post
 }
 
 /*
-  PutPoolsPoolID updates a pool
+PutPoolsPoolID updates a pool
 */
 func (a *Client) PutPoolsPoolID(params *PutPoolsPoolIDParams, opts ...ClientOption) (*PutPoolsPoolIDAccepted, error) {
 	// TODO: Validate the params before sending

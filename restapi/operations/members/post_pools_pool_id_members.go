@@ -50,10 +50,10 @@ func NewPostPoolsPoolIDMembers(ctx *middleware.Context, handler PostPoolsPoolIDM
 	return &PostPoolsPoolIDMembers{Context: ctx, Handler: handler}
 }
 
-/* PostPoolsPoolIDMembers swagger:route POST /pools/{pool_id}/members Members postPoolsPoolIdMembers
+/*
+	PostPoolsPoolIDMembers swagger:route POST /pools/{pool_id}/members Members postPoolsPoolIdMembers
 
 Create new member
-
 */
 type PostPoolsPoolIDMembers struct {
 	Context *middleware.Context

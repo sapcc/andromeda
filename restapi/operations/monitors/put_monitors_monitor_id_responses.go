@@ -30,7 +30,8 @@ import (
 // PutMonitorsMonitorIDAcceptedCode is the HTTP code returned for type PutMonitorsMonitorIDAccepted
 const PutMonitorsMonitorIDAcceptedCode int = 202
 
-/*PutMonitorsMonitorIDAccepted Updated monitor.
+/*
+PutMonitorsMonitorIDAccepted Updated monitor.
 
 swagger:response putMonitorsMonitorIdAccepted
 */
@@ -74,7 +75,8 @@ func (o *PutMonitorsMonitorIDAccepted) WriteResponse(rw http.ResponseWriter, pro
 // PutMonitorsMonitorIDBadRequestCode is the HTTP code returned for type PutMonitorsMonitorIDBadRequest
 const PutMonitorsMonitorIDBadRequestCode int = 400
 
-/*PutMonitorsMonitorIDBadRequest Bad request
+/*
+PutMonitorsMonitorIDBadRequest Bad request
 
 swagger:response putMonitorsMonitorIdBadRequest
 */
@@ -118,7 +120,8 @@ func (o *PutMonitorsMonitorIDBadRequest) WriteResponse(rw http.ResponseWriter, p
 // PutMonitorsMonitorIDNotFoundCode is the HTTP code returned for type PutMonitorsMonitorIDNotFound
 const PutMonitorsMonitorIDNotFoundCode int = 404
 
-/*PutMonitorsMonitorIDNotFound Not Found
+/*
+PutMonitorsMonitorIDNotFound Not Found
 
 swagger:response putMonitorsMonitorIdNotFound
 */
@@ -159,7 +162,8 @@ func (o *PutMonitorsMonitorIDNotFound) WriteResponse(rw http.ResponseWriter, pro
 	}
 }
 
-/*PutMonitorsMonitorIDDefault Unexpected Error
+/*
+PutMonitorsMonitorIDDefault Unexpected Error
 
 swagger:response putMonitorsMonitorIdDefault
 */

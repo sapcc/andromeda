@@ -70,7 +70,8 @@ func NewGetMonitorsOK() *GetMonitorsOK {
 	return &GetMonitorsOK{}
 }
 
-/* GetMonitorsOK describes a response with status code 200, with default header values.
+/*
+GetMonitorsOK describes a response with status code 200, with default header values.
 
 A JSON array of monitors
 */
@@ -78,9 +79,39 @@ type GetMonitorsOK struct {
 	Payload *GetMonitorsOKBody
 }
 
+// IsSuccess returns true when this get monitors o k response has a 2xx status code
+func (o *GetMonitorsOK) IsSuccess() bool {
+	return true
+}
+
+// IsRedirect returns true when this get monitors o k response has a 3xx status code
+func (o *GetMonitorsOK) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this get monitors o k response has a 4xx status code
+func (o *GetMonitorsOK) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this get monitors o k response has a 5xx status code
+func (o *GetMonitorsOK) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this get monitors o k response a status code equal to that given
+func (o *GetMonitorsOK) IsCode(code int) bool {
+	return code == 200
+}
+
 func (o *GetMonitorsOK) Error() string {
 	return fmt.Sprintf("[GET /monitors][%d] getMonitorsOK  %+v", 200, o.Payload)
 }
+
+func (o *GetMonitorsOK) String() string {
+	return fmt.Sprintf("[GET /monitors][%d] getMonitorsOK  %+v", 200, o.Payload)
+}
+
 func (o *GetMonitorsOK) GetPayload() *GetMonitorsOKBody {
 	return o.Payload
 }
@@ -102,7 +133,8 @@ func NewGetMonitorsBadRequest() *GetMonitorsBadRequest {
 	return &GetMonitorsBadRequest{}
 }
 
-/* GetMonitorsBadRequest describes a response with status code 400, with default header values.
+/*
+GetMonitorsBadRequest describes a response with status code 400, with default header values.
 
 Bad request
 */
@@ -110,9 +142,39 @@ type GetMonitorsBadRequest struct {
 	Payload *models.Error
 }
 
+// IsSuccess returns true when this get monitors bad request response has a 2xx status code
+func (o *GetMonitorsBadRequest) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this get monitors bad request response has a 3xx status code
+func (o *GetMonitorsBadRequest) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this get monitors bad request response has a 4xx status code
+func (o *GetMonitorsBadRequest) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this get monitors bad request response has a 5xx status code
+func (o *GetMonitorsBadRequest) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this get monitors bad request response a status code equal to that given
+func (o *GetMonitorsBadRequest) IsCode(code int) bool {
+	return code == 400
+}
+
 func (o *GetMonitorsBadRequest) Error() string {
 	return fmt.Sprintf("[GET /monitors][%d] getMonitorsBadRequest  %+v", 400, o.Payload)
 }
+
+func (o *GetMonitorsBadRequest) String() string {
+	return fmt.Sprintf("[GET /monitors][%d] getMonitorsBadRequest  %+v", 400, o.Payload)
+}
+
 func (o *GetMonitorsBadRequest) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -136,7 +198,8 @@ func NewGetMonitorsDefault(code int) *GetMonitorsDefault {
 	}
 }
 
-/* GetMonitorsDefault describes a response with status code -1, with default header values.
+/*
+GetMonitorsDefault describes a response with status code -1, with default header values.
 
 Unexpected Error
 */
@@ -151,9 +214,39 @@ func (o *GetMonitorsDefault) Code() int {
 	return o._statusCode
 }
 
+// IsSuccess returns true when this get monitors default response has a 2xx status code
+func (o *GetMonitorsDefault) IsSuccess() bool {
+	return o._statusCode/100 == 2
+}
+
+// IsRedirect returns true when this get monitors default response has a 3xx status code
+func (o *GetMonitorsDefault) IsRedirect() bool {
+	return o._statusCode/100 == 3
+}
+
+// IsClientError returns true when this get monitors default response has a 4xx status code
+func (o *GetMonitorsDefault) IsClientError() bool {
+	return o._statusCode/100 == 4
+}
+
+// IsServerError returns true when this get monitors default response has a 5xx status code
+func (o *GetMonitorsDefault) IsServerError() bool {
+	return o._statusCode/100 == 5
+}
+
+// IsCode returns true when this get monitors default response a status code equal to that given
+func (o *GetMonitorsDefault) IsCode(code int) bool {
+	return o._statusCode == code
+}
+
 func (o *GetMonitorsDefault) Error() string {
 	return fmt.Sprintf("[GET /monitors][%d] GetMonitors default  %+v", o._statusCode, o.Payload)
 }
+
+func (o *GetMonitorsDefault) String() string {
+	return fmt.Sprintf("[GET /monitors][%d] GetMonitors default  %+v", o._statusCode, o.Payload)
+}
+
 func (o *GetMonitorsDefault) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -170,7 +263,8 @@ func (o *GetMonitorsDefault) readResponse(response runtime.ClientResponse, consu
 	return nil
 }
 
-/*GetMonitorsOKBody get monitors o k body
+/*
+GetMonitorsOKBody get monitors o k body
 swagger:model GetMonitorsOKBody
 */
 type GetMonitorsOKBody struct {
