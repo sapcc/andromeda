@@ -1,6 +1,6 @@
 module github.com/sapcc/andromeda
 
-go 1.17
+go 1.19
 
 replace github.com/micro/protoc-gen-micro => go-micro.dev/v4/cmd/protoc-gen-micro/v4 v4.9.0
 
