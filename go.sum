@@ -92,6 +92,8 @@ github.com/akamai/AkamaiOPEN-edgegrid-golang v1.1.0 h1:NNsy0ugDFZbu6S11NlsR4Kmko
 github.com/akamai/AkamaiOPEN-edgegrid-golang v1.1.0/go.mod h1:kX6YddBkXqqywAe8c9LyvgTCyFuZCTMF4cRPQhc3Fy8=
 github.com/akamai/AkamaiOPEN-edgegrid-golang/v2 v2.15.0 h1:DhbD/Ofn3aU1lqIflS0IqF1wgA8dsDMn0vSuBBiCzAM=
 github.com/akamai/AkamaiOPEN-edgegrid-golang/v2 v2.15.0/go.mod h1:MURtCG1+RCi2X8ripBKIfEIXz3a7aAZfV94DgLovem8=
+github.com/akamai/AkamaiOPEN-edgegrid-golang/v2 v2.17.0 h1:gdiVgTeGujOUqEC5gPPe7qyQkpy+VLUT7Lx3AruIu9w=
+github.com/akamai/AkamaiOPEN-edgegrid-golang/v2 v2.17.0/go.mod h1:MURtCG1+RCi2X8ripBKIfEIXz3a7aAZfV94DgLovem8=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
