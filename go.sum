@@ -262,6 +262,8 @@ github.com/go-micro/plugins/v4/broker/nats v1.1.0 h1:JCo2JksH0M6HC8q8L+x9QCqGRr5
 github.com/go-micro/plugins/v4/broker/nats v1.1.0/go.mod h1:qfrgRHN39JMwkml/50LD2zWkHoEAROX5kNJd12Nll9c=
 github.com/go-micro/plugins/v4/config/encoder/yaml v1.1.0 h1:8G9f9WfdN8zzoEznAv5dOtMCh9R9RMdC3isUhDwe6Ro=
 github.com/go-micro/plugins/v4/config/encoder/yaml v1.1.0/go.mod h1:NB58gTmSYwibr+jZQOPDj/WoeGXSCcHTvQi+UcdDNxw=
+github.com/go-micro/plugins/v4/config/encoder/yaml v1.2.0 h1:mijLWwVEvkpMKCGo3KzR1MDyS55zPEzY/srERqof/zA=
+github.com/go-micro/plugins/v4/config/encoder/yaml v1.2.0/go.mod h1:ef/zSqzvYPp3m0lKCY16mI/KMMaf8t5tUfLVUcWEgfk=
 github.com/go-micro/plugins/v4/registry/nats v1.1.0 h1:oqQzP5P2FkfoYZiBRuCWsKqh4BCJG6MQkxYmLw2lNrU=
 github.com/go-micro/plugins/v4/registry/nats v1.1.0/go.mod h1:4tTfa958PiYUOZNBBNoY1awmgfxFcqQOmix8cR3UM+E=
 github.com/go-micro/plugins/v4/transport/nats v1.1.0 h1:04Gd/EcvqMydLXe/LmfWey2fYfkbZumG7as4ocdU2r4=
