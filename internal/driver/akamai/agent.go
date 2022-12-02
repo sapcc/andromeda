@@ -25,6 +25,10 @@ import (
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/configgtm"
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/edgegrid"
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/session"
+	"go-micro.dev/v4"
+	"go-micro.dev/v4/logger"
+	"go-micro.dev/v4/metadata"
+
 	"github.com/sapcc/andromeda/internal/config"
 	_ "github.com/sapcc/andromeda/internal/plugins"
 	"github.com/sapcc/andromeda/internal/rpc/server"
@@ -32,9 +36,6 @@ import (
 	"github.com/sapcc/andromeda/internal/rpcmodels"
 	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/models"
-	"go-micro.dev/v4"
-	"go-micro.dev/v4/logger"
-	"go-micro.dev/v4/metadata"
 )
 
 var PROPERTY_TYPE_MAP = map[string]string{

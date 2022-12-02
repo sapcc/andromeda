@@ -27,6 +27,16 @@ import (
 	"github.com/sapcc/andromeda/internal/utils"
 )
 
+func addTrafficTarget(property *gtm.Property, member *rpcmodels.Member) bool {
+	for _, trafficTarget := range property.TrafficTargets {
+		if trafficTarget.Name == member.GetDatacenter() {
+			trafficTarget.Servers = append(trafficTarget.Servers, utils.InetNtoa(member.Address).String())
+			return true
+		}
+	}
+	return false
+}
+
 func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain) error {
 	var members []*rpcmodels.Member
 	var monitors []*rpcmodels.Monitor
@@ -55,8 +65,14 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain) error {
 
 	// Add new Members
 	for _, member := range members {
+		// Add member to existing traffic target within the same Datacenter
+		if addTrafficTarget(&property, member) {
+			continue
+		}
+
+		// Add new traffic target
 		trafficTarget := gtm.TrafficTarget{
-			Name:    member.GetId(),
+			Name:    member.GetDatacenter(),
 			Enabled: member.GetAdminStateUp(),
 			Servers: []string{utils.InetNtoa(member.Address).String()},
 			Weight:  50,
@@ -124,11 +140,13 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain) error {
 		"Name",
 		"Type",
 		"Comments",
+		"TrafficTargets",
 		"TrafficTargets.DatacenterId",
 		"TrafficTargets.Enabled",
 		"TrafficTargets.Weight",
 		"TrafficTargets.Servers",
 		"TrafficTargets.Name",
+		"LivenessTests",
 		"LivenessTests.Name",
 		"LivenessTests.TestObject",
 		"LivenessTests.TestInterval",
@@ -140,10 +158,11 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain) error {
 	if !utils.DeepEqualFields(&property, existingProperty, fieldsToCompare) {
 		// Update
 		logger.Infof("UpdateProperty(%s) of domain %s", property.Name, config.Global.AkamaiConfig.Domain)
-		if _, err := s.gtm.UpdateProperty(context.Background(), &property, config.Global.AkamaiConfig.Domain); err != nil {
+		_, err := s.gtm.UpdateProperty(context.Background(), &property, config.Global.AkamaiConfig.Domain)
+		if err != nil {
 			return err
 		}
-	}
 
+	}
 	return nil
 }
