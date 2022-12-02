@@ -23,6 +23,7 @@ import (
 	"go-micro.dev/v4/registry"
 	"go-micro.dev/v4/server"
 	"net/url"
+	"time"
 
 	nats_b "github.com/go-micro/plugins/v4/broker/nats"
 	nats_r "github.com/go-micro/plugins/v4/registry/nats"
@@ -47,14 +48,14 @@ func ConfigureTransport() micro.Option {
 			o.Broker = broker.NewBroker(
 				broker.Addrs(config.Global.Default.TransportURL))
 			o.Registry = registry.NewRegistry(
-				registry.Addrs(config.Global.Default.TransportURL))
+				registry.Addrs(config.Global.Default.TransportURL), registry.Timeout(time.Second*3))
 		case "nats":
 			o.Transport = nats_t.NewTransport(
 				transport.Addrs(uri.Host))
 			o.Broker = nats_b.NewBroker(
 				broker.Addrs(uri.Host))
 			o.Registry = nats_r.NewRegistry(
-				registry.Addrs(uri.Host))
+				registry.Addrs(uri.Host), registry.Timeout(time.Second*3))
 		default:
 			panic(fmt.Errorf("unknown scheme for transport_url %s", uri.Scheme))
 		}

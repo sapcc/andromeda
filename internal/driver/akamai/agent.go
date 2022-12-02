@@ -18,7 +18,6 @@ package akamai
 
 import (
 	"context"
-	"github.com/sapcc/andromeda/internal/utils"
 	"net/http"
 	"os"
 	"time"
@@ -26,16 +25,16 @@ import (
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/configgtm"
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/edgegrid"
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/session"
-	"go-micro.dev/v4"
-	"go-micro.dev/v4/logger"
-	"go-micro.dev/v4/metadata"
-
 	"github.com/sapcc/andromeda/internal/config"
 	_ "github.com/sapcc/andromeda/internal/plugins"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/rpc/worker"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
+	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/models"
+	"go-micro.dev/v4"
+	"go-micro.dev/v4/logger"
+	"go-micro.dev/v4/metadata"
 )
 
 var PROPERTY_TYPE_MAP = map[string]string{
@@ -57,6 +56,14 @@ type Sub struct {
 	akamai *AkamaiAgent
 }
 
+// Method can be of any name
+func (s *Sub) Process(ctx context.Context, request *worker.SyncRequest) error {
+	md, _ := metadata.FromContext(ctx)
+	logger.Infof("[pubsub.1] Received event %+v with metadata %+v\n", request, md)
+	// do something with event
+	return nil
+}
+
 func ExecuteAkamaiAgent() error {
 	meta := map[string]string{
 		"type":    "Akamai",
@@ -69,7 +76,6 @@ func ExecuteAkamaiAgent() error {
 		micro.RegisterInterval(time.Second*30),
 		utils.ConfigureTransport(),
 	)
-
 	service.Init()
 
 	option := edgegrid.WithEnv(true)
@@ -132,6 +138,12 @@ func ExecuteAkamaiAgent() error {
 		service.Server(), &Sub{&akamai}); err != nil {
 		logger.Error(err)
 	}
+
+	_listServices, err := service.Options().Registry.ListServices()
+	if err != nil {
+		logger.Error(err)
+	}
+	logger.Infof("%+v", _listServices)
 
 	go akamai.periodicSync()
 	go func() {
