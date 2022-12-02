@@ -4,7 +4,7 @@ go 1.17
 
 replace github.com/micro/protoc-gen-micro => go-micro.dev/v4/cmd/protoc-gen-micro/v4 v4.8.1
 
-replace github.com/micro/go-micro => go-micro.dev/v4 v4.8.1
+replace github.com/micro/go-micro => go-micro.dev/v4 v4.9.0
 
 require (
 	github.com/Boostport/migration v1.1.1
@@ -35,13 +35,14 @@ require (
 	github.com/jedib0t/go-pretty v4.3.0+incompatible
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/jmoiron/sqlx v1.3.5
+	github.com/lib/pq v1.10.7
 	github.com/rs/cors v1.8.2
 	github.com/sapcc/go-bits v0.0.0-20220909131733-7e2aa654bf15
 	github.com/scottdware/go-bigip v0.0.0-20220517145708-9fe3e2f9f005
 	github.com/stretchr/testify v1.8.0
 	github.com/urfave/cli/v2 v2.16.3
 	github.com/xo/dburl v0.12.3
-	go-micro.dev/v4 v4.8.1
+	go-micro.dev/v4 v4.9.0
 	golang.org/x/net v0.0.0-20220909164309-bea034e7d591
 	google.golang.org/protobuf v1.28.1
 )
@@ -93,7 +94,6 @@ require (
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/klauspost/compress v1.15.3 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
-	github.com/lib/pq v1.10.7 // indirect
 	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/markbates/errx v1.1.0 // indirect
