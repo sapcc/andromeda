@@ -40,7 +40,7 @@ require (
 	github.com/sapcc/go-bits v0.0.0-20220909131733-7e2aa654bf15
 	github.com/scottdware/go-bigip v0.0.0-20220517145708-9fe3e2f9f005
 	github.com/stretchr/testify v1.8.0
-	github.com/urfave/cli/v2 v2.16.3
+	github.com/urfave/cli/v2 v2.23.5
 	github.com/xo/dburl v0.12.3
 	go-micro.dev/v4 v4.9.0
 	golang.org/x/net v0.0.0-20220909164309-bea034e7d591
