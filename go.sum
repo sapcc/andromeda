@@ -61,6 +61,8 @@ github.com/Boostport/migration v1.1.2 h1:lglRoWoNLPEOyFSsyVcH1LhNy9PvdMtGOlgTajq
 github.com/Boostport/migration v1.1.2/go.mod h1:YxtlQVL8Dn4aB5FMRJlWvanL3vtST1/vTqF92PopSlc=
 github.com/Boostport/migration/driver/mysql v1.1.1 h1:UWrdJmPIcscrJL+jI/KwR7RIf+BjKvoMEnCAq9eKouM=
 github.com/Boostport/migration/driver/mysql v1.1.1/go.mod h1:ZyxYrvIrXSGBGQql+D8nppi70+f0jUC0elHMocIOWSI=
+github.com/Boostport/migration/driver/mysql v1.1.2 h1:nyD2BTJNjTvQ1Sm8kLgk1//hSF7eXs+naijUC0LCEVA=
+github.com/Boostport/migration/driver/mysql v1.1.2/go.mod h1:oTf2hEpPQLO4MZNw8um9LT3Vz+G0DhiTaEuY+B2pi24=
 github.com/Boostport/migration/driver/postgres v1.1.1 h1:h84g7O1CcpspV5K91U6+imhcm4NsqHU57BzJmqSglJs=
 github.com/Boostport/migration/driver/postgres v1.1.1/go.mod h1:qvcPY9cGrD/pa7djjMQRrvBBWa3QnCAUsTbF9/X32ds=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=

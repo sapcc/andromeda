@@ -8,7 +8,7 @@ replace github.com/micro/go-micro => go-micro.dev/v4 v4.8.1
 
 require (
 	github.com/Boostport/migration v1.1.2
-	github.com/Boostport/migration/driver/mysql v1.1.1
+	github.com/Boostport/migration/driver/mysql v1.1.2
 	github.com/Boostport/migration/driver/postgres v1.1.1
 	github.com/akamai/AkamaiOPEN-edgegrid-golang/v2 v2.15.0
 	github.com/cockroachdb/cockroach-go/v2 v2.2.16
