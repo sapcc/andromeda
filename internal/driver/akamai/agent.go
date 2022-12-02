@@ -18,13 +18,9 @@ package akamai
 
 import (
 	"context"
-	"net/http"
-	"os"
 	"time"
 
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/configgtm"
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/edgegrid"
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/session"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/logger"
 	"go-micro.dev/v4/metadata"
@@ -79,53 +75,10 @@ func ExecuteAkamaiAgent() error {
 	)
 	service.Init()
 
-	option := edgegrid.WithEnv(true)
-	if env := os.Getenv("AKAMAI_EDGE_RC"); env != "" {
-		option = edgegrid.WithFile(env)
-	} else if config.Global.AkamaiConfig.EdgeRC != "" {
-		option = edgegrid.WithFile(config.Global.AkamaiConfig.EdgeRC)
-	}
-
-	edgerc := edgegrid.Must(edgegrid.New(option))
-	s := session.Must(session.New(
-		session.WithSigner(edgerc),
-	))
-
-	var identity struct {
-		AccountID string `json:"accountId"`
-		Active    bool   `json:"active"`
-		Contracts []struct {
-			ContractID  string   `json:"contractId"`
-			Features    []string `json:"features"`
-			Permissions []string `json:"permissions"`
-		} `json:"contracts"`
-		Email string `json:"email"`
-	}
-
-	req, _ := http.NewRequest(http.MethodGet, "/config-gtm/v1/identity", nil)
-	if _, err := s.Exec(req, &identity); err != nil {
-		panic(err)
-	}
-
-	if len(identity.Contracts) != 1 && config.Global.AkamaiConfig.ContractId == "" {
-		logger.Fatalf("More than one contract detected, specificy contract_id.")
-	}
-
-	var domainType string
-	for _, contract := range identity.Contracts {
-		if config.Global.AkamaiConfig.ContractId != "" && contract.ContractID != config.Global.AkamaiConfig.ContractId {
-			continue
-		}
-
-		domainType = DetectTypeFromFeatures(contract.Features)
-		logger.Infof("Detected Akamai Contract '%s' with best features enabling '%s' domain type.",
-			contract.ContractID, domainType)
-		break
-	}
-
 	// Create F5 worker instance with Server RPC interface
+	s, domainType := NewAkamaiSession()
 	akamai := AkamaiAgent{
-		gtm.Client(s),
+		gtm.Client(*s),
 		domainType,
 		server.NewRPCServerService("andromeda.server", service.Client()),
 	}
@@ -157,6 +110,14 @@ func ExecuteAkamaiAgent() error {
 
 func (s *AkamaiAgent) pendingSync() error {
 	// Akamai backend can only process one change at a time
+	status, err := s.gtm.GetDomainStatus(context.Background(), config.Global.AkamaiConfig.Domain)
+	if err != nil {
+		return err
+	}
+	if status.PropagationStatus == "PENDING" {
+		return nil
+	}
+
 	response, err := s.rpc.GetDomains(context.Background(), &server.SearchRequest{
 		Provider:       "akamai",
 		PageNumber:     0,
@@ -173,31 +134,6 @@ func (s *AkamaiAgent) pendingSync() error {
 		// Run Sync
 		if err := s.SyncProperty(domain); err != nil {
 			return err
-		}
-
-		// Check for running domain's propagation state
-		status, err := s.gtm.GetDomainStatus(context.Background(), config.Global.AkamaiConfig.Domain)
-		if err != nil {
-			return err
-		}
-
-		// Tracks the status of the domain's propagation state. Either PENDING, COMPLETE, or DENIED.
-		// A DENIED value indicates that the domain configuration is invalid,
-		// and doesn't propagate until the validation errors are resolved.
-		switch status.PropagationStatus {
-		case "PENDING":
-			logger.Debug("Backend has pending configuration change")
-		case "DENIED":
-			logger.Errorf("Domain %s failed syncing: %s", domain.Id, status.Message)
-			if err := s.UpdateDomainProvisioningStatus(domain, "ERROR"); err != nil {
-				return err
-			}
-		case "COMPLETE":
-			logger.Infof("Domain %s is in sync", domain.Id)
-			if err := s.UpdateDomainProvisioningStatus(domain, "ACTIVE"); err != nil {
-				return err
-			}
-			// Ready for new Changes
 		}
 	}
 	return nil
