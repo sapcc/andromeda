@@ -19,14 +19,13 @@ package controller
 import (
 	"errors"
 	"fmt"
-	"github.com/lib/pq"
 	"strings"
 
-	"github.com/go-sql-driver/mysql"
-
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-sql-driver/mysql"
 	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 	"go-micro.dev/v4"
 
 	"github.com/sapcc/andromeda/db"
@@ -98,18 +97,16 @@ func (c MemberController) PostMembers(params members.PostPoolsPoolIDMembersParam
 	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
 		// Run insert transaction
 		sql := `
-			INSERT INTO pool
-				(name, admin_state_up, project_id)
+			INSERT INTO member
+				(name, admin_state_up, project_id, address, port, pool_id, datacenter_id)
 			VALUES
-				(:name, :admin_state_up, :project_id)
+				(:name, :admin_state_up, :project_id, :address, :port, :pool_id, :datacenter_id)
 			RETURNING *
 		`
-
 		stmt, err := tx.PrepareNamed(sql)
 		if err != nil {
 			panic(err)
 		}
-
 		if err := stmt.Get(member, member); err != nil {
 			return err
 		}

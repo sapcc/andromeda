@@ -246,11 +246,19 @@ func UpdateCascadePool(tx *sqlx.Tx, poolID strfmt.UUID, provisioningStatus strin
 	}
 
 	// Pending Domain
-	sql = tx.Rebind(`
-		UPDATE domain
-		SET provisioning_status = 'PENDING_UPDATE'
-		FROM domain_pool_relation
-		WHERE domain.id = domain_pool_relation.domain_id AND domain_pool_relation.pool_id = ?`)
+	if tx.DriverName() == "mysql" {
+		sql = tx.Rebind(`
+			UPDATE domain
+			JOIN domain_pool_relation dpr on domain.id = dpr.domain_id
+			SET provisioning_status = 'PENDING_UPDATE'
+			WHERE dpr.pool_id = ?`)
+	} else {
+		sql = tx.Rebind(`
+			UPDATE domain
+			SET provisioning_status = 'PENDING_UPDATE'
+			FROM domain_pool_relation
+			WHERE domain.id = domain_pool_relation.domain_id AND domain_pool_relation.pool_id = ?`)
+	}
 	if _, err := tx.Exec(sql, poolID); err != nil {
 		return err
 	}

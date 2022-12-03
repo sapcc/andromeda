@@ -18,9 +18,9 @@ package akamai
 
 import (
 	"context"
-	"go-micro.dev/v4/logger"
 
 	gtm "github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/configgtm"
+	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
