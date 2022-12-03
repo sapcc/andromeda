@@ -76,7 +76,7 @@ func ExecuteAkamaiAgent() error {
 	service.Init()
 
 	// Create F5 worker instance with Server RPC interface
-	s, domainType := NewAkamaiSession()
+	s, domainType := NewAkamaiSession(&config.Global.AkamaiConfig)
 	akamai := AkamaiAgent{
 		gtm.Client(*s),
 		domainType,
@@ -93,13 +93,10 @@ func ExecuteAkamaiAgent() error {
 		logger.Error(err)
 	}
 
-	_listServices, err := service.Options().Registry.ListServices()
-	if err != nil {
-		logger.Error(err)
-	}
-	logger.Infof("%+v", _listServices)
-
 	go akamai.periodicSync()
+	if config.Global.AkamaiConfig.CombinedStatus {
+		go akamai.periodicStatusSync()
+	}
 	go func() {
 		if err := akamai.pendingSync(); err != nil {
 			logger.Error(err)
@@ -109,15 +106,6 @@ func ExecuteAkamaiAgent() error {
 }
 
 func (s *AkamaiAgent) pendingSync() error {
-	// Akamai backend can only process one change at a time
-	status, err := s.gtm.GetDomainStatus(context.Background(), config.Global.AkamaiConfig.Domain)
-	if err != nil {
-		return err
-	}
-	if status.PropagationStatus == "PENDING" {
-		return nil
-	}
-
 	response, err := s.rpc.GetDomains(context.Background(), &server.SearchRequest{
 		Provider:       "akamai",
 		PageNumber:     0,
@@ -130,6 +118,19 @@ func (s *AkamaiAgent) pendingSync() error {
 	}
 
 	res := response.GetResponse()
+	if len(res) == 0 {
+		return nil
+	}
+
+	// Akamai backend can only process one change at a time
+	status, err := s.gtm.GetDomainStatus(context.Background(), config.Global.AkamaiConfig.Domain)
+	if err != nil {
+		return err
+	}
+	if status.PropagationStatus == "PENDING" {
+		return nil
+	}
+
 	for _, domain := range res {
 		// Run Sync
 		if err := s.SyncProperty(domain); err != nil {

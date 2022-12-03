@@ -207,6 +207,7 @@ func (c DomainController) PutDomainsDomainID(params domains.PutDomainsDomainIDPa
 				fqdn = COALESCE(:fqdn, fqdn), 
 				mode = COALESCE(:mode, mode), 
 				record_type = COALESCE(:record_type, record_type), 
+			    provisioning_status = 'PENDING_UPDATE',
 				updated_at = NOW()
 			WHERE id = :id
 		`

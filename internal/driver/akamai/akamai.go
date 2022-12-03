@@ -27,12 +27,12 @@ import (
 	"github.com/sapcc/andromeda/internal/config"
 )
 
-func NewAkamaiSession() (*session.Session, string) {
+func NewAkamaiSession(akamaiConfig *config.AkamaiConfig) (*session.Session, string) {
 	option := edgegrid.WithEnv(true)
 	if env := os.Getenv("AKAMAI_EDGE_RC"); env != "" {
 		option = edgegrid.WithFile(env)
-	} else if config.Global.AkamaiConfig.EdgeRC != "" {
-		option = edgegrid.WithFile(config.Global.AkamaiConfig.EdgeRC)
+	} else if akamaiConfig.EdgeRC != "" {
+		option = edgegrid.WithFile(akamaiConfig.EdgeRC)
 	}
 
 	edgerc := edgegrid.Must(edgegrid.New(option))
@@ -56,13 +56,13 @@ func NewAkamaiSession() (*session.Session, string) {
 		panic(err)
 	}
 
-	if len(identity.Contracts) != 1 && config.Global.AkamaiConfig.ContractId == "" {
+	if len(identity.Contracts) != 1 && akamaiConfig.ContractId == "" {
 		logger.Fatalf("More than one contract detected, specificy contract_id.")
 	}
 
 	var domainType string
 	for _, contract := range identity.Contracts {
-		if config.Global.AkamaiConfig.ContractId != "" && contract.ContractID != config.Global.AkamaiConfig.ContractId {
+		if akamaiConfig.ContractId != "" && contract.ContractID != akamaiConfig.ContractId {
 			continue
 		}
 

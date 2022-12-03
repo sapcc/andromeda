@@ -45,7 +45,7 @@ func ExecuteAkamaiStatusAgent() error {
 	service.Init()
 
 	// Create F5 worker instance with Server RPC interface
-	s, domainType := NewAkamaiSession()
+	s, domainType := NewAkamaiSession(&config.Global.AkamaiConfig)
 	akamai := AkamaiAgent{
 		gtm.Client(*s),
 		domainType,

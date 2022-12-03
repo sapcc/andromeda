@@ -95,18 +95,27 @@ func (c MemberController) PostMembers(params members.PostPoolsPoolIDMembersParam
 		panic(err)
 	}
 
-	sql := `
-		INSERT INTO member
-		    (name, admin_state_up, project_id, address, port, pool_id, datacenter_id)
-		VALUES
-		    (:name, :admin_state_up, :project_id, :address, :port, :pool_id, :datacenter_id)
-		RETURNING *
-	`
-	stmt, err := c.db.PrepareNamed(sql)
-	if err != nil {
-		panic(err)
-	}
-	if err := stmt.Get(member, member); err != nil {
+	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
+		// Run insert transaction
+		sql := `
+			INSERT INTO pool
+				(name, admin_state_up, project_id)
+			VALUES
+				(:name, :admin_state_up, :project_id)
+			RETURNING *
+		`
+
+		stmt, err := tx.PrepareNamed(sql)
+		if err != nil {
+			panic(err)
+		}
+
+		if err := stmt.Get(member, member); err != nil {
+			return err
+		}
+
+		return UpdateCascadePool(tx, params.PoolID, "PENDING_UPDATE")
+	}); err != nil {
 		var pe *pq.Error
 		if errors.As(err, &pe) && pe.Code == pgerrcode.UniqueViolation {
 			return members.NewPostPoolsPoolIDMembersDefault(409).WithPayload(utils.DuplicateMember)
@@ -117,6 +126,7 @@ func (c MemberController) PostMembers(params members.PostPoolsPoolIDMembersParam
 		}
 		panic(err)
 	}
+
 	return members.NewPostPoolsPoolIDMembersCreated().
 		WithPayload(&members.PostPoolsPoolIDMembersCreatedBody{Member: member})
 }
@@ -145,18 +155,25 @@ func (c MemberController) PutMembersMemberID(params members.PutPoolsPoolIDMember
 		return utils.GetPolicyForbiddenResponse()
 	}
 
-	params.Member.Member.ID = params.MemberID
-	params.Member.Member.PoolID = params.PoolID
-	sql := `
-		UPDATE member SET
-			name = COALESCE(:name, name),
-			admin_state_up = COALESCE(:admin_state_up, admin_state_up),
-			address = COALESCE(:address, address),
-			port = COALESCE(:port, port),
-		    updated_at = NOW()
-		WHERE id = :id
-	`
-	if _, err := c.db.NamedExec(sql, params.Member.Member); err != nil {
+	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
+		params.Member.Member.ID = params.MemberID
+		params.Member.Member.PoolID = params.PoolID
+
+		sql := `
+			UPDATE member SET
+				name = COALESCE(:name, name),
+				admin_state_up = COALESCE(:admin_state_up, admin_state_up),
+				address = COALESCE(:address, address),
+				port = COALESCE(:port, port),
+				updated_at = NOW(),
+				provisioning_status = 'PENDING_UPDATE'
+			WHERE id = :id
+		`
+		if _, err := tx.NamedExec(sql, params.Member.Member); err != nil {
+			panic(err)
+		}
+		return UpdateCascadePool(tx, params.PoolID, "PENDING_UPDATE")
+	}); err != nil {
 		panic(err)
 	}
 
@@ -179,10 +196,18 @@ func (c MemberController) DeleteMembersMemberID(params members.DeletePoolsPoolID
 		return utils.GetPolicyForbiddenResponse()
 	}
 
-	sql := c.db.Rebind(`DELETE FROM member WHERE id = ?`)
-	res := c.db.MustExec(sql, params.MemberID)
-	if deleted, _ := res.RowsAffected(); deleted != 1 {
-		members.NewDeletePoolsPoolIDMembersMemberIDNotFound().WithPayload(utils.NotFound)
+	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
+		sql := tx.Rebind(`DELETE FROM member WHERE id = ?`)
+		res := tx.MustExec(sql, params.MemberID)
+		if deleted, _ := res.RowsAffected(); deleted != 1 {
+			return EmptyResultError
+		}
+		return UpdateCascadePool(tx, params.PoolID, "PENDING_UPDATE")
+	}); err != nil {
+		if errors.Is(err, EmptyResultError) {
+			return members.NewDeletePoolsPoolIDMembersMemberIDNotFound().WithPayload(utils.NotFound)
+		}
+		panic(err)
 	}
 
 	return members.NewDeletePoolsPoolIDMembersMemberIDNoContent()

@@ -64,6 +64,9 @@ func (c PoolController) GetPools(params pools.GetPoolsParams) middleware.Respond
 		if err := PopulatePoolDomains(c.db, &pool); err != nil {
 			panic(err)
 		}
+		if err := PopulatePoolMembers(c.db, &pool); err != nil {
+			panic(err)
+		}
 		_pools = append(_pools, &pool)
 	}
 	_links := pagination.GetLinks(_pools, params.HTTPRequest)
@@ -231,6 +234,25 @@ func PopulatePool(db *sqlx.DB, pool *models.Pool, fields []string, fullyPopulate
 		if err := PopulatePoolMonitors(db, pool); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func UpdateCascadePool(tx *sqlx.Tx, poolID strfmt.UUID, provisioningStatus string) error {
+	// Pending Pool
+	sql := fmt.Sprintf(`UPDATE pool SET provisioning_status = '%s' WHERE id = ?`, provisioningStatus)
+	if _, err := tx.Exec(tx.Rebind(sql), poolID); err != nil {
+		return err
+	}
+
+	// Pending Domain
+	sql = tx.Rebind(`
+		UPDATE domain
+		SET provisioning_status = 'PENDING_UPDATE'
+		FROM domain_pool_relation
+		WHERE domain.id = domain_pool_relation.domain_id AND domain_pool_relation.pool_id = ?`)
+	if _, err := tx.Exec(sql, poolID); err != nil {
+		return err
 	}
 	return nil
 }

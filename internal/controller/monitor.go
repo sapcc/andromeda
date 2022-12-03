@@ -110,21 +110,7 @@ func (c MonitorController) PostMonitors(params monitors.PostMonitorsParams) midd
 			return err
 		}
 
-		// Invalidate parent pool and domains
-		sql = `UPDATE pool SET provisioning_status = 'PENDING_UPDATE' where id = ?`
-		if _, err := tx.Exec(sql, monitor.PoolID); err != nil {
-			return err
-		}
-		sql = `
-				UPDATE domain d 
-				JOIN domain_pool_relation dpr 
-				    ON d.id = dpr.domain_id 
-				SET provisioning_status = 'PENDING_UPDATE' where dpr.pool_id = ?`
-		if _, err := tx.Exec(sql, monitor.PoolID); err != nil {
-			return err
-		}
-
-		return nil
+		return UpdateCascadePool(tx, *monitor.PoolID, "PENDING_UPDATE")
 	}); err != nil {
 		var pe *pgconn.PgError
 		if errors.As(err, &pe) && pe.Code == pgerrcode.UniqueViolation {
@@ -168,7 +154,8 @@ func (c MonitorController) PutMonitorsMonitorID(params monitors.PutMonitorsMonit
 	}
 
 	params.Monitor.Monitor.ID = params.MonitorID
-	sql := `
+	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
+		sql := `
 		UPDATE monitor SET
 			name = COALESCE(:name, name),
 			admin_state_up = COALESCE(:admin_state_up, admin_state_up),
@@ -181,9 +168,14 @@ func (c MonitorController) PutMonitorsMonitorID(params monitors.PutMonitorsMonit
 		WHERE id = :id
 	`
 
-	if _, err := c.db.NamedExec(sql, params.Monitor.Monitor); err != nil {
+		if _, err := c.db.NamedExec(sql, params.Monitor.Monitor); err != nil {
+			return err
+		}
+		return UpdateCascadePool(tx, *monitor.PoolID, "PENDING_UPDATE")
+	}); err != nil {
 		panic(err)
 	}
+
 	if err := PopulateMonitor(c.db, &monitor, []string{"*"}); err != nil {
 		panic(err)
 	}
@@ -201,10 +193,18 @@ func (c MonitorController) DeleteMonitorsMonitorID(params monitors.DeleteMonitor
 		return utils.GetPolicyForbiddenResponse()
 	}
 
-	sql := `DELETE FROM monitor WHERE id = ?`
-	res := c.db.MustExec(sql, params.MonitorID)
-	if deleted, _ := res.RowsAffected(); deleted != 1 {
-		monitors.NewDeleteMonitorsMonitorIDNotFound().WithPayload(utils.NotFound)
+	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
+		sql := `DELETE FROM monitor WHERE id = ?`
+		res := c.db.MustExec(sql, params.MonitorID)
+		if deleted, _ := res.RowsAffected(); deleted != 1 {
+			return EmptyResultError
+		}
+		return UpdateCascadePool(tx, *monitor.PoolID, "PENDING_UPDATE")
+	}); err != nil {
+		if errors.Is(err, EmptyResultError) {
+			return monitors.NewDeleteMonitorsMonitorIDNotFound().WithPayload(utils.NotFound)
+		}
+		panic(err)
 	}
 	return monitors.NewDeleteMonitorsMonitorIDNoContent()
 }

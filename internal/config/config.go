@@ -169,8 +169,9 @@ type F5Config struct {
 }
 
 type AkamaiConfig struct {
-	EdgeRC     string `json:"edgerc" description:"Path to akamai edgerc file, else sourced from AKAMAI_EDGE_RC env variable."`
-	Domain     string `json:"domain" description:"Traffic Management Domain to use (e.g. production.akadns.net)."`
-	DomainType string `json:"domain_type" description:"Indicates the type of domain available based on your contract, defaults to autodetect. Either failover-only, static, weighted, basic, or full."`
-	ContractId string `json:"contract_id" description:"Indicated the contract id to use, autodetects if only one contract is associated."`
+	EdgeRC         string `json:"edgerc" description:"Path to akamai edgerc file, else sourced from AKAMAI_EDGE_RC env variable."`
+	Domain         string `json:"domain" description:"Traffic Management Domain to use (e.g. production.akadns.net)."`
+	DomainType     string `json:"domain_type" description:"Indicates the type of domain available based on your contract, defaults to autodetect. Either failover-only, static, weighted, basic, or full."`
+	ContractId     string `json:"contract_id" description:"Indicated the contract id to use, autodetects if only one contract is associated."`
+	CombinedStatus bool   `json:"combined_status" description:"Runs status agent inside the akamai agent"`
 }
