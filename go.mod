@@ -9,7 +9,7 @@ replace github.com/micro/go-micro => go-micro.dev/v4 v4.9.0
 require (
 	github.com/Boostport/migration v1.1.2
 	github.com/Boostport/migration/driver/mysql v1.1.2
-	github.com/Boostport/migration/driver/postgres v1.1.1
+	github.com/Boostport/migration/driver/postgres v1.1.2
 	github.com/akamai/AkamaiOPEN-edgegrid-golang/v2 v2.17.0
 	github.com/cockroachdb/cockroach-go/v2 v2.2.19
 	github.com/didip/tollbooth v4.0.2+incompatible
@@ -89,6 +89,7 @@ require (
 	github.com/jackc/pgproto3/v2 v2.3.1 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b // indirect
 	github.com/jackc/pgtype v1.12.0 // indirect
+	github.com/jackc/pgx/v5 v5.0.1 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/karrick/godirwalk v1.17.0 // indirect
