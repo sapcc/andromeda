@@ -23,7 +23,7 @@ import (
 	"github.com/go-openapi/loads"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/iancoleman/strcase"
-	_ "github.com/jackc/pgx/v4/stdlib"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
 	"github.com/xo/dburl"
 	"go-micro.dev/v4"
