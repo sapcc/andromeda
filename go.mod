@@ -16,7 +16,7 @@ require (
 	github.com/dre1080/recovr v1.0.3
 	github.com/go-micro/plugins/v4/broker/nats v1.2.0
 	github.com/go-micro/plugins/v4/config/encoder/yaml v1.2.0
-	github.com/go-micro/plugins/v4/registry/nats v1.1.0
+	github.com/go-micro/plugins/v4/registry/nats v1.2.1
 	github.com/go-micro/plugins/v4/transport/nats v1.2.0
 	github.com/go-openapi/errors v0.20.3
 	github.com/go-openapi/loads v0.21.2

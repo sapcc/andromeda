@@ -238,6 +238,8 @@ github.com/go-micro/plugins/v4/config/encoder/yaml v1.2.0 h1:mijLWwVEvkpMKCGo3Kz
 github.com/go-micro/plugins/v4/config/encoder/yaml v1.2.0/go.mod h1:ef/zSqzvYPp3m0lKCY16mI/KMMaf8t5tUfLVUcWEgfk=
 github.com/go-micro/plugins/v4/registry/nats v1.1.0 h1:oqQzP5P2FkfoYZiBRuCWsKqh4BCJG6MQkxYmLw2lNrU=
 github.com/go-micro/plugins/v4/registry/nats v1.1.0/go.mod h1:4tTfa958PiYUOZNBBNoY1awmgfxFcqQOmix8cR3UM+E=
+github.com/go-micro/plugins/v4/registry/nats v1.2.1 h1:YsGmSYxhdu9NK7d8NYMY/xhaYMB4AhcCWoSrk7YGdEY=
+github.com/go-micro/plugins/v4/registry/nats v1.2.1/go.mod h1:RDsrDhcjJggCzAvvUzo/Bzy68d9s9+tu0KOfofXVCog=
 github.com/go-micro/plugins/v4/transport/nats v1.2.0 h1:PrAEAlgnveN9B5liONUg7U9xoRTS7zdIXLpCYSGfjMI=
 github.com/go-micro/plugins/v4/transport/nats v1.2.0/go.mod h1:SYWQF1aJaHEKhOaFQianOksTCJR4ZXsaXAr0JuRbI5A=
 github.com/go-openapi/analysis v0.21.2/go.mod h1:HZwRk4RRisyG8vx2Oe6aqeSQcoxRp47Xkp3+K6q+LdY=
