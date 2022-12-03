@@ -267,6 +267,8 @@ github.com/go-logfmt/logfmt v0.5.0/go.mod h1:wCYkCAKZfumFQihp8CzCvQ3paCTfi41vtzG
 github.com/go-logfmt/logfmt v0.5.1/go.mod h1:WYhtIu8zTZfxdn5+rREduYbwxfcBr/Vr6KEVveWlfTs=
 github.com/go-micro/plugins/v4/broker/nats v1.1.0 h1:JCo2JksH0M6HC8q8L+x9QCqGRr5M0BADQw2Q50TWCas=
 github.com/go-micro/plugins/v4/broker/nats v1.1.0/go.mod h1:qfrgRHN39JMwkml/50LD2zWkHoEAROX5kNJd12Nll9c=
+github.com/go-micro/plugins/v4/broker/nats v1.2.0 h1:uI9ksw/YrG1dJWMHnG/1bqodqUr3OvsISyjWGjiBE6I=
+github.com/go-micro/plugins/v4/broker/nats v1.2.0/go.mod h1:HKZKcWPJQPCA2CA/WvDtko0aXz2U5xywZYzCgGn8hiY=
 github.com/go-micro/plugins/v4/config/encoder/yaml v1.1.0 h1:8G9f9WfdN8zzoEznAv5dOtMCh9R9RMdC3isUhDwe6Ro=
 github.com/go-micro/plugins/v4/config/encoder/yaml v1.1.0/go.mod h1:NB58gTmSYwibr+jZQOPDj/WoeGXSCcHTvQi+UcdDNxw=
 github.com/go-micro/plugins/v4/config/encoder/yaml v1.2.0 h1:mijLWwVEvkpMKCGo3KzR1MDyS55zPEzY/srERqof/zA=
