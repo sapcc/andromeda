@@ -2422,7 +2422,7 @@ Unexpected Error
 | provisioning_status | string| `string` |  | |  |  |
 | receive | string| `string` |  | | Specifies the text string that the monitor expects to receive from the target member. | `HTTP/1.` |
 | send | string| `string` |  | | Specifies the text string that the monitor sends to the target member. | `HEAD / HTTP/1.0\\r\\n\\r\\n` |
-| timeout | integer| `int64` |  | `180`| The time in total, in seconds, after which a health check times out. | `30` |
+| timeout | integer| `int64` |  | `10`| The time in total, in seconds, after which a health check times out. | `30` |
 | type | string| `string` |  | `"ICMP"`| Type of the health check monitor. | `HTTP` |
 | updated_at | dateTime (formatted string)| `string` |  | | The UTC date and timestamp when the resource was created. | `2020-09-09T14:52:15` |
 
