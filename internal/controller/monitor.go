@@ -43,7 +43,7 @@ type MonitorController struct {
 	sv micro.Service
 }
 
-//GetMonitors GET /monitors
+// GetMonitors GET /monitors
 func (c MonitorController) GetMonitors(params monitors.GetMonitorsParams) middleware.Responder {
 	pagination := db.NewPagination("monitor", params.Limit, params.Marker, params.Sort, params.PageReverse)
 	rows, err := pagination.Query(c.db, params.HTTPRequest, nil)
@@ -71,7 +71,7 @@ func (c MonitorController) GetMonitors(params monitors.GetMonitorsParams) middle
 	return monitors.NewGetMonitorsOK().WithPayload(&payload)
 }
 
-//PostMonitors POST /monitors
+// PostMonitors POST /monitors
 func (c MonitorController) PostMonitors(params monitors.PostMonitorsParams) middleware.Responder {
 	monitor := params.Monitor.Monitor
 	projectID, err := auth.ProjectScopeForRequest(params.HTTPRequest)
@@ -126,7 +126,7 @@ func (c MonitorController) PostMonitors(params monitors.PostMonitorsParams) midd
 	return monitors.NewPostMonitorsCreated().WithPayload(&monitors.PostMonitorsCreatedBody{Monitor: monitor})
 }
 
-//GetMonitorsMonitorID GET /monitors/:id
+// GetMonitorsMonitorID GET /monitors/:id
 func (c MonitorController) GetMonitorsMonitorID(params monitors.GetMonitorsMonitorIDParams) middleware.Responder {
 	monitor := models.Monitor{ID: params.MonitorID}
 	if err := PopulateMonitor(c.db, &monitor, []string{"*"}); err != nil {
@@ -139,7 +139,7 @@ func (c MonitorController) GetMonitorsMonitorID(params monitors.GetMonitorsMonit
 	return monitors.NewGetMonitorsMonitorIDOK().WithPayload(&monitors.GetMonitorsMonitorIDOKBody{Monitor: &monitor})
 }
 
-//PutMonitorsMonitorID PUT /monitors/:id
+// PutMonitorsMonitorID PUT /monitors/:id
 func (c MonitorController) PutMonitorsMonitorID(params monitors.PutMonitorsMonitorIDParams) middleware.Responder {
 	monitor := models.Monitor{ID: params.MonitorID}
 	if err := PopulateMonitor(c.db, &monitor, []string{"project_id", "pool_id"}); err != nil {
@@ -183,7 +183,7 @@ func (c MonitorController) PutMonitorsMonitorID(params monitors.PutMonitorsMonit
 		&monitors.PutMonitorsMonitorIDAcceptedBody{Monitor: &monitor})
 }
 
-//DeleteMonitorsMonitorID DELETE /monitors/:id
+// DeleteMonitorsMonitorID DELETE /monitors/:id
 func (c MonitorController) DeleteMonitorsMonitorID(params monitors.DeleteMonitorsMonitorIDParams) middleware.Responder {
 	monitor := models.Monitor{ID: params.MonitorID}
 	if err := PopulateMonitor(c.db, &monitor, []string{"project_id"}); err != nil {
@@ -194,7 +194,7 @@ func (c MonitorController) DeleteMonitorsMonitorID(params monitors.DeleteMonitor
 	}
 
 	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
-		sql := `DELETE FROM monitor WHERE id = ?`
+		sql := tx.Rebind(`DELETE FROM monitor WHERE id = ?`)
 		res := c.db.MustExec(sql, params.MonitorID)
 		if deleted, _ := res.RowsAffected(); deleted != 1 {
 			return EmptyResultError
@@ -209,10 +209,10 @@ func (c MonitorController) DeleteMonitorsMonitorID(params monitors.DeleteMonitor
 	return monitors.NewDeleteMonitorsMonitorIDNoContent()
 }
 
-//PopulateMonitor populates attributes of a monitor instance based on it's ID
+// PopulateMonitor populates attributes of a monitor instance based on it's ID
 func PopulateMonitor(db *sqlx.DB, monitor *models.Monitor, fields []string) error {
 	sql := fmt.Sprintf(`SELECT %s FROM monitor WHERE id = ?`, strings.Join(fields, ", "))
-	if err := db.Get(monitor, sql, monitor.ID); err != nil {
+	if err := db.Get(monitor, db.Rebind(sql), monitor.ID); err != nil {
 		return err
 	}
 	return nil

@@ -50,7 +50,7 @@ type Monitor struct {
 	// The interval, in seconds, between health checks.
 	// Example: 10
 	// Maximum: 86399
-	// Minimum: 0
+	// Minimum: 10
 	Interval *int64 `json:"interval,omitempty"`
 
 	// Human-readable name of the resource.
@@ -85,7 +85,7 @@ type Monitor struct {
 
 	// The time in total, in seconds, after which a health check times out.
 	// Example: 30
-	// Maximum: 86400
+	// Maximum: 60
 	// Minimum: 0
 	Timeout *int64 `json:"timeout,omitempty"`
 
@@ -167,7 +167,7 @@ func (m *Monitor) validateInterval(formats strfmt.Registry) error {
 		return nil
 	}
 
-	if err := validate.MinimumInt("interval", "body", *m.Interval, 0, false); err != nil {
+	if err := validate.MinimumInt("interval", "body", *m.Interval, 10, false); err != nil {
 		return err
 	}
 
@@ -297,7 +297,7 @@ func (m *Monitor) validateTimeout(formats strfmt.Registry) error {
 		return err
 	}
 
-	if err := validate.MaximumInt("timeout", "body", *m.Timeout, 86400, false); err != nil {
+	if err := validate.MaximumInt("timeout", "body", *m.Timeout, 60, false); err != nil {
 		return err
 	}
 

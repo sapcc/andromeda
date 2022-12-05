@@ -1882,6 +1882,7 @@ func init() {
           "type": "integer",
           "default": 60,
           "maximum": 86399,
+          "minimum": 10,
           "x-nullable": true,
           "example": 10
         },
@@ -1931,8 +1932,8 @@ func init() {
         "timeout": {
           "description": "The time in total, in seconds, after which a health check times out.",
           "type": "integer",
-          "default": 180,
-          "maximum": 86400,
+          "default": 10,
+          "maximum": 60,
           "x-nullable": true,
           "example": 30
         },
@@ -4137,7 +4138,7 @@ func init() {
           "type": "integer",
           "default": 60,
           "maximum": 86399,
-          "minimum": 0,
+          "minimum": 10,
           "x-nullable": true,
           "example": 10
         },
@@ -4187,8 +4188,8 @@ func init() {
         "timeout": {
           "description": "The time in total, in seconds, after which a health check times out.",
           "type": "integer",
-          "default": 180,
-          "maximum": 86400,
+          "default": 10,
+          "maximum": 60,
           "minimum": 0,
           "x-nullable": true,
           "example": 30

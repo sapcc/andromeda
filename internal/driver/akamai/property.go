@@ -118,6 +118,8 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain) error {
 			} else {
 				livenessTest.TestObject = monitor.GetSend()
 			}
+			livenessTest.TestObjectPort = 80
+			livenessTest.HttpHeaders = []*gtm.HttpHeader{}
 		case rpcmodels.Monitor_TCP:
 			livenessTest.RequestString = monitor.GetSend()
 			livenessTest.ResponseString = monitor.GetReceive()

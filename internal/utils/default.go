@@ -59,21 +59,19 @@ func SetModelDefaults(s interface{}) error {
 
 					// Generate correct Value
 					vp := reflect.New(propertyField.Type())
-					switch property.Default.(type) {
-					case bool:
+					if property.Type.Contains("boolean") {
 						val := property.Default.(bool)
 						vp.Elem().Set(reflect.ValueOf(&val))
-					case string:
+					} else if property.Type.Contains("string") {
 						val := property.Default.(string)
 						vp.Elem().Set(reflect.ValueOf(&val))
-					case int64:
-						val := property.Default.(int64)
+					} else if property.Type.Contains("integer") {
+						val := int64(property.Default.(float64))
 						vp.Elem().Set(reflect.ValueOf(&val))
-					case float64:
+					} else if property.Type.Contains("number") {
 						val := property.Default.(float64)
-						_tmp := float32(val)
-						vp.Elem().Set(reflect.ValueOf(&_tmp))
-					default:
+						vp.Elem().Set(reflect.ValueOf(&val))
+					} else {
 						return fmt.Errorf("unexpected type %T for property %s", property.Default, propName)
 					}
 					propertyField.Set(vp.Elem())

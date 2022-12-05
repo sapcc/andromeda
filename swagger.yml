@@ -1384,7 +1384,7 @@ definitions:
         type: integer
         description: The interval, in seconds, between health checks.
         example: 10
-        minimum: 0
+        minimum: 10
         maximum: 86399
         default: 60
         x-nullable: true
@@ -1393,8 +1393,8 @@ definitions:
         description: The time in total, in seconds, after which a health check times out.
         example: 30
         minimum: 0
-        maximum: 86400
-        default: 180
+        maximum: 60
+        default: 10
         x-nullable: true
       pool_id:
         type: string
