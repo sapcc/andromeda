@@ -7,6 +7,8 @@ Features:
 * keystone authentication
 * OpenStack policy files
 * Prometheus metrics
+* Rate limiting
+* OpenStack like Quota API
 * Multiple Database backends supported
   * PostgreSQL
   * MariaDB (Warning, MySQL/Percona is **not** supported)
@@ -14,6 +16,7 @@ Features:
 
 Currently it supports following provider:
 * F5 BigIP DNS
+* Akamai
 
 API Documentation: https://sapcc.github.io/andromeda/
 
@@ -21,7 +24,7 @@ API Documentation: https://sapcc.github.io/andromeda/
 Andromeda provides a reference CLI client called `m31ctl` that uses the REST API of Andromeda.
 
 ## Running Requirements
-* go 1.17
+* go 1.19
 * NATS
 * SQL Database (PostgreSQL/MariaDB/CockroachDB)
 
