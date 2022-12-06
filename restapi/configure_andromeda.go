@@ -92,14 +92,20 @@ func setupMiddlewares(handler http.Handler) http.Handler {
 		handler = tollbooth.LimitHandler(limiter, handler)
 	}
 
+	if config.Global.Audit.Enabled {
+		logger.Info("Initializing audit middleware")
+		auditMiddleware := middlewares.NewAuditController()
+		handler = auditMiddleware.AuditHandler(handler)
+	}
+
 	switch config.Global.ApiSettings.AuthStrategy {
 	case "keystone":
 		logger.Info("Initializing keystone middleware")
-		handler, err := auth.KeystoneMiddleware(handler)
+		var err error
+		handler, err = auth.KeystoneMiddleware(handler)
 		if err != nil {
 			logger.Fatal(err)
 		}
-		return handler
 	}
 
 	return handler

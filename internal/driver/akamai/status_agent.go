@@ -18,97 +18,36 @@ package akamai
 
 import (
 	"context"
-	"time"
 
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/configgtm"
-	"go-micro.dev/v4"
 	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/config"
-	_ "github.com/sapcc/andromeda/internal/plugins"
-	"github.com/sapcc/andromeda/internal/rpc/server"
-	"github.com/sapcc/andromeda/internal/utils"
+	"github.com/sapcc/andromeda/internal/rpcmodels"
 )
 
-func ExecuteAkamaiStatusAgent() error {
-	meta := map[string]string{
-		"type":    "Akamai",
-		"version": "2.0",
-	}
-	service := micro.NewService(
-		micro.Name("andromeda.agent.akamai-status"),
-		micro.Metadata(meta),
-		micro.RegisterTTL(time.Second*60),
-		micro.RegisterInterval(time.Second*30),
-		utils.ConfigureTransport(),
-	)
-	service.Init()
-
-	// Create F5 worker instance with Server RPC interface
-	s, domainType := NewAkamaiSession(&config.Global.AkamaiConfig)
-	akamai := AkamaiAgent{
-		gtm.Client(*s),
-		domainType,
-		server.NewRPCServerService("andromeda.server", service.Client()),
-	}
-
-	go akamai.periodicStatusSync()
-	return service.Run()
-}
-
-func (s *AkamaiAgent) periodicStatusSync() {
-	t := time.NewTicker(30 * time.Second)
-	defer t.Stop()
-	for {
-		<-t.C // Activate periodically
-		if err := s.syncStatus(); err != nil {
-			logger.Error(err)
-		}
-	}
-}
-
-func (s *AkamaiAgent) syncStatus() error {
-	// Akamai backend can only process one change at a time
-	response, err := s.rpc.GetDomains(context.Background(), &server.SearchRequest{
-		Provider:       "akamai",
-		PageNumber:     0,
-		ResultPerPage:  1,
-		FullyPopulated: false,
-		Pending:        true,
-	})
-	if err != nil {
-		return err
-	}
-
+func (s *AkamaiAgent) syncStatus(domain *rpcmodels.Domain) (string, error) {
 	// Check for running domain's propagation state
 	status, err := s.gtm.GetDomainStatus(context.Background(), config.Global.AkamaiConfig.Domain)
 	if err != nil {
-		return err
+		return "UNKNOWN", err
 	}
 
-	if status.PropagationStatus == "PENDING" {
-		return nil
-	}
-
-	for _, domain := range response.GetResponse() {
-		// Tracks the status of the domain's propagation state. Either PENDING, COMPLETE, or DENIED.
-		// A DENIED value indicates that the domain configuration is invalid,
-		// and doesn't propagate until the validation errors are resolved.
-		switch status.PropagationStatus {
-		case "PENDING":
-			logger.Debug("Backend has pending configuration change")
-		case "DENIED":
-			logger.Errorf("Domain %s failed syncing: %s", domain.Id, status.Message)
-			if err := s.UpdateDomainProvisioningStatus(domain, "ERROR"); err != nil {
-				return err
-			}
-		case "COMPLETE":
-			logger.Infof("Domain %s is in sync", domain.Id)
-			if err := s.UpdateDomainProvisioningStatus(domain, "ACTIVE"); err != nil {
-				return err
-			}
-			// Ready for new Changes
+	// Tracks the status of the domain's propagation state. Either PENDING, COMPLETE, or DENIED.
+	// A DENIED value indicates that the domain configuration is invalid,
+	// and doesn't propagate until the validation errors are resolved.
+	switch status.PropagationStatus {
+	case "PENDING":
+		logger.Debug("Akamai Backend: pending configuration change")
+	case "DENIED":
+		logger.Errorf("Domain %s failed syncing: %s", domain.Id, status.Message)
+		if err := s.UpdateDomainProvisioningStatus(domain, "ERROR"); err != nil {
+			return "UNKNOWN", err
+		}
+	case "COMPLETE":
+		logger.Infof("Domain %s is in sync", domain.Id)
+		if err := s.UpdateDomainProvisioningStatus(domain, "ACTIVE"); err != nil {
+			return "UNKNOWN", err
 		}
 	}
-	return nil
+	return status.PropagationStatus, nil
 }

@@ -19,6 +19,7 @@ package auth
 import (
 	"context"
 	"errors"
+	"github.com/sapcc/go-bits/audittools"
 	"net/http"
 
 	"github.com/gophercloud/gophercloud"
@@ -36,10 +37,11 @@ type contextKey struct {
 	name string
 }
 
-//Middleware Keystone token injector, also implements goslo policy checker
+// Middleware Keystone token injector, also implements goslo policy checker
 func KeystoneMiddleware(next http.Handler) (http.Handler, error) {
-	authInfo := clientconfig.AuthInfo(config.Global.ServiceAuth)
-	providerClient, err := clientconfig.AuthenticatedClient(&clientconfig.ClientOpts{AuthInfo: &authInfo})
+	authInfo := config.Global.ServiceAuth
+	providerClient, err := clientconfig.AuthenticatedClient(&clientconfig.ClientOpts{
+		AuthInfo: &authInfo})
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +82,7 @@ func TokenFrom(r *http.Request) *gopherpolicy.Token {
 	return nil
 }
 
-//ProjectScopeForRequest helper for getting project id
+// ProjectScopeForRequest helper for getting project id
 func ProjectScopeForRequest(r *http.Request) (string, error) {
 	if config.Global.ApiSettings.AuthStrategy != "keystone" {
 		return "", nil
@@ -89,4 +91,14 @@ func ProjectScopeForRequest(r *http.Request) (string, error) {
 		return ksToken.ProjectScopeUUID(), nil
 	}
 	return "", errors.New("failure accessing keystone token")
+}
+
+func UserForRequest(r *http.Request) (audittools.UserInfo, error) {
+	if config.Global.ApiSettings.AuthStrategy != "keystone" {
+		return nil, nil
+	}
+	if ksToken := TokenFrom(r); ksToken != nil {
+		return ksToken, nil
+	}
+	return nil, errors.New("failure accessing keystone token")
 }

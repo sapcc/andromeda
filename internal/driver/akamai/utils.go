@@ -16,6 +16,11 @@
 
 package akamai
 
+import (
+	"encoding/json"
+	"go-micro.dev/v4/logger"
+)
+
 // Max returns the larger of x or y.
 func Max(x, y int) int {
 	if x < y {
@@ -24,8 +29,8 @@ func Max(x, y int) int {
 	return x
 }
 
-//DetectTypeFromFeatures detects best domain type according to matrix
-//https://techdocs.akamai.com/gtm/reference/api-workflow
+// DetectTypeFromFeatures detects best domain type according to matrix
+// https://techdocs.akamai.com/gtm/reference/api-workflow
 func DetectTypeFromFeatures(features []string) string {
 	const (
 		FailoverOnly int = iota
@@ -73,4 +78,13 @@ func DetectTypeFromFeatures(features []string) string {
 	default:
 		return "basic"
 	}
+}
+
+func PrettyJson(data interface{}) string {
+	val, err := json.MarshalIndent(data, "", " ")
+	if err != nil {
+		logger.Error(err)
+		return ""
+	}
+	return string(val)
 }

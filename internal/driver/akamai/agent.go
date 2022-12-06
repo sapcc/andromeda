@@ -24,7 +24,9 @@ import (
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/logger"
 	"go-micro.dev/v4/metadata"
+	"go-micro.dev/v4/sync"
 
+	"github.com/go-micro/plugins/v4/sync/memory"
 	"github.com/sapcc/andromeda/internal/config"
 	_ "github.com/sapcc/andromeda/internal/plugins"
 	"github.com/sapcc/andromeda/internal/rpc/server"
@@ -43,6 +45,7 @@ var PROPERTY_TYPE_MAP = map[string]string{
 
 type AkamaiAgent struct {
 	gtm        gtm.GTM
+	gtmLock    sync.Sync
 	domainType string
 	rpc        server.RPCServerService
 }
@@ -73,39 +76,37 @@ func ExecuteAkamaiAgent() error {
 		micro.RegisterInterval(time.Second*30),
 		utils.ConfigureTransport(),
 	)
-	service.Init()
+	service.Init(
+		micro.AfterStart(func() error {
+			// Create F5 worker instance with Server RPC interface
+			s, domainType := NewAkamaiSession(&config.Global.AkamaiConfig)
+			akamai := AkamaiAgent{
+				gtm.Client(*s),
+				memory.NewSync(),
+				domainType,
+				server.NewRPCServerService("andromeda.server", service.Client()),
+			}
 
-	// Create F5 worker instance with Server RPC interface
-	s, domainType := NewAkamaiSession(&config.Global.AkamaiConfig)
-	akamai := AkamaiAgent{
-		gtm.Client(*s),
-		domainType,
-		server.NewRPCServerService("andromeda.server", service.Client()),
-	}
+			if err := akamai.EnsureDomain(); err != nil {
+				return err
+			}
 
-	if err := akamai.EnsureDomain(); err != nil {
-		panic(err)
-	}
+			// Register callbacks
+			if err := micro.RegisterSubscriber("andromeda.force_sync",
+				service.Server(), &Sub{&akamai}); err != nil {
+				logger.Error(err)
+			}
 
-	// Register callbacks
-	if err := micro.RegisterSubscriber("andromeda.force_sync",
-		service.Server(), &Sub{&akamai}); err != nil {
-		logger.Error(err)
-	}
+			go akamai.periodicSync()
+			return nil
+		}),
+	)
 
-	go akamai.periodicSync()
-	if config.Global.AkamaiConfig.CombinedStatus {
-		go akamai.periodicStatusSync()
-	}
-	go func() {
-		if err := akamai.pendingSync(); err != nil {
-			logger.Error(err)
-		}
-	}()
 	return service.Run()
 }
 
 func (s *AkamaiAgent) pendingSync() error {
+	logger.Debug("Running pending sync()")
 	response, err := s.rpc.GetDomains(context.Background(), &server.SearchRequest{
 		Provider:       "akamai",
 		PageNumber:     0,
@@ -122,18 +123,32 @@ func (s *AkamaiAgent) pendingSync() error {
 		return nil
 	}
 
-	// Akamai backend can only process one change at a time
-	status, err := s.gtm.GetDomainStatus(context.Background(), config.Global.AkamaiConfig.Domain)
-	if err != nil {
-		return err
-	}
-	if status.PropagationStatus == "PENDING" {
-		return nil
-	}
+	// TODO: support multiple trafficManagementDomains due to limit of 100 properties
+	trafficManagementDomain := config.Global.AkamaiConfig.Domain
 
 	for _, domain := range res {
+		logger.Infof("--- SyncDomain(%s) running...", domain.Id)
+		if err := s.gtmLock.Lock(trafficManagementDomain); err != nil {
+			return err
+		}
+
 		// Run Sync
-		if err := s.SyncProperty(domain); err != nil {
+		if err := s.SyncProperty(domain, trafficManagementDomain); err != nil {
+			return err
+		}
+
+		// Wait for status propagation
+		var status string
+		for ok := true; ok; ok = status == "PENDING" {
+			time.Sleep(5 * time.Second)
+			status, err = s.syncStatus(domain)
+			if err != nil {
+				return err
+			}
+		}
+
+		logger.Infof("--- SyncDomain(%s) finished with '%s'", domain.Id, status)
+		if err := s.gtmLock.Unlock(trafficManagementDomain); err != nil {
 			return err
 		}
 	}
@@ -141,13 +156,22 @@ func (s *AkamaiAgent) pendingSync() error {
 }
 
 func (s *AkamaiAgent) periodicSync() {
-	t := time.NewTicker(30 * time.Second)
+	interval := time.Duration(config.Global.AkamaiConfig.SyncInterval)
+	t := time.NewTicker(interval * time.Second)
 	defer t.Stop()
+
+	executing := false
 	for {
 		<-t.C // Activate periodically
+		if executing {
+			// skip tick if pending sync is running
+			continue
+		}
+		executing = true
 		if err := s.pendingSync(); err != nil {
 			logger.Error(err)
 		}
+		executing = false
 	}
 
 }
@@ -189,7 +213,7 @@ func (s *AkamaiAgent) ForceSync(ctx context.Context, request *worker.SyncRequest
 	go func() {
 		for i, domain := range domains {
 			logger.Infof("Syncing Domain %d/%d: %s", i, len(domains), domain.Id)
-			if err := s.SyncProperty(domain); err != nil {
+			if err := s.SyncProperty(domain, config.Global.AkamaiConfig.Domain); err != nil {
 				logger.Error(err)
 			}
 		}

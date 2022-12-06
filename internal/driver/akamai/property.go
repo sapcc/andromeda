@@ -18,6 +18,7 @@ package akamai
 
 import (
 	"context"
+	"fmt"
 
 	gtm "github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/configgtm"
 	"go-micro.dev/v4/logger"
@@ -37,7 +38,7 @@ func addTrafficTarget(property *gtm.Property, member *rpcmodels.Member) bool {
 	return false
 }
 
-func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain) error {
+func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDomain string) error {
 	var members []*rpcmodels.Member
 	var monitors []*rpcmodels.Monitor
 
@@ -130,12 +131,13 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain) error {
 	// Pre-Validation
 	if len(property.TrafficTargets) == 0 {
 		// Need traffictargets with datacenters
+		logger.Debugf("Skipping Property '%s': No traffic targets", property.Name)
 		return nil
 	}
 
 	existingProperty, err := s.gtm.GetProperty(context.Background(), property.Name, config.Global.AkamaiConfig.Domain)
 	if err != nil {
-		logger.Warnf("Property %s doesn't exist, creating...", property.Name)
+		logger.Debugf("Property '%s' doesn't exist, creating...", property.Name)
 	}
 
 	fieldsToCompare := []string{
@@ -157,14 +159,21 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain) error {
 		"LivenessTests.ResponseString",
 		"LivenessTests.TestObjectProtocol",
 	}
-	if !utils.DeepEqualFields(&property, existingProperty, fieldsToCompare) {
-		// Update
-		logger.Infof("UpdateProperty(%s) of domain %s", property.Name, config.Global.AkamaiConfig.Domain)
-		_, err := s.gtm.UpdateProperty(context.Background(), &property, config.Global.AkamaiConfig.Domain)
-		if err != nil {
-			return err
-		}
+	if utils.DeepEqualFields(&property, existingProperty, fieldsToCompare) {
+		return nil
+	}
 
+	// Update
+	logger.Infof("UpdateProperty(%s) of domain %s", property.Name, trafficManagementDomain)
+	ret, err := s.gtm.UpdateProperty(context.Background(), &property, trafficManagementDomain)
+	if err != nil {
+		return fmt.Errorf("Request %s: %w", PrettyJson(property), err)
+	}
+
+	if !logger.V(logger.DebugLevel, nil) {
+		logger.Debugf("Request: %s\nResponse: %s",
+			PrettyJson(property),
+			PrettyJson(ret))
 	}
 	return nil
 }
