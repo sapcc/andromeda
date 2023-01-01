@@ -405,6 +405,8 @@ github.com/gophercloud/gophercloud v0.15.1-0.20210202035223-633d73521055/go.mod 
 github.com/gophercloud/gophercloud v0.16.0/go.mod h1:wRtmUelyIIv3CSSDI47aUwbs075O6i+LY+pXsKCBsb4=
 github.com/gophercloud/gophercloud v1.1.0 h1:xlsBMeBi0KJ56RBW6GJ2laJJKbtlpObj5HwQzggYAsA=
 github.com/gophercloud/gophercloud v1.1.0/go.mod h1:aAVqcocTSXh2vYFZ1JTvx4EQmfgzxRcNupUfxZbBNDM=
+github.com/gophercloud/gophercloud v1.1.1 h1:MuGyqbSxiuVBqkPZ3+Nhbytk1xZxhmfCB2Rg1cJWFWM=
+github.com/gophercloud/gophercloud v1.1.1/go.mod h1:aAVqcocTSXh2vYFZ1JTvx4EQmfgzxRcNupUfxZbBNDM=
 github.com/gophercloud/utils v0.0.0-20210216074907-f6de111f2eae/go.mod h1:wx8HMD8oQD0Ryhz6+6ykq75PJ79iPyEqYHfwZ4l7OsA=
 github.com/gophercloud/utils v0.0.0-20221128194715-5caf33c866da h1:50QooRtRu+HVucCMrBO6RzmoxFClnQvFDTijBkIivwQ=
 github.com/gophercloud/utils v0.0.0-20221128194715-5caf33c866da/go.mod h1:gY7sdkpsI1IjTD9krr+XXywtsfhcrPx1Nu2DFLGZWWg=
@@ -763,6 +765,8 @@ github.com/sapcc/go-api-declarations v1.4.2 h1:YlxBFe+gFjOwZHZLTSjVWVVgDJo+Xs3eg
 github.com/sapcc/go-api-declarations v1.4.2/go.mod h1:EA4x5xxJGyG/3JTteUOYBg6cJLJgsBHrDj3ryfNU4dQ=
 github.com/sapcc/go-bits v0.0.0-20221129160449-962ccbbba85a h1:QxiUoF/P82D2zEf/4kDrA3kutXqvUEJusKo1ebqUp0A=
 github.com/sapcc/go-bits v0.0.0-20221129160449-962ccbbba85a/go.mod h1:x5MOamgZV8J/tunan4OeYglo53diviF04eI85r6rCjo=
+github.com/sapcc/go-bits v0.0.0-20230101201537-12465ca06570 h1:clh+Gd5uYycehvLUuOz/blnmuJ/IF2yx2kq3kfP7sPY=
+github.com/sapcc/go-bits v0.0.0-20230101201537-12465ca06570/go.mod h1:xsNbTVzDPJ46nPplFMszEHaPM9+NVwB3Jx/XFBqPkNI=
 github.com/satori/go.uuid v1.2.0/go.mod h1:dA0hQrYB0VpLJoorglMZABFdXlWrHn1NEOzdhQKdks0=
 github.com/scaleway/scaleway-sdk-go v1.0.0-beta.7.0.20210127161313-bd30bebeac4f/go.mod h1:CJJ5VAbozOl0yEw7nHB9+7BXTJbIn6h7W+f6Gau5IP8=
 github.com/scottdware/go-bigip v0.0.0-20220517145708-9fe3e2f9f005 h1:rWavEQRGLwPMp7fWiAMIO2tZivQDEVHLewYUuIVUv70=

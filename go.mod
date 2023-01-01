@@ -27,7 +27,7 @@ require (
 	github.com/go-openapi/swag v0.22.3
 	github.com/go-openapi/validate v0.22.0
 	github.com/go-sql-driver/mysql v1.7.0
-	github.com/gophercloud/gophercloud v1.1.0
+	github.com/gophercloud/gophercloud v1.1.1
 	github.com/gophercloud/utils v0.0.0-20221128194715-5caf33c866da
 	github.com/iancoleman/strcase v0.2.0
 	github.com/jackc/pgconn v1.13.0
@@ -39,7 +39,7 @@ require (
 	github.com/lib/pq v1.10.7
 	github.com/rs/cors v1.8.2
 	github.com/sapcc/go-api-declarations v1.4.2
-	github.com/sapcc/go-bits v0.0.0-20221129160449-962ccbbba85a
+	github.com/sapcc/go-bits v0.0.0-20230101201537-12465ca06570
 	github.com/scottdware/go-bigip v0.0.0-20220517145708-9fe3e2f9f005
 	github.com/stretchr/testify v1.8.1
 	github.com/urfave/cli/v2 v2.23.5
