@@ -44,7 +44,7 @@ func NewAuditController() *auditController {
 		EventSink:    s,
 		observerUUID: audittools.GenerateUUID(),
 	}
-	rabbitmqQueueName := "down-the-rabbit-hole"
+	rabbitmqQueueName := config.Global.Audit.QueueName
 	transportURL, err := url.Parse(config.Global.Audit.TransportURL)
 	if err != nil {
 		panic(err)

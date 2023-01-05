@@ -20,11 +20,16 @@ package administrative
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"fmt"
 	"io"
+	"strconv"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	"github.com/sapcc/andromeda/models"
 )
@@ -175,5 +180,70 @@ func (o *PostSyncDefault) readResponse(response runtime.ClientResponse, consumer
 		return err
 	}
 
+	return nil
+}
+
+/*
+PostSyncBody post sync body
+swagger:model PostSyncBody
+*/
+type PostSyncBody struct {
+
+	// domains
+	// Required: true
+	Domains []strfmt.UUID `json:"domains"`
+}
+
+// Validate validates this post sync body
+func (o *PostSyncBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateDomains(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *PostSyncBody) validateDomains(formats strfmt.Registry) error {
+
+	if err := validate.Required("domains"+"."+"domains", "body", o.Domains); err != nil {
+		return err
+	}
+
+	for i := 0; i < len(o.Domains); i++ {
+
+		if err := validate.FormatOf("domains"+"."+"domains"+"."+strconv.Itoa(i), "body", "uuid", o.Domains[i].String(), formats); err != nil {
+			return err
+		}
+
+	}
+
+	return nil
+}
+
+// ContextValidate validates this post sync body based on context it is used
+func (o *PostSyncBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *PostSyncBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *PostSyncBody) UnmarshalBinary(b []byte) error {
+	var res PostSyncBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
 	return nil
 }

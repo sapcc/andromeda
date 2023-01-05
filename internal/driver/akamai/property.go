@@ -164,7 +164,7 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 	}
 
 	// Update
-	logger.Infof("UpdateProperty(%s) of domain %s", property.Name, trafficManagementDomain)
+	logger.Infof("UpdateProperty(domain=%s, property=%s)", trafficManagementDomain, property.Name)
 	ret, err := s.gtm.UpdateProperty(context.Background(), &property, trafficManagementDomain)
 	if err != nil {
 		return fmt.Errorf("Request %s: %w", PrettyJson(property), err)

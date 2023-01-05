@@ -9,79 +9,7 @@ import (
 	math "math"
 )
 
-import (
-	context "context"
-	api "go-micro.dev/v4/api"
-	client "go-micro.dev/v4/client"
-	server "go-micro.dev/v4/server"
-)
-
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
-
-// Reference imports to suppress errors if they are not otherwise used.
-var _ api.Endpoint
-var _ context.Context
-var _ client.Option
-var _ server.Option
-
-// Api Endpoints for RPCWorker service
-
-func NewRPCWorkerEndpoints() []*api.Endpoint {
-	return []*api.Endpoint{}
-}
-
-// Client API for RPCWorker service
-
-type RPCWorkerService interface {
-	SyncAll(ctx context.Context, in *SyncRequest, opts ...client.CallOption) (*SyncResponse, error)
-}
-
-type rPCWorkerService struct {
-	c    client.Client
-	name string
-}
-
-func NewRPCWorkerService(name string, c client.Client) RPCWorkerService {
-	return &rPCWorkerService{
-		c:    c,
-		name: name,
-	}
-}
-
-func (c *rPCWorkerService) SyncAll(ctx context.Context, in *SyncRequest, opts ...client.CallOption) (*SyncResponse, error) {
-	req := c.c.NewRequest(c.name, "RPCWorker.SyncAll", in)
-	out := new(SyncResponse)
-	err := c.c.Call(ctx, req, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// Server API for RPCWorker service
-
-type RPCWorkerHandler interface {
-	SyncAll(context.Context, *SyncRequest, *SyncResponse) error
-}
-
-func RegisterRPCWorkerHandler(s server.Server, hdlr RPCWorkerHandler, opts ...server.HandlerOption) error {
-	type rPCWorker interface {
-		SyncAll(ctx context.Context, in *SyncRequest, out *SyncResponse) error
-	}
-	type RPCWorker struct {
-		rPCWorker
-	}
-	h := &rPCWorkerHandler{hdlr}
-	return s.Handle(s.NewHandler(&RPCWorker{h}, opts...))
-}
-
-type rPCWorkerHandler struct {
-	RPCWorkerHandler
-}
-
-func (h *rPCWorkerHandler) SyncAll(ctx context.Context, in *SyncRequest, out *SyncResponse) error {
-	return h.RPCWorkerHandler.SyncAll(ctx, in, out)
-}

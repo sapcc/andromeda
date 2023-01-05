@@ -5,7 +5,7 @@ package server
 
 import (
 	fmt "fmt"
-	models "github.com/sapcc/andromeda/internal/rpcmodels"
+	rpcmodels "github.com/sapcc/andromeda/internal/rpcmodels"
 	proto "google.golang.org/protobuf/proto"
 	math "math"
 )
@@ -44,7 +44,7 @@ type RPCServerService interface {
 	GetMonitors(ctx context.Context, in *SearchRequest, opts ...client.CallOption) (*MonitorsResponse, error)
 	GetDatacenters(ctx context.Context, in *SearchRequest, opts ...client.CallOption) (*DatacentersResponse, error)
 	GetMembers(ctx context.Context, in *SearchRequest, opts ...client.CallOption) (*MembersResponse, error)
-	UpdateDatacenterMeta(ctx context.Context, in *DatacenterMetaRequest, opts ...client.CallOption) (*models.Datacenter, error)
+	UpdateDatacenterMeta(ctx context.Context, in *DatacenterMetaRequest, opts ...client.CallOption) (*rpcmodels.Datacenter, error)
 }
 
 type rPCServerService struct {
@@ -129,9 +129,9 @@ func (c *rPCServerService) GetMembers(ctx context.Context, in *SearchRequest, op
 	return out, nil
 }
 
-func (c *rPCServerService) UpdateDatacenterMeta(ctx context.Context, in *DatacenterMetaRequest, opts ...client.CallOption) (*models.Datacenter, error) {
+func (c *rPCServerService) UpdateDatacenterMeta(ctx context.Context, in *DatacenterMetaRequest, opts ...client.CallOption) (*rpcmodels.Datacenter, error) {
 	req := c.c.NewRequest(c.name, "RPCServer.UpdateDatacenterMeta", in)
-	out := new(models.Datacenter)
+	out := new(rpcmodels.Datacenter)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -149,7 +149,7 @@ type RPCServerHandler interface {
 	GetMonitors(context.Context, *SearchRequest, *MonitorsResponse) error
 	GetDatacenters(context.Context, *SearchRequest, *DatacentersResponse) error
 	GetMembers(context.Context, *SearchRequest, *MembersResponse) error
-	UpdateDatacenterMeta(context.Context, *DatacenterMetaRequest, *models.Datacenter) error
+	UpdateDatacenterMeta(context.Context, *DatacenterMetaRequest, *rpcmodels.Datacenter) error
 }
 
 func RegisterRPCServerHandler(s server.Server, hdlr RPCServerHandler, opts ...server.HandlerOption) error {
@@ -161,7 +161,7 @@ func RegisterRPCServerHandler(s server.Server, hdlr RPCServerHandler, opts ...se
 		GetMonitors(ctx context.Context, in *SearchRequest, out *MonitorsResponse) error
 		GetDatacenters(ctx context.Context, in *SearchRequest, out *DatacentersResponse) error
 		GetMembers(ctx context.Context, in *SearchRequest, out *MembersResponse) error
-		UpdateDatacenterMeta(ctx context.Context, in *DatacenterMetaRequest, out *models.Datacenter) error
+		UpdateDatacenterMeta(ctx context.Context, in *DatacenterMetaRequest, out *rpcmodels.Datacenter) error
 	}
 	type RPCServer struct {
 		rPCServer
@@ -202,6 +202,6 @@ func (h *rPCServerHandler) GetMembers(ctx context.Context, in *SearchRequest, ou
 	return h.RPCServerHandler.GetMembers(ctx, in, out)
 }
 
-func (h *rPCServerHandler) UpdateDatacenterMeta(ctx context.Context, in *DatacenterMetaRequest, out *models.Datacenter) error {
+func (h *rPCServerHandler) UpdateDatacenterMeta(ctx context.Context, in *DatacenterMetaRequest, out *rpcmodels.Datacenter) error {
 	return h.RPCServerHandler.UpdateDatacenterMeta(ctx, in, out)
 }

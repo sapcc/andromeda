@@ -180,4 +180,5 @@ type AkamaiConfig struct {
 type Audit struct {
 	Enabled      bool   `json:"enabled" description:"Enables message notification bus."`
 	TransportURL string `json:"transport_url" description:"The network address and optional user credentials for connecting to the messaging backend."`
+	QueueName    string `json:"queue_name" description:"RabbitMQ queue name"`
 }

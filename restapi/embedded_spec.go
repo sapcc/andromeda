@@ -1462,6 +1462,29 @@ func init() {
           "Administrative"
         ],
         "summary": "Enqueue a full sync",
+        "parameters": [
+          {
+            "name": "domains",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "domains"
+              ],
+              "properties": {
+                "domains": {
+                  "type": "array",
+                  "items": {
+                    "description": "The ID of a domain to be synced.",
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        ],
         "responses": {
           "202": {
             "description": "Full sync has been enqueued."
@@ -3695,6 +3718,29 @@ func init() {
           "Administrative"
         ],
         "summary": "Enqueue a full sync",
+        "parameters": [
+          {
+            "name": "domains",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "domains"
+              ],
+              "properties": {
+                "domains": {
+                  "type": "array",
+                  "items": {
+                    "description": "The ID of a domain to be synced.",
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        ],
         "responses": {
           "202": {
             "description": "Full sync has been enqueued."

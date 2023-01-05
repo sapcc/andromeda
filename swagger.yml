@@ -836,6 +836,22 @@ paths:
           description: Unexpected Error
           schema:
             $ref: '#/definitions/error'
+      parameters:
+        - in: body
+          name: domains
+          required: true
+          schema:
+            required:
+              - domains
+            type: object
+            properties:
+              domains:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+                  description: The ID of a domain to be synced.
+
   /quotas:
     parameters:
       - in: query

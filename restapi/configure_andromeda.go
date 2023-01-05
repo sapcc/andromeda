@@ -50,7 +50,7 @@ func configureAPI(api *operations.AndromedaAPI) http.Handler {
 	// api.Logger = log.Printf
 	api.Logger = logger.Infof
 
-	api.UseSwaggerUI()
+	// api.UseSwaggerUI()
 	// To continue using redoc as your UI, uncomment the following line
 	api.UseRedoc()
 

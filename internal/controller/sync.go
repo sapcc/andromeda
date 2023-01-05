@@ -18,22 +18,22 @@ package controller
 
 import (
 	"context"
-	"github.com/sapcc/andromeda/internal/utils"
-
-	"github.com/sapcc/andromeda/internal/rpc/worker"
 
 	"github.com/go-openapi/runtime/middleware"
+	"go-micro.dev/v4"
+
 	"github.com/sapcc/andromeda/internal/auth"
 	"github.com/sapcc/andromeda/internal/policy"
+	"github.com/sapcc/andromeda/internal/rpc/worker"
+	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/restapi/operations/administrative"
-	"go-micro.dev/v4"
 )
 
 type SyncController struct {
 	sv micro.Service
 }
 
-//GetServices GET /services
+// PostSync POST /sync
 func (c SyncController) PostSync(params administrative.PostSyncParams) middleware.Responder {
 	projectID, err := auth.ProjectScopeForRequest(params.HTTPRequest)
 	if err != nil {
@@ -43,21 +43,18 @@ func (c SyncController) PostSync(params administrative.PostSyncParams) middlewar
 		return utils.GetPolicyForbiddenResponse()
 	}
 
-	pub1 := micro.NewEvent("andromeda.sync_all", c.sv.Client())
-	if err := pub1.Publish(context.Background(), &worker.SyncRequest{}); err != nil {
+	var domainIDs []string
+	for _, domainUUID := range params.Domains.Domains {
+		domainIDs = append(domainIDs, domainUUID.String())
+	}
+
+	ev := &worker.SyncRequest{
+		DomainIds: domainIDs,
+	}
+
+	pub1 := micro.NewEvent("andromeda.sync", c.sv.Client())
+	if err := pub1.Publish(context.Background(), ev); err != nil {
 		panic(err)
 	}
 	return administrative.NewPostSyncAccepted()
-
-	/*worker := worker.NewRPCWorkerService("andromeda.agent.*", c.sv.Client())
-	res, err := worker.SyncAll(context.TODO(), nil)
-	if err != nil {
-		panic(err)
-	}
-
-	if res.Accepted {
-		return administrative.NewPostSyncAccepted()
-	} else {
-		return middleware.NotImplemented("Blub")
-	}*/
 }

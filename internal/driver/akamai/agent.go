@@ -31,7 +31,6 @@ import (
 	_ "github.com/sapcc/andromeda/internal/plugins"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/rpc/worker"
-	"github.com/sapcc/andromeda/internal/rpcmodels"
 	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/models"
 )
@@ -44,23 +43,26 @@ var PROPERTY_TYPE_MAP = map[string]string{
 }
 
 type AkamaiAgent struct {
-	gtm        gtm.GTM
-	gtmLock    sync.Sync
-	domainType string
-	rpc        server.RPCServerService
+	gtm          gtm.GTM
+	gtmLock      sync.Sync
+	domainType   string
+	rpc          server.RPCServerService
+	workerTicker *time.Ticker
+	forceSync    chan []string
+	executing    bool
 }
 
-// All methods of Sub will be executed when
+// All methods of Sync will be executed when
 // a message is received
-type Sub struct {
+type Sync struct {
 	akamai *AkamaiAgent
 }
 
 // Method can be of any name
-func (s *Sub) Process(ctx context.Context, request *worker.SyncRequest) error {
+func (s *Sync) Process(ctx context.Context, request *worker.SyncRequest) error {
 	md, _ := metadata.FromContext(ctx)
-	logger.Infof("[pubsub.1] Received event %+v with metadata %+v\n", request, md)
-	// do something with event
+	logger.Infof("[Sync] Received sync request %+v with metadata %+v", request.DomainIds, md)
+	s.akamai.forceSync <- request.DomainIds
 	return nil
 }
 
@@ -76,43 +78,73 @@ func ExecuteAkamaiAgent() error {
 		micro.RegisterInterval(time.Second*30),
 		utils.ConfigureTransport(),
 	)
+	syncer := &Sync{}
 	service.Init(
 		micro.AfterStart(func() error {
 			// Create F5 worker instance with Server RPC interface
 			s, domainType := NewAkamaiSession(&config.Global.AkamaiConfig)
+			interval := time.Duration(config.Global.AkamaiConfig.SyncInterval)
 			akamai := AkamaiAgent{
 				gtm.Client(*s),
 				memory.NewSync(),
 				domainType,
 				server.NewRPCServerService("andromeda.server", service.Client()),
+				time.NewTicker(interval * time.Second),
+				make(chan []string),
+				false,
 			}
+			syncer.akamai = &akamai
 
 			if err := akamai.EnsureDomain(); err != nil {
 				return err
 			}
 
-			// Register callbacks
-			if err := micro.RegisterSubscriber("andromeda.force_sync",
-				service.Server(), &Sub{&akamai}); err != nil {
-				logger.Error(err)
-			}
-
-			go akamai.periodicSync()
+			go akamai.WorkerThread()
 			return nil
 		}),
 	)
 
+	// Sync
+	if err := micro.RegisterSubscriber("andromeda.sync",
+		service.Server(), syncer.Process); err != nil {
+		logger.Error(err)
+	}
+
 	return service.Run()
 }
 
-func (s *AkamaiAgent) pendingSync() error {
-	logger.Debug("Running pending sync()")
+func (s *AkamaiAgent) WorkerThread() {
+	for {
+		select {
+		case domains := <-s.forceSync:
+			if err := s.pendingSync(domains); err != nil {
+				logger.Error(err)
+			}
+		case <-s.workerTicker.C: // Activate periodically
+			if err := s.pendingSync(nil); err != nil {
+				logger.Error(err)
+			}
+		}
+	}
+
+}
+
+func (s *AkamaiAgent) pendingSync(domains []string) error {
+	if s.executing {
+		return nil
+	}
+
+	s.executing = true
+	defer func() { s.executing = false }()
+
+	logger.Debugf("Running pending sync(domains=%+v)", domains)
 	response, err := s.rpc.GetDomains(context.Background(), &server.SearchRequest{
 		Provider:       "akamai",
 		PageNumber:     0,
 		ResultPerPage:  1,
 		FullyPopulated: true,
-		Pending:        true,
+		Pending:        len(domains) == 0,
+		Ids:            domains,
 	})
 	if err != nil {
 		return err
@@ -127,7 +159,7 @@ func (s *AkamaiAgent) pendingSync() error {
 	trafficManagementDomain := config.Global.AkamaiConfig.Domain
 
 	for _, domain := range res {
-		logger.Infof("--- SyncDomain(%s) running...", domain.Id)
+		logger.Infof("SyncDomain(%s) running...", domain.Id)
 		if err := s.gtmLock.Lock(trafficManagementDomain); err != nil {
 			return err
 		}
@@ -147,7 +179,7 @@ func (s *AkamaiAgent) pendingSync() error {
 			}
 		}
 
-		logger.Infof("--- SyncDomain(%s) finished with '%s'", domain.Id, status)
+		logger.Infof("SyncDomain(%s) finished with '%s'", domain.Id, status)
 		if err := s.gtmLock.Unlock(trafficManagementDomain); err != nil {
 			return err
 		}
@@ -155,68 +187,10 @@ func (s *AkamaiAgent) pendingSync() error {
 	return nil
 }
 
-func (s *AkamaiAgent) periodicSync() {
-	interval := time.Duration(config.Global.AkamaiConfig.SyncInterval)
-	t := time.NewTicker(interval * time.Second)
-	defer t.Stop()
-
-	executing := false
-	for {
-		<-t.C // Activate periodically
-		if executing {
-			// skip tick if pending sync is running
-			continue
-		}
-		executing = true
-		if err := s.pendingSync(); err != nil {
-			logger.Error(err)
-		}
-		executing = false
-	}
-
-}
-
 func (s *AkamaiAgent) ForceSync(ctx context.Context, request *worker.SyncRequest) error {
 	md, _ := metadata.FromContext(ctx)
-	var searchIds []string
 	if domainId, ok := md.Get("domain"); ok {
-		searchIds = []string{domainId}
-		logger.Infof("Sync invoked for domain %s", md["domain"])
-	} else {
-		logger.Infof("Sync invoked for all domains")
+		s.forceSync <- []string{domainId}
 	}
-
-	var pageNumber int32 = 0
-	var domains []*rpcmodels.Domain
-	for {
-		response, err := s.rpc.GetDomains(context.Background(), &server.SearchRequest{
-			Provider:       "akamai",
-			PageNumber:     pageNumber,
-			ResultPerPage:  10,
-			FullyPopulated: true,
-			Pending:        false,
-			Ids:            searchIds,
-		})
-		if err != nil {
-			return err
-		}
-
-		domains = append(domains, response.Response...)
-
-		if len(response.Response) < 100 {
-			break
-		} else {
-			pageNumber++
-		}
-	}
-
-	go func() {
-		for i, domain := range domains {
-			logger.Infof("Syncing Domain %d/%d: %s", i, len(domains), domain.Id)
-			if err := s.SyncProperty(domain, config.Global.AkamaiConfig.Domain); err != nil {
-				logger.Error(err)
-			}
-		}
-	}()
 	return nil
 }

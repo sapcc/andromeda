@@ -34,7 +34,7 @@ type RPCHandler struct {
 	DB *sqlx.DB
 }
 
-//QueryxWithIds run sql query if optional WHERE condition based on IDs
+// QueryxWithIds run sql query if optional WHERE condition based on IDs
 func (u *RPCHandler) QueryxWithIds(sql string, request *SearchRequest) (*sqlx.Rows, error) {
 	args := []interface{}{request.Provider}
 	if len(request.Ids) > 0 {
@@ -313,7 +313,7 @@ func (u *RPCHandler) UpdateProvisioningStatus(ctx context.Context, req *Provisio
 	return nil
 }
 
-//UpdateMemberStatus Updates member status according to the requests, also updates dependend pool and domain status.
+// UpdateMemberStatus Updates member status according to the requests, also updates dependend pool and domain status.
 func (u *RPCHandler) UpdateMemberStatus(ctx context.Context, req *MemberStatusRequest, res *MemberStatusResponse) error {
 	var statusResult []*StatusResult
 	for _, memberStatusReq := range req.GetMemberStatus() {

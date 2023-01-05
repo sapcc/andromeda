@@ -1,13 +1,7 @@
 syntax = "proto3";
 option go_package = "github.com/sapcc/andromeda/internal/rpc/worker";
 
-service RPCWorker {
-  rpc SyncAll(SyncRequest) returns (SyncResponse) {}
-}
-
 message SyncRequest {
+  repeated string domain_ids = 1;
 }
 
-message SyncResponse {
-  bool accepted = 1;
-}

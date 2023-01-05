@@ -50,7 +50,7 @@ type outputFormatters struct {
 }
 
 var opts struct {
-	Debug      bool             `short:"d" long:"debug" description:"Show verbose debug information"`
+	Debug      bool             `long:"debug" description:"Show verbose debug information"`
 	Formatters outputFormatters `group:"Output formatters"`
 
 	OSEndpoint          string `long:"os-endpoint" env:"OS_ENDPOINT" description:"The endpoint that will always be used"`

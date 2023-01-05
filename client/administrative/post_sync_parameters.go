@@ -74,6 +74,10 @@ PostSyncParams contains all the parameters to send to the API endpoint
 	Typically these are written to a http.Request.
 */
 type PostSyncParams struct {
+
+	// Domains.
+	Domains PostSyncBody
+
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
@@ -127,6 +131,17 @@ func (o *PostSyncParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
+// WithDomains adds the domains to the post sync params
+func (o *PostSyncParams) WithDomains(domains PostSyncBody) *PostSyncParams {
+	o.SetDomains(domains)
+	return o
+}
+
+// SetDomains adds the domains to the post sync params
+func (o *PostSyncParams) SetDomains(domains PostSyncBody) {
+	o.Domains = domains
+}
+
 // WriteToRequest writes these params to a swagger request
 func (o *PostSyncParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
@@ -134,6 +149,9 @@ func (o *PostSyncParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Regi
 		return err
 	}
 	var res []error
+	if err := r.SetBodyParam(o.Domains); err != nil {
+		return err
+	}
 
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)

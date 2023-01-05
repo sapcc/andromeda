@@ -1,5 +1,5 @@
 syntax = "proto3";
-import "internal/models/rpc_models.proto";
+import "internal/rpcmodels/rpc_models.proto";
 option go_package = "github.com/sapcc/andromeda/internal/rpc/server";
 
 service RPCServer {
