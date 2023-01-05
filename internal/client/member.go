@@ -72,7 +72,7 @@ func (*MemberList) Execute(_ []string) error {
 
 func (*MemberCreate) Execute(_ []string) error {
 	adminStateUp := !MemberOptions.Disable
-	member := members.PostPoolsPoolIDMembersBody{&models.Member{
+	member := members.PostPoolsPoolIDMembersBody{Member: &models.Member{
 		AdminStateUp: &adminStateUp,
 		Name:         &MemberOptions.Name,
 		Address:      &MemberOptions.Address,

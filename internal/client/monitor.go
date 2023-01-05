@@ -67,7 +67,7 @@ func (*MonitorList) Execute(_ []string) error {
 func (*MonitorCreate) Execute(_ []string) error {
 	adminStateUp := !MonitorOptions.Disable
 	poolID := strfmt.UUID(MonitorOptions.Pool)
-	monitor := monitors.PostMonitorsBody{&models.Monitor{
+	monitor := monitors.PostMonitorsBody{Monitor: &models.Monitor{
 		AdminStateUp: &adminStateUp,
 		Name:         &MonitorOptions.Name,
 		PoolID:       &poolID,

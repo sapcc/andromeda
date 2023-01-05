@@ -42,7 +42,7 @@ func getMetadata(metadata map[string]string, key string) string {
 	return res
 }
 
-//GetServices GET /services
+// GetServices GET /services
 func (c ServiceController) GetServices(params administrative.GetServicesParams) middleware.Responder {
 	projectID, err := auth.ProjectScopeForRequest(params.HTTPRequest)
 	if err != nil {
@@ -82,5 +82,5 @@ func (c ServiceController) GetServices(params administrative.GetServicesParams) 
 		}
 	}
 
-	return administrative.NewGetServicesOK().WithPayload(&administrative.GetServicesOKBody{responseServices})
+	return administrative.NewGetServicesOK().WithPayload(&administrative.GetServicesOKBody{Services: responseServices})
 }

@@ -60,7 +60,7 @@ func getQuotas(db *sqlx.DB, projectID *string) ([]*administrative.GetQuotasOKBod
 	return quotas, nil
 }
 
-//GetQuotas GET /quotas
+// GetQuotas GET /quotas
 func (c QuotaController) GetQuotas(params administrative.GetQuotasParams) middleware.Responder {
 	projectID, err := auth.ProjectScopeForRequest(params.HTTPRequest)
 	if err != nil {
@@ -74,7 +74,7 @@ func (c QuotaController) GetQuotas(params administrative.GetQuotasParams) middle
 	if err != nil {
 		return domains.NewGetDomainsDefault(404).WithPayload(utils.NotFound)
 	}
-	return administrative.NewGetQuotasOK().WithPayload(&administrative.GetQuotasOKBody{responseQuotas})
+	return administrative.NewGetQuotasOK().WithPayload(&administrative.GetQuotasOKBody{Quotas: responseQuotas})
 }
 
 func (c QuotaController) GetQuotasProjectID(params administrative.GetQuotasProjectIDParams) middleware.Responder {
@@ -188,7 +188,7 @@ func (c QuotaController) PutQuotasProjectID(params administrative.PutQuotasProje
 	}
 
 	return administrative.NewPutQuotasProjectIDAccepted().WithPayload(
-		&administrative.PutQuotasProjectIDAcceptedBody{quota.Quota})
+		&administrative.PutQuotasProjectIDAcceptedBody{Quota: quota.Quota})
 }
 
 func (c QuotaController) DeleteQuotasProjectID(params administrative.DeleteQuotasProjectIDParams) middleware.Responder {

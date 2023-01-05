@@ -65,7 +65,7 @@ func (*PoolCreate) Execute(_ []string) error {
 	for _, d := range PoolOptions.Domain {
 		domains = append(domains, strfmt.UUID(d))
 	}
-	pool := pools.PostPoolsBody{&models.Pool{
+	pool := pools.PostPoolsBody{Pool: &models.Pool{
 		AdminStateUp: &adminStateUp,
 		Name:         &PoolOptions.Name,
 		Domains:      domains,

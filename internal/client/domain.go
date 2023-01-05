@@ -70,7 +70,7 @@ func (*DomainList) Execute(_ []string) error {
 func (*DomainCreate) Execute(_ []string) error {
 	fqdn := strfmt.Hostname(DomainOptions.FQDN)
 
-	domain := domains.PostDomainsBody{&models.Domain{
+	domain := domains.PostDomainsBody{Domain: &models.Domain{
 		Name:       &DomainOptions.Name,
 		Fqdn:       &fqdn,
 		Provider:   &DomainOptions.Provider,
