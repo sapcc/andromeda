@@ -1753,6 +1753,12 @@ Unexpected Error
 POST /v1/sync
 ```
 
+#### Parameters
+
+| Name | Source | Type | Go type | Separator | Required | Default | Description |
+|------|--------|------|---------|-----------| :------: |---------|-------------|
+| domains | `body` | [PostSyncBody](#post-sync-body) | `PostSyncBody` | | ✓ | |  |
+
 #### All responses
 | Code | Status | Description | Has headers | Schema |
 |------|--------|-------------|:-----------:|--------|
@@ -1775,6 +1781,23 @@ Unexpected Error
   
 
 [Error](#error)
+
+###### Inlined models
+
+**<span id="post-sync-body"></span> PostSyncBody**
+
+
+  
+
+
+
+**Properties**
+
+| Name | Type | Go type | Required | Default | Description | Example |
+|------|------|---------|:--------:| ------- |-------------|---------|
+| domains | []uuid (formatted string)| `[]strfmt.UUID` | ✓ | |  |  |
+
+
 
 ### <span id="put-datacenters-datacenter-id"></span> Update a datacenter (*PutDatacentersDatacenterID*)
 
