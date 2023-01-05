@@ -11,6 +11,7 @@ require (
 	github.com/Boostport/migration/driver/mysql v1.1.2
 	github.com/Boostport/migration/driver/postgres v1.1.2
 	github.com/akamai/AkamaiOPEN-edgegrid-golang/v2 v2.17.0
+	github.com/akamai/AkamaiOPEN-edgegrid-golang/v3 v3.1.0
 	github.com/cockroachdb/cockroach-go/v2 v2.2.20
 	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/dre1080/recovr v1.0.3
