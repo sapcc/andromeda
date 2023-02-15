@@ -11,7 +11,6 @@ require (
 	github.com/Boostport/migration/driver/mysql v1.1.2
 	github.com/Boostport/migration/driver/postgres v1.1.2
 	github.com/akamai/AkamaiOPEN-edgegrid-golang/v2 v2.17.0
-	github.com/akamai/AkamaiOPEN-edgegrid-golang/v3 v3.1.0
 	github.com/cockroachdb/cockroach-go/v2 v2.2.20
 	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/dre1080/recovr v1.0.3
@@ -38,6 +37,7 @@ require (
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/lib/pq v1.10.7
+	github.com/mcuadros/go-defaults v1.2.0
 	github.com/rs/cors v1.8.3
 	github.com/sapcc/go-api-declarations v1.4.2
 	github.com/sapcc/go-bits v0.0.0-20230101201537-12465ca06570

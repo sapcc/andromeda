@@ -95,7 +95,7 @@ func ExecuteAkamaiAgent() error {
 			}
 			syncer.akamai = &akamai
 
-			if err := akamai.EnsureDomain(); err != nil {
+			if err := akamai.EnsureDomain(domainType); err != nil {
 				return err
 			}
 

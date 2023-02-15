@@ -31,11 +31,10 @@ var MONITOR_LIVENESS_TYPE_MAP = map[rpcmodels.Monitor_MonitorType]string{
 	rpcmodels.Monitor_TCP:   "TCP",
 }
 
-func (s *AkamaiAgent) EnsureDomain() error {
+func (s *AkamaiAgent) EnsureDomain(domainType string) error {
 	if _, err := s.gtm.GetDomain(context.Background(), config.Global.AkamaiConfig.Domain); err != nil {
-		logger.Warnf("Akamai Domain %s doesn't exist, creating...")
-		domain := s.gtm.NewDomain(context.Background(),
-			config.Global.AkamaiConfig.Domain, config.Global.AkamaiConfig.DomainType)
+		logger.Warnf("Akamai Domain %s doesn't exist, creating...", config.Global.AkamaiConfig.Domain)
+		domain := s.gtm.NewDomain(context.Background(), config.Global.AkamaiConfig.Domain, domainType)
 		if _, err := s.gtm.CreateDomain(context.Background(), domain, nil); err != nil {
 			return err
 		}

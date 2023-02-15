@@ -23,6 +23,7 @@ import (
 
 	"github.com/go-micro/plugins/v4/config/encoder/yaml"
 	"github.com/gophercloud/utils/openstack/clientconfig"
+	"github.com/mcuadros/go-defaults"
 	"github.com/urfave/cli/v2"
 	"go-micro.dev/v4/config"
 	"go-micro.dev/v4/config/reader"
@@ -53,6 +54,9 @@ func ParseArgsAndRun(name string, usage string, action cli.ActionFunc, flags ...
 			if !c.IsSet("config-file") {
 				return errors.New("No config files specified")
 			}
+
+			// Set defaults
+			defaults.SetDefaults(&Global)
 
 			// Parse config flags
 			if err := parseConfigFlags(c.StringSlice("config-file")); err != nil {
@@ -89,7 +93,12 @@ func ParseArgsAndRun(name string, usage string, action cli.ActionFunc, flags ...
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		logger.Fatal(err)
+		currentErr := err
+		for errors.Unwrap(currentErr) != nil {
+			logger.Fatal(currentErr)
+			currentErr = errors.Unwrap(currentErr)
+		}
+		logger.Fatal(currentErr)
 	}
 }
 
