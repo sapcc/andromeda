@@ -59,6 +59,8 @@ github.com/Boostport/migration/driver/mysql v1.1.2 h1:nyD2BTJNjTvQ1Sm8kLgk1//hSF
 github.com/Boostport/migration/driver/mysql v1.1.2/go.mod h1:oTf2hEpPQLO4MZNw8um9LT3Vz+G0DhiTaEuY+B2pi24=
 github.com/Boostport/migration/driver/postgres v1.1.2 h1:RtsSNSKuBvx3aTmOb8wrT2kyOupsW7PRS6yfq0YkGww=
 github.com/Boostport/migration/driver/postgres v1.1.2/go.mod h1:hiwHuDDpbBSrP1+CqkVMcWl7mQs1CSKB0//PJGnjcoo=
+github.com/Boostport/migration/driver/postgres v1.1.3 h1:CGIM4X6GaPXN5WntFj7WGIc/9k97+Jr3vM9emfdDNnM=
+github.com/Boostport/migration/driver/postgres v1.1.3/go.mod h1:nS3juUpTQa7rIDmwvtDMGZeCebphjlzC4aN7fz7phho=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/DATA-DOG/go-sqlmock v1.5.0 h1:Shsta01QNfFxHCfpW6YH2STWB0MudeXXEWMr20OEh60=
