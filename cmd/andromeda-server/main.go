@@ -17,10 +17,11 @@
 package main
 
 import (
+	"github.com/urfave/cli/v2"
+
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/server"
 	"github.com/sapcc/andromeda/restapi"
-	"github.com/urfave/cli/v2"
 )
 
 func main() {
@@ -28,7 +29,13 @@ func main() {
 		func(c *cli.Context) error {
 			API := restapi.NewServer(nil)
 			API.Port = c.Int("port")
+			API.Host = c.String("host")
 			return server.ExecuteServer(API)
+		},
+		&cli.StringFlag{
+			Name:  "host",
+			Usage: "The IP to listen on",
+			Value: "0.0.0.0",
 		},
 		&cli.IntFlag{
 			Name:  "port",

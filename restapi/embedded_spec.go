@@ -1630,7 +1630,8 @@ func init() {
       "description": "A representation of a domain",
       "type": "object",
       "required": [
-        "fqdn"
+        "fqdn",
+        "provider"
       ],
       "properties": {
         "admin_state_up": {
@@ -3908,7 +3909,8 @@ func init() {
       "description": "A representation of a domain",
       "type": "object",
       "required": [
-        "fqdn"
+        "fqdn",
+        "provider"
       ],
       "properties": {
         "admin_state_up": {

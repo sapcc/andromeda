@@ -82,8 +82,9 @@ type Domain struct {
 
 	// Supported provider drivers
 	// Example: akamai
+	// Required: true
 	// Enum: [akamai f5]
-	Provider *string `json:"provider,omitempty"`
+	Provider *string `json:"provider"`
 
 	// provisioning status
 	// Read Only: true
@@ -306,8 +307,9 @@ func (m *Domain) validateProviderEnum(path, location string, value string) error
 }
 
 func (m *Domain) validateProvider(formats strfmt.Registry) error {
-	if swag.IsZero(m.Provider) { // not required
-		return nil
+
+	if err := validate.Required("provider", "body", m.Provider); err != nil {
+		return err
 	}
 
 	// value enum
