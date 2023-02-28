@@ -2358,7 +2358,7 @@ Unexpected Error
 | name | string| `string` |  | | Human-readable name of the resource. |  |
 | pools | []uuid (formatted string)| `[]strfmt.UUID` |  | |  |  |
 | project_id | string| `string` |  | | The ID of the project owning this resource. | `fa84c217f361441986a220edf9b1e337` |
-| provider | string| `string` |  | | Supported provider drivers | `akamai` |
+| provider | string| `string` | ✓ | | Supported provider drivers | `akamai` |
 | provisioning_status | string| `string` |  | |  |  |
 | record_type | string| `string` |  | `"A"`| DNS Record type to use. |  |
 | status | string| `string` |  | |  |  |
