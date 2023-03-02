@@ -39,7 +39,7 @@ type PoolController struct {
 	sv micro.Service
 }
 
-//GetPools GET /pools
+// GetPools GET /pools
 func (c PoolController) GetPools(params pools.GetPoolsParams) middleware.Responder {
 	pagination := db.NewPagination("pool", params.Limit, params.Marker, params.Sort, params.PageReverse)
 	rows, err := pagination.Query(c.db, params.HTTPRequest, nil)
@@ -67,6 +67,9 @@ func (c PoolController) GetPools(params pools.GetPoolsParams) middleware.Respond
 		if err := PopulatePoolMembers(c.db, &pool); err != nil {
 			panic(err)
 		}
+		if err := PopulatePoolMonitors(c.db, &pool); err != nil {
+			panic(err)
+		}
 		_pools = append(_pools, &pool)
 	}
 	_links := pagination.GetLinks(_pools, params.HTTPRequest)
@@ -74,7 +77,7 @@ func (c PoolController) GetPools(params pools.GetPoolsParams) middleware.Respond
 	return pools.NewGetPoolsOK().WithPayload(&payload)
 }
 
-//PostPools POST /pools
+// PostPools POST /pools
 func (c PoolController) PostPools(params pools.PostPoolsParams) middleware.Responder {
 	pool := params.Pool.Pool
 	projectID, err := auth.ProjectScopeForRequest(params.HTTPRequest)
@@ -121,7 +124,7 @@ func (c PoolController) PostPools(params pools.PostPoolsParams) middleware.Respo
 	return pools.NewPostPoolsCreated().WithPayload(&pools.PostPoolsCreatedBody{Pool: pool})
 }
 
-//GetPoolsPoolID GET /pools/:id
+// GetPoolsPoolID GET /pools/:id
 func (c PoolController) GetPoolsPoolID(params pools.GetPoolsPoolIDParams) middleware.Responder {
 	//zero-length slice used because we want [] via json encoder, nil encodes null
 	pool := models.Pool{ID: params.PoolID, Members: []strfmt.UUID{}, Domains: []strfmt.UUID{}}
@@ -135,7 +138,7 @@ func (c PoolController) GetPoolsPoolID(params pools.GetPoolsPoolIDParams) middle
 	return pools.NewGetPoolsPoolIDOK().WithPayload(&pools.GetPoolsPoolIDOKBody{Pool: &pool})
 }
 
-//PutPoolsPoolID PUT /pools/:id
+// PutPoolsPoolID PUT /pools/:id
 func (c PoolController) PutPoolsPoolID(params pools.PutPoolsPoolIDParams) middleware.Responder {
 	//zero-length slice used because we want [] via json encoder, nil encodes null
 	pool := models.Pool{ID: params.PoolID, Members: []strfmt.UUID{}, Domains: []strfmt.UUID{}}
@@ -166,7 +169,7 @@ func (c PoolController) PutPoolsPoolID(params pools.PutPoolsPoolIDParams) middle
 	return pools.NewPutPoolsPoolIDAccepted().WithPayload(&pools.PutPoolsPoolIDAcceptedBody{Pool: &pool})
 }
 
-//DeletePoolsPoolID DELETE /pools/:id
+// DeletePoolsPoolID DELETE /pools/:id
 func (c PoolController) DeletePoolsPoolID(params pools.DeletePoolsPoolIDParams) middleware.Responder {
 	//zero-length slice used because we want [] via json encoder, nil encodes null
 	pool := models.Pool{ID: params.PoolID, Members: []strfmt.UUID{}, Domains: []strfmt.UUID{}}
@@ -185,7 +188,7 @@ func (c PoolController) DeletePoolsPoolID(params pools.DeletePoolsPoolIDParams) 
 	return pools.NewDeletePoolsPoolIDNoContent()
 }
 
-//PopulatePoolMembers populates a pool instance with associated members
+// PopulatePoolMembers populates a pool instance with associated members
 func PopulatePoolMembers(db *sqlx.DB, pool *models.Pool) error {
 	// Get datacenter_id's associated
 	sql := db.Rebind(`SELECT id FROM member WHERE pool_id = ?`)
@@ -195,7 +198,7 @@ func PopulatePoolMembers(db *sqlx.DB, pool *models.Pool) error {
 	return nil
 }
 
-//PopulatePoolDomains populates a pool instance with associated domains
+// PopulatePoolDomains populates a pool instance with associated domains
 func PopulatePoolDomains(db *sqlx.DB, pool *models.Pool) error {
 	//Get domain_id's associated
 	sql := db.Rebind(`SELECT domain_id FROM domain_pool_relation WHERE pool_id = ?`)
@@ -206,7 +209,7 @@ func PopulatePoolDomains(db *sqlx.DB, pool *models.Pool) error {
 	return nil
 }
 
-//PopulatePoolMonitors populates a pool instance with associated monitors
+// PopulatePoolMonitors populates a pool instance with associated monitors
 func PopulatePoolMonitors(db *sqlx.DB, pool *models.Pool) error {
 	//Get domain_id's associated
 	sql := db.Rebind(`SELECT id FROM monitor WHERE pool_id = ?`)
@@ -217,7 +220,7 @@ func PopulatePoolMonitors(db *sqlx.DB, pool *models.Pool) error {
 	return nil
 }
 
-//PopulatePool populates attributes of a pool instance based on it's ID
+// PopulatePool populates attributes of a pool instance based on it's ID
 func PopulatePool(db *sqlx.DB, pool *models.Pool, fields []string, fullyPopulate bool) error {
 	//Get pool
 	sql := db.Rebind(fmt.Sprintf(`SELECT %s FROM pool WHERE id = ?`, strings.Join(fields, ", ")))

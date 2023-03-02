@@ -186,7 +186,7 @@ func (c MonitorController) PutMonitorsMonitorID(params monitors.PutMonitorsMonit
 // DeleteMonitorsMonitorID DELETE /monitors/:id
 func (c MonitorController) DeleteMonitorsMonitorID(params monitors.DeleteMonitorsMonitorIDParams) middleware.Responder {
 	monitor := models.Monitor{ID: params.MonitorID}
-	if err := PopulateMonitor(c.db, &monitor, []string{"project_id"}); err != nil {
+	if err := PopulateMonitor(c.db, &monitor, []string{"project_id", "pool_id"}); err != nil {
 		return monitors.NewDeleteMonitorsMonitorIDNotFound().WithPayload(utils.NotFound)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *monitor.ProjectID) {

@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"net/http"
 	"reflect"
+	"regexp"
 	"strings"
 
 	"github.com/go-openapi/strfmt"
@@ -57,6 +58,7 @@ type Pagination struct {
 	sort *string
 
 	table string
+	r     *regexp.Regexp
 }
 
 func NewPagination(Table string, Limit *int64, Marker *strfmt.UUID, Sort *string, pageReverse *bool) *Pagination {
@@ -66,6 +68,7 @@ func NewPagination(Table string, Limit *int64, Marker *strfmt.UUID, Sort *string
 		sort:        Sort,
 		pageReverse: pageReverse,
 		table:       Table,
+		r:           regexp.MustCompile("^[a-z0-9_]+$"),
 	}
 }
 
@@ -74,7 +77,7 @@ func stripDesc(sortDirKey string) (string, bool) {
 	return sortKey, sortKey != sortDirKey
 }
 
-//Query pagination helper that also includes policy query filter
+// Query pagination helper that also includes policy query filter
 func (p *Pagination) Query(db *sqlx.DB, r *http.Request, filter []string) (*sqlx.Rows, error) {
 	var sortDirKeys []string
 	var whereClauses []string
@@ -124,6 +127,11 @@ func (p *Pagination) Query(db *sqlx.DB, r *http.Request, filter []string) (*sqlx
 	//always order to ensure stable result
 	orderBy += " ORDER BY "
 	for i, sortDirKey := range sortDirKeys {
+		// Input sanitation
+		if !p.r.MatchString(sortDirKey) {
+			continue
+		}
+
 		if sortKey, ok := stripDesc(sortDirKey); ok {
 			orderBy += fmt.Sprintf("%s DESC", sortKey)
 		} else {
@@ -136,7 +144,7 @@ func (p *Pagination) Query(db *sqlx.DB, r *http.Request, filter []string) (*sqlx
 	}
 
 	if !config.Global.ApiSettings.DisablePagination && p.marker != nil {
-		sql := fmt.Sprintf(`SELECT * FROM %s WHERE id=$1`, p.table)
+		sql := db.Rebind(fmt.Sprintf(`SELECT * FROM %s WHERE id=?`, p.table))
 		rows, err := db.Queryx(sql, p.marker)
 		if err != nil {
 			return nil, err
