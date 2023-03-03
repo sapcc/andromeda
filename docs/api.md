@@ -92,11 +92,11 @@ Administrative API
 
 | Method  | URI     | Name   | Summary |
 |---------|---------|--------|---------|
-| DELETE | /v1/pools/{pool_id}/members/{member_id} | [delete pools pool ID members member ID](#delete-pools-pool-id-members-member-id) | Delete a member |
-| GET | /v1/pools/{pool_id}/members | [get pools pool ID members](#get-pools-pool-id-members) | List members |
-| GET | /v1/pools/{pool_id}/members/{member_id} | [get pools pool ID members member ID](#get-pools-pool-id-members-member-id) | Show member detail |
-| POST | /v1/pools/{pool_id}/members | [post pools pool ID members](#post-pools-pool-id-members) | Create new member |
-| PUT | /v1/pools/{pool_id}/members/{member_id} | [put pools pool ID members member ID](#put-pools-pool-id-members-member-id) | Update a member |
+| DELETE | /v1/members/{member_id} | [delete members member ID](#delete-members-member-id) | Delete a member |
+| GET | /v1/members | [get members](#get-members) | List members |
+| GET | /v1/members/{member_id} | [get members member ID](#get-members-member-id) | Show member detail |
+| POST | /v1/members | [post members](#post-members) | Create new member |
+| PUT | /v1/members/{member_id} | [put members member ID](#put-members-member-id) | Update a member |
   
 
 
@@ -216,6 +216,51 @@ Unexpected Error
 
 [Error](#error)
 
+### <span id="delete-members-member-id"></span> Delete a member (*DeleteMembersMemberID*)
+
+```
+DELETE /v1/members/{member_id}
+```
+
+#### Parameters
+
+| Name | Source | Type | Go type | Separator | Required | Default | Description |
+|------|--------|------|---------|-----------| :------: |---------|-------------|
+| member_id | `path` | uuid (formatted string) | `strfmt.UUID` |  | ✓ |  | The UUID of the member |
+
+#### All responses
+| Code | Status | Description | Has headers | Schema |
+|------|--------|-------------|:-----------:|--------|
+| [204](#delete-members-member-id-204) | No Content | Resource successfully deleted. |  | [schema](#delete-members-member-id-204-schema) |
+| [404](#delete-members-member-id-404) | Not Found | Not Found |  | [schema](#delete-members-member-id-404-schema) |
+| [default](#delete-members-member-id-default) | | Unexpected Error |  | [schema](#delete-members-member-id-default-schema) |
+
+#### Responses
+
+
+##### <span id="delete-members-member-id-204"></span> 204 - Resource successfully deleted.
+Status: No Content
+
+###### <span id="delete-members-member-id-204-schema"></span> Schema
+
+##### <span id="delete-members-member-id-404"></span> 404 - Not Found
+Status: Not Found
+
+###### <span id="delete-members-member-id-404-schema"></span> Schema
+   
+  
+
+[Error](#error)
+
+##### <span id="delete-members-member-id-default"></span> Default Response
+Unexpected Error
+
+###### <span id="delete-members-member-id-default-schema"></span> Schema
+
+  
+
+[Error](#error)
+
 ### <span id="delete-monitors-monitor-id"></span> Delete a monitor (*DeleteMonitorsMonitorID*)
 
 ```
@@ -301,52 +346,6 @@ Status: Not Found
 Unexpected Error
 
 ###### <span id="delete-pools-pool-id-default-schema"></span> Schema
-
-  
-
-[Error](#error)
-
-### <span id="delete-pools-pool-id-members-member-id"></span> Delete a member (*DeletePoolsPoolIDMembersMemberID*)
-
-```
-DELETE /v1/pools/{pool_id}/members/{member_id}
-```
-
-#### Parameters
-
-| Name | Source | Type | Go type | Separator | Required | Default | Description |
-|------|--------|------|---------|-----------| :------: |---------|-------------|
-| member_id | `path` | uuid (formatted string) | `strfmt.UUID` |  | ✓ |  | The UUID of the member |
-| pool_id | `path` | uuid (formatted string) | `strfmt.UUID` |  | ✓ |  | The UUID of the pool |
-
-#### All responses
-| Code | Status | Description | Has headers | Schema |
-|------|--------|-------------|:-----------:|--------|
-| [204](#delete-pools-pool-id-members-member-id-204) | No Content | Resource successfully deleted. |  | [schema](#delete-pools-pool-id-members-member-id-204-schema) |
-| [404](#delete-pools-pool-id-members-member-id-404) | Not Found | Not Found |  | [schema](#delete-pools-pool-id-members-member-id-404-schema) |
-| [default](#delete-pools-pool-id-members-member-id-default) | | Unexpected Error |  | [schema](#delete-pools-pool-id-members-member-id-default-schema) |
-
-#### Responses
-
-
-##### <span id="delete-pools-pool-id-members-member-id-204"></span> 204 - Resource successfully deleted.
-Status: No Content
-
-###### <span id="delete-pools-pool-id-members-member-id-204-schema"></span> Schema
-
-##### <span id="delete-pools-pool-id-members-member-id-404"></span> 404 - Not Found
-Status: Not Found
-
-###### <span id="delete-pools-pool-id-members-member-id-404-schema"></span> Schema
-   
-  
-
-[Error](#error)
-
-##### <span id="delete-pools-pool-id-members-member-id-default"></span> Default Response
-Unexpected Error
-
-###### <span id="delete-pools-pool-id-members-member-id-default-schema"></span> Schema
 
   
 
@@ -669,6 +668,143 @@ Unexpected Error
 
 
 
+### <span id="get-members"></span> List members (*GetMembers*)
+
+```
+GET /v1/members
+```
+
+#### Parameters
+
+| Name | Source | Type | Go type | Separator | Required | Default | Description |
+|------|--------|------|---------|-----------| :------: |---------|-------------|
+| limit | `query` | integer | `int64` |  |  |  | Sets the page size. |
+| marker | `query` | uuid (formatted string) | `strfmt.UUID` |  |  |  | Pagination ID of the last item in the previous list. |
+| page_reverse | `query` | boolean | `bool` |  |  |  | Sets the page direction. |
+| pool_id | `query` | uuid (formatted string) | `strfmt.UUID` |  |  |  | Pool ID of the members to fetch |
+| sort | `query` | string | `string` |  |  |  | Comma-separated list of sort keys, optinally prefix with - to reverse sort order. |
+
+#### All responses
+| Code | Status | Description | Has headers | Schema |
+|------|--------|-------------|:-----------:|--------|
+| [200](#get-members-200) | OK | A JSON array of members |  | [schema](#get-members-200-schema) |
+| [400](#get-members-400) | Bad Request | Bad request |  | [schema](#get-members-400-schema) |
+| [default](#get-members-default) | | Unexpected Error |  | [schema](#get-members-default-schema) |
+
+#### Responses
+
+
+##### <span id="get-members-200"></span> 200 - A JSON array of members
+Status: OK
+
+###### <span id="get-members-200-schema"></span> Schema
+   
+  
+
+[GetMembersOKBody](#get-members-o-k-body)
+
+##### <span id="get-members-400"></span> 400 - Bad request
+Status: Bad Request
+
+###### <span id="get-members-400-schema"></span> Schema
+   
+  
+
+[Error](#error)
+
+##### <span id="get-members-default"></span> Default Response
+Unexpected Error
+
+###### <span id="get-members-default-schema"></span> Schema
+
+  
+
+[Error](#error)
+
+###### Inlined models
+
+**<span id="get-members-o-k-body"></span> GetMembersOKBody**
+
+
+  
+
+
+
+**Properties**
+
+| Name | Type | Go type | Required | Default | Description | Example |
+|------|------|---------|:--------:| ------- |-------------|---------|
+| links | [][Link](#link)| `[]*models.Link` |  | |  |  |
+| members | [][Member](#member)| `[]*models.Member` |  | |  |  |
+
+
+
+### <span id="get-members-member-id"></span> Show member detail (*GetMembersMemberID*)
+
+```
+GET /v1/members/{member_id}
+```
+
+#### Parameters
+
+| Name | Source | Type | Go type | Separator | Required | Default | Description |
+|------|--------|------|---------|-----------| :------: |---------|-------------|
+| member_id | `path` | uuid (formatted string) | `strfmt.UUID` |  | ✓ |  | The UUID of the member |
+
+#### All responses
+| Code | Status | Description | Has headers | Schema |
+|------|--------|-------------|:-----------:|--------|
+| [200](#get-members-member-id-200) | OK | Shows the details of a specific member. |  | [schema](#get-members-member-id-200-schema) |
+| [404](#get-members-member-id-404) | Not Found | Not Found |  | [schema](#get-members-member-id-404-schema) |
+| [default](#get-members-member-id-default) | | Unexpected Error |  | [schema](#get-members-member-id-default-schema) |
+
+#### Responses
+
+
+##### <span id="get-members-member-id-200"></span> 200 - Shows the details of a specific member.
+Status: OK
+
+###### <span id="get-members-member-id-200-schema"></span> Schema
+   
+  
+
+[GetMembersMemberIDOKBody](#get-members-member-id-o-k-body)
+
+##### <span id="get-members-member-id-404"></span> 404 - Not Found
+Status: Not Found
+
+###### <span id="get-members-member-id-404-schema"></span> Schema
+   
+  
+
+[Error](#error)
+
+##### <span id="get-members-member-id-default"></span> Default Response
+Unexpected Error
+
+###### <span id="get-members-member-id-default-schema"></span> Schema
+
+  
+
+[Error](#error)
+
+###### Inlined models
+
+**<span id="get-members-member-id-o-k-body"></span> GetMembersMemberIDOKBody**
+
+
+  
+
+
+
+**Properties**
+
+| Name | Type | Go type | Required | Default | Description | Example |
+|------|------|---------|:--------:| ------- |-------------|---------|
+| member | [Member](#member)| `models.Member` |  | |  |  |
+
+
+
 ### <span id="get-monitors"></span> List monitors (*GetMonitors*)
 
 ```
@@ -682,6 +818,7 @@ GET /v1/monitors
 | limit | `query` | integer | `int64` |  |  |  | Sets the page size. |
 | marker | `query` | uuid (formatted string) | `strfmt.UUID` |  |  |  | Pagination ID of the last item in the previous list. |
 | page_reverse | `query` | boolean | `bool` |  |  |  | Sets the page direction. |
+| pool_id | `query` | uuid (formatted string) | `strfmt.UUID` |  |  |  | Pool ID of the monitors to fetch |
 | sort | `query` | string | `string` |  |  |  | Comma-separated list of sort keys, optinally prefix with - to reverse sort order. |
 
 #### All responses
@@ -938,144 +1075,6 @@ Unexpected Error
 | Name | Type | Go type | Required | Default | Description | Example |
 |------|------|---------|:--------:| ------- |-------------|---------|
 | pool | [Pool](#pool)| `models.Pool` |  | |  |  |
-
-
-
-### <span id="get-pools-pool-id-members"></span> List members (*GetPoolsPoolIDMembers*)
-
-```
-GET /v1/pools/{pool_id}/members
-```
-
-#### Parameters
-
-| Name | Source | Type | Go type | Separator | Required | Default | Description |
-|------|--------|------|---------|-----------| :------: |---------|-------------|
-| pool_id | `path` | uuid (formatted string) | `strfmt.UUID` |  | ✓ |  | The UUID of the pool |
-| limit | `query` | integer | `int64` |  |  |  | Sets the page size. |
-| marker | `query` | uuid (formatted string) | `strfmt.UUID` |  |  |  | Pagination ID of the last item in the previous list. |
-| page_reverse | `query` | boolean | `bool` |  |  |  | Sets the page direction. |
-| sort | `query` | string | `string` |  |  |  | Comma-separated list of sort keys, optinally prefix with - to reverse sort order. |
-
-#### All responses
-| Code | Status | Description | Has headers | Schema |
-|------|--------|-------------|:-----------:|--------|
-| [200](#get-pools-pool-id-members-200) | OK | A JSON array of members |  | [schema](#get-pools-pool-id-members-200-schema) |
-| [400](#get-pools-pool-id-members-400) | Bad Request | Bad request |  | [schema](#get-pools-pool-id-members-400-schema) |
-| [default](#get-pools-pool-id-members-default) | | Unexpected Error |  | [schema](#get-pools-pool-id-members-default-schema) |
-
-#### Responses
-
-
-##### <span id="get-pools-pool-id-members-200"></span> 200 - A JSON array of members
-Status: OK
-
-###### <span id="get-pools-pool-id-members-200-schema"></span> Schema
-   
-  
-
-[GetPoolsPoolIDMembersOKBody](#get-pools-pool-id-members-o-k-body)
-
-##### <span id="get-pools-pool-id-members-400"></span> 400 - Bad request
-Status: Bad Request
-
-###### <span id="get-pools-pool-id-members-400-schema"></span> Schema
-   
-  
-
-[Error](#error)
-
-##### <span id="get-pools-pool-id-members-default"></span> Default Response
-Unexpected Error
-
-###### <span id="get-pools-pool-id-members-default-schema"></span> Schema
-
-  
-
-[Error](#error)
-
-###### Inlined models
-
-**<span id="get-pools-pool-id-members-o-k-body"></span> GetPoolsPoolIDMembersOKBody**
-
-
-  
-
-
-
-**Properties**
-
-| Name | Type | Go type | Required | Default | Description | Example |
-|------|------|---------|:--------:| ------- |-------------|---------|
-| links | [][Link](#link)| `[]*models.Link` |  | |  |  |
-| members | [][Member](#member)| `[]*models.Member` |  | |  |  |
-
-
-
-### <span id="get-pools-pool-id-members-member-id"></span> Show member detail (*GetPoolsPoolIDMembersMemberID*)
-
-```
-GET /v1/pools/{pool_id}/members/{member_id}
-```
-
-#### Parameters
-
-| Name | Source | Type | Go type | Separator | Required | Default | Description |
-|------|--------|------|---------|-----------| :------: |---------|-------------|
-| member_id | `path` | uuid (formatted string) | `strfmt.UUID` |  | ✓ |  | The UUID of the member |
-| pool_id | `path` | uuid (formatted string) | `strfmt.UUID` |  | ✓ |  | The UUID of the pool |
-
-#### All responses
-| Code | Status | Description | Has headers | Schema |
-|------|--------|-------------|:-----------:|--------|
-| [200](#get-pools-pool-id-members-member-id-200) | OK | Shows the details of a specific member. |  | [schema](#get-pools-pool-id-members-member-id-200-schema) |
-| [404](#get-pools-pool-id-members-member-id-404) | Not Found | Not Found |  | [schema](#get-pools-pool-id-members-member-id-404-schema) |
-| [default](#get-pools-pool-id-members-member-id-default) | | Unexpected Error |  | [schema](#get-pools-pool-id-members-member-id-default-schema) |
-
-#### Responses
-
-
-##### <span id="get-pools-pool-id-members-member-id-200"></span> 200 - Shows the details of a specific member.
-Status: OK
-
-###### <span id="get-pools-pool-id-members-member-id-200-schema"></span> Schema
-   
-  
-
-[GetPoolsPoolIDMembersMemberIDOKBody](#get-pools-pool-id-members-member-id-o-k-body)
-
-##### <span id="get-pools-pool-id-members-member-id-404"></span> 404 - Not Found
-Status: Not Found
-
-###### <span id="get-pools-pool-id-members-member-id-404-schema"></span> Schema
-   
-  
-
-[Error](#error)
-
-##### <span id="get-pools-pool-id-members-member-id-default"></span> Default Response
-Unexpected Error
-
-###### <span id="get-pools-pool-id-members-member-id-default-schema"></span> Schema
-
-  
-
-[Error](#error)
-
-###### Inlined models
-
-**<span id="get-pools-pool-id-members-member-id-o-k-body"></span> GetPoolsPoolIDMembersMemberIDOKBody**
-
-
-  
-
-
-
-**Properties**
-
-| Name | Type | Go type | Required | Default | Description | Example |
-|------|------|---------|:--------:| ------- |-------------|---------|
-| member | [Member](#member)| `models.Member` |  | |  |  |
 
 
 
@@ -1483,6 +1482,97 @@ Unexpected Error
 
 
 
+### <span id="post-members"></span> Create new member (*PostMembers*)
+
+```
+POST /v1/members
+```
+
+#### Parameters
+
+| Name | Source | Type | Go type | Separator | Required | Default | Description |
+|------|--------|------|---------|-----------| :------: |---------|-------------|
+| member | `body` | [PostMembersBody](#post-members-body) | `PostMembersBody` | | ✓ | |  |
+
+#### All responses
+| Code | Status | Description | Has headers | Schema |
+|------|--------|-------------|:-----------:|--------|
+| [201](#post-members-201) | Created | Created member. |  | [schema](#post-members-201-schema) |
+| [400](#post-members-400) | Bad Request | Bad request |  | [schema](#post-members-400-schema) |
+| [404](#post-members-404) | Not Found | Not Found |  | [schema](#post-members-404-schema) |
+| [default](#post-members-default) | | Unexpected Error |  | [schema](#post-members-default-schema) |
+
+#### Responses
+
+
+##### <span id="post-members-201"></span> 201 - Created member.
+Status: Created
+
+###### <span id="post-members-201-schema"></span> Schema
+   
+  
+
+[PostMembersCreatedBody](#post-members-created-body)
+
+##### <span id="post-members-400"></span> 400 - Bad request
+Status: Bad Request
+
+###### <span id="post-members-400-schema"></span> Schema
+   
+  
+
+[Error](#error)
+
+##### <span id="post-members-404"></span> 404 - Not Found
+Status: Not Found
+
+###### <span id="post-members-404-schema"></span> Schema
+   
+  
+
+[Error](#error)
+
+##### <span id="post-members-default"></span> Default Response
+Unexpected Error
+
+###### <span id="post-members-default-schema"></span> Schema
+
+  
+
+[Error](#error)
+
+###### Inlined models
+
+**<span id="post-members-body"></span> PostMembersBody**
+
+
+  
+
+
+
+**Properties**
+
+| Name | Type | Go type | Required | Default | Description | Example |
+|------|------|---------|:--------:| ------- |-------------|---------|
+| member | [Member](#member)| `models.Member` | ✓ | |  |  |
+
+
+
+**<span id="post-members-created-body"></span> PostMembersCreatedBody**
+
+
+  
+
+
+
+**Properties**
+
+| Name | Type | Go type | Required | Default | Description | Example |
+|------|------|---------|:--------:| ------- |-------------|---------|
+| member | [Member](#member)| `models.Member` |  | |  |  |
+
+
+
 ### <span id="post-monitors"></span> Create new monitor (*PostMonitors*)
 
 ```
@@ -1652,98 +1742,6 @@ Unexpected Error
 | Name | Type | Go type | Required | Default | Description | Example |
 |------|------|---------|:--------:| ------- |-------------|---------|
 | pool | [Pool](#pool)| `models.Pool` |  | |  |  |
-
-
-
-### <span id="post-pools-pool-id-members"></span> Create new member (*PostPoolsPoolIDMembers*)
-
-```
-POST /v1/pools/{pool_id}/members
-```
-
-#### Parameters
-
-| Name | Source | Type | Go type | Separator | Required | Default | Description |
-|------|--------|------|---------|-----------| :------: |---------|-------------|
-| pool_id | `path` | uuid (formatted string) | `strfmt.UUID` |  | ✓ |  | The UUID of the pool |
-| member | `body` | [PostPoolsPoolIDMembersBody](#post-pools-pool-id-members-body) | `PostPoolsPoolIDMembersBody` | | ✓ | |  |
-
-#### All responses
-| Code | Status | Description | Has headers | Schema |
-|------|--------|-------------|:-----------:|--------|
-| [201](#post-pools-pool-id-members-201) | Created | Created member. |  | [schema](#post-pools-pool-id-members-201-schema) |
-| [400](#post-pools-pool-id-members-400) | Bad Request | Bad request |  | [schema](#post-pools-pool-id-members-400-schema) |
-| [404](#post-pools-pool-id-members-404) | Not Found | Not Found |  | [schema](#post-pools-pool-id-members-404-schema) |
-| [default](#post-pools-pool-id-members-default) | | Unexpected Error |  | [schema](#post-pools-pool-id-members-default-schema) |
-
-#### Responses
-
-
-##### <span id="post-pools-pool-id-members-201"></span> 201 - Created member.
-Status: Created
-
-###### <span id="post-pools-pool-id-members-201-schema"></span> Schema
-   
-  
-
-[PostPoolsPoolIDMembersCreatedBody](#post-pools-pool-id-members-created-body)
-
-##### <span id="post-pools-pool-id-members-400"></span> 400 - Bad request
-Status: Bad Request
-
-###### <span id="post-pools-pool-id-members-400-schema"></span> Schema
-   
-  
-
-[Error](#error)
-
-##### <span id="post-pools-pool-id-members-404"></span> 404 - Not Found
-Status: Not Found
-
-###### <span id="post-pools-pool-id-members-404-schema"></span> Schema
-   
-  
-
-[Error](#error)
-
-##### <span id="post-pools-pool-id-members-default"></span> Default Response
-Unexpected Error
-
-###### <span id="post-pools-pool-id-members-default-schema"></span> Schema
-
-  
-
-[Error](#error)
-
-###### Inlined models
-
-**<span id="post-pools-pool-id-members-body"></span> PostPoolsPoolIDMembersBody**
-
-
-  
-
-
-
-**Properties**
-
-| Name | Type | Go type | Required | Default | Description | Example |
-|------|------|---------|:--------:| ------- |-------------|---------|
-| member | [Member](#member)| `models.Member` | ✓ | |  |  |
-
-
-
-**<span id="post-pools-pool-id-members-created-body"></span> PostPoolsPoolIDMembersCreatedBody**
-
-
-  
-
-
-
-**Properties**
-
-| Name | Type | Go type | Required | Default | Description | Example |
-|------|------|---------|:--------:| ------- |-------------|---------|
-| member | [Member](#member)| `models.Member` |  | |  |  |
 
 
 
@@ -1973,6 +1971,88 @@ Unexpected Error
 
 
 
+### <span id="put-members-member-id"></span> Update a member (*PutMembersMemberID*)
+
+```
+PUT /v1/members/{member_id}
+```
+
+#### Parameters
+
+| Name | Source | Type | Go type | Separator | Required | Default | Description |
+|------|--------|------|---------|-----------| :------: |---------|-------------|
+| member_id | `path` | uuid (formatted string) | `strfmt.UUID` |  | ✓ |  | The UUID of the member |
+| member | `body` | [PutMembersMemberIDBody](#put-members-member-id-body) | `PutMembersMemberIDBody` | | ✓ | |  |
+
+#### All responses
+| Code | Status | Description | Has headers | Schema |
+|------|--------|-------------|:-----------:|--------|
+| [202](#put-members-member-id-202) | Accepted | Updated member. |  | [schema](#put-members-member-id-202-schema) |
+| [404](#put-members-member-id-404) | Not Found | Not Found |  | [schema](#put-members-member-id-404-schema) |
+| [default](#put-members-member-id-default) | | Unexpected Error |  | [schema](#put-members-member-id-default-schema) |
+
+#### Responses
+
+
+##### <span id="put-members-member-id-202"></span> 202 - Updated member.
+Status: Accepted
+
+###### <span id="put-members-member-id-202-schema"></span> Schema
+   
+  
+
+[PutMembersMemberIDAcceptedBody](#put-members-member-id-accepted-body)
+
+##### <span id="put-members-member-id-404"></span> 404 - Not Found
+Status: Not Found
+
+###### <span id="put-members-member-id-404-schema"></span> Schema
+   
+  
+
+[Error](#error)
+
+##### <span id="put-members-member-id-default"></span> Default Response
+Unexpected Error
+
+###### <span id="put-members-member-id-default-schema"></span> Schema
+
+  
+
+[Error](#error)
+
+###### Inlined models
+
+**<span id="put-members-member-id-accepted-body"></span> PutMembersMemberIDAcceptedBody**
+
+
+  
+
+
+
+**Properties**
+
+| Name | Type | Go type | Required | Default | Description | Example |
+|------|------|---------|:--------:| ------- |-------------|---------|
+| member | [Member](#member)| `models.Member` |  | |  |  |
+
+
+
+**<span id="put-members-member-id-body"></span> PutMembersMemberIDBody**
+
+
+  
+
+
+
+**Properties**
+
+| Name | Type | Go type | Required | Default | Description | Example |
+|------|------|---------|:--------:| ------- |-------------|---------|
+| member | [Member](#member)| `models.Member` | ✓ | |  |  |
+
+
+
 ### <span id="put-monitors-monitor-id"></span> Update a monitor (*PutMonitorsMonitorID*)
 
 ```
@@ -2144,89 +2224,6 @@ Unexpected Error
 | Name | Type | Go type | Required | Default | Description | Example |
 |------|------|---------|:--------:| ------- |-------------|---------|
 | pool | [Pool](#pool)| `models.Pool` | ✓ | |  |  |
-
-
-
-### <span id="put-pools-pool-id-members-member-id"></span> Update a member (*PutPoolsPoolIDMembersMemberID*)
-
-```
-PUT /v1/pools/{pool_id}/members/{member_id}
-```
-
-#### Parameters
-
-| Name | Source | Type | Go type | Separator | Required | Default | Description |
-|------|--------|------|---------|-----------| :------: |---------|-------------|
-| member_id | `path` | uuid (formatted string) | `strfmt.UUID` |  | ✓ |  | The UUID of the member |
-| pool_id | `path` | uuid (formatted string) | `strfmt.UUID` |  | ✓ |  | The UUID of the pool |
-| member | `body` | [PutPoolsPoolIDMembersMemberIDBody](#put-pools-pool-id-members-member-id-body) | `PutPoolsPoolIDMembersMemberIDBody` | | ✓ | |  |
-
-#### All responses
-| Code | Status | Description | Has headers | Schema |
-|------|--------|-------------|:-----------:|--------|
-| [202](#put-pools-pool-id-members-member-id-202) | Accepted | Updated member. |  | [schema](#put-pools-pool-id-members-member-id-202-schema) |
-| [404](#put-pools-pool-id-members-member-id-404) | Not Found | Not Found |  | [schema](#put-pools-pool-id-members-member-id-404-schema) |
-| [default](#put-pools-pool-id-members-member-id-default) | | Unexpected Error |  | [schema](#put-pools-pool-id-members-member-id-default-schema) |
-
-#### Responses
-
-
-##### <span id="put-pools-pool-id-members-member-id-202"></span> 202 - Updated member.
-Status: Accepted
-
-###### <span id="put-pools-pool-id-members-member-id-202-schema"></span> Schema
-   
-  
-
-[PutPoolsPoolIDMembersMemberIDAcceptedBody](#put-pools-pool-id-members-member-id-accepted-body)
-
-##### <span id="put-pools-pool-id-members-member-id-404"></span> 404 - Not Found
-Status: Not Found
-
-###### <span id="put-pools-pool-id-members-member-id-404-schema"></span> Schema
-   
-  
-
-[Error](#error)
-
-##### <span id="put-pools-pool-id-members-member-id-default"></span> Default Response
-Unexpected Error
-
-###### <span id="put-pools-pool-id-members-member-id-default-schema"></span> Schema
-
-  
-
-[Error](#error)
-
-###### Inlined models
-
-**<span id="put-pools-pool-id-members-member-id-accepted-body"></span> PutPoolsPoolIDMembersMemberIDAcceptedBody**
-
-
-  
-
-
-
-**Properties**
-
-| Name | Type | Go type | Required | Default | Description | Example |
-|------|------|---------|:--------:| ------- |-------------|---------|
-| member | [Member](#member)| `models.Member` |  | |  |  |
-
-
-
-**<span id="put-pools-pool-id-members-member-id-body"></span> PutPoolsPoolIDMembersMemberIDBody**
-
-
-  
-
-
-
-**Properties**
-
-| Name | Type | Go type | Required | Default | Description | Example |
-|------|------|---------|:--------:| ------- |-------------|---------|
-| member | [Member](#member)| `models.Member` | ✓ | |  |  |
 
 
 
@@ -2415,7 +2412,7 @@ Unexpected Error
 | datacenter_id | uuid (formatted string)| `strfmt.UUID` |  | | Datacenter assigned for this member. |  |
 | id | uuid (formatted string)| `strfmt.UUID` |  | | The id of the resource. |  |
 | name | string| `string` |  | | Human-readable name of the resource. |  |
-| pool_id | uuid (formatted string)| `strfmt.UUID` |  | | pool id. |  |
+| pool_id | uuid (formatted string)| `strfmt.UUID` | ✓ | | pool id. |  |
 | port | integer| `int64` | ✓ | | Port to use for monitor checks. | `80` |
 | project_id | string| `string` |  | | The ID of the project owning this resource. | `fa84c217f361441986a220edf9b1e337` |
 | provisioning_status | string| `string` |  | |  |  |
