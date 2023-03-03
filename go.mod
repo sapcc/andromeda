@@ -41,7 +41,7 @@ require (
 	github.com/mcuadros/go-defaults v1.2.0
 	github.com/rs/cors v1.8.3
 	github.com/sapcc/go-api-declarations v1.4.3
-	github.com/sapcc/go-bits v0.0.0-20230224132913-e0c607476181
+	github.com/sapcc/go-bits v0.0.0-20230303130505-59fda5b7664e
 	github.com/scottdware/go-bigip v0.0.0-20220517145708-9fe3e2f9f005
 	github.com/stretchr/testify v1.8.2
 	github.com/urfave/cli/v2 v2.24.4
