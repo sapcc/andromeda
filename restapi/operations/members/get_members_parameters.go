@@ -30,19 +30,19 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// NewGetPoolsPoolIDMembersParams creates a new GetPoolsPoolIDMembersParams object
+// NewGetMembersParams creates a new GetMembersParams object
 //
 // There are no default values defined in the spec.
-func NewGetPoolsPoolIDMembersParams() GetPoolsPoolIDMembersParams {
+func NewGetMembersParams() GetMembersParams {
 
-	return GetPoolsPoolIDMembersParams{}
+	return GetMembersParams{}
 }
 
-// GetPoolsPoolIDMembersParams contains all the bound params for the get pools pool ID members operation
+// GetMembersParams contains all the bound params for the get members operation
 // typically these are obtained from a http.Request
 //
-// swagger:parameters GetPoolsPoolIDMembers
-type GetPoolsPoolIDMembersParams struct {
+// swagger:parameters GetMembers
+type GetMembersParams struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
@@ -59,11 +59,10 @@ type GetPoolsPoolIDMembersParams struct {
 	  In: query
 	*/
 	PageReverse *bool
-	/*The UUID of the pool
-	  Required: true
-	  In: path
+	/*Pool ID of the members to fetch
+	  In: query
 	*/
-	PoolID strfmt.UUID
+	PoolID *strfmt.UUID
 	/*Comma-separated list of sort keys, optinally prefix with - to reverse sort order.
 	  In: query
 	*/
@@ -73,8 +72,8 @@ type GetPoolsPoolIDMembersParams struct {
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
 // for simple values it will use straight method calls.
 //
-// To ensure default values, the struct must have been initialized with NewGetPoolsPoolIDMembersParams() beforehand.
-func (o *GetPoolsPoolIDMembersParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+// To ensure default values, the struct must have been initialized with NewGetMembersParams() beforehand.
+func (o *GetMembersParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
 	var res []error
 
 	o.HTTPRequest = r
@@ -96,8 +95,8 @@ func (o *GetPoolsPoolIDMembersParams) BindRequest(r *http.Request, route *middle
 		res = append(res, err)
 	}
 
-	rPoolID, rhkPoolID, _ := route.Params.GetOK("pool_id")
-	if err := o.bindPoolID(rPoolID, rhkPoolID, route.Formats); err != nil {
+	qPoolID, qhkPoolID, _ := qs.GetOK("pool_id")
+	if err := o.bindPoolID(qPoolID, qhkPoolID, route.Formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -112,7 +111,7 @@ func (o *GetPoolsPoolIDMembersParams) BindRequest(r *http.Request, route *middle
 }
 
 // bindLimit binds and validates parameter Limit from query.
-func (o *GetPoolsPoolIDMembersParams) bindLimit(rawData []string, hasKey bool, formats strfmt.Registry) error {
+func (o *GetMembersParams) bindLimit(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
@@ -135,7 +134,7 @@ func (o *GetPoolsPoolIDMembersParams) bindLimit(rawData []string, hasKey bool, f
 }
 
 // bindMarker binds and validates parameter Marker from query.
-func (o *GetPoolsPoolIDMembersParams) bindMarker(rawData []string, hasKey bool, formats strfmt.Registry) error {
+func (o *GetMembersParams) bindMarker(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
@@ -163,7 +162,7 @@ func (o *GetPoolsPoolIDMembersParams) bindMarker(rawData []string, hasKey bool, 
 }
 
 // validateMarker carries on validations for parameter Marker
-func (o *GetPoolsPoolIDMembersParams) validateMarker(formats strfmt.Registry) error {
+func (o *GetMembersParams) validateMarker(formats strfmt.Registry) error {
 
 	if err := validate.FormatOf("marker", "query", "uuid", o.Marker.String(), formats); err != nil {
 		return err
@@ -172,7 +171,7 @@ func (o *GetPoolsPoolIDMembersParams) validateMarker(formats strfmt.Registry) er
 }
 
 // bindPageReverse binds and validates parameter PageReverse from query.
-func (o *GetPoolsPoolIDMembersParams) bindPageReverse(rawData []string, hasKey bool, formats strfmt.Registry) error {
+func (o *GetMembersParams) bindPageReverse(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
@@ -194,22 +193,26 @@ func (o *GetPoolsPoolIDMembersParams) bindPageReverse(rawData []string, hasKey b
 	return nil
 }
 
-// bindPoolID binds and validates parameter PoolID from path.
-func (o *GetPoolsPoolIDMembersParams) bindPoolID(rawData []string, hasKey bool, formats strfmt.Registry) error {
+// bindPoolID binds and validates parameter PoolID from query.
+func (o *GetMembersParams) bindPoolID(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
 	}
 
-	// Required: true
-	// Parameter is provided by construction from the route
+	// Required: false
+	// AllowEmptyValue: false
+
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
 
 	// Format: uuid
 	value, err := formats.Parse("uuid", raw)
 	if err != nil {
-		return errors.InvalidType("pool_id", "path", "strfmt.UUID", raw)
+		return errors.InvalidType("pool_id", "query", "strfmt.UUID", raw)
 	}
-	o.PoolID = *(value.(*strfmt.UUID))
+	o.PoolID = (value.(*strfmt.UUID))
 
 	if err := o.validatePoolID(formats); err != nil {
 		return err
@@ -219,16 +222,16 @@ func (o *GetPoolsPoolIDMembersParams) bindPoolID(rawData []string, hasKey bool, 
 }
 
 // validatePoolID carries on validations for parameter PoolID
-func (o *GetPoolsPoolIDMembersParams) validatePoolID(formats strfmt.Registry) error {
+func (o *GetMembersParams) validatePoolID(formats strfmt.Registry) error {
 
-	if err := validate.FormatOf("pool_id", "path", "uuid", o.PoolID.String(), formats); err != nil {
+	if err := validate.FormatOf("pool_id", "query", "uuid", o.PoolID.String(), formats); err != nil {
 		return err
 	}
 	return nil
 }
 
 // bindSort binds and validates parameter Sort from query.
-func (o *GetPoolsPoolIDMembersParams) bindSort(rawData []string, hasKey bool, formats strfmt.Registry) error {
+func (o *GetMembersParams) bindSort(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]

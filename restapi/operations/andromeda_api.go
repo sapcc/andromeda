@@ -69,14 +69,14 @@ func NewAndromedaAPI(spec *loads.Document) *AndromedaAPI {
 		DomainsDeleteDomainsDomainIDHandler: domains.DeleteDomainsDomainIDHandlerFunc(func(params domains.DeleteDomainsDomainIDParams) middleware.Responder {
 			return middleware.NotImplemented("operation domains.DeleteDomainsDomainID has not yet been implemented")
 		}),
+		MembersDeleteMembersMemberIDHandler: members.DeleteMembersMemberIDHandlerFunc(func(params members.DeleteMembersMemberIDParams) middleware.Responder {
+			return middleware.NotImplemented("operation members.DeleteMembersMemberID has not yet been implemented")
+		}),
 		MonitorsDeleteMonitorsMonitorIDHandler: monitors.DeleteMonitorsMonitorIDHandlerFunc(func(params monitors.DeleteMonitorsMonitorIDParams) middleware.Responder {
 			return middleware.NotImplemented("operation monitors.DeleteMonitorsMonitorID has not yet been implemented")
 		}),
 		PoolsDeletePoolsPoolIDHandler: pools.DeletePoolsPoolIDHandlerFunc(func(params pools.DeletePoolsPoolIDParams) middleware.Responder {
 			return middleware.NotImplemented("operation pools.DeletePoolsPoolID has not yet been implemented")
-		}),
-		MembersDeletePoolsPoolIDMembersMemberIDHandler: members.DeletePoolsPoolIDMembersMemberIDHandlerFunc(func(params members.DeletePoolsPoolIDMembersMemberIDParams) middleware.Responder {
-			return middleware.NotImplemented("operation members.DeletePoolsPoolIDMembersMemberID has not yet been implemented")
 		}),
 		AdministrativeDeleteQuotasProjectIDHandler: administrative.DeleteQuotasProjectIDHandlerFunc(func(params administrative.DeleteQuotasProjectIDParams) middleware.Responder {
 			return middleware.NotImplemented("operation administrative.DeleteQuotasProjectID has not yet been implemented")
@@ -93,6 +93,12 @@ func NewAndromedaAPI(spec *loads.Document) *AndromedaAPI {
 		DomainsGetDomainsDomainIDHandler: domains.GetDomainsDomainIDHandlerFunc(func(params domains.GetDomainsDomainIDParams) middleware.Responder {
 			return middleware.NotImplemented("operation domains.GetDomainsDomainID has not yet been implemented")
 		}),
+		MembersGetMembersHandler: members.GetMembersHandlerFunc(func(params members.GetMembersParams) middleware.Responder {
+			return middleware.NotImplemented("operation members.GetMembers has not yet been implemented")
+		}),
+		MembersGetMembersMemberIDHandler: members.GetMembersMemberIDHandlerFunc(func(params members.GetMembersMemberIDParams) middleware.Responder {
+			return middleware.NotImplemented("operation members.GetMembersMemberID has not yet been implemented")
+		}),
 		MonitorsGetMonitorsHandler: monitors.GetMonitorsHandlerFunc(func(params monitors.GetMonitorsParams) middleware.Responder {
 			return middleware.NotImplemented("operation monitors.GetMonitors has not yet been implemented")
 		}),
@@ -104,12 +110,6 @@ func NewAndromedaAPI(spec *loads.Document) *AndromedaAPI {
 		}),
 		PoolsGetPoolsPoolIDHandler: pools.GetPoolsPoolIDHandlerFunc(func(params pools.GetPoolsPoolIDParams) middleware.Responder {
 			return middleware.NotImplemented("operation pools.GetPoolsPoolID has not yet been implemented")
-		}),
-		MembersGetPoolsPoolIDMembersHandler: members.GetPoolsPoolIDMembersHandlerFunc(func(params members.GetPoolsPoolIDMembersParams) middleware.Responder {
-			return middleware.NotImplemented("operation members.GetPoolsPoolIDMembers has not yet been implemented")
-		}),
-		MembersGetPoolsPoolIDMembersMemberIDHandler: members.GetPoolsPoolIDMembersMemberIDHandlerFunc(func(params members.GetPoolsPoolIDMembersMemberIDParams) middleware.Responder {
-			return middleware.NotImplemented("operation members.GetPoolsPoolIDMembersMemberID has not yet been implemented")
 		}),
 		AdministrativeGetQuotasHandler: administrative.GetQuotasHandlerFunc(func(params administrative.GetQuotasParams) middleware.Responder {
 			return middleware.NotImplemented("operation administrative.GetQuotas has not yet been implemented")
@@ -129,14 +129,14 @@ func NewAndromedaAPI(spec *loads.Document) *AndromedaAPI {
 		DomainsPostDomainsHandler: domains.PostDomainsHandlerFunc(func(params domains.PostDomainsParams) middleware.Responder {
 			return middleware.NotImplemented("operation domains.PostDomains has not yet been implemented")
 		}),
+		MembersPostMembersHandler: members.PostMembersHandlerFunc(func(params members.PostMembersParams) middleware.Responder {
+			return middleware.NotImplemented("operation members.PostMembers has not yet been implemented")
+		}),
 		MonitorsPostMonitorsHandler: monitors.PostMonitorsHandlerFunc(func(params monitors.PostMonitorsParams) middleware.Responder {
 			return middleware.NotImplemented("operation monitors.PostMonitors has not yet been implemented")
 		}),
 		PoolsPostPoolsHandler: pools.PostPoolsHandlerFunc(func(params pools.PostPoolsParams) middleware.Responder {
 			return middleware.NotImplemented("operation pools.PostPools has not yet been implemented")
-		}),
-		MembersPostPoolsPoolIDMembersHandler: members.PostPoolsPoolIDMembersHandlerFunc(func(params members.PostPoolsPoolIDMembersParams) middleware.Responder {
-			return middleware.NotImplemented("operation members.PostPoolsPoolIDMembers has not yet been implemented")
 		}),
 		AdministrativePostSyncHandler: administrative.PostSyncHandlerFunc(func(params administrative.PostSyncParams) middleware.Responder {
 			return middleware.NotImplemented("operation administrative.PostSync has not yet been implemented")
@@ -147,14 +147,14 @@ func NewAndromedaAPI(spec *loads.Document) *AndromedaAPI {
 		DomainsPutDomainsDomainIDHandler: domains.PutDomainsDomainIDHandlerFunc(func(params domains.PutDomainsDomainIDParams) middleware.Responder {
 			return middleware.NotImplemented("operation domains.PutDomainsDomainID has not yet been implemented")
 		}),
+		MembersPutMembersMemberIDHandler: members.PutMembersMemberIDHandlerFunc(func(params members.PutMembersMemberIDParams) middleware.Responder {
+			return middleware.NotImplemented("operation members.PutMembersMemberID has not yet been implemented")
+		}),
 		MonitorsPutMonitorsMonitorIDHandler: monitors.PutMonitorsMonitorIDHandlerFunc(func(params monitors.PutMonitorsMonitorIDParams) middleware.Responder {
 			return middleware.NotImplemented("operation monitors.PutMonitorsMonitorID has not yet been implemented")
 		}),
 		PoolsPutPoolsPoolIDHandler: pools.PutPoolsPoolIDHandlerFunc(func(params pools.PutPoolsPoolIDParams) middleware.Responder {
 			return middleware.NotImplemented("operation pools.PutPoolsPoolID has not yet been implemented")
-		}),
-		MembersPutPoolsPoolIDMembersMemberIDHandler: members.PutPoolsPoolIDMembersMemberIDHandlerFunc(func(params members.PutPoolsPoolIDMembersMemberIDParams) middleware.Responder {
-			return middleware.NotImplemented("operation members.PutPoolsPoolIDMembersMemberID has not yet been implemented")
 		}),
 		AdministrativePutQuotasProjectIDHandler: administrative.PutQuotasProjectIDHandlerFunc(func(params administrative.PutQuotasProjectIDParams) middleware.Responder {
 			return middleware.NotImplemented("operation administrative.PutQuotasProjectID has not yet been implemented")
@@ -199,12 +199,12 @@ type AndromedaAPI struct {
 	DatacentersDeleteDatacentersDatacenterIDHandler datacenters.DeleteDatacentersDatacenterIDHandler
 	// DomainsDeleteDomainsDomainIDHandler sets the operation handler for the delete domains domain ID operation
 	DomainsDeleteDomainsDomainIDHandler domains.DeleteDomainsDomainIDHandler
+	// MembersDeleteMembersMemberIDHandler sets the operation handler for the delete members member ID operation
+	MembersDeleteMembersMemberIDHandler members.DeleteMembersMemberIDHandler
 	// MonitorsDeleteMonitorsMonitorIDHandler sets the operation handler for the delete monitors monitor ID operation
 	MonitorsDeleteMonitorsMonitorIDHandler monitors.DeleteMonitorsMonitorIDHandler
 	// PoolsDeletePoolsPoolIDHandler sets the operation handler for the delete pools pool ID operation
 	PoolsDeletePoolsPoolIDHandler pools.DeletePoolsPoolIDHandler
-	// MembersDeletePoolsPoolIDMembersMemberIDHandler sets the operation handler for the delete pools pool ID members member ID operation
-	MembersDeletePoolsPoolIDMembersMemberIDHandler members.DeletePoolsPoolIDMembersMemberIDHandler
 	// AdministrativeDeleteQuotasProjectIDHandler sets the operation handler for the delete quotas project ID operation
 	AdministrativeDeleteQuotasProjectIDHandler administrative.DeleteQuotasProjectIDHandler
 	// DatacentersGetDatacentersHandler sets the operation handler for the get datacenters operation
@@ -215,6 +215,10 @@ type AndromedaAPI struct {
 	DomainsGetDomainsHandler domains.GetDomainsHandler
 	// DomainsGetDomainsDomainIDHandler sets the operation handler for the get domains domain ID operation
 	DomainsGetDomainsDomainIDHandler domains.GetDomainsDomainIDHandler
+	// MembersGetMembersHandler sets the operation handler for the get members operation
+	MembersGetMembersHandler members.GetMembersHandler
+	// MembersGetMembersMemberIDHandler sets the operation handler for the get members member ID operation
+	MembersGetMembersMemberIDHandler members.GetMembersMemberIDHandler
 	// MonitorsGetMonitorsHandler sets the operation handler for the get monitors operation
 	MonitorsGetMonitorsHandler monitors.GetMonitorsHandler
 	// MonitorsGetMonitorsMonitorIDHandler sets the operation handler for the get monitors monitor ID operation
@@ -223,10 +227,6 @@ type AndromedaAPI struct {
 	PoolsGetPoolsHandler pools.GetPoolsHandler
 	// PoolsGetPoolsPoolIDHandler sets the operation handler for the get pools pool ID operation
 	PoolsGetPoolsPoolIDHandler pools.GetPoolsPoolIDHandler
-	// MembersGetPoolsPoolIDMembersHandler sets the operation handler for the get pools pool ID members operation
-	MembersGetPoolsPoolIDMembersHandler members.GetPoolsPoolIDMembersHandler
-	// MembersGetPoolsPoolIDMembersMemberIDHandler sets the operation handler for the get pools pool ID members member ID operation
-	MembersGetPoolsPoolIDMembersMemberIDHandler members.GetPoolsPoolIDMembersMemberIDHandler
 	// AdministrativeGetQuotasHandler sets the operation handler for the get quotas operation
 	AdministrativeGetQuotasHandler administrative.GetQuotasHandler
 	// AdministrativeGetQuotasDefaultsHandler sets the operation handler for the get quotas defaults operation
@@ -239,24 +239,24 @@ type AndromedaAPI struct {
 	DatacentersPostDatacentersHandler datacenters.PostDatacentersHandler
 	// DomainsPostDomainsHandler sets the operation handler for the post domains operation
 	DomainsPostDomainsHandler domains.PostDomainsHandler
+	// MembersPostMembersHandler sets the operation handler for the post members operation
+	MembersPostMembersHandler members.PostMembersHandler
 	// MonitorsPostMonitorsHandler sets the operation handler for the post monitors operation
 	MonitorsPostMonitorsHandler monitors.PostMonitorsHandler
 	// PoolsPostPoolsHandler sets the operation handler for the post pools operation
 	PoolsPostPoolsHandler pools.PostPoolsHandler
-	// MembersPostPoolsPoolIDMembersHandler sets the operation handler for the post pools pool ID members operation
-	MembersPostPoolsPoolIDMembersHandler members.PostPoolsPoolIDMembersHandler
 	// AdministrativePostSyncHandler sets the operation handler for the post sync operation
 	AdministrativePostSyncHandler administrative.PostSyncHandler
 	// DatacentersPutDatacentersDatacenterIDHandler sets the operation handler for the put datacenters datacenter ID operation
 	DatacentersPutDatacentersDatacenterIDHandler datacenters.PutDatacentersDatacenterIDHandler
 	// DomainsPutDomainsDomainIDHandler sets the operation handler for the put domains domain ID operation
 	DomainsPutDomainsDomainIDHandler domains.PutDomainsDomainIDHandler
+	// MembersPutMembersMemberIDHandler sets the operation handler for the put members member ID operation
+	MembersPutMembersMemberIDHandler members.PutMembersMemberIDHandler
 	// MonitorsPutMonitorsMonitorIDHandler sets the operation handler for the put monitors monitor ID operation
 	MonitorsPutMonitorsMonitorIDHandler monitors.PutMonitorsMonitorIDHandler
 	// PoolsPutPoolsPoolIDHandler sets the operation handler for the put pools pool ID operation
 	PoolsPutPoolsPoolIDHandler pools.PutPoolsPoolIDHandler
-	// MembersPutPoolsPoolIDMembersMemberIDHandler sets the operation handler for the put pools pool ID members member ID operation
-	MembersPutPoolsPoolIDMembersMemberIDHandler members.PutPoolsPoolIDMembersMemberIDHandler
 	// AdministrativePutQuotasProjectIDHandler sets the operation handler for the put quotas project ID operation
 	AdministrativePutQuotasProjectIDHandler administrative.PutQuotasProjectIDHandler
 
@@ -342,14 +342,14 @@ func (o *AndromedaAPI) Validate() error {
 	if o.DomainsDeleteDomainsDomainIDHandler == nil {
 		unregistered = append(unregistered, "domains.DeleteDomainsDomainIDHandler")
 	}
+	if o.MembersDeleteMembersMemberIDHandler == nil {
+		unregistered = append(unregistered, "members.DeleteMembersMemberIDHandler")
+	}
 	if o.MonitorsDeleteMonitorsMonitorIDHandler == nil {
 		unregistered = append(unregistered, "monitors.DeleteMonitorsMonitorIDHandler")
 	}
 	if o.PoolsDeletePoolsPoolIDHandler == nil {
 		unregistered = append(unregistered, "pools.DeletePoolsPoolIDHandler")
-	}
-	if o.MembersDeletePoolsPoolIDMembersMemberIDHandler == nil {
-		unregistered = append(unregistered, "members.DeletePoolsPoolIDMembersMemberIDHandler")
 	}
 	if o.AdministrativeDeleteQuotasProjectIDHandler == nil {
 		unregistered = append(unregistered, "administrative.DeleteQuotasProjectIDHandler")
@@ -366,6 +366,12 @@ func (o *AndromedaAPI) Validate() error {
 	if o.DomainsGetDomainsDomainIDHandler == nil {
 		unregistered = append(unregistered, "domains.GetDomainsDomainIDHandler")
 	}
+	if o.MembersGetMembersHandler == nil {
+		unregistered = append(unregistered, "members.GetMembersHandler")
+	}
+	if o.MembersGetMembersMemberIDHandler == nil {
+		unregistered = append(unregistered, "members.GetMembersMemberIDHandler")
+	}
 	if o.MonitorsGetMonitorsHandler == nil {
 		unregistered = append(unregistered, "monitors.GetMonitorsHandler")
 	}
@@ -377,12 +383,6 @@ func (o *AndromedaAPI) Validate() error {
 	}
 	if o.PoolsGetPoolsPoolIDHandler == nil {
 		unregistered = append(unregistered, "pools.GetPoolsPoolIDHandler")
-	}
-	if o.MembersGetPoolsPoolIDMembersHandler == nil {
-		unregistered = append(unregistered, "members.GetPoolsPoolIDMembersHandler")
-	}
-	if o.MembersGetPoolsPoolIDMembersMemberIDHandler == nil {
-		unregistered = append(unregistered, "members.GetPoolsPoolIDMembersMemberIDHandler")
 	}
 	if o.AdministrativeGetQuotasHandler == nil {
 		unregistered = append(unregistered, "administrative.GetQuotasHandler")
@@ -402,14 +402,14 @@ func (o *AndromedaAPI) Validate() error {
 	if o.DomainsPostDomainsHandler == nil {
 		unregistered = append(unregistered, "domains.PostDomainsHandler")
 	}
+	if o.MembersPostMembersHandler == nil {
+		unregistered = append(unregistered, "members.PostMembersHandler")
+	}
 	if o.MonitorsPostMonitorsHandler == nil {
 		unregistered = append(unregistered, "monitors.PostMonitorsHandler")
 	}
 	if o.PoolsPostPoolsHandler == nil {
 		unregistered = append(unregistered, "pools.PostPoolsHandler")
-	}
-	if o.MembersPostPoolsPoolIDMembersHandler == nil {
-		unregistered = append(unregistered, "members.PostPoolsPoolIDMembersHandler")
 	}
 	if o.AdministrativePostSyncHandler == nil {
 		unregistered = append(unregistered, "administrative.PostSyncHandler")
@@ -420,14 +420,14 @@ func (o *AndromedaAPI) Validate() error {
 	if o.DomainsPutDomainsDomainIDHandler == nil {
 		unregistered = append(unregistered, "domains.PutDomainsDomainIDHandler")
 	}
+	if o.MembersPutMembersMemberIDHandler == nil {
+		unregistered = append(unregistered, "members.PutMembersMemberIDHandler")
+	}
 	if o.MonitorsPutMonitorsMonitorIDHandler == nil {
 		unregistered = append(unregistered, "monitors.PutMonitorsMonitorIDHandler")
 	}
 	if o.PoolsPutPoolsPoolIDHandler == nil {
 		unregistered = append(unregistered, "pools.PutPoolsPoolIDHandler")
-	}
-	if o.MembersPutPoolsPoolIDMembersMemberIDHandler == nil {
-		unregistered = append(unregistered, "members.PutPoolsPoolIDMembersMemberIDHandler")
 	}
 	if o.AdministrativePutQuotasProjectIDHandler == nil {
 		unregistered = append(unregistered, "administrative.PutQuotasProjectIDHandler")
@@ -531,15 +531,15 @@ func (o *AndromedaAPI) initHandlerCache() {
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
+	o.handlers["DELETE"]["/members/{member_id}"] = members.NewDeleteMembersMemberID(o.context, o.MembersDeleteMembersMemberIDHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
 	o.handlers["DELETE"]["/monitors/{monitor_id}"] = monitors.NewDeleteMonitorsMonitorID(o.context, o.MonitorsDeleteMonitorsMonitorIDHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
 	o.handlers["DELETE"]["/pools/{pool_id}"] = pools.NewDeletePoolsPoolID(o.context, o.PoolsDeletePoolsPoolIDHandler)
-	if o.handlers["DELETE"] == nil {
-		o.handlers["DELETE"] = make(map[string]http.Handler)
-	}
-	o.handlers["DELETE"]["/pools/{pool_id}/members/{member_id}"] = members.NewDeletePoolsPoolIDMembersMemberID(o.context, o.MembersDeletePoolsPoolIDMembersMemberIDHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
@@ -563,6 +563,14 @@ func (o *AndromedaAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
+	o.handlers["GET"]["/members"] = members.NewGetMembers(o.context, o.MembersGetMembersHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/members/{member_id}"] = members.NewGetMembersMemberID(o.context, o.MembersGetMembersMemberIDHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
 	o.handlers["GET"]["/monitors"] = monitors.NewGetMonitors(o.context, o.MonitorsGetMonitorsHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
@@ -576,14 +584,6 @@ func (o *AndromedaAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/pools/{pool_id}"] = pools.NewGetPoolsPoolID(o.context, o.PoolsGetPoolsPoolIDHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/pools/{pool_id}/members"] = members.NewGetPoolsPoolIDMembers(o.context, o.MembersGetPoolsPoolIDMembersHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/pools/{pool_id}/members/{member_id}"] = members.NewGetPoolsPoolIDMembersMemberID(o.context, o.MembersGetPoolsPoolIDMembersMemberIDHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -611,15 +611,15 @@ func (o *AndromedaAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
+	o.handlers["POST"]["/members"] = members.NewPostMembers(o.context, o.MembersPostMembersHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
 	o.handlers["POST"]["/monitors"] = monitors.NewPostMonitors(o.context, o.MonitorsPostMonitorsHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/pools"] = pools.NewPostPools(o.context, o.PoolsPostPoolsHandler)
-	if o.handlers["POST"] == nil {
-		o.handlers["POST"] = make(map[string]http.Handler)
-	}
-	o.handlers["POST"]["/pools/{pool_id}/members"] = members.NewPostPoolsPoolIDMembers(o.context, o.MembersPostPoolsPoolIDMembersHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -635,15 +635,15 @@ func (o *AndromedaAPI) initHandlerCache() {
 	if o.handlers["PUT"] == nil {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}
+	o.handlers["PUT"]["/members/{member_id}"] = members.NewPutMembersMemberID(o.context, o.MembersPutMembersMemberIDHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
 	o.handlers["PUT"]["/monitors/{monitor_id}"] = monitors.NewPutMonitorsMonitorID(o.context, o.MonitorsPutMonitorsMonitorIDHandler)
 	if o.handlers["PUT"] == nil {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}
 	o.handlers["PUT"]["/pools/{pool_id}"] = pools.NewPutPoolsPoolID(o.context, o.PoolsPutPoolsPoolIDHandler)
-	if o.handlers["PUT"] == nil {
-		o.handlers["PUT"] = make(map[string]http.Handler)
-	}
-	o.handlers["PUT"]["/pools/{pool_id}/members/{member_id}"] = members.NewPutPoolsPoolIDMembersMemberID(o.context, o.MembersPutPoolsPoolIDMembersMemberIDHandler)
 	if o.handlers["PUT"] == nil {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}

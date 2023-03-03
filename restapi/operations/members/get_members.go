@@ -32,40 +32,40 @@ import (
 	"github.com/sapcc/andromeda/models"
 )
 
-// GetPoolsPoolIDMembersHandlerFunc turns a function with the right signature into a get pools pool ID members handler
-type GetPoolsPoolIDMembersHandlerFunc func(GetPoolsPoolIDMembersParams) middleware.Responder
+// GetMembersHandlerFunc turns a function with the right signature into a get members handler
+type GetMembersHandlerFunc func(GetMembersParams) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn GetPoolsPoolIDMembersHandlerFunc) Handle(params GetPoolsPoolIDMembersParams) middleware.Responder {
+func (fn GetMembersHandlerFunc) Handle(params GetMembersParams) middleware.Responder {
 	return fn(params)
 }
 
-// GetPoolsPoolIDMembersHandler interface for that can handle valid get pools pool ID members params
-type GetPoolsPoolIDMembersHandler interface {
-	Handle(GetPoolsPoolIDMembersParams) middleware.Responder
+// GetMembersHandler interface for that can handle valid get members params
+type GetMembersHandler interface {
+	Handle(GetMembersParams) middleware.Responder
 }
 
-// NewGetPoolsPoolIDMembers creates a new http.Handler for the get pools pool ID members operation
-func NewGetPoolsPoolIDMembers(ctx *middleware.Context, handler GetPoolsPoolIDMembersHandler) *GetPoolsPoolIDMembers {
-	return &GetPoolsPoolIDMembers{Context: ctx, Handler: handler}
+// NewGetMembers creates a new http.Handler for the get members operation
+func NewGetMembers(ctx *middleware.Context, handler GetMembersHandler) *GetMembers {
+	return &GetMembers{Context: ctx, Handler: handler}
 }
 
 /*
-	GetPoolsPoolIDMembers swagger:route GET /pools/{pool_id}/members Members getPoolsPoolIdMembers
+	GetMembers swagger:route GET /members Members getMembers
 
 List members
 */
-type GetPoolsPoolIDMembers struct {
+type GetMembers struct {
 	Context *middleware.Context
-	Handler GetPoolsPoolIDMembersHandler
+	Handler GetMembersHandler
 }
 
-func (o *GetPoolsPoolIDMembers) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+func (o *GetMembers) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
 		*r = *rCtx
 	}
-	var Params = NewGetPoolsPoolIDMembersParams()
+	var Params = NewGetMembersParams()
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
@@ -76,10 +76,10 @@ func (o *GetPoolsPoolIDMembers) ServeHTTP(rw http.ResponseWriter, r *http.Reques
 
 }
 
-// GetPoolsPoolIDMembersOKBody get pools pool ID members o k body
+// GetMembersOKBody get members o k body
 //
-// swagger:model GetPoolsPoolIDMembersOKBody
-type GetPoolsPoolIDMembersOKBody struct {
+// swagger:model GetMembersOKBody
+type GetMembersOKBody struct {
 
 	// links
 	Links []*models.Link `json:"links,omitempty"`
@@ -88,8 +88,8 @@ type GetPoolsPoolIDMembersOKBody struct {
 	Members []*models.Member `json:"members"`
 }
 
-// Validate validates this get pools pool ID members o k body
-func (o *GetPoolsPoolIDMembersOKBody) Validate(formats strfmt.Registry) error {
+// Validate validates this get members o k body
+func (o *GetMembersOKBody) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := o.validateLinks(formats); err != nil {
@@ -106,7 +106,7 @@ func (o *GetPoolsPoolIDMembersOKBody) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (o *GetPoolsPoolIDMembersOKBody) validateLinks(formats strfmt.Registry) error {
+func (o *GetMembersOKBody) validateLinks(formats strfmt.Registry) error {
 	if swag.IsZero(o.Links) { // not required
 		return nil
 	}
@@ -119,9 +119,9 @@ func (o *GetPoolsPoolIDMembersOKBody) validateLinks(formats strfmt.Registry) err
 		if o.Links[i] != nil {
 			if err := o.Links[i].Validate(formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("getPoolsPoolIdMembersOK" + "." + "links" + "." + strconv.Itoa(i))
+					return ve.ValidateName("getMembersOK" + "." + "links" + "." + strconv.Itoa(i))
 				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("getPoolsPoolIdMembersOK" + "." + "links" + "." + strconv.Itoa(i))
+					return ce.ValidateName("getMembersOK" + "." + "links" + "." + strconv.Itoa(i))
 				}
 				return err
 			}
@@ -132,7 +132,7 @@ func (o *GetPoolsPoolIDMembersOKBody) validateLinks(formats strfmt.Registry) err
 	return nil
 }
 
-func (o *GetPoolsPoolIDMembersOKBody) validateMembers(formats strfmt.Registry) error {
+func (o *GetMembersOKBody) validateMembers(formats strfmt.Registry) error {
 	if swag.IsZero(o.Members) { // not required
 		return nil
 	}
@@ -145,9 +145,9 @@ func (o *GetPoolsPoolIDMembersOKBody) validateMembers(formats strfmt.Registry) e
 		if o.Members[i] != nil {
 			if err := o.Members[i].Validate(formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("getPoolsPoolIdMembersOK" + "." + "members" + "." + strconv.Itoa(i))
+					return ve.ValidateName("getMembersOK" + "." + "members" + "." + strconv.Itoa(i))
 				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("getPoolsPoolIdMembersOK" + "." + "members" + "." + strconv.Itoa(i))
+					return ce.ValidateName("getMembersOK" + "." + "members" + "." + strconv.Itoa(i))
 				}
 				return err
 			}
@@ -158,8 +158,8 @@ func (o *GetPoolsPoolIDMembersOKBody) validateMembers(formats strfmt.Registry) e
 	return nil
 }
 
-// ContextValidate validate this get pools pool ID members o k body based on the context it is used
-func (o *GetPoolsPoolIDMembersOKBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validate this get members o k body based on the context it is used
+func (o *GetMembersOKBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
 	if err := o.contextValidateLinks(ctx, formats); err != nil {
@@ -176,16 +176,16 @@ func (o *GetPoolsPoolIDMembersOKBody) ContextValidate(ctx context.Context, forma
 	return nil
 }
 
-func (o *GetPoolsPoolIDMembersOKBody) contextValidateLinks(ctx context.Context, formats strfmt.Registry) error {
+func (o *GetMembersOKBody) contextValidateLinks(ctx context.Context, formats strfmt.Registry) error {
 
 	for i := 0; i < len(o.Links); i++ {
 
 		if o.Links[i] != nil {
 			if err := o.Links[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("getPoolsPoolIdMembersOK" + "." + "links" + "." + strconv.Itoa(i))
+					return ve.ValidateName("getMembersOK" + "." + "links" + "." + strconv.Itoa(i))
 				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("getPoolsPoolIdMembersOK" + "." + "links" + "." + strconv.Itoa(i))
+					return ce.ValidateName("getMembersOK" + "." + "links" + "." + strconv.Itoa(i))
 				}
 				return err
 			}
@@ -196,16 +196,16 @@ func (o *GetPoolsPoolIDMembersOKBody) contextValidateLinks(ctx context.Context, 
 	return nil
 }
 
-func (o *GetPoolsPoolIDMembersOKBody) contextValidateMembers(ctx context.Context, formats strfmt.Registry) error {
+func (o *GetMembersOKBody) contextValidateMembers(ctx context.Context, formats strfmt.Registry) error {
 
 	for i := 0; i < len(o.Members); i++ {
 
 		if o.Members[i] != nil {
 			if err := o.Members[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("getPoolsPoolIdMembersOK" + "." + "members" + "." + strconv.Itoa(i))
+					return ve.ValidateName("getMembersOK" + "." + "members" + "." + strconv.Itoa(i))
 				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("getPoolsPoolIdMembersOK" + "." + "members" + "." + strconv.Itoa(i))
+					return ce.ValidateName("getMembersOK" + "." + "members" + "." + strconv.Itoa(i))
 				}
 				return err
 			}
@@ -217,7 +217,7 @@ func (o *GetPoolsPoolIDMembersOKBody) contextValidateMembers(ctx context.Context
 }
 
 // MarshalBinary interface implementation
-func (o *GetPoolsPoolIDMembersOKBody) MarshalBinary() ([]byte, error) {
+func (o *GetMembersOKBody) MarshalBinary() ([]byte, error) {
 	if o == nil {
 		return nil, nil
 	}
@@ -225,8 +225,8 @@ func (o *GetPoolsPoolIDMembersOKBody) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (o *GetPoolsPoolIDMembersOKBody) UnmarshalBinary(b []byte) error {
-	var res GetPoolsPoolIDMembersOKBody
+func (o *GetMembersOKBody) UnmarshalBinary(b []byte) error {
+	var res GetMembersOKBody
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

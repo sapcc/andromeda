@@ -32,40 +32,40 @@ import (
 	"github.com/sapcc/andromeda/models"
 )
 
-// PutPoolsPoolIDMembersMemberIDHandlerFunc turns a function with the right signature into a put pools pool ID members member ID handler
-type PutPoolsPoolIDMembersMemberIDHandlerFunc func(PutPoolsPoolIDMembersMemberIDParams) middleware.Responder
+// PutMembersMemberIDHandlerFunc turns a function with the right signature into a put members member ID handler
+type PutMembersMemberIDHandlerFunc func(PutMembersMemberIDParams) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn PutPoolsPoolIDMembersMemberIDHandlerFunc) Handle(params PutPoolsPoolIDMembersMemberIDParams) middleware.Responder {
+func (fn PutMembersMemberIDHandlerFunc) Handle(params PutMembersMemberIDParams) middleware.Responder {
 	return fn(params)
 }
 
-// PutPoolsPoolIDMembersMemberIDHandler interface for that can handle valid put pools pool ID members member ID params
-type PutPoolsPoolIDMembersMemberIDHandler interface {
-	Handle(PutPoolsPoolIDMembersMemberIDParams) middleware.Responder
+// PutMembersMemberIDHandler interface for that can handle valid put members member ID params
+type PutMembersMemberIDHandler interface {
+	Handle(PutMembersMemberIDParams) middleware.Responder
 }
 
-// NewPutPoolsPoolIDMembersMemberID creates a new http.Handler for the put pools pool ID members member ID operation
-func NewPutPoolsPoolIDMembersMemberID(ctx *middleware.Context, handler PutPoolsPoolIDMembersMemberIDHandler) *PutPoolsPoolIDMembersMemberID {
-	return &PutPoolsPoolIDMembersMemberID{Context: ctx, Handler: handler}
+// NewPutMembersMemberID creates a new http.Handler for the put members member ID operation
+func NewPutMembersMemberID(ctx *middleware.Context, handler PutMembersMemberIDHandler) *PutMembersMemberID {
+	return &PutMembersMemberID{Context: ctx, Handler: handler}
 }
 
 /*
-	PutPoolsPoolIDMembersMemberID swagger:route PUT /pools/{pool_id}/members/{member_id} Members putPoolsPoolIdMembersMemberId
+	PutMembersMemberID swagger:route PUT /members/{member_id} Members putMembersMemberId
 
 Update a member
 */
-type PutPoolsPoolIDMembersMemberID struct {
+type PutMembersMemberID struct {
 	Context *middleware.Context
-	Handler PutPoolsPoolIDMembersMemberIDHandler
+	Handler PutMembersMemberIDHandler
 }
 
-func (o *PutPoolsPoolIDMembersMemberID) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+func (o *PutMembersMemberID) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
 		*r = *rCtx
 	}
-	var Params = NewPutPoolsPoolIDMembersMemberIDParams()
+	var Params = NewPutMembersMemberIDParams()
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
@@ -76,17 +76,17 @@ func (o *PutPoolsPoolIDMembersMemberID) ServeHTTP(rw http.ResponseWriter, r *htt
 
 }
 
-// PutPoolsPoolIDMembersMemberIDAcceptedBody put pools pool ID members member ID accepted body
+// PutMembersMemberIDAcceptedBody put members member ID accepted body
 //
-// swagger:model PutPoolsPoolIDMembersMemberIDAcceptedBody
-type PutPoolsPoolIDMembersMemberIDAcceptedBody struct {
+// swagger:model PutMembersMemberIDAcceptedBody
+type PutMembersMemberIDAcceptedBody struct {
 
 	// member
 	Member *models.Member `json:"member,omitempty"`
 }
 
-// Validate validates this put pools pool ID members member ID accepted body
-func (o *PutPoolsPoolIDMembersMemberIDAcceptedBody) Validate(formats strfmt.Registry) error {
+// Validate validates this put members member ID accepted body
+func (o *PutMembersMemberIDAcceptedBody) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := o.validateMember(formats); err != nil {
@@ -99,7 +99,7 @@ func (o *PutPoolsPoolIDMembersMemberIDAcceptedBody) Validate(formats strfmt.Regi
 	return nil
 }
 
-func (o *PutPoolsPoolIDMembersMemberIDAcceptedBody) validateMember(formats strfmt.Registry) error {
+func (o *PutMembersMemberIDAcceptedBody) validateMember(formats strfmt.Registry) error {
 	if swag.IsZero(o.Member) { // not required
 		return nil
 	}
@@ -107,9 +107,9 @@ func (o *PutPoolsPoolIDMembersMemberIDAcceptedBody) validateMember(formats strfm
 	if o.Member != nil {
 		if err := o.Member.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("putPoolsPoolIdMembersMemberIdAccepted" + "." + "member")
+				return ve.ValidateName("putMembersMemberIdAccepted" + "." + "member")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("putPoolsPoolIdMembersMemberIdAccepted" + "." + "member")
+				return ce.ValidateName("putMembersMemberIdAccepted" + "." + "member")
 			}
 			return err
 		}
@@ -118,8 +118,8 @@ func (o *PutPoolsPoolIDMembersMemberIDAcceptedBody) validateMember(formats strfm
 	return nil
 }
 
-// ContextValidate validate this put pools pool ID members member ID accepted body based on the context it is used
-func (o *PutPoolsPoolIDMembersMemberIDAcceptedBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validate this put members member ID accepted body based on the context it is used
+func (o *PutMembersMemberIDAcceptedBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
 	if err := o.contextValidateMember(ctx, formats); err != nil {
@@ -132,14 +132,14 @@ func (o *PutPoolsPoolIDMembersMemberIDAcceptedBody) ContextValidate(ctx context.
 	return nil
 }
 
-func (o *PutPoolsPoolIDMembersMemberIDAcceptedBody) contextValidateMember(ctx context.Context, formats strfmt.Registry) error {
+func (o *PutMembersMemberIDAcceptedBody) contextValidateMember(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Member != nil {
 		if err := o.Member.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("putPoolsPoolIdMembersMemberIdAccepted" + "." + "member")
+				return ve.ValidateName("putMembersMemberIdAccepted" + "." + "member")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("putPoolsPoolIdMembersMemberIdAccepted" + "." + "member")
+				return ce.ValidateName("putMembersMemberIdAccepted" + "." + "member")
 			}
 			return err
 		}
@@ -149,7 +149,7 @@ func (o *PutPoolsPoolIDMembersMemberIDAcceptedBody) contextValidateMember(ctx co
 }
 
 // MarshalBinary interface implementation
-func (o *PutPoolsPoolIDMembersMemberIDAcceptedBody) MarshalBinary() ([]byte, error) {
+func (o *PutMembersMemberIDAcceptedBody) MarshalBinary() ([]byte, error) {
 	if o == nil {
 		return nil, nil
 	}
@@ -157,8 +157,8 @@ func (o *PutPoolsPoolIDMembersMemberIDAcceptedBody) MarshalBinary() ([]byte, err
 }
 
 // UnmarshalBinary interface implementation
-func (o *PutPoolsPoolIDMembersMemberIDAcceptedBody) UnmarshalBinary(b []byte) error {
-	var res PutPoolsPoolIDMembersMemberIDAcceptedBody
+func (o *PutMembersMemberIDAcceptedBody) UnmarshalBinary(b []byte) error {
+	var res PutMembersMemberIDAcceptedBody
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}
@@ -166,18 +166,18 @@ func (o *PutPoolsPoolIDMembersMemberIDAcceptedBody) UnmarshalBinary(b []byte) er
 	return nil
 }
 
-// PutPoolsPoolIDMembersMemberIDBody put pools pool ID members member ID body
+// PutMembersMemberIDBody put members member ID body
 //
-// swagger:model PutPoolsPoolIDMembersMemberIDBody
-type PutPoolsPoolIDMembersMemberIDBody struct {
+// swagger:model PutMembersMemberIDBody
+type PutMembersMemberIDBody struct {
 
 	// member
 	// Required: true
 	Member *models.Member `json:"member"`
 }
 
-// Validate validates this put pools pool ID members member ID body
-func (o *PutPoolsPoolIDMembersMemberIDBody) Validate(formats strfmt.Registry) error {
+// Validate validates this put members member ID body
+func (o *PutMembersMemberIDBody) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := o.validateMember(formats); err != nil {
@@ -190,7 +190,7 @@ func (o *PutPoolsPoolIDMembersMemberIDBody) Validate(formats strfmt.Registry) er
 	return nil
 }
 
-func (o *PutPoolsPoolIDMembersMemberIDBody) validateMember(formats strfmt.Registry) error {
+func (o *PutMembersMemberIDBody) validateMember(formats strfmt.Registry) error {
 
 	if err := validate.Required("member"+"."+"member", "body", o.Member); err != nil {
 		return err
@@ -210,8 +210,8 @@ func (o *PutPoolsPoolIDMembersMemberIDBody) validateMember(formats strfmt.Regist
 	return nil
 }
 
-// ContextValidate validate this put pools pool ID members member ID body based on the context it is used
-func (o *PutPoolsPoolIDMembersMemberIDBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validate this put members member ID body based on the context it is used
+func (o *PutMembersMemberIDBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
 	if err := o.contextValidateMember(ctx, formats); err != nil {
@@ -224,7 +224,7 @@ func (o *PutPoolsPoolIDMembersMemberIDBody) ContextValidate(ctx context.Context,
 	return nil
 }
 
-func (o *PutPoolsPoolIDMembersMemberIDBody) contextValidateMember(ctx context.Context, formats strfmt.Registry) error {
+func (o *PutMembersMemberIDBody) contextValidateMember(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Member != nil {
 		if err := o.Member.ContextValidate(ctx, formats); err != nil {
@@ -241,7 +241,7 @@ func (o *PutPoolsPoolIDMembersMemberIDBody) contextValidateMember(ctx context.Co
 }
 
 // MarshalBinary interface implementation
-func (o *PutPoolsPoolIDMembersMemberIDBody) MarshalBinary() ([]byte, error) {
+func (o *PutMembersMemberIDBody) MarshalBinary() ([]byte, error) {
 	if o == nil {
 		return nil, nil
 	}
@@ -249,8 +249,8 @@ func (o *PutPoolsPoolIDMembersMemberIDBody) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (o *PutPoolsPoolIDMembersMemberIDBody) UnmarshalBinary(b []byte) error {
-	var res PutPoolsPoolIDMembersMemberIDBody
+func (o *PutMembersMemberIDBody) UnmarshalBinary(b []byte) error {
+	var res PutMembersMemberIDBody
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

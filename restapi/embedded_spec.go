@@ -504,6 +504,246 @@ func init() {
         }
       ]
     },
+    "/members": {
+      "get": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "List members",
+        "parameters": [
+          {
+            "$ref": "#/parameters/marker"
+          },
+          {
+            "$ref": "#/parameters/limit"
+          },
+          {
+            "$ref": "#/parameters/sort"
+          },
+          {
+            "$ref": "#/parameters/page_reverse"
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "x-nullable": true,
+            "description": "Pool ID of the members to fetch",
+            "name": "pool_id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A JSON array of members",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "links": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/link"
+                  },
+                  "x-omitempty": true
+                },
+                "members": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/member"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "default": {
+            "description": "Unexpected Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        },
+        "x-policy": "andromeda:member:get_all"
+      },
+      "post": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Create new member",
+        "parameters": [
+          {
+            "name": "member",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "member"
+              ],
+              "properties": {
+                "member": {
+                  "$ref": "#/definitions/member"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created member.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "member": {
+                  "$ref": "#/definitions/member"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "default": {
+            "description": "Unexpected Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        },
+        "x-policy": "andromeda:member:post"
+      }
+    },
+    "/members/{member_id}": {
+      "get": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Show member detail",
+        "responses": {
+          "200": {
+            "description": "Shows the details of a specific member.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "member": {
+                  "$ref": "#/definitions/member"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "default": {
+            "description": "Unexpected Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        },
+        "x-policy": "andromeda:member:get_one"
+      },
+      "put": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Update a member",
+        "parameters": [
+          {
+            "name": "member",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "member"
+              ],
+              "properties": {
+                "member": {
+                  "$ref": "#/definitions/member"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Updated member.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "member": {
+                  "$ref": "#/definitions/member"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "default": {
+            "description": "Unexpected Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        },
+        "x-policy": "andromeda:member:put"
+      },
+      "delete": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Delete a member",
+        "responses": {
+          "204": {
+            "description": "Resource successfully deleted."
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "default": {
+            "description": "Unexpected Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        },
+        "x-policy": "andromeda:member:delete"
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "The UUID of the member",
+          "name": "member_id",
+          "in": "path",
+          "required": true
+        }
+      ]
+    },
     "/monitors": {
       "get": {
         "tags": [
@@ -522,6 +762,14 @@ func init() {
           },
           {
             "$ref": "#/parameters/page_reverse"
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "x-nullable": true,
+            "description": "Pool ID of the monitors to fetch",
+            "name": "pool_id",
+            "in": "query"
           }
         ],
         "responses": {
@@ -964,256 +1212,6 @@ func init() {
           "format": "uuid",
           "description": "The UUID of the pool",
           "name": "pool_id",
-          "in": "path",
-          "required": true
-        }
-      ]
-    },
-    "/pools/{pool_id}/members": {
-      "get": {
-        "tags": [
-          "Members"
-        ],
-        "summary": "List members",
-        "parameters": [
-          {
-            "$ref": "#/parameters/marker"
-          },
-          {
-            "$ref": "#/parameters/limit"
-          },
-          {
-            "$ref": "#/parameters/sort"
-          },
-          {
-            "$ref": "#/parameters/page_reverse"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A JSON array of members",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "links": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/link"
-                  },
-                  "x-omitempty": true
-                },
-                "members": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/member"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          },
-          "default": {
-            "description": "Unexpected Error",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          }
-        },
-        "x-policy": "andromeda:member:get_all"
-      },
-      "post": {
-        "tags": [
-          "Members"
-        ],
-        "summary": "Create new member",
-        "parameters": [
-          {
-            "name": "member",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "member"
-              ],
-              "properties": {
-                "member": {
-                  "$ref": "#/definitions/member"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created member.",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "member": {
-                  "$ref": "#/definitions/member"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          },
-          "default": {
-            "description": "Unexpected Error",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          }
-        },
-        "x-policy": "andromeda:member:post"
-      },
-      "parameters": [
-        {
-          "type": "string",
-          "format": "uuid",
-          "description": "The UUID of the pool",
-          "name": "pool_id",
-          "in": "path",
-          "required": true
-        }
-      ]
-    },
-    "/pools/{pool_id}/members/{member_id}": {
-      "get": {
-        "tags": [
-          "Members"
-        ],
-        "summary": "Show member detail",
-        "responses": {
-          "200": {
-            "description": "Shows the details of a specific member.",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "member": {
-                  "$ref": "#/definitions/member"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          },
-          "default": {
-            "description": "Unexpected Error",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          }
-        },
-        "x-policy": "andromeda:member:get_one"
-      },
-      "put": {
-        "tags": [
-          "Members"
-        ],
-        "summary": "Update a member",
-        "parameters": [
-          {
-            "name": "member",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "member"
-              ],
-              "properties": {
-                "member": {
-                  "$ref": "#/definitions/member"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "202": {
-            "description": "Updated member.",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "member": {
-                  "$ref": "#/definitions/member"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          },
-          "default": {
-            "description": "Unexpected Error",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          }
-        },
-        "x-policy": "andromeda:member:put"
-      },
-      "delete": {
-        "tags": [
-          "Members"
-        ],
-        "summary": "Delete a member",
-        "responses": {
-          "204": {
-            "description": "Resource successfully deleted."
-          },
-          "404": {
-            "description": "Not Found",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          },
-          "default": {
-            "description": "Unexpected Error",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          }
-        },
-        "x-policy": "andromeda:member:delete"
-      },
-      "parameters": [
-        {
-          "type": "string",
-          "format": "uuid",
-          "description": "The UUID of the pool",
-          "name": "pool_id",
-          "in": "path",
-          "required": true
-        },
-        {
-          "type": "string",
-          "format": "uuid",
-          "description": "The UUID of the member",
-          "name": "member_id",
           "in": "path",
           "required": true
         }
@@ -1789,7 +1787,8 @@ func init() {
       "type": "object",
       "required": [
         "address",
-        "port"
+        "port",
+        "pool_id"
       ],
       "properties": {
         "address": {
@@ -1833,7 +1832,7 @@ func init() {
           "description": "pool id.",
           "type": "string",
           "format": "uuid",
-          "readOnly": true
+          "x-nullable": true
         },
         "port": {
           "description": "Port to use for monitor checks.",
@@ -2741,6 +2740,259 @@ func init() {
         }
       ]
     },
+    "/members": {
+      "get": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "List members",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "uuid",
+            "description": "Pagination ID of the last item in the previous list.",
+            "name": "marker",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Sets the page size.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Comma-separated list of sort keys, optinally prefix with - to reverse sort order.",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Sets the page direction.",
+            "name": "page_reverse",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "x-nullable": true,
+            "description": "Pool ID of the members to fetch",
+            "name": "pool_id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A JSON array of members",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "links": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/link"
+                  },
+                  "x-omitempty": true
+                },
+                "members": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/member"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "default": {
+            "description": "Unexpected Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        },
+        "x-policy": "andromeda:member:get_all"
+      },
+      "post": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Create new member",
+        "parameters": [
+          {
+            "name": "member",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "member"
+              ],
+              "properties": {
+                "member": {
+                  "$ref": "#/definitions/member"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created member.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "member": {
+                  "$ref": "#/definitions/member"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "default": {
+            "description": "Unexpected Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        },
+        "x-policy": "andromeda:member:post"
+      }
+    },
+    "/members/{member_id}": {
+      "get": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Show member detail",
+        "responses": {
+          "200": {
+            "description": "Shows the details of a specific member.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "member": {
+                  "$ref": "#/definitions/member"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "default": {
+            "description": "Unexpected Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        },
+        "x-policy": "andromeda:member:get_one"
+      },
+      "put": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Update a member",
+        "parameters": [
+          {
+            "name": "member",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "member"
+              ],
+              "properties": {
+                "member": {
+                  "$ref": "#/definitions/member"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Updated member.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "member": {
+                  "$ref": "#/definitions/member"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "default": {
+            "description": "Unexpected Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        },
+        "x-policy": "andromeda:member:put"
+      },
+      "delete": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Delete a member",
+        "responses": {
+          "204": {
+            "description": "Resource successfully deleted."
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "default": {
+            "description": "Unexpected Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        },
+        "x-policy": "andromeda:member:delete"
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "The UUID of the member",
+          "name": "member_id",
+          "in": "path",
+          "required": true
+        }
+      ]
+    },
     "/monitors": {
       "get": {
         "tags": [
@@ -2771,6 +3023,14 @@ func init() {
             "type": "boolean",
             "description": "Sets the page direction.",
             "name": "page_reverse",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "x-nullable": true,
+            "description": "Pool ID of the monitors to fetch",
+            "name": "pool_id",
             "in": "query"
           }
         ],
@@ -3227,269 +3487,6 @@ func init() {
           "format": "uuid",
           "description": "The UUID of the pool",
           "name": "pool_id",
-          "in": "path",
-          "required": true
-        }
-      ]
-    },
-    "/pools/{pool_id}/members": {
-      "get": {
-        "tags": [
-          "Members"
-        ],
-        "summary": "List members",
-        "parameters": [
-          {
-            "type": "string",
-            "format": "uuid",
-            "description": "Pagination ID of the last item in the previous list.",
-            "name": "marker",
-            "in": "query"
-          },
-          {
-            "type": "integer",
-            "description": "Sets the page size.",
-            "name": "limit",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "description": "Comma-separated list of sort keys, optinally prefix with - to reverse sort order.",
-            "name": "sort",
-            "in": "query"
-          },
-          {
-            "type": "boolean",
-            "description": "Sets the page direction.",
-            "name": "page_reverse",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A JSON array of members",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "links": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/link"
-                  },
-                  "x-omitempty": true
-                },
-                "members": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/member"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          },
-          "default": {
-            "description": "Unexpected Error",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          }
-        },
-        "x-policy": "andromeda:member:get_all"
-      },
-      "post": {
-        "tags": [
-          "Members"
-        ],
-        "summary": "Create new member",
-        "parameters": [
-          {
-            "name": "member",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "member"
-              ],
-              "properties": {
-                "member": {
-                  "$ref": "#/definitions/member"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created member.",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "member": {
-                  "$ref": "#/definitions/member"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          },
-          "default": {
-            "description": "Unexpected Error",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          }
-        },
-        "x-policy": "andromeda:member:post"
-      },
-      "parameters": [
-        {
-          "type": "string",
-          "format": "uuid",
-          "description": "The UUID of the pool",
-          "name": "pool_id",
-          "in": "path",
-          "required": true
-        }
-      ]
-    },
-    "/pools/{pool_id}/members/{member_id}": {
-      "get": {
-        "tags": [
-          "Members"
-        ],
-        "summary": "Show member detail",
-        "responses": {
-          "200": {
-            "description": "Shows the details of a specific member.",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "member": {
-                  "$ref": "#/definitions/member"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          },
-          "default": {
-            "description": "Unexpected Error",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          }
-        },
-        "x-policy": "andromeda:member:get_one"
-      },
-      "put": {
-        "tags": [
-          "Members"
-        ],
-        "summary": "Update a member",
-        "parameters": [
-          {
-            "name": "member",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "member"
-              ],
-              "properties": {
-                "member": {
-                  "$ref": "#/definitions/member"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "202": {
-            "description": "Updated member.",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "member": {
-                  "$ref": "#/definitions/member"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          },
-          "default": {
-            "description": "Unexpected Error",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          }
-        },
-        "x-policy": "andromeda:member:put"
-      },
-      "delete": {
-        "tags": [
-          "Members"
-        ],
-        "summary": "Delete a member",
-        "responses": {
-          "204": {
-            "description": "Resource successfully deleted."
-          },
-          "404": {
-            "description": "Not Found",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          },
-          "default": {
-            "description": "Unexpected Error",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          }
-        },
-        "x-policy": "andromeda:member:delete"
-      },
-      "parameters": [
-        {
-          "type": "string",
-          "format": "uuid",
-          "description": "The UUID of the pool",
-          "name": "pool_id",
-          "in": "path",
-          "required": true
-        },
-        {
-          "type": "string",
-          "format": "uuid",
-          "description": "The UUID of the member",
-          "name": "member_id",
           "in": "path",
           "required": true
         }
@@ -4068,7 +4065,8 @@ func init() {
       "type": "object",
       "required": [
         "address",
-        "port"
+        "port",
+        "pool_id"
       ],
       "properties": {
         "address": {
@@ -4112,7 +4110,7 @@ func init() {
           "description": "pool id.",
           "type": "string",
           "format": "uuid",
-          "readOnly": true
+          "x-nullable": true
         },
         "port": {
           "description": "Port to use for monitor checks.",

@@ -32,40 +32,40 @@ import (
 	"github.com/sapcc/andromeda/models"
 )
 
-// PostPoolsPoolIDMembersHandlerFunc turns a function with the right signature into a post pools pool ID members handler
-type PostPoolsPoolIDMembersHandlerFunc func(PostPoolsPoolIDMembersParams) middleware.Responder
+// PostMembersHandlerFunc turns a function with the right signature into a post members handler
+type PostMembersHandlerFunc func(PostMembersParams) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn PostPoolsPoolIDMembersHandlerFunc) Handle(params PostPoolsPoolIDMembersParams) middleware.Responder {
+func (fn PostMembersHandlerFunc) Handle(params PostMembersParams) middleware.Responder {
 	return fn(params)
 }
 
-// PostPoolsPoolIDMembersHandler interface for that can handle valid post pools pool ID members params
-type PostPoolsPoolIDMembersHandler interface {
-	Handle(PostPoolsPoolIDMembersParams) middleware.Responder
+// PostMembersHandler interface for that can handle valid post members params
+type PostMembersHandler interface {
+	Handle(PostMembersParams) middleware.Responder
 }
 
-// NewPostPoolsPoolIDMembers creates a new http.Handler for the post pools pool ID members operation
-func NewPostPoolsPoolIDMembers(ctx *middleware.Context, handler PostPoolsPoolIDMembersHandler) *PostPoolsPoolIDMembers {
-	return &PostPoolsPoolIDMembers{Context: ctx, Handler: handler}
+// NewPostMembers creates a new http.Handler for the post members operation
+func NewPostMembers(ctx *middleware.Context, handler PostMembersHandler) *PostMembers {
+	return &PostMembers{Context: ctx, Handler: handler}
 }
 
 /*
-	PostPoolsPoolIDMembers swagger:route POST /pools/{pool_id}/members Members postPoolsPoolIdMembers
+	PostMembers swagger:route POST /members Members postMembers
 
 Create new member
 */
-type PostPoolsPoolIDMembers struct {
+type PostMembers struct {
 	Context *middleware.Context
-	Handler PostPoolsPoolIDMembersHandler
+	Handler PostMembersHandler
 }
 
-func (o *PostPoolsPoolIDMembers) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+func (o *PostMembers) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
 		*r = *rCtx
 	}
-	var Params = NewPostPoolsPoolIDMembersParams()
+	var Params = NewPostMembersParams()
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
@@ -76,18 +76,18 @@ func (o *PostPoolsPoolIDMembers) ServeHTTP(rw http.ResponseWriter, r *http.Reque
 
 }
 
-// PostPoolsPoolIDMembersBody post pools pool ID members body
+// PostMembersBody post members body
 //
-// swagger:model PostPoolsPoolIDMembersBody
-type PostPoolsPoolIDMembersBody struct {
+// swagger:model PostMembersBody
+type PostMembersBody struct {
 
 	// member
 	// Required: true
 	Member *models.Member `json:"member"`
 }
 
-// Validate validates this post pools pool ID members body
-func (o *PostPoolsPoolIDMembersBody) Validate(formats strfmt.Registry) error {
+// Validate validates this post members body
+func (o *PostMembersBody) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := o.validateMember(formats); err != nil {
@@ -100,7 +100,7 @@ func (o *PostPoolsPoolIDMembersBody) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (o *PostPoolsPoolIDMembersBody) validateMember(formats strfmt.Registry) error {
+func (o *PostMembersBody) validateMember(formats strfmt.Registry) error {
 
 	if err := validate.Required("member"+"."+"member", "body", o.Member); err != nil {
 		return err
@@ -120,8 +120,8 @@ func (o *PostPoolsPoolIDMembersBody) validateMember(formats strfmt.Registry) err
 	return nil
 }
 
-// ContextValidate validate this post pools pool ID members body based on the context it is used
-func (o *PostPoolsPoolIDMembersBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validate this post members body based on the context it is used
+func (o *PostMembersBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
 	if err := o.contextValidateMember(ctx, formats); err != nil {
@@ -134,7 +134,7 @@ func (o *PostPoolsPoolIDMembersBody) ContextValidate(ctx context.Context, format
 	return nil
 }
 
-func (o *PostPoolsPoolIDMembersBody) contextValidateMember(ctx context.Context, formats strfmt.Registry) error {
+func (o *PostMembersBody) contextValidateMember(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Member != nil {
 		if err := o.Member.ContextValidate(ctx, formats); err != nil {
@@ -151,7 +151,7 @@ func (o *PostPoolsPoolIDMembersBody) contextValidateMember(ctx context.Context, 
 }
 
 // MarshalBinary interface implementation
-func (o *PostPoolsPoolIDMembersBody) MarshalBinary() ([]byte, error) {
+func (o *PostMembersBody) MarshalBinary() ([]byte, error) {
 	if o == nil {
 		return nil, nil
 	}
@@ -159,8 +159,8 @@ func (o *PostPoolsPoolIDMembersBody) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (o *PostPoolsPoolIDMembersBody) UnmarshalBinary(b []byte) error {
-	var res PostPoolsPoolIDMembersBody
+func (o *PostMembersBody) UnmarshalBinary(b []byte) error {
+	var res PostMembersBody
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}
@@ -168,17 +168,17 @@ func (o *PostPoolsPoolIDMembersBody) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-// PostPoolsPoolIDMembersCreatedBody post pools pool ID members created body
+// PostMembersCreatedBody post members created body
 //
-// swagger:model PostPoolsPoolIDMembersCreatedBody
-type PostPoolsPoolIDMembersCreatedBody struct {
+// swagger:model PostMembersCreatedBody
+type PostMembersCreatedBody struct {
 
 	// member
 	Member *models.Member `json:"member,omitempty"`
 }
 
-// Validate validates this post pools pool ID members created body
-func (o *PostPoolsPoolIDMembersCreatedBody) Validate(formats strfmt.Registry) error {
+// Validate validates this post members created body
+func (o *PostMembersCreatedBody) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := o.validateMember(formats); err != nil {
@@ -191,7 +191,7 @@ func (o *PostPoolsPoolIDMembersCreatedBody) Validate(formats strfmt.Registry) er
 	return nil
 }
 
-func (o *PostPoolsPoolIDMembersCreatedBody) validateMember(formats strfmt.Registry) error {
+func (o *PostMembersCreatedBody) validateMember(formats strfmt.Registry) error {
 	if swag.IsZero(o.Member) { // not required
 		return nil
 	}
@@ -199,9 +199,9 @@ func (o *PostPoolsPoolIDMembersCreatedBody) validateMember(formats strfmt.Regist
 	if o.Member != nil {
 		if err := o.Member.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("postPoolsPoolIdMembersCreated" + "." + "member")
+				return ve.ValidateName("postMembersCreated" + "." + "member")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("postPoolsPoolIdMembersCreated" + "." + "member")
+				return ce.ValidateName("postMembersCreated" + "." + "member")
 			}
 			return err
 		}
@@ -210,8 +210,8 @@ func (o *PostPoolsPoolIDMembersCreatedBody) validateMember(formats strfmt.Regist
 	return nil
 }
 
-// ContextValidate validate this post pools pool ID members created body based on the context it is used
-func (o *PostPoolsPoolIDMembersCreatedBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validate this post members created body based on the context it is used
+func (o *PostMembersCreatedBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
 	if err := o.contextValidateMember(ctx, formats); err != nil {
@@ -224,14 +224,14 @@ func (o *PostPoolsPoolIDMembersCreatedBody) ContextValidate(ctx context.Context,
 	return nil
 }
 
-func (o *PostPoolsPoolIDMembersCreatedBody) contextValidateMember(ctx context.Context, formats strfmt.Registry) error {
+func (o *PostMembersCreatedBody) contextValidateMember(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Member != nil {
 		if err := o.Member.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("postPoolsPoolIdMembersCreated" + "." + "member")
+				return ve.ValidateName("postMembersCreated" + "." + "member")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("postPoolsPoolIdMembersCreated" + "." + "member")
+				return ce.ValidateName("postMembersCreated" + "." + "member")
 			}
 			return err
 		}
@@ -241,7 +241,7 @@ func (o *PostPoolsPoolIDMembersCreatedBody) contextValidateMember(ctx context.Co
 }
 
 // MarshalBinary interface implementation
-func (o *PostPoolsPoolIDMembersCreatedBody) MarshalBinary() ([]byte, error) {
+func (o *PostMembersCreatedBody) MarshalBinary() ([]byte, error) {
 	if o == nil {
 		return nil, nil
 	}
@@ -249,8 +249,8 @@ func (o *PostPoolsPoolIDMembersCreatedBody) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (o *PostPoolsPoolIDMembersCreatedBody) UnmarshalBinary(b []byte) error {
-	var res PostPoolsPoolIDMembersCreatedBody
+func (o *PostMembersCreatedBody) UnmarshalBinary(b []byte) error {
+	var res PostMembersCreatedBody
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

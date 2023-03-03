@@ -62,9 +62,9 @@ type Member struct {
 	Name *string `json:"name,omitempty"`
 
 	// pool id.
-	// Read Only: true
+	// Required: true
 	// Format: uuid
-	PoolID strfmt.UUID `json:"pool_id,omitempty"`
+	PoolID *strfmt.UUID `json:"pool_id"`
 
 	// Port to use for monitor checks.
 	// Example: 80
@@ -191,8 +191,9 @@ func (m *Member) validateName(formats strfmt.Registry) error {
 }
 
 func (m *Member) validatePoolID(formats strfmt.Registry) error {
-	if swag.IsZero(m.PoolID) { // not required
-		return nil
+
+	if err := validate.Required("pool_id", "body", m.PoolID); err != nil {
+		return err
 	}
 
 	if err := validate.FormatOf("pool_id", "body", "uuid", m.PoolID.String(), formats); err != nil {
@@ -337,10 +338,6 @@ func (m *Member) ContextValidate(ctx context.Context, formats strfmt.Registry) e
 		res = append(res, err)
 	}
 
-	if err := m.contextValidatePoolID(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.contextValidateProvisioningStatus(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -371,15 +368,6 @@ func (m *Member) contextValidateCreatedAt(ctx context.Context, formats strfmt.Re
 func (m *Member) contextValidateID(ctx context.Context, formats strfmt.Registry) error {
 
 	if err := validate.ReadOnly(ctx, "id", "body", strfmt.UUID(m.ID)); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *Member) contextValidatePoolID(ctx context.Context, formats strfmt.Registry) error {
-
-	if err := validate.ReadOnly(ctx, "pool_id", "body", strfmt.UUID(m.PoolID)); err != nil {
 		return err
 	}
 

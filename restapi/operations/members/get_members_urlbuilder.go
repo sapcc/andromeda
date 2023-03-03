@@ -23,19 +23,17 @@ import (
 	"errors"
 	"net/url"
 	golangswaggerpaths "path"
-	"strings"
 
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
 
-// GetPoolsPoolIDMembersURL generates an URL for the get pools pool ID members operation
-type GetPoolsPoolIDMembersURL struct {
-	PoolID strfmt.UUID
-
+// GetMembersURL generates an URL for the get members operation
+type GetMembersURL struct {
 	Limit       *int64
 	Marker      *strfmt.UUID
 	PageReverse *bool
+	PoolID      *strfmt.UUID
 	Sort        *string
 
 	_basePath string
@@ -46,7 +44,7 @@ type GetPoolsPoolIDMembersURL struct {
 // WithBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *GetPoolsPoolIDMembersURL) WithBasePath(bp string) *GetPoolsPoolIDMembersURL {
+func (o *GetMembersURL) WithBasePath(bp string) *GetMembersURL {
 	o.SetBasePath(bp)
 	return o
 }
@@ -54,22 +52,15 @@ func (o *GetPoolsPoolIDMembersURL) WithBasePath(bp string) *GetPoolsPoolIDMember
 // SetBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *GetPoolsPoolIDMembersURL) SetBasePath(bp string) {
+func (o *GetMembersURL) SetBasePath(bp string) {
 	o._basePath = bp
 }
 
 // Build a url path and query string
-func (o *GetPoolsPoolIDMembersURL) Build() (*url.URL, error) {
+func (o *GetMembersURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/pools/{pool_id}/members"
-
-	poolID := o.PoolID.String()
-	if poolID != "" {
-		_path = strings.Replace(_path, "{pool_id}", poolID, -1)
-	} else {
-		return nil, errors.New("poolId is required on GetPoolsPoolIDMembersURL")
-	}
+	var _path = "/members"
 
 	_basePath := o._basePath
 	if _basePath == "" {
@@ -103,6 +94,14 @@ func (o *GetPoolsPoolIDMembersURL) Build() (*url.URL, error) {
 		qs.Set("page_reverse", pageReverseQ)
 	}
 
+	var poolIDQ string
+	if o.PoolID != nil {
+		poolIDQ = o.PoolID.String()
+	}
+	if poolIDQ != "" {
+		qs.Set("pool_id", poolIDQ)
+	}
+
 	var sortQ string
 	if o.Sort != nil {
 		sortQ = *o.Sort
@@ -117,7 +116,7 @@ func (o *GetPoolsPoolIDMembersURL) Build() (*url.URL, error) {
 }
 
 // Must is a helper function to panic when the url builder returns an error
-func (o *GetPoolsPoolIDMembersURL) Must(u *url.URL, err error) *url.URL {
+func (o *GetMembersURL) Must(u *url.URL, err error) *url.URL {
 	if err != nil {
 		panic(err)
 	}
@@ -128,17 +127,17 @@ func (o *GetPoolsPoolIDMembersURL) Must(u *url.URL, err error) *url.URL {
 }
 
 // String returns the string representation of the path with query string
-func (o *GetPoolsPoolIDMembersURL) String() string {
+func (o *GetMembersURL) String() string {
 	return o.Must(o.Build()).String()
 }
 
 // BuildFull builds a full url with scheme, host, path and query string
-func (o *GetPoolsPoolIDMembersURL) BuildFull(scheme, host string) (*url.URL, error) {
+func (o *GetMembersURL) BuildFull(scheme, host string) (*url.URL, error) {
 	if scheme == "" {
-		return nil, errors.New("scheme is required for a full url on GetPoolsPoolIDMembersURL")
+		return nil, errors.New("scheme is required for a full url on GetMembersURL")
 	}
 	if host == "" {
-		return nil, errors.New("host is required for a full url on GetPoolsPoolIDMembersURL")
+		return nil, errors.New("host is required for a full url on GetMembersURL")
 	}
 
 	base, err := o.Build()
@@ -152,6 +151,6 @@ func (o *GetPoolsPoolIDMembersURL) BuildFull(scheme, host string) (*url.URL, err
 }
 
 // StringFull returns the string representation of a complete url
-func (o *GetPoolsPoolIDMembersURL) StringFull(scheme, host string) string {
+func (o *GetMembersURL) StringFull(scheme, host string) string {
 	return o.Must(o.BuildFull(scheme, host)).String()
 }

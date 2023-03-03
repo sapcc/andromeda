@@ -42,36 +42,36 @@ type ClientOption func(*runtime.ClientOperation)
 
 // ClientService is the interface for Client methods
 type ClientService interface {
-	DeletePoolsPoolIDMembersMemberID(params *DeletePoolsPoolIDMembersMemberIDParams, opts ...ClientOption) (*DeletePoolsPoolIDMembersMemberIDNoContent, error)
+	DeleteMembersMemberID(params *DeleteMembersMemberIDParams, opts ...ClientOption) (*DeleteMembersMemberIDNoContent, error)
 
-	GetPoolsPoolIDMembers(params *GetPoolsPoolIDMembersParams, opts ...ClientOption) (*GetPoolsPoolIDMembersOK, error)
+	GetMembers(params *GetMembersParams, opts ...ClientOption) (*GetMembersOK, error)
 
-	GetPoolsPoolIDMembersMemberID(params *GetPoolsPoolIDMembersMemberIDParams, opts ...ClientOption) (*GetPoolsPoolIDMembersMemberIDOK, error)
+	GetMembersMemberID(params *GetMembersMemberIDParams, opts ...ClientOption) (*GetMembersMemberIDOK, error)
 
-	PostPoolsPoolIDMembers(params *PostPoolsPoolIDMembersParams, opts ...ClientOption) (*PostPoolsPoolIDMembersCreated, error)
+	PostMembers(params *PostMembersParams, opts ...ClientOption) (*PostMembersCreated, error)
 
-	PutPoolsPoolIDMembersMemberID(params *PutPoolsPoolIDMembersMemberIDParams, opts ...ClientOption) (*PutPoolsPoolIDMembersMemberIDAccepted, error)
+	PutMembersMemberID(params *PutMembersMemberIDParams, opts ...ClientOption) (*PutMembersMemberIDAccepted, error)
 
 	SetTransport(transport runtime.ClientTransport)
 }
 
 /*
-DeletePoolsPoolIDMembersMemberID deletes a member
+DeleteMembersMemberID deletes a member
 */
-func (a *Client) DeletePoolsPoolIDMembersMemberID(params *DeletePoolsPoolIDMembersMemberIDParams, opts ...ClientOption) (*DeletePoolsPoolIDMembersMemberIDNoContent, error) {
+func (a *Client) DeleteMembersMemberID(params *DeleteMembersMemberIDParams, opts ...ClientOption) (*DeleteMembersMemberIDNoContent, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewDeletePoolsPoolIDMembersMemberIDParams()
+		params = NewDeleteMembersMemberIDParams()
 	}
 	op := &runtime.ClientOperation{
-		ID:                 "DeletePoolsPoolIDMembersMemberID",
+		ID:                 "DeleteMembersMemberID",
 		Method:             "DELETE",
-		PathPattern:        "/pools/{pool_id}/members/{member_id}",
+		PathPattern:        "/members/{member_id}",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &DeletePoolsPoolIDMembersMemberIDReader{formats: a.formats},
+		Reader:             &DeleteMembersMemberIDReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	}
@@ -83,32 +83,32 @@ func (a *Client) DeletePoolsPoolIDMembersMemberID(params *DeletePoolsPoolIDMembe
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*DeletePoolsPoolIDMembersMemberIDNoContent)
+	success, ok := result.(*DeleteMembersMemberIDNoContent)
 	if ok {
 		return success, nil
 	}
 	// unexpected success response
-	unexpectedSuccess := result.(*DeletePoolsPoolIDMembersMemberIDDefault)
+	unexpectedSuccess := result.(*DeleteMembersMemberIDDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
-GetPoolsPoolIDMembers lists members
+GetMembers lists members
 */
-func (a *Client) GetPoolsPoolIDMembers(params *GetPoolsPoolIDMembersParams, opts ...ClientOption) (*GetPoolsPoolIDMembersOK, error) {
+func (a *Client) GetMembers(params *GetMembersParams, opts ...ClientOption) (*GetMembersOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewGetPoolsPoolIDMembersParams()
+		params = NewGetMembersParams()
 	}
 	op := &runtime.ClientOperation{
-		ID:                 "GetPoolsPoolIDMembers",
+		ID:                 "GetMembers",
 		Method:             "GET",
-		PathPattern:        "/pools/{pool_id}/members",
+		PathPattern:        "/members",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &GetPoolsPoolIDMembersReader{formats: a.formats},
+		Reader:             &GetMembersReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	}
@@ -120,32 +120,32 @@ func (a *Client) GetPoolsPoolIDMembers(params *GetPoolsPoolIDMembersParams, opts
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*GetPoolsPoolIDMembersOK)
+	success, ok := result.(*GetMembersOK)
 	if ok {
 		return success, nil
 	}
 	// unexpected success response
-	unexpectedSuccess := result.(*GetPoolsPoolIDMembersDefault)
+	unexpectedSuccess := result.(*GetMembersDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
-GetPoolsPoolIDMembersMemberID shows member detail
+GetMembersMemberID shows member detail
 */
-func (a *Client) GetPoolsPoolIDMembersMemberID(params *GetPoolsPoolIDMembersMemberIDParams, opts ...ClientOption) (*GetPoolsPoolIDMembersMemberIDOK, error) {
+func (a *Client) GetMembersMemberID(params *GetMembersMemberIDParams, opts ...ClientOption) (*GetMembersMemberIDOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewGetPoolsPoolIDMembersMemberIDParams()
+		params = NewGetMembersMemberIDParams()
 	}
 	op := &runtime.ClientOperation{
-		ID:                 "GetPoolsPoolIDMembersMemberID",
+		ID:                 "GetMembersMemberID",
 		Method:             "GET",
-		PathPattern:        "/pools/{pool_id}/members/{member_id}",
+		PathPattern:        "/members/{member_id}",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &GetPoolsPoolIDMembersMemberIDReader{formats: a.formats},
+		Reader:             &GetMembersMemberIDReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	}
@@ -157,32 +157,32 @@ func (a *Client) GetPoolsPoolIDMembersMemberID(params *GetPoolsPoolIDMembersMemb
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*GetPoolsPoolIDMembersMemberIDOK)
+	success, ok := result.(*GetMembersMemberIDOK)
 	if ok {
 		return success, nil
 	}
 	// unexpected success response
-	unexpectedSuccess := result.(*GetPoolsPoolIDMembersMemberIDDefault)
+	unexpectedSuccess := result.(*GetMembersMemberIDDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
-PostPoolsPoolIDMembers creates new member
+PostMembers creates new member
 */
-func (a *Client) PostPoolsPoolIDMembers(params *PostPoolsPoolIDMembersParams, opts ...ClientOption) (*PostPoolsPoolIDMembersCreated, error) {
+func (a *Client) PostMembers(params *PostMembersParams, opts ...ClientOption) (*PostMembersCreated, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewPostPoolsPoolIDMembersParams()
+		params = NewPostMembersParams()
 	}
 	op := &runtime.ClientOperation{
-		ID:                 "PostPoolsPoolIDMembers",
+		ID:                 "PostMembers",
 		Method:             "POST",
-		PathPattern:        "/pools/{pool_id}/members",
+		PathPattern:        "/members",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &PostPoolsPoolIDMembersReader{formats: a.formats},
+		Reader:             &PostMembersReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	}
@@ -194,32 +194,32 @@ func (a *Client) PostPoolsPoolIDMembers(params *PostPoolsPoolIDMembersParams, op
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*PostPoolsPoolIDMembersCreated)
+	success, ok := result.(*PostMembersCreated)
 	if ok {
 		return success, nil
 	}
 	// unexpected success response
-	unexpectedSuccess := result.(*PostPoolsPoolIDMembersDefault)
+	unexpectedSuccess := result.(*PostMembersDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
-PutPoolsPoolIDMembersMemberID updates a member
+PutMembersMemberID updates a member
 */
-func (a *Client) PutPoolsPoolIDMembersMemberID(params *PutPoolsPoolIDMembersMemberIDParams, opts ...ClientOption) (*PutPoolsPoolIDMembersMemberIDAccepted, error) {
+func (a *Client) PutMembersMemberID(params *PutMembersMemberIDParams, opts ...ClientOption) (*PutMembersMemberIDAccepted, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewPutPoolsPoolIDMembersMemberIDParams()
+		params = NewPutMembersMemberIDParams()
 	}
 	op := &runtime.ClientOperation{
-		ID:                 "PutPoolsPoolIDMembersMemberID",
+		ID:                 "PutMembersMemberID",
 		Method:             "PUT",
-		PathPattern:        "/pools/{pool_id}/members/{member_id}",
+		PathPattern:        "/members/{member_id}",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &PutPoolsPoolIDMembersMemberIDReader{formats: a.formats},
+		Reader:             &PutMembersMemberIDReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	}
@@ -231,12 +231,12 @@ func (a *Client) PutPoolsPoolIDMembersMemberID(params *PutPoolsPoolIDMembersMemb
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*PutPoolsPoolIDMembersMemberIDAccepted)
+	success, ok := result.(*PutMembersMemberIDAccepted)
 	if ok {
 		return success, nil
 	}
 	// unexpected success response
-	unexpectedSuccess := result.(*PutPoolsPoolIDMembersMemberIDDefault)
+	unexpectedSuccess := result.(*PutMembersMemberIDDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 

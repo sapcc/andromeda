@@ -31,40 +31,40 @@ import (
 	"github.com/sapcc/andromeda/models"
 )
 
-// GetPoolsPoolIDMembersMemberIDHandlerFunc turns a function with the right signature into a get pools pool ID members member ID handler
-type GetPoolsPoolIDMembersMemberIDHandlerFunc func(GetPoolsPoolIDMembersMemberIDParams) middleware.Responder
+// GetMembersMemberIDHandlerFunc turns a function with the right signature into a get members member ID handler
+type GetMembersMemberIDHandlerFunc func(GetMembersMemberIDParams) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn GetPoolsPoolIDMembersMemberIDHandlerFunc) Handle(params GetPoolsPoolIDMembersMemberIDParams) middleware.Responder {
+func (fn GetMembersMemberIDHandlerFunc) Handle(params GetMembersMemberIDParams) middleware.Responder {
 	return fn(params)
 }
 
-// GetPoolsPoolIDMembersMemberIDHandler interface for that can handle valid get pools pool ID members member ID params
-type GetPoolsPoolIDMembersMemberIDHandler interface {
-	Handle(GetPoolsPoolIDMembersMemberIDParams) middleware.Responder
+// GetMembersMemberIDHandler interface for that can handle valid get members member ID params
+type GetMembersMemberIDHandler interface {
+	Handle(GetMembersMemberIDParams) middleware.Responder
 }
 
-// NewGetPoolsPoolIDMembersMemberID creates a new http.Handler for the get pools pool ID members member ID operation
-func NewGetPoolsPoolIDMembersMemberID(ctx *middleware.Context, handler GetPoolsPoolIDMembersMemberIDHandler) *GetPoolsPoolIDMembersMemberID {
-	return &GetPoolsPoolIDMembersMemberID{Context: ctx, Handler: handler}
+// NewGetMembersMemberID creates a new http.Handler for the get members member ID operation
+func NewGetMembersMemberID(ctx *middleware.Context, handler GetMembersMemberIDHandler) *GetMembersMemberID {
+	return &GetMembersMemberID{Context: ctx, Handler: handler}
 }
 
 /*
-	GetPoolsPoolIDMembersMemberID swagger:route GET /pools/{pool_id}/members/{member_id} Members getPoolsPoolIdMembersMemberId
+	GetMembersMemberID swagger:route GET /members/{member_id} Members getMembersMemberId
 
 Show member detail
 */
-type GetPoolsPoolIDMembersMemberID struct {
+type GetMembersMemberID struct {
 	Context *middleware.Context
-	Handler GetPoolsPoolIDMembersMemberIDHandler
+	Handler GetMembersMemberIDHandler
 }
 
-func (o *GetPoolsPoolIDMembersMemberID) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+func (o *GetMembersMemberID) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
 		*r = *rCtx
 	}
-	var Params = NewGetPoolsPoolIDMembersMemberIDParams()
+	var Params = NewGetMembersMemberIDParams()
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
@@ -75,17 +75,17 @@ func (o *GetPoolsPoolIDMembersMemberID) ServeHTTP(rw http.ResponseWriter, r *htt
 
 }
 
-// GetPoolsPoolIDMembersMemberIDOKBody get pools pool ID members member ID o k body
+// GetMembersMemberIDOKBody get members member ID o k body
 //
-// swagger:model GetPoolsPoolIDMembersMemberIDOKBody
-type GetPoolsPoolIDMembersMemberIDOKBody struct {
+// swagger:model GetMembersMemberIDOKBody
+type GetMembersMemberIDOKBody struct {
 
 	// member
 	Member *models.Member `json:"member,omitempty"`
 }
 
-// Validate validates this get pools pool ID members member ID o k body
-func (o *GetPoolsPoolIDMembersMemberIDOKBody) Validate(formats strfmt.Registry) error {
+// Validate validates this get members member ID o k body
+func (o *GetMembersMemberIDOKBody) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := o.validateMember(formats); err != nil {
@@ -98,7 +98,7 @@ func (o *GetPoolsPoolIDMembersMemberIDOKBody) Validate(formats strfmt.Registry) 
 	return nil
 }
 
-func (o *GetPoolsPoolIDMembersMemberIDOKBody) validateMember(formats strfmt.Registry) error {
+func (o *GetMembersMemberIDOKBody) validateMember(formats strfmt.Registry) error {
 	if swag.IsZero(o.Member) { // not required
 		return nil
 	}
@@ -106,9 +106,9 @@ func (o *GetPoolsPoolIDMembersMemberIDOKBody) validateMember(formats strfmt.Regi
 	if o.Member != nil {
 		if err := o.Member.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("getPoolsPoolIdMembersMemberIdOK" + "." + "member")
+				return ve.ValidateName("getMembersMemberIdOK" + "." + "member")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("getPoolsPoolIdMembersMemberIdOK" + "." + "member")
+				return ce.ValidateName("getMembersMemberIdOK" + "." + "member")
 			}
 			return err
 		}
@@ -117,8 +117,8 @@ func (o *GetPoolsPoolIDMembersMemberIDOKBody) validateMember(formats strfmt.Regi
 	return nil
 }
 
-// ContextValidate validate this get pools pool ID members member ID o k body based on the context it is used
-func (o *GetPoolsPoolIDMembersMemberIDOKBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validate this get members member ID o k body based on the context it is used
+func (o *GetMembersMemberIDOKBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
 	if err := o.contextValidateMember(ctx, formats); err != nil {
@@ -131,14 +131,14 @@ func (o *GetPoolsPoolIDMembersMemberIDOKBody) ContextValidate(ctx context.Contex
 	return nil
 }
 
-func (o *GetPoolsPoolIDMembersMemberIDOKBody) contextValidateMember(ctx context.Context, formats strfmt.Registry) error {
+func (o *GetMembersMemberIDOKBody) contextValidateMember(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Member != nil {
 		if err := o.Member.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("getPoolsPoolIdMembersMemberIdOK" + "." + "member")
+				return ve.ValidateName("getMembersMemberIdOK" + "." + "member")
 			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("getPoolsPoolIdMembersMemberIdOK" + "." + "member")
+				return ce.ValidateName("getMembersMemberIdOK" + "." + "member")
 			}
 			return err
 		}
@@ -148,7 +148,7 @@ func (o *GetPoolsPoolIDMembersMemberIDOKBody) contextValidateMember(ctx context.
 }
 
 // MarshalBinary interface implementation
-func (o *GetPoolsPoolIDMembersMemberIDOKBody) MarshalBinary() ([]byte, error) {
+func (o *GetMembersMemberIDOKBody) MarshalBinary() ([]byte, error) {
 	if o == nil {
 		return nil, nil
 	}
@@ -156,8 +156,8 @@ func (o *GetPoolsPoolIDMembersMemberIDOKBody) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (o *GetPoolsPoolIDMembersMemberIDOKBody) UnmarshalBinary(b []byte) error {
-	var res GetPoolsPoolIDMembersMemberIDOKBody
+func (o *GetMembersMemberIDOKBody) UnmarshalBinary(b []byte) error {
+	var res GetMembersMemberIDOKBody
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

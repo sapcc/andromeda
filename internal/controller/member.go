@@ -41,15 +41,15 @@ type MemberController struct {
 	sv micro.Service
 }
 
-//GetMembers GET /pools/:id/members
-func (c MemberController) GetMembers(params members.GetPoolsPoolIDMembersParams) middleware.Responder {
+// GetMembers GET /members
+func (c MemberController) GetMembers(params members.GetMembersParams) middleware.Responder {
 	pagination := db.NewPagination("member", params.Limit, params.Marker, params.Sort, params.PageReverse)
 	//filter for pool_id, pool_id is safe and type validated
 	filter := []string{fmt.Sprintf("pool_id = '%s'", params.PoolID)}
 	rows, err := pagination.Query(c.db, params.HTTPRequest, filter)
 	if err != nil {
 		if errors.Is(err, db.ErrInvalidMarker) {
-			return members.NewGetPoolsPoolIDMembersBadRequest().WithPayload(utils.InvalidMarker)
+			return members.NewGetMembersBadRequest().WithPayload(utils.InvalidMarker)
 		}
 		if errors.Is(err, db.ErrPolicyForbidden) {
 			return utils.GetPolicyForbiddenResponse()
@@ -67,12 +67,12 @@ func (c MemberController) GetMembers(params members.GetPoolsPoolIDMembersParams)
 		_members = append(_members, &member)
 	}
 	_links := pagination.GetLinks(_members, params.HTTPRequest)
-	payload := members.GetPoolsPoolIDMembersOKBody{Members: _members, Links: _links}
-	return members.NewGetPoolsPoolIDMembersOK().WithPayload(&payload)
+	payload := members.GetMembersOKBody{Members: _members, Links: _links}
+	return members.NewGetMembersOK().WithPayload(&payload)
 }
 
-//PostMembers POST /pools/:id/members
-func (c MemberController) PostMembers(params members.PostPoolsPoolIDMembersParams) middleware.Responder {
+// PostMembers POST /members
+func (c MemberController) PostMembers(params members.PostMembersParams) middleware.Responder {
 	member := params.Member.Member
 	projectID, err := auth.ProjectScopeForRequest(params.HTTPRequest)
 	if err != nil {
@@ -82,11 +82,11 @@ func (c MemberController) PostMembers(params members.PostPoolsPoolIDMembersParam
 		return utils.GetPolicyForbiddenResponse()
 	}
 
-	pool := models.Pool{ID: params.PoolID}
+	pool := models.Pool{ID: *params.Member.Member.PoolID}
 	if err := PopulatePool(c.db, &pool, []string{"project_id"}, false); err != nil || *pool.ProjectID != projectID {
-		return members.NewPostPoolsPoolIDMembersNotFound().WithPayload(utils.GetErrorPoolNotFound(&params.PoolID))
+		return members.NewPostMembersNotFound().WithPayload(utils.GetErrorPoolNotFound(&pool.ID))
 	}
-	member.PoolID = params.PoolID
+	member.PoolID = &pool.ID
 	member.ProjectID = &projectID
 
 	// Set default values
@@ -111,42 +111,42 @@ func (c MemberController) PostMembers(params members.PostPoolsPoolIDMembersParam
 			return err
 		}
 
-		return UpdateCascadePool(tx, params.PoolID, "PENDING_UPDATE")
+		return UpdateCascadePool(tx, pool.ID, "PENDING_UPDATE")
 	}); err != nil {
 		var pe *pq.Error
 		if errors.As(err, &pe) && pe.Code == pgerrcode.UniqueViolation {
-			return members.NewPostPoolsPoolIDMembersDefault(409).WithPayload(utils.DuplicateMember)
+			return members.NewPostMembersDefault(409).WithPayload(utils.DuplicateMember)
 		}
 		var me *mysql.MySQLError
 		if errors.As(err, &me) && me.Number == 1062 {
-			return members.NewPostPoolsPoolIDMembersDefault(409).WithPayload(utils.DuplicateMember)
+			return members.NewPostMembersDefault(409).WithPayload(utils.DuplicateMember)
 		}
 		panic(err)
 	}
 
-	return members.NewPostPoolsPoolIDMembersCreated().
-		WithPayload(&members.PostPoolsPoolIDMembersCreatedBody{Member: member})
+	return members.NewPostMembersCreated().
+		WithPayload(&members.PostMembersCreatedBody{Member: member})
 }
 
-//GetMembersMemberID GET /pools/:id/members/:id
-func (c MemberController) GetMembersMemberID(params members.GetPoolsPoolIDMembersMemberIDParams) middleware.Responder {
-	member := models.Member{ID: params.MemberID, PoolID: params.PoolID}
+// GetMembersMemberID GET /members/:id
+func (c MemberController) GetMembersMemberID(params members.GetMembersMemberIDParams) middleware.Responder {
+	member := models.Member{ID: params.MemberID}
 	if err := PopulateMember(c.db, &member, []string{"*"}); err != nil {
-		return members.NewGetPoolsPoolIDMembersMemberIDNotFound().WithPayload(utils.NotFound)
+		return members.NewGetMembersMemberIDNotFound().WithPayload(utils.NotFound)
 	}
 
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *member.ProjectID) {
 		return utils.GetPolicyForbiddenResponse()
 	}
-	return members.NewGetPoolsPoolIDMembersMemberIDOK().
-		WithPayload(&members.GetPoolsPoolIDMembersMemberIDOKBody{Member: &member})
+	return members.NewGetMembersMemberIDOK().
+		WithPayload(&members.GetMembersMemberIDOKBody{Member: &member})
 }
 
-//PutMembersMemberID PUT /pools/:id/members/:id
-func (c MemberController) PutMembersMemberID(params members.PutPoolsPoolIDMembersMemberIDParams) middleware.Responder {
-	member := models.Member{ID: params.MemberID, PoolID: params.PoolID}
+// PutMembersMemberID PUT /members/:id
+func (c MemberController) PutMembersMemberID(params members.PutMembersMemberIDParams) middleware.Responder {
+	member := models.Member{ID: params.MemberID}
 	if err := PopulateMember(c.db, &member, []string{"project_id"}); err != nil {
-		return members.NewPutPoolsPoolIDMembersMemberIDNotFound().WithPayload(utils.NotFound)
+		return members.NewPutMembersMemberIDNotFound().WithPayload(utils.NotFound)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *member.ProjectID) {
 		return utils.GetPolicyForbiddenResponse()
@@ -154,7 +154,6 @@ func (c MemberController) PutMembersMemberID(params members.PutPoolsPoolIDMember
 
 	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
 		params.Member.Member.ID = params.MemberID
-		params.Member.Member.PoolID = params.PoolID
 
 		sql := `
 			UPDATE member SET
@@ -169,7 +168,7 @@ func (c MemberController) PutMembersMemberID(params members.PutPoolsPoolIDMember
 		if _, err := tx.NamedExec(sql, params.Member.Member); err != nil {
 			panic(err)
 		}
-		return UpdateCascadePool(tx, params.PoolID, "PENDING_UPDATE")
+		return UpdateCascadePool(tx, *member.PoolID, "PENDING_UPDATE")
 	}); err != nil {
 		panic(err)
 	}
@@ -179,15 +178,15 @@ func (c MemberController) PutMembersMemberID(params members.PutPoolsPoolIDMember
 		panic(err)
 	}
 
-	return members.NewPutPoolsPoolIDMembersMemberIDAccepted().
-		WithPayload(&members.PutPoolsPoolIDMembersMemberIDAcceptedBody{Member: &member})
+	return members.NewPutMembersMemberIDAccepted().
+		WithPayload(&members.PutMembersMemberIDAcceptedBody{Member: &member})
 }
 
-//DeleteMembersMemberID DELETE /pools/:id/members/:id
-func (c MemberController) DeleteMembersMemberID(params members.DeletePoolsPoolIDMembersMemberIDParams) middleware.Responder {
-	member := models.Member{ID: params.MemberID, PoolID: params.PoolID}
+// DeleteMembersMemberID DELETE /pools/:id/members/:id
+func (c MemberController) DeleteMembersMemberID(params members.DeleteMembersMemberIDParams) middleware.Responder {
+	member := models.Member{ID: params.MemberID}
 	if err := PopulateMember(c.db, &member, []string{"project_id"}); err != nil {
-		return members.NewDeletePoolsPoolIDMembersMemberIDNotFound().WithPayload(utils.NotFound)
+		return members.NewDeleteMembersMemberIDNotFound().WithPayload(utils.NotFound)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *member.ProjectID) {
 		return utils.GetPolicyForbiddenResponse()
@@ -199,19 +198,21 @@ func (c MemberController) DeleteMembersMemberID(params members.DeletePoolsPoolID
 		if deleted, _ := res.RowsAffected(); deleted != 1 {
 			return EmptyResultError
 		}
-		return UpdateCascadePool(tx, params.PoolID, "PENDING_UPDATE")
+		return UpdateCascadePool(tx, *member.PoolID, "PENDING_UPDATE")
 	}); err != nil {
 		if errors.Is(err, EmptyResultError) {
-			return members.NewDeletePoolsPoolIDMembersMemberIDNotFound().WithPayload(utils.NotFound)
+			return members.NewDeleteMembersMemberIDNotFound().WithPayload(utils.NotFound)
 		}
 		panic(err)
 	}
 
-	return members.NewDeletePoolsPoolIDMembersMemberIDNoContent()
+	return members.NewDeleteMembersMemberIDNoContent()
 }
 
 func PopulateMember(db *sqlx.DB, member *models.Member, fields []string) error {
-	sql := db.Rebind(fmt.Sprintf(`SELECT %s FROM member WHERE pool_id = ? AND id = ?`, strings.Join(fields, ", ")))
+	sql := db.Rebind(
+		fmt.Sprintf(`SELECT %s FROM member WHERE pool_id = ? AND id = ?`,
+			strings.Join(fields, ", ")))
 	if err := db.Get(member, sql, member.PoolID, member.ID); err != nil {
 		return err
 	}

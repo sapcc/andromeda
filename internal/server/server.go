@@ -93,11 +93,11 @@ func ExecuteServer(server *restapi.Server) error {
 	api.PoolsDeletePoolsPoolIDHandler = pools.DeletePoolsPoolIDHandlerFunc(c.Pools.DeletePoolsPoolID)
 
 	// Members
-	api.MembersGetPoolsPoolIDMembersHandler = members.GetPoolsPoolIDMembersHandlerFunc(c.Members.GetMembers)
-	api.MembersPostPoolsPoolIDMembersHandler = members.PostPoolsPoolIDMembersHandlerFunc(c.Members.PostMembers)
-	api.MembersGetPoolsPoolIDMembersMemberIDHandler = members.GetPoolsPoolIDMembersMemberIDHandlerFunc(c.Members.GetMembersMemberID)
-	api.MembersPutPoolsPoolIDMembersMemberIDHandler = members.PutPoolsPoolIDMembersMemberIDHandlerFunc(c.Members.PutMembersMemberID)
-	api.MembersDeletePoolsPoolIDMembersMemberIDHandler = members.DeletePoolsPoolIDMembersMemberIDHandlerFunc(c.Members.DeleteMembersMemberID)
+	api.MembersGetMembersHandler = members.GetMembersHandlerFunc(c.Members.GetMembers)
+	api.MembersPostMembersHandler = members.PostMembersHandlerFunc(c.Members.PostMembers)
+	api.MembersGetMembersMemberIDHandler = members.GetMembersMemberIDHandlerFunc(c.Members.GetMembersMemberID)
+	api.MembersPutMembersMemberIDHandler = members.PutMembersMemberIDHandlerFunc(c.Members.PutMembersMemberID)
+	api.MembersDeleteMembersMemberIDHandler = members.DeleteMembersMemberIDHandlerFunc(c.Members.DeleteMembersMemberID)
 
 	// Datacenters
 	api.DatacentersGetDatacentersHandler = datacenters.GetDatacentersHandlerFunc(c.Datacenters.GetDatacenters)

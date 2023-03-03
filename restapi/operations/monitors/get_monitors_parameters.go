@@ -59,6 +59,10 @@ type GetMonitorsParams struct {
 	  In: query
 	*/
 	PageReverse *bool
+	/*Pool ID of the monitors to fetch
+	  In: query
+	*/
+	PoolID *strfmt.UUID
 	/*Comma-separated list of sort keys, optinally prefix with - to reverse sort order.
 	  In: query
 	*/
@@ -88,6 +92,11 @@ func (o *GetMonitorsParams) BindRequest(r *http.Request, route *middleware.Match
 
 	qPageReverse, qhkPageReverse, _ := qs.GetOK("page_reverse")
 	if err := o.bindPageReverse(qPageReverse, qhkPageReverse, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
+	qPoolID, qhkPoolID, _ := qs.GetOK("pool_id")
+	if err := o.bindPoolID(qPoolID, qhkPoolID, route.Formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -181,6 +190,43 @@ func (o *GetMonitorsParams) bindPageReverse(rawData []string, hasKey bool, forma
 	}
 	o.PageReverse = &value
 
+	return nil
+}
+
+// bindPoolID binds and validates parameter PoolID from query.
+func (o *GetMonitorsParams) bindPoolID(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
+
+	// Format: uuid
+	value, err := formats.Parse("uuid", raw)
+	if err != nil {
+		return errors.InvalidType("pool_id", "query", "strfmt.UUID", raw)
+	}
+	o.PoolID = (value.(*strfmt.UUID))
+
+	if err := o.validatePoolID(formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// validatePoolID carries on validations for parameter PoolID
+func (o *GetMonitorsParams) validatePoolID(formats strfmt.Registry) error {
+
+	if err := validate.FormatOf("pool_id", "query", "uuid", o.PoolID.String(), formats); err != nil {
+		return err
+	}
 	return nil
 }
 

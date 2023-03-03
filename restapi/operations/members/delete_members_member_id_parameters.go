@@ -28,19 +28,19 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// NewDeletePoolsPoolIDMembersMemberIDParams creates a new DeletePoolsPoolIDMembersMemberIDParams object
+// NewDeleteMembersMemberIDParams creates a new DeleteMembersMemberIDParams object
 //
 // There are no default values defined in the spec.
-func NewDeletePoolsPoolIDMembersMemberIDParams() DeletePoolsPoolIDMembersMemberIDParams {
+func NewDeleteMembersMemberIDParams() DeleteMembersMemberIDParams {
 
-	return DeletePoolsPoolIDMembersMemberIDParams{}
+	return DeleteMembersMemberIDParams{}
 }
 
-// DeletePoolsPoolIDMembersMemberIDParams contains all the bound params for the delete pools pool ID members member ID operation
+// DeleteMembersMemberIDParams contains all the bound params for the delete members member ID operation
 // typically these are obtained from a http.Request
 //
-// swagger:parameters DeletePoolsPoolIDMembersMemberID
-type DeletePoolsPoolIDMembersMemberIDParams struct {
+// swagger:parameters DeleteMembersMemberID
+type DeleteMembersMemberIDParams struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
@@ -50,29 +50,19 @@ type DeletePoolsPoolIDMembersMemberIDParams struct {
 	  In: path
 	*/
 	MemberID strfmt.UUID
-	/*The UUID of the pool
-	  Required: true
-	  In: path
-	*/
-	PoolID strfmt.UUID
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
 // for simple values it will use straight method calls.
 //
-// To ensure default values, the struct must have been initialized with NewDeletePoolsPoolIDMembersMemberIDParams() beforehand.
-func (o *DeletePoolsPoolIDMembersMemberIDParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+// To ensure default values, the struct must have been initialized with NewDeleteMembersMemberIDParams() beforehand.
+func (o *DeleteMembersMemberIDParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
 	var res []error
 
 	o.HTTPRequest = r
 
 	rMemberID, rhkMemberID, _ := route.Params.GetOK("member_id")
 	if err := o.bindMemberID(rMemberID, rhkMemberID, route.Formats); err != nil {
-		res = append(res, err)
-	}
-
-	rPoolID, rhkPoolID, _ := route.Params.GetOK("pool_id")
-	if err := o.bindPoolID(rPoolID, rhkPoolID, route.Formats); err != nil {
 		res = append(res, err)
 	}
 	if len(res) > 0 {
@@ -82,7 +72,7 @@ func (o *DeletePoolsPoolIDMembersMemberIDParams) BindRequest(r *http.Request, ro
 }
 
 // bindMemberID binds and validates parameter MemberID from path.
-func (o *DeletePoolsPoolIDMembersMemberIDParams) bindMemberID(rawData []string, hasKey bool, formats strfmt.Registry) error {
+func (o *DeleteMembersMemberIDParams) bindMemberID(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
@@ -106,42 +96,9 @@ func (o *DeletePoolsPoolIDMembersMemberIDParams) bindMemberID(rawData []string, 
 }
 
 // validateMemberID carries on validations for parameter MemberID
-func (o *DeletePoolsPoolIDMembersMemberIDParams) validateMemberID(formats strfmt.Registry) error {
+func (o *DeleteMembersMemberIDParams) validateMemberID(formats strfmt.Registry) error {
 
 	if err := validate.FormatOf("member_id", "path", "uuid", o.MemberID.String(), formats); err != nil {
-		return err
-	}
-	return nil
-}
-
-// bindPoolID binds and validates parameter PoolID from path.
-func (o *DeletePoolsPoolIDMembersMemberIDParams) bindPoolID(rawData []string, hasKey bool, formats strfmt.Registry) error {
-	var raw string
-	if len(rawData) > 0 {
-		raw = rawData[len(rawData)-1]
-	}
-
-	// Required: true
-	// Parameter is provided by construction from the route
-
-	// Format: uuid
-	value, err := formats.Parse("uuid", raw)
-	if err != nil {
-		return errors.InvalidType("pool_id", "path", "strfmt.UUID", raw)
-	}
-	o.PoolID = *(value.(*strfmt.UUID))
-
-	if err := o.validatePoolID(formats); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// validatePoolID carries on validations for parameter PoolID
-func (o *DeletePoolsPoolIDMembersMemberIDParams) validatePoolID(formats strfmt.Registry) error {
-
-	if err := validate.FormatOf("pool_id", "path", "uuid", o.PoolID.String(), formats); err != nil {
 		return err
 	}
 	return nil

@@ -28,10 +28,9 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// GetPoolsPoolIDMembersMemberIDURL generates an URL for the get pools pool ID members member ID operation
-type GetPoolsPoolIDMembersMemberIDURL struct {
+// DeleteMembersMemberIDURL generates an URL for the delete members member ID operation
+type DeleteMembersMemberIDURL struct {
 	MemberID strfmt.UUID
-	PoolID   strfmt.UUID
 
 	_basePath string
 	// avoid unkeyed usage
@@ -41,7 +40,7 @@ type GetPoolsPoolIDMembersMemberIDURL struct {
 // WithBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *GetPoolsPoolIDMembersMemberIDURL) WithBasePath(bp string) *GetPoolsPoolIDMembersMemberIDURL {
+func (o *DeleteMembersMemberIDURL) WithBasePath(bp string) *DeleteMembersMemberIDURL {
 	o.SetBasePath(bp)
 	return o
 }
@@ -49,28 +48,21 @@ func (o *GetPoolsPoolIDMembersMemberIDURL) WithBasePath(bp string) *GetPoolsPool
 // SetBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *GetPoolsPoolIDMembersMemberIDURL) SetBasePath(bp string) {
+func (o *DeleteMembersMemberIDURL) SetBasePath(bp string) {
 	o._basePath = bp
 }
 
 // Build a url path and query string
-func (o *GetPoolsPoolIDMembersMemberIDURL) Build() (*url.URL, error) {
+func (o *DeleteMembersMemberIDURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/pools/{pool_id}/members/{member_id}"
+	var _path = "/members/{member_id}"
 
 	memberID := o.MemberID.String()
 	if memberID != "" {
 		_path = strings.Replace(_path, "{member_id}", memberID, -1)
 	} else {
-		return nil, errors.New("memberId is required on GetPoolsPoolIDMembersMemberIDURL")
-	}
-
-	poolID := o.PoolID.String()
-	if poolID != "" {
-		_path = strings.Replace(_path, "{pool_id}", poolID, -1)
-	} else {
-		return nil, errors.New("poolId is required on GetPoolsPoolIDMembersMemberIDURL")
+		return nil, errors.New("memberId is required on DeleteMembersMemberIDURL")
 	}
 
 	_basePath := o._basePath
@@ -83,7 +75,7 @@ func (o *GetPoolsPoolIDMembersMemberIDURL) Build() (*url.URL, error) {
 }
 
 // Must is a helper function to panic when the url builder returns an error
-func (o *GetPoolsPoolIDMembersMemberIDURL) Must(u *url.URL, err error) *url.URL {
+func (o *DeleteMembersMemberIDURL) Must(u *url.URL, err error) *url.URL {
 	if err != nil {
 		panic(err)
 	}
@@ -94,17 +86,17 @@ func (o *GetPoolsPoolIDMembersMemberIDURL) Must(u *url.URL, err error) *url.URL 
 }
 
 // String returns the string representation of the path with query string
-func (o *GetPoolsPoolIDMembersMemberIDURL) String() string {
+func (o *DeleteMembersMemberIDURL) String() string {
 	return o.Must(o.Build()).String()
 }
 
 // BuildFull builds a full url with scheme, host, path and query string
-func (o *GetPoolsPoolIDMembersMemberIDURL) BuildFull(scheme, host string) (*url.URL, error) {
+func (o *DeleteMembersMemberIDURL) BuildFull(scheme, host string) (*url.URL, error) {
 	if scheme == "" {
-		return nil, errors.New("scheme is required for a full url on GetPoolsPoolIDMembersMemberIDURL")
+		return nil, errors.New("scheme is required for a full url on DeleteMembersMemberIDURL")
 	}
 	if host == "" {
-		return nil, errors.New("host is required for a full url on GetPoolsPoolIDMembersMemberIDURL")
+		return nil, errors.New("host is required for a full url on DeleteMembersMemberIDURL")
 	}
 
 	base, err := o.Build()
@@ -118,6 +110,6 @@ func (o *GetPoolsPoolIDMembersMemberIDURL) BuildFull(scheme, host string) (*url.
 }
 
 // StringFull returns the string representation of a complete url
-func (o *GetPoolsPoolIDMembersMemberIDURL) StringFull(scheme, host string) string {
+func (o *DeleteMembersMemberIDURL) StringFull(scheme, host string) string {
 	return o.Must(o.BuildFull(scheme, host)).String()
 }

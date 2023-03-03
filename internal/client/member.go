@@ -32,7 +32,7 @@ var MemberOptions struct {
 type MemberList struct {
 	PositionalMemberList struct {
 		PoolID strfmt.UUID `description:"UUID of the pool"`
-	} `positional-args:"yes" required:"yes"`
+	} `positional-args:"yes" required:"no"`
 }
 
 type MemberShow struct {
@@ -61,9 +61,9 @@ type MemberDelete struct {
 }
 
 func (*MemberList) Execute(_ []string) error {
-	resp, err := AndromedaClient.Members.GetPoolsPoolIDMembers(members.
-		NewGetPoolsPoolIDMembersParams().
-		WithPoolID(MemberOptions.PositionalMemberList.PoolID))
+	resp, err := AndromedaClient.Members.GetMembers(members.
+		NewGetMembersParams().
+		WithPoolID(&MemberOptions.PositionalMemberList.PoolID))
 	if err != nil {
 		return err
 	}
@@ -72,17 +72,16 @@ func (*MemberList) Execute(_ []string) error {
 
 func (*MemberCreate) Execute(_ []string) error {
 	adminStateUp := !MemberOptions.Disable
-	member := members.PostPoolsPoolIDMembersBody{Member: &models.Member{
+	member := members.PostMembersBody{Member: &models.Member{
 		AdminStateUp: &adminStateUp,
 		Name:         &MemberOptions.Name,
 		Address:      &MemberOptions.Address,
 		Port:         &MemberOptions.Port,
 		DatacenterID: &MemberOptions.DatacenterID,
+		PoolID:       &MemberOptions.PositionalMemberCreate.PoolID,
 	}}
-	resp, err := AndromedaClient.Members.PostPoolsPoolIDMembers(members.
-		NewPostPoolsPoolIDMembersParams().
-		WithPoolID(MemberOptions.PositionalMemberCreate.PoolID).
-		WithMember(member))
+	resp, err := AndromedaClient.Members.PostMembers(members.
+		NewPostMembersParams().WithMember(member))
 	if err != nil {
 		return err
 	}
@@ -91,10 +90,9 @@ func (*MemberCreate) Execute(_ []string) error {
 
 func (*MemberShow) Execute(_ []string) error {
 	params := members.
-		NewGetPoolsPoolIDMembersMemberIDParams().
-		WithPoolID(MemberOptions.PositionalMemberShow.PoolID).
+		NewGetMembersMemberIDParams().
 		WithMemberID(MemberOptions.MemberShow.PositionalMemberShow.MemberID)
-	resp, err := AndromedaClient.Members.GetPoolsPoolIDMembersMemberID(params)
+	resp, err := AndromedaClient.Members.GetMembersMemberID(params)
 	if err != nil {
 		return err
 	}
@@ -103,11 +101,10 @@ func (*MemberShow) Execute(_ []string) error {
 
 func (*MemberDelete) Execute(_ []string) error {
 	params := members.
-		NewDeletePoolsPoolIDMembersMemberIDParams().
-		WithPoolID(MemberOptions.MemberDelete.PositionalMemberDelete.PoolID).
+		NewDeleteMembersMemberIDParams().
 		WithMemberID(MemberOptions.MemberDelete.PositionalMemberDelete.UUID)
 
-	if _, err := AndromedaClient.Members.DeletePoolsPoolIDMembersMemberID(params); err != nil {
+	if _, err := AndromedaClient.Members.DeleteMembersMemberID(params); err != nil {
 		return err
 	}
 	return nil

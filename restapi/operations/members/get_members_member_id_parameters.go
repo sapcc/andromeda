@@ -28,19 +28,19 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// NewGetPoolsPoolIDMembersMemberIDParams creates a new GetPoolsPoolIDMembersMemberIDParams object
+// NewGetMembersMemberIDParams creates a new GetMembersMemberIDParams object
 //
 // There are no default values defined in the spec.
-func NewGetPoolsPoolIDMembersMemberIDParams() GetPoolsPoolIDMembersMemberIDParams {
+func NewGetMembersMemberIDParams() GetMembersMemberIDParams {
 
-	return GetPoolsPoolIDMembersMemberIDParams{}
+	return GetMembersMemberIDParams{}
 }
 
-// GetPoolsPoolIDMembersMemberIDParams contains all the bound params for the get pools pool ID members member ID operation
+// GetMembersMemberIDParams contains all the bound params for the get members member ID operation
 // typically these are obtained from a http.Request
 //
-// swagger:parameters GetPoolsPoolIDMembersMemberID
-type GetPoolsPoolIDMembersMemberIDParams struct {
+// swagger:parameters GetMembersMemberID
+type GetMembersMemberIDParams struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
@@ -50,29 +50,19 @@ type GetPoolsPoolIDMembersMemberIDParams struct {
 	  In: path
 	*/
 	MemberID strfmt.UUID
-	/*The UUID of the pool
-	  Required: true
-	  In: path
-	*/
-	PoolID strfmt.UUID
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
 // for simple values it will use straight method calls.
 //
-// To ensure default values, the struct must have been initialized with NewGetPoolsPoolIDMembersMemberIDParams() beforehand.
-func (o *GetPoolsPoolIDMembersMemberIDParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+// To ensure default values, the struct must have been initialized with NewGetMembersMemberIDParams() beforehand.
+func (o *GetMembersMemberIDParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
 	var res []error
 
 	o.HTTPRequest = r
 
 	rMemberID, rhkMemberID, _ := route.Params.GetOK("member_id")
 	if err := o.bindMemberID(rMemberID, rhkMemberID, route.Formats); err != nil {
-		res = append(res, err)
-	}
-
-	rPoolID, rhkPoolID, _ := route.Params.GetOK("pool_id")
-	if err := o.bindPoolID(rPoolID, rhkPoolID, route.Formats); err != nil {
 		res = append(res, err)
 	}
 	if len(res) > 0 {
@@ -82,7 +72,7 @@ func (o *GetPoolsPoolIDMembersMemberIDParams) BindRequest(r *http.Request, route
 }
 
 // bindMemberID binds and validates parameter MemberID from path.
-func (o *GetPoolsPoolIDMembersMemberIDParams) bindMemberID(rawData []string, hasKey bool, formats strfmt.Registry) error {
+func (o *GetMembersMemberIDParams) bindMemberID(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
@@ -106,42 +96,9 @@ func (o *GetPoolsPoolIDMembersMemberIDParams) bindMemberID(rawData []string, has
 }
 
 // validateMemberID carries on validations for parameter MemberID
-func (o *GetPoolsPoolIDMembersMemberIDParams) validateMemberID(formats strfmt.Registry) error {
+func (o *GetMembersMemberIDParams) validateMemberID(formats strfmt.Registry) error {
 
 	if err := validate.FormatOf("member_id", "path", "uuid", o.MemberID.String(), formats); err != nil {
-		return err
-	}
-	return nil
-}
-
-// bindPoolID binds and validates parameter PoolID from path.
-func (o *GetPoolsPoolIDMembersMemberIDParams) bindPoolID(rawData []string, hasKey bool, formats strfmt.Registry) error {
-	var raw string
-	if len(rawData) > 0 {
-		raw = rawData[len(rawData)-1]
-	}
-
-	// Required: true
-	// Parameter is provided by construction from the route
-
-	// Format: uuid
-	value, err := formats.Parse("uuid", raw)
-	if err != nil {
-		return errors.InvalidType("pool_id", "path", "strfmt.UUID", raw)
-	}
-	o.PoolID = *(value.(*strfmt.UUID))
-
-	if err := o.validatePoolID(formats); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// validatePoolID carries on validations for parameter PoolID
-func (o *GetPoolsPoolIDMembersMemberIDParams) validatePoolID(formats strfmt.Registry) error {
-
-	if err := validate.FormatOf("pool_id", "path", "uuid", o.PoolID.String(), formats); err != nil {
 		return err
 	}
 	return nil

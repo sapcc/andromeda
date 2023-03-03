@@ -26,23 +26,22 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/validate"
 )
 
-// NewPostPoolsPoolIDMembersParams creates a new PostPoolsPoolIDMembersParams object
+// NewPostMembersParams creates a new PostMembersParams object
 //
 // There are no default values defined in the spec.
-func NewPostPoolsPoolIDMembersParams() PostPoolsPoolIDMembersParams {
+func NewPostMembersParams() PostMembersParams {
 
-	return PostPoolsPoolIDMembersParams{}
+	return PostMembersParams{}
 }
 
-// PostPoolsPoolIDMembersParams contains all the bound params for the post pools pool ID members operation
+// PostMembersParams contains all the bound params for the post members operation
 // typically these are obtained from a http.Request
 //
-// swagger:parameters PostPoolsPoolIDMembers
-type PostPoolsPoolIDMembersParams struct {
+// swagger:parameters PostMembers
+type PostMembersParams struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
@@ -51,26 +50,21 @@ type PostPoolsPoolIDMembersParams struct {
 	  Required: true
 	  In: body
 	*/
-	Member PostPoolsPoolIDMembersBody
-	/*The UUID of the pool
-	  Required: true
-	  In: path
-	*/
-	PoolID strfmt.UUID
+	Member PostMembersBody
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
 // for simple values it will use straight method calls.
 //
-// To ensure default values, the struct must have been initialized with NewPostPoolsPoolIDMembersParams() beforehand.
-func (o *PostPoolsPoolIDMembersParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+// To ensure default values, the struct must have been initialized with NewPostMembersParams() beforehand.
+func (o *PostMembersParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
 	var res []error
 
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body PostPoolsPoolIDMembersBody
+		var body PostMembersBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			if err == io.EOF {
 				res = append(res, errors.Required("member", "body", ""))
@@ -95,46 +89,8 @@ func (o *PostPoolsPoolIDMembersParams) BindRequest(r *http.Request, route *middl
 	} else {
 		res = append(res, errors.Required("member", "body", ""))
 	}
-
-	rPoolID, rhkPoolID, _ := route.Params.GetOK("pool_id")
-	if err := o.bindPoolID(rPoolID, rhkPoolID, route.Formats); err != nil {
-		res = append(res, err)
-	}
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-// bindPoolID binds and validates parameter PoolID from path.
-func (o *PostPoolsPoolIDMembersParams) bindPoolID(rawData []string, hasKey bool, formats strfmt.Registry) error {
-	var raw string
-	if len(rawData) > 0 {
-		raw = rawData[len(rawData)-1]
-	}
-
-	// Required: true
-	// Parameter is provided by construction from the route
-
-	// Format: uuid
-	value, err := formats.Parse("uuid", raw)
-	if err != nil {
-		return errors.InvalidType("pool_id", "path", "strfmt.UUID", raw)
-	}
-	o.PoolID = *(value.(*strfmt.UUID))
-
-	if err := o.validatePoolID(formats); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// validatePoolID carries on validations for parameter PoolID
-func (o *PostPoolsPoolIDMembersParams) validatePoolID(formats strfmt.Registry) error {
-
-	if err := validate.FormatOf("pool_id", "path", "uuid", o.PoolID.String(), formats); err != nil {
-		return err
 	}
 	return nil
 }
