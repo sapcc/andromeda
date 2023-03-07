@@ -149,15 +149,43 @@ func (c PoolController) PutPoolsPoolID(params pools.PutPoolsPoolIDParams) middle
 		return utils.GetPolicyForbiddenResponse()
 	}
 
-	params.Pool.Pool.ID = params.PoolID
-	sql := `
-		UPDATE pool SET
-			name = COALESCE(:name, name),
-			admin_state_up = COALESCE(:admin_state_up, admin_state_up),
-		    updated_at = NOW()
-		WHERE id = :id
-	`
-	if _, err := c.db.NamedExec(sql, params.Pool.Pool); err != nil {
+	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
+		// Populate args
+		if params.Pool.Pool.Domains != nil {
+			var existingDomainRefs []strfmt.UUID
+			sql := tx.Rebind(`SELECT domain_id FROM domain_pool_relation WHERE pool_id = ? FOR UPDATE`)
+			if err := tx.Select(&existingDomainRefs, sql, params.PoolID); err != nil {
+				return err
+			}
+
+			domainsRemoved := utils.UUIDsDifference(existingDomainRefs, params.Pool.Pool.Domains)
+			domainsAdded := utils.UUIDsDifference(params.Pool.Pool.Domains, existingDomainRefs)
+			for _, domain := range domainsRemoved {
+				if _, err := removeDomainPoolRelations(tx, domain, []strfmt.UUID{params.PoolID}); err != nil {
+					return err
+				}
+			}
+			for _, domain := range domainsAdded {
+				if _, err := insertDomainPoolRelations(tx, domain, *pool.ProjectID, []strfmt.UUID{params.PoolID}); err != nil {
+					return err
+				}
+			}
+		}
+
+		params.Pool.Pool.ID = params.PoolID
+		sql := `
+			UPDATE pool SET
+				name = COALESCE(:name, name),
+				admin_state_up = COALESCE(:admin_state_up, admin_state_up),
+				updated_at = NOW()
+			WHERE id = :id
+		`
+		if _, err := tx.NamedExec(sql, params.Pool.Pool); err != nil {
+			return err
+		}
+
+		return nil
+	}); err != nil {
 		panic(err)
 	}
 
