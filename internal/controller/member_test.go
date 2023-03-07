@@ -31,45 +31,43 @@ func (t *SuiteTest) TestMembers() {
 	rr := httptest.NewRecorder()
 
 	poolID := t.createPool()
-	res := mc.GetMembersMemberID(members.GetPoolsPoolIDMembersMemberIDParams{
+	res := mc.GetMembersMemberID(members.GetMembersMemberIDParams{
 		MemberID: "test123",
-		PoolID:   poolID,
 	})
 	res.WriteResponse(rr, runtime.JSONProducer())
 	assert.Equal(t.T(), rr.Code, http.StatusNotFound, rr.Body)
 
-	member := members.PostPoolsPoolIDMembersBody{}
+	member := members.PostMembersBody{}
 	_ = member.UnmarshalBinary([]byte(`{ "member": { "name": "test", "address": "1.2.3.4", "port": 1234 } }`))
+	member.Member.PoolID = &poolID
 
 	// Write new member
-	res = mc.PostMembers(members.PostPoolsPoolIDMembersParams{Member: member, PoolID: poolID})
+	res = mc.PostMembers(members.PostMembersParams{Member: member})
 	rr = httptest.NewRecorder()
 	res.WriteResponse(rr, runtime.JSONProducer())
 	assert.Equal(t.T(), rr.Code, http.StatusCreated, rr.Body)
 
 	// Get all members
-	res = mc.GetMembers(members.GetPoolsPoolIDMembersParams{PoolID: poolID})
+	res = mc.GetMembers(members.GetMembersParams{PoolID: &poolID})
 	rr = httptest.NewRecorder()
 	res.WriteResponse(rr, runtime.JSONProducer())
 	assert.Equal(t.T(), rr.Code, http.StatusOK, rr.Body)
 
-	membersResponse := members.GetPoolsPoolIDMembersOKBody{}
+	membersResponse := members.GetMembersOKBody{}
 	_ = membersResponse.UnmarshalBinary(rr.Body.Bytes())
 	assert.Equal(t.T(), len(membersResponse.Members), 1, rr.Body)
 	assert.Equal(t.T(), membersResponse.Members[0].ID, member.Member.ID, rr.Body)
 	assert.Equal(t.T(), *membersResponse.Members[0].Name, "test", rr.Body)
 
 	// Get specific member
-	res = mc.GetMembersMemberID(members.GetPoolsPoolIDMembersMemberIDParams{
-		PoolID:   poolID,
+	res = mc.GetMembersMemberID(members.GetMembersMemberIDParams{
 		MemberID: member.Member.ID})
 	rr = httptest.NewRecorder()
 	res.WriteResponse(rr, runtime.JSONProducer())
 	assert.Equal(t.T(), http.StatusOK, rr.Code, rr.Body)
 
 	// Delete specific member
-	res = mc.DeleteMembersMemberID(members.DeletePoolsPoolIDMembersMemberIDParams{
-		PoolID:   poolID,
+	res = mc.DeleteMembersMemberID(members.DeleteMembersMemberIDParams{
 		MemberID: member.Member.ID})
 	rr = httptest.NewRecorder()
 	res.WriteResponse(rr, runtime.JSONProducer())
