@@ -22,17 +22,20 @@ import (
 
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-sql-driver/mysql"
 	"github.com/sapcc/andromeda/models"
 )
 
 var (
-	PolicyForbidden      = &models.Error{Code: 403, Message: "policy does not allow this request to be performed"}
-	NotFound             = &models.Error{Code: 404, Message: "not found"}
-	ProviderUnchangeable = &models.Error{Code: 400, Message: "provider cannot be changed"}
-	InvalidMarker        = &models.Error{Code: 400, Message: "invalid marker"}
-	PoolIDImmutable      = &models.Error{Code: 400, Message: "invalid value for 'pool_id': change of immutable attribute 'pool_id' not allowed"}
-	DuplicateMember      = &models.Error{Code: 409, Message: "invalid value for 'address' and 'port': endpoint already exists in pool"}
-	DuplicateDomain      = &models.Error{Code: 409, Message: "invalid value for 'domain' and 'provider': domain already exists"}
+	PolicyForbidden          = &models.Error{Code: 403, Message: "policy does not allow this request to be performed"}
+	NotFound                 = &models.Error{Code: 404, Message: "not found"}
+	ProviderUnchangeable     = &models.Error{Code: 400, Message: "provider cannot be changed"}
+	InvalidMarker            = &models.Error{Code: 400, Message: "invalid marker"}
+	PoolIDImmutable          = &models.Error{Code: 400, Message: "invalid value for 'pool_id': change of immutable attribute 'pool_id' not allowed"}
+	DuplicateMember          = &models.Error{Code: 409, Message: "invalid value for 'address' and 'port': endpoint already exists in pool"}
+	DuplicateDomain          = &models.Error{Code: 409, Message: "invalid value for 'domain' and 'provider': domain already exists"}
+	DatacenterInUse          = &models.Error{Code: 409, Message: "datacenter is in use"}
+	MySQLForeignKeyViolation = &mysql.MySQLError{Number: 1451}
 )
 
 func GetPolicyForbiddenResponse() middleware.Responder {

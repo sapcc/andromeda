@@ -185,7 +185,7 @@ func (c MemberController) PutMembersMemberID(params members.PutMembersMemberIDPa
 // DeleteMembersMemberID DELETE /pools/:id/members/:id
 func (c MemberController) DeleteMembersMemberID(params members.DeleteMembersMemberIDParams) middleware.Responder {
 	member := models.Member{ID: params.MemberID}
-	if err := PopulateMember(c.db, &member, []string{"project_id"}); err != nil {
+	if err := PopulateMember(c.db, &member, []string{"project_id", "pool_id"}); err != nil {
 		return members.NewDeleteMembersMemberIDNotFound().WithPayload(utils.NotFound)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *member.ProjectID) {
@@ -211,9 +211,9 @@ func (c MemberController) DeleteMembersMemberID(params members.DeleteMembersMemb
 
 func PopulateMember(db *sqlx.DB, member *models.Member, fields []string) error {
 	sql := db.Rebind(
-		fmt.Sprintf(`SELECT %s FROM member WHERE pool_id = ? AND id = ?`,
+		fmt.Sprintf(`SELECT %s FROM member WHERE id = ?`,
 			strings.Join(fields, ", ")))
-	if err := db.Get(member, sql, member.PoolID, member.ID); err != nil {
+	if err := db.Get(member, sql, member.ID); err != nil {
 		return err
 	}
 	return nil

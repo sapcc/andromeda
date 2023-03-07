@@ -19,6 +19,8 @@ package controller
 import (
 	"errors"
 	"fmt"
+	"github.com/jackc/pgerrcode"
+	"github.com/lib/pq"
 	"strings"
 
 	"github.com/go-openapi/runtime/middleware"
@@ -38,7 +40,7 @@ type DatacenterController struct {
 	sv micro.Service
 }
 
-//GetDatacenters GET /datacenters
+// GetDatacenters GET /datacenters
 func (c DatacenterController) GetDatacenters(params datacenters.GetDatacentersParams) middleware.Responder {
 	pagination := db.NewPagination("datacenter", params.Limit, params.Marker, params.Sort, params.PageReverse)
 	rows, err := pagination.Query(c.db, params.HTTPRequest, nil)
@@ -67,7 +69,7 @@ func (c DatacenterController) GetDatacenters(params datacenters.GetDatacentersPa
 	return datacenters.NewGetDatacentersOK().WithPayload(&payload)
 }
 
-//PostDatacenters POST /datacenters
+// PostDatacenters POST /datacenters
 func (c DatacenterController) PostDatacenters(params datacenters.PostDatacentersParams) middleware.Responder {
 	datacenter := params.Datacenter.Datacenter
 	projectID, err := auth.ProjectScopeForRequest(params.HTTPRequest)
@@ -101,7 +103,7 @@ func (c DatacenterController) PostDatacenters(params datacenters.PostDatacenters
 	return datacenters.NewPostDatacentersCreated().WithPayload(&datacenters.PostDatacentersCreatedBody{Datacenter: datacenter})
 }
 
-//GetDatacentersDatacenterID GET /datacenters/:id
+// GetDatacentersDatacenterID GET /datacenters/:id
 func (c DatacenterController) GetDatacentersDatacenterID(params datacenters.GetDatacentersDatacenterIDParams) middleware.Responder {
 	datacenter := models.Datacenter{ID: params.DatacenterID}
 	err := PopulateDatacenter(c.db, &datacenter, []string{"*"})
@@ -115,7 +117,7 @@ func (c DatacenterController) GetDatacentersDatacenterID(params datacenters.GetD
 	return datacenters.NewGetDatacentersDatacenterIDOK().WithPayload(&datacenters.GetDatacentersDatacenterIDOKBody{Datacenter: &datacenter})
 }
 
-//PutDatacentersDatacenterID PUT /datacenters/:id
+// PutDatacentersDatacenterID PUT /datacenters/:id
 func (c DatacenterController) PutDatacentersDatacenterID(params datacenters.PutDatacentersDatacenterIDParams) middleware.Responder {
 	datacenter := models.Datacenter{ID: params.DatacenterID}
 	err := PopulateDatacenter(c.db, &datacenter, []string{"project_id"})
@@ -154,7 +156,7 @@ func (c DatacenterController) PutDatacentersDatacenterID(params datacenters.PutD
 		&datacenters.PutDatacentersDatacenterIDAcceptedBody{Datacenter: &datacenter})
 }
 
-//DeleteDatacentersDatacenterID DELETE /datacenters/:id
+// DeleteDatacentersDatacenterID DELETE /datacenters/:id
 func (c DatacenterController) DeleteDatacentersDatacenterID(params datacenters.DeleteDatacentersDatacenterIDParams) middleware.Responder {
 	datacenter := models.Datacenter{ID: params.DatacenterID}
 	if err := PopulateDatacenter(c.db, &datacenter, []string{"project_id"}); err != nil {
@@ -165,14 +167,24 @@ func (c DatacenterController) DeleteDatacentersDatacenterID(params datacenters.D
 	}
 
 	sql := c.db.Rebind(`DELETE FROM datacenter WHERE id = ?`)
-	res := c.db.MustExec(sql, params.DatacenterID)
+	res, err := c.db.Exec(sql, params.DatacenterID)
+	if err != nil {
+		var pe *pq.Error
+		if errors.As(err, &pe) && pgerrcode.IsIntegrityConstraintViolation(string(pe.Code)) {
+			return datacenters.NewDeleteDatacentersDatacenterIDDefault(409).WithPayload(utils.DatacenterInUse)
+		}
+		if utils.MySQLForeignKeyViolation.Is(err) {
+			return datacenters.NewDeleteDatacentersDatacenterIDDefault(409).WithPayload(utils.DatacenterInUse)
+		}
+		panic(err)
+	}
 	if deleted, _ := res.RowsAffected(); deleted != 1 {
 		return datacenters.NewDeleteDatacentersDatacenterIDNotFound().WithPayload(utils.NotFound)
 	}
 	return datacenters.NewDeleteDatacentersDatacenterIDNoContent()
 }
 
-//PopulateDatacenter populates attributes of a datacenter instance based on it's ID
+// PopulateDatacenter populates attributes of a datacenter instance based on it's ID
 func PopulateDatacenter(db *sqlx.DB, datacenter *models.Datacenter, fields []string) error {
 	sql := db.Rebind(fmt.Sprintf(`SELECT %s FROM datacenter WHERE id = ?`, strings.Join(fields, ", ")))
 	if err := db.Get(datacenter, sql, datacenter.ID); err != nil {

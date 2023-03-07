@@ -12,7 +12,7 @@ require (
 	github.com/Boostport/migration/driver/postgres v1.1.3
 	github.com/akamai/AkamaiOPEN-edgegrid-golang/v2 v2.17.0
 	github.com/akamai/AkamaiOPEN-edgegrid-golang/v4 v4.1.0
-	github.com/cockroachdb/cockroach-go/v2 v2.2.20
+	github.com/cockroachdb/cockroach-go/v2 v2.3.0
 	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/dre1080/recovr v1.0.3
 	github.com/go-micro/plugins/v4/broker/nats v1.2.0
@@ -29,7 +29,7 @@ require (
 	github.com/go-openapi/validate v0.22.1
 	github.com/go-sql-driver/mysql v1.7.0
 	github.com/gophercloud/gophercloud v1.2.0
-	github.com/gophercloud/utils v0.0.0-20221207145018-e8fba78967ca
+	github.com/gophercloud/utils v0.0.0-20230301065655-769528992f29
 	github.com/iancoleman/strcase v0.2.0
 	github.com/jackc/pgconn v1.14.0
 	github.com/jackc/pgerrcode v0.0.0-20220416144525-469b46aa5efa
@@ -41,7 +41,7 @@ require (
 	github.com/mcuadros/go-defaults v1.2.0
 	github.com/rs/cors v1.8.3
 	github.com/sapcc/go-api-declarations v1.4.3
-	github.com/sapcc/go-bits v0.0.0-20230224132913-e0c607476181
+	github.com/sapcc/go-bits v0.0.0-20230303130505-59fda5b7664e
 	github.com/scottdware/go-bigip v0.0.0-20220517145708-9fe3e2f9f005
 	github.com/stretchr/testify v1.8.2
 	github.com/urfave/cli/v2 v2.25.0
@@ -122,7 +122,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rabbitmq/amqp091-go v1.7.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
-	github.com/rogpeppe/go-internal v1.8.1 // indirect
+	github.com/rogpeppe/go-internal v1.9.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
