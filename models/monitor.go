@@ -58,9 +58,8 @@ type Monitor struct {
 	Name *string `json:"name,omitempty"`
 
 	// ID of the pool to check members
-	// Required: true
 	// Format: uuid
-	PoolID *strfmt.UUID `json:"pool_id"`
+	PoolID *strfmt.UUID `json:"pool_id,omitempty"`
 
 	// The ID of the project owning this resource.
 	// Example: fa84c217f361441986a220edf9b1e337
@@ -191,9 +190,8 @@ func (m *Monitor) validateName(formats strfmt.Registry) error {
 }
 
 func (m *Monitor) validatePoolID(formats strfmt.Registry) error {
-
-	if err := validate.Required("pool_id", "body", m.PoolID); err != nil {
-		return err
+	if swag.IsZero(m.PoolID) { // not required
+		return nil
 	}
 
 	if err := validate.FormatOf("pool_id", "body", "uuid", m.PoolID.String(), formats); err != nil {

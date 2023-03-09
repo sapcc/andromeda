@@ -74,6 +74,10 @@ func (c MonitorController) GetMonitors(params monitors.GetMonitorsParams) middle
 // PostMonitors POST /monitors
 func (c MonitorController) PostMonitors(params monitors.PostMonitorsParams) middleware.Responder {
 	monitor := params.Monitor.Monitor
+	if monitor.PoolID == nil {
+		return monitors.NewPostMonitorsBadRequest().WithPayload(utils.PoolIDRequired)
+	}
+
 	projectID, err := auth.ProjectScopeForRequest(params.HTTPRequest)
 	if err != nil {
 		panic(err)
@@ -149,7 +153,7 @@ func (c MonitorController) PutMonitorsMonitorID(params monitors.PutMonitorsMonit
 		return utils.GetPolicyForbiddenResponse()
 	}
 
-	if *params.Monitor.Monitor.PoolID != *monitor.PoolID {
+	if params.Monitor.Monitor.PoolID != nil && *params.Monitor.Monitor.PoolID != *monitor.PoolID {
 		return monitors.NewPutMonitorsMonitorIDBadRequest().WithPayload(utils.PoolIDImmutable)
 	}
 

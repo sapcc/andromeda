@@ -149,16 +149,19 @@ func (c MemberController) GetMembersMemberID(params members.GetMembersMemberIDPa
 // PutMembersMemberID PUT /members/:id
 func (c MemberController) PutMembersMemberID(params members.PutMembersMemberIDParams) middleware.Responder {
 	member := models.Member{ID: params.MemberID}
-	if err := PopulateMember(c.db, &member, []string{"project_id"}); err != nil {
+	if err := PopulateMember(c.db, &member, []string{"project_id", "pool_id"}); err != nil {
 		return members.NewPutMembersMemberIDNotFound().WithPayload(utils.NotFound)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *member.ProjectID) {
 		return utils.GetPolicyForbiddenResponse()
 	}
 
-	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
-		params.Member.Member.ID = params.MemberID
+	if params.Member.Member.PoolID != nil && *params.Member.Member.PoolID != *member.PoolID {
+		return members.NewPutMembersMemberIDBadRequest().WithPayload(utils.PoolIDImmutable)
+	}
 
+	params.Member.Member.ID = params.MemberID
+	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
 		sql := `
 			UPDATE member SET
 				name = COALESCE(:name, name),
@@ -166,6 +169,7 @@ func (c MemberController) PutMembersMemberID(params members.PutMembersMemberIDPa
 				address = COALESCE(:address, address),
 				port = COALESCE(:port, port),
 				updated_at = NOW(),
+				datacenter_id = COALESCE(:datacenter_id, datacenter_id),
 				provisioning_status = 'PENDING_UPDATE'
 			WHERE id = :id
 		`

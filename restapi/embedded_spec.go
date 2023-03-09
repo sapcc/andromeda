@@ -586,9 +586,6 @@ func init() {
               ],
               "properties": {
                 "member": {
-                  "required": [
-                    "pool_id"
-                  ],
                   "$ref": "#/definitions/member"
                 }
               }
@@ -695,6 +692,12 @@ func init() {
                   "$ref": "#/definitions/member"
                 }
               }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/error"
             }
           },
           "404": {
@@ -825,8 +828,7 @@ func init() {
             "schema": {
               "type": "object",
               "required": [
-                "monitor",
-                "monitor.pool_id"
+                "monitor"
               ],
               "properties": {
                 "monitor": {
@@ -1879,9 +1881,6 @@ func init() {
     },
     "monitor": {
       "type": "object",
-      "required": [
-        "pool_id"
-      ],
       "properties": {
         "admin_state_up": {
           "description": "The administrative state of the resource, which is up (true) or down (false). Default is true.",
@@ -2837,9 +2836,6 @@ func init() {
               ],
               "properties": {
                 "member": {
-                  "required": [
-                    "pool_id"
-                  ],
                   "$ref": "#/definitions/member"
                 }
               }
@@ -2946,6 +2942,12 @@ func init() {
                   "$ref": "#/definitions/member"
                 }
               }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/error"
             }
           },
           "404": {
@@ -3089,8 +3091,7 @@ func init() {
             "schema": {
               "type": "object",
               "required": [
-                "monitor",
-                "monitor.pool_id"
+                "monitor"
               ],
               "properties": {
                 "monitor": {
@@ -4160,9 +4161,6 @@ func init() {
     },
     "monitor": {
       "type": "object",
-      "required": [
-        "pool_id"
-      ],
       "properties": {
         "admin_state_up": {
           "description": "The administrative state of the resource, which is up (true) or down (false). Default is true.",
