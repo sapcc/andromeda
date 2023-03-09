@@ -614,6 +614,10 @@ paths:
             properties:
               member:
                 $ref: '#/definitions/member'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error'
         404:
           description: Not Found
           schema:
@@ -695,7 +699,6 @@ paths:
             type: object
             required:
               - monitor
-              - monitor.pool_id
             properties:
               monitor:
                 $ref: '#/definitions/monitor'
@@ -1269,7 +1272,6 @@ definitions:
     required:
       - address
       - port
-      - pool_id
     properties:
       id:
         type: string
@@ -1343,8 +1345,6 @@ definitions:
 
   monitor:
     type: object
-    required:
-      - pool_id
     properties:
       id:
         type: string
