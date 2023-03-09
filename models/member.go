@@ -62,9 +62,8 @@ type Member struct {
 	Name *string `json:"name,omitempty"`
 
 	// pool id.
-	// Required: true
 	// Format: uuid
-	PoolID *strfmt.UUID `json:"pool_id"`
+	PoolID *strfmt.UUID `json:"pool_id,omitempty"`
 
 	// Port to use for monitor checks.
 	// Example: 80
@@ -191,9 +190,8 @@ func (m *Member) validateName(formats strfmt.Registry) error {
 }
 
 func (m *Member) validatePoolID(formats strfmt.Registry) error {
-
-	if err := validate.Required("pool_id", "body", m.PoolID); err != nil {
-		return err
+	if swag.IsZero(m.PoolID) { // not required
+		return nil
 	}
 
 	if err := validate.FormatOf("pool_id", "body", "uuid", m.PoolID.String(), formats); err != nil {

@@ -586,6 +586,9 @@ func init() {
               ],
               "properties": {
                 "member": {
+                  "required": [
+                    "pool_id"
+                  ],
                   "$ref": "#/definitions/member"
                 }
               }
@@ -1787,8 +1790,7 @@ func init() {
       "type": "object",
       "required": [
         "address",
-        "port",
-        "pool_id"
+        "port"
       ],
       "properties": {
         "address": {
@@ -2835,6 +2837,9 @@ func init() {
               ],
               "properties": {
                 "member": {
+                  "required": [
+                    "pool_id"
+                  ],
                   "$ref": "#/definitions/member"
                 }
               }
@@ -4065,8 +4070,7 @@ func init() {
       "type": "object",
       "required": [
         "address",
-        "port",
-        "pool_id"
+        "port"
       ],
       "properties": {
         "address": {

@@ -73,6 +73,10 @@ func (c MemberController) GetMembers(params members.GetMembersParams) middleware
 
 // PostMembers POST /members
 func (c MemberController) PostMembers(params members.PostMembersParams) middleware.Responder {
+	if params.Member.Member.PoolID == nil {
+		return members.NewPostMembersBadRequest().WithPayload(utils.PoolIDRequired)
+	}
+
 	member := params.Member.Member
 	projectID, err := auth.ProjectScopeForRequest(params.HTTPRequest)
 	if err != nil {

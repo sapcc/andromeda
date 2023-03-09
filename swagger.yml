@@ -1269,7 +1269,6 @@ definitions:
     required:
       - address
       - port
-      - pool_id
     properties:
       id:
         type: string

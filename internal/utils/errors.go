@@ -32,6 +32,7 @@ var (
 	ProviderUnchangeable     = &models.Error{Code: 400, Message: "provider cannot be changed"}
 	InvalidMarker            = &models.Error{Code: 400, Message: "invalid marker"}
 	PoolIDImmutable          = &models.Error{Code: 400, Message: "invalid value for 'pool_id': change of immutable attribute 'pool_id' not allowed"}
+	PoolIDRequired           = &models.Error{Code: 400, Message: "invalid value for 'pool_id': 'pool_id' is required"}
 	DuplicateMember          = &models.Error{Code: 409, Message: "invalid value for 'address' and 'port': endpoint already exists in pool"}
 	DuplicateDomain          = &models.Error{Code: 409, Message: "invalid value for 'domain' and 'provider': domain already exists"}
 	DatacenterInUse          = &models.Error{Code: 409, Message: "datacenter is in use"}
