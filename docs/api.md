@@ -1988,6 +1988,7 @@ PUT /v1/members/{member_id}
 | Code | Status | Description | Has headers | Schema |
 |------|--------|-------------|:-----------:|--------|
 | [202](#put-members-member-id-202) | Accepted | Updated member. |  | [schema](#put-members-member-id-202-schema) |
+| [400](#put-members-member-id-400) | Bad Request | Bad request |  | [schema](#put-members-member-id-400-schema) |
 | [404](#put-members-member-id-404) | Not Found | Not Found |  | [schema](#put-members-member-id-404-schema) |
 | [default](#put-members-member-id-default) | | Unexpected Error |  | [schema](#put-members-member-id-default-schema) |
 
@@ -2002,6 +2003,15 @@ Status: Accepted
   
 
 [PutMembersMemberIDAcceptedBody](#put-members-member-id-accepted-body)
+
+##### <span id="put-members-member-id-400"></span> 400 - Bad request
+Status: Bad Request
+
+###### <span id="put-members-member-id-400-schema"></span> Schema
+   
+  
+
+[Error](#error)
 
 ##### <span id="put-members-member-id-404"></span> 404 - Not Found
 Status: Not Found
@@ -2412,7 +2422,7 @@ Unexpected Error
 | datacenter_id | uuid (formatted string)| `strfmt.UUID` |  | | Datacenter assigned for this member. |  |
 | id | uuid (formatted string)| `strfmt.UUID` |  | | The id of the resource. |  |
 | name | string| `string` |  | | Human-readable name of the resource. |  |
-| pool_id | uuid (formatted string)| `strfmt.UUID` | ✓ | | pool id. |  |
+| pool_id | uuid (formatted string)| `strfmt.UUID` |  | | pool id. |  |
 | port | integer| `int64` | ✓ | | Port to use for monitor checks. | `80` |
 | project_id | string| `string` |  | | The ID of the project owning this resource. | `fa84c217f361441986a220edf9b1e337` |
 | provisioning_status | string| `string` |  | |  |  |
@@ -2437,7 +2447,7 @@ Unexpected Error
 | id | uuid (formatted string)| `strfmt.UUID` |  | | The id of the resource. |  |
 | interval | integer| `int64` |  | `60`| The interval, in seconds, between health checks. | `10` |
 | name | string| `string` |  | | Human-readable name of the resource. |  |
-| pool_id | uuid (formatted string)| `strfmt.UUID` | ✓ | | ID of the pool to check members |  |
+| pool_id | uuid (formatted string)| `strfmt.UUID` |  | | ID of the pool to check members |  |
 | project_id | string| `string` |  | | The ID of the project owning this resource. | `fa84c217f361441986a220edf9b1e337` |
 | provisioning_status | string| `string` |  | |  |  |
 | receive | string| `string` |  | | Specifies the text string that the monitor expects to receive from the target member. | `HTTP/1.` |
