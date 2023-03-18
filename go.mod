@@ -12,7 +12,7 @@ require (
 	github.com/Boostport/migration/driver/postgres v1.1.3
 	github.com/akamai/AkamaiOPEN-edgegrid-golang/v2 v2.17.0
 	github.com/akamai/AkamaiOPEN-edgegrid-golang/v4 v4.1.0
-	github.com/cockroachdb/cockroach-go/v2 v2.3.0
+	github.com/cockroachdb/cockroach-go/v2 v2.3.3
 	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/dre1080/recovr v1.0.3
 	github.com/go-micro/plugins/v4/broker/nats v1.2.0
