@@ -143,6 +143,8 @@ github.com/cockroachdb/cockroach-go/v2 v2.2.20 h1:TLSzwdTdIwgsbdApHzaxunhSMrmbGf
 github.com/cockroachdb/cockroach-go/v2 v2.2.20/go.mod h1:73vQi5H/H7kE8SgOt+XA6729Tubvj5hxKIEgbQQhp4c=
 github.com/cockroachdb/cockroach-go/v2 v2.3.0 h1:4cFEeTP7l9av+AhqY9wmw96UFL+TsaaFGu08ke1iSJo=
 github.com/cockroachdb/cockroach-go/v2 v2.3.0/go.mod h1:1wNJ45eSXW9AnOc3skntW9ZUZz6gxrQK3cOj3rK+BC8=
+github.com/cockroachdb/cockroach-go/v2 v2.3.3 h1:fNmtG6XhoA1DhdDCIu66YyGSsNb1szj4CaAsbDxRmy4=
+github.com/cockroachdb/cockroach-go/v2 v2.3.3/go.mod h1:1wNJ45eSXW9AnOc3skntW9ZUZz6gxrQK3cOj3rK+BC8=
 github.com/coreos/bbolt v1.3.2/go.mod h1:iRUV2dpdMOn7Bo10OQBFzIJO9kkE559Wcmn+qkEiiKk=
 github.com/coreos/etcd v3.3.10+incompatible/go.mod h1:uF7uidLiAD3TWHmW31ZFd/JWoc32PjwdhPthX9715RE=
 github.com/coreos/etcd v3.3.13+incompatible/go.mod h1:uF7uidLiAD3TWHmW31ZFd/JWoc32PjwdhPthX9715RE=
