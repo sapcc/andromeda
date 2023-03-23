@@ -63,9 +63,11 @@ func KeystoneMiddleware(next http.Handler) (http.Handler, error) {
 			http.Error(w, "unauthorized", 401)
 		}
 
-		t.Context.Logger = logger.Infof
-		logger.Debug("token has auth = %v", t.Context.Auth)
-		logger.Debug("token has roles = %v", t.Context.Roles)
+		if t.Enforcer != nil {
+			t.Context.Logger = logger.Infof
+			logger.Debug("token has auth = %v", t.Context.Auth)
+			logger.Debug("token has roles = %v", t.Context.Roles)
+		}
 
 		ctx := context.WithValue(r.Context(), projectContextKey, t)
 		r = r.WithContext(ctx)
