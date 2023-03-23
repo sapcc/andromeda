@@ -44,7 +44,7 @@ type MemberController struct {
 // GetMembers GET /members
 func (c MemberController) GetMembers(params members.GetMembersParams) middleware.Responder {
 	pagination := db.NewPagination("member", params.Limit, params.Marker, params.Sort, params.PageReverse)
-	//filter for pool_id, pool_id is safe and type validated
+	// filter for pool_id, pool_id is safe and type validated
 	filter := []string{fmt.Sprintf("pool_id = '%s'", params.PoolID)}
 	rows, err := pagination.Query(c.db, params.HTTPRequest, filter)
 	if err != nil {

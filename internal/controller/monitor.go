@@ -46,7 +46,9 @@ type MonitorController struct {
 // GetMonitors GET /monitors
 func (c MonitorController) GetMonitors(params monitors.GetMonitorsParams) middleware.Responder {
 	pagination := db.NewPagination("monitor", params.Limit, params.Marker, params.Sort, params.PageReverse)
-	rows, err := pagination.Query(c.db, params.HTTPRequest, nil)
+	// filter for pool_id, pool_id is safe and type validated
+	filter := []string{fmt.Sprintf("pool_id = '%s'", params.PoolID)}
+	rows, err := pagination.Query(c.db, params.HTTPRequest, filter)
 	if err != nil {
 		if errors.Is(err, db.ErrInvalidMarker) {
 			return monitors.NewGetMonitorsBadRequest().WithPayload(utils.InvalidMarker)
