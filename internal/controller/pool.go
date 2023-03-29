@@ -98,6 +98,11 @@ func (c PoolController) PostPools(params pools.PostPoolsParams) middleware.Respo
 
 	// Wrap insert and relations into transaction
 	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
+		if len(params.Pool.Pool.Domains) == 0 {
+			// unused pool is auto-active (since not touched by agent)
+			pool.ProvisioningStatus = "ACTIVE"
+		}
+
 		sql := `
 			INSERT INTO pool
 				(name, admin_state_up, project_id)
@@ -177,7 +182,8 @@ func (c PoolController) PutPoolsPoolID(params pools.PutPoolsPoolIDParams) middle
 			UPDATE pool SET
 				name = COALESCE(:name, name),
 				admin_state_up = COALESCE(:admin_state_up, admin_state_up),
-				updated_at = NOW()
+				updated_at = NOW(),
+				provisioning_status = 'PENDING_UPDATE'
 			WHERE id = :id
 		`
 		if _, err := tx.NamedExec(sql, params.Pool.Pool); err != nil {
@@ -199,7 +205,7 @@ func (c PoolController) PutPoolsPoolID(params pools.PutPoolsPoolIDParams) middle
 
 // DeletePoolsPoolID DELETE /pools/:id
 func (c PoolController) DeletePoolsPoolID(params pools.DeletePoolsPoolIDParams) middleware.Responder {
-	//zero-length slice used because we want [] via json encoder, nil encodes null
+	// zero-length slice used because we want [] via json encoder, nil encodes null
 	pool := models.Pool{ID: params.PoolID, Members: []strfmt.UUID{}, Domains: []strfmt.UUID{}}
 	if err := PopulatePool(c.db, &pool, []string{"id", "project_id"}, false); err != nil {
 		return pools.NewDeletePoolsPoolIDNotFound().WithPayload(utils.NotFound)
@@ -208,10 +214,10 @@ func (c PoolController) DeletePoolsPoolID(params pools.DeletePoolsPoolIDParams) 
 		return utils.GetPolicyForbiddenResponse()
 	}
 
-	sql := c.db.Rebind(`DELETE FROM pool WHERE id = ?`)
-	res := c.db.MustExec(sql, params.PoolID)
-	if deleted, _ := res.RowsAffected(); deleted != 1 {
-		return pools.NewDeletePoolsPoolIDNotFound().WithPayload(utils.NotFound)
+	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
+		return UpdateCascadePool(tx, params.PoolID, "PENDING_DELETE")
+	}); err != nil {
+		panic(err)
 	}
 	return pools.NewDeletePoolsPoolIDNoContent()
 }
@@ -270,12 +276,7 @@ func PopulatePool(db *sqlx.DB, pool *models.Pool, fields []string, fullyPopulate
 }
 
 func UpdateCascadePool(tx *sqlx.Tx, poolID strfmt.UUID, provisioningStatus string) error {
-	// Pending Pool
-	sql := fmt.Sprintf(`UPDATE pool SET provisioning_status = '%s' WHERE id = ?`, provisioningStatus)
-	if _, err := tx.Exec(tx.Rebind(sql), poolID); err != nil {
-		return err
-	}
-
+	var sql string
 	// Pending Domain
 	if tx.DriverName() == "mysql" {
 		sql = tx.Rebind(`
@@ -293,5 +294,15 @@ func UpdateCascadePool(tx *sqlx.Tx, poolID strfmt.UUID, provisioningStatus strin
 	if _, err := tx.Exec(sql, poolID); err != nil {
 		return err
 	}
+
+	if provisioningStatus == "PENDING_DELETE" {
+		sql = `DELETE FROM pool WHERE id = ?`
+	} else {
+		sql = fmt.Sprintf(`UPDATE pool SET provisioning_status = '%s' WHERE id = ?`, provisioningStatus)
+	}
+	if _, err := tx.Exec(tx.Rebind(sql), poolID); err != nil {
+		return err
+	}
+
 	return nil
 }

@@ -141,6 +141,7 @@ type Andromeda struct {
 	F5Config     F5Config              `json:"f5"`
 	AkamaiConfig AkamaiConfig          `json:"akamai"`
 	Audit        Audit                 `json:"audit_middleware_notifications"`
+	HouseKeeping HouseKeeping          `json:"house_keeping"`
 }
 
 type ApiSettings struct {
@@ -190,4 +191,9 @@ type Audit struct {
 	Enabled      bool   `json:"enabled" description:"Enables message notification bus."`
 	TransportURL string `json:"transport_url" description:"The network address and optional user credentials for connecting to the messaging backend."`
 	QueueName    string `json:"queue_name" description:"RabbitMQ queue name"`
+}
+
+type HouseKeeping struct {
+	Enabled     bool  `json:"enabled" description:"Enables house keeping."`
+	DeleteAfter int64 `json:"delete_after" default:"600" description:"Minimum seconds elapsed after cleanup of a deleted domain."`
 }

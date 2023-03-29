@@ -17,16 +17,23 @@
 package akamai
 
 import (
+	"context"
+	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/driver"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
+	"go-micro.dev/v4/logger"
 )
 
 func (s *AkamaiAgent) UpdateDomainProvisioningStatus(domain *rpcmodels.Domain, value string) error {
-	provisioningStatusRequests := []*server.ProvisioningStatusRequest_ProvisioningStatus{
-		driver.GetProvisioningStatusRequest(domain.Id, "DOMAIN", value),
+	var provisioningStatusRequests []*server.ProvisioningStatusRequest_ProvisioningStatus
+
+	provisioningStatusRequests = append(provisioningStatusRequests,
+		driver.GetProvisioningStatusRequest(domain.Id, "DOMAIN", value))
+	if value == "DELETED" {
+		// Only delete domain, set related objects to active
+		value = "ACTIVE"
 	}
-	memberStatusRequests := []*server.MemberStatusRequest_MemberStatus{}
 
 	for _, datacenter := range domain.Datacenters {
 		if datacenter.ProvisioningStatus != "ACTIVE" {
@@ -51,13 +58,45 @@ func (s *AkamaiAgent) UpdateDomainProvisioningStatus(domain *rpcmodels.Domain, v
 			if member.ProvisioningStatus != "ACTIVE" {
 				provisioningStatusRequests = append(provisioningStatusRequests,
 					driver.GetProvisioningStatusRequest(member.Id, "MEMBER", value))
-				memberStatusRequests = append(memberStatusRequests,
-					driver.GetMemberStatusRequest(member.Id, "ONLINE"))
 			}
 		}
 	}
 
 	driver.UpdateProvisioningStatus(s.rpc, provisioningStatusRequests)
-	driver.UpdateMemberStatus(s.rpc, memberStatusRequests)
 	return nil
+}
+
+func (s *AkamaiAgent) syncProvisioningStatus(domain *rpcmodels.Domain) (string, error) {
+	// Check for running domain's propagation state
+	status, err := s.gtm.GetDomainStatus(context.Background(), config.Global.AkamaiConfig.Domain)
+	if err != nil {
+		return "UNKNOWN", err
+	}
+
+	// Tracks the status of the domain's propagation state. Either PENDING, COMPLETE, or DENIED.
+	// A DENIED value indicates that the domain configuration is invalid,
+	// and doesn't propagate until the validation errors are resolved.
+	switch status.PropagationStatus {
+	case "PENDING":
+		logger.Debug("Akamai Backend: pending configuration change")
+	case "DENIED":
+		logger.Errorf("Domain %s failed syncing: %s", domain.Id, status.Message)
+		if err := s.UpdateDomainProvisioningStatus(domain, "ERROR"); err != nil {
+			return "UNKNOWN", err
+		}
+	case "COMPLETE":
+		logger.Infof("Domain %s has been propagated", domain.Id)
+		provStatus := "ACTIVE"
+		if domain.ProvisioningStatus == "PENDING_DELETE" {
+			provStatus = "DELETED"
+		} else if err := s.syncMemberStatus(domain); err != nil {
+			logger.Warn(err)
+		}
+
+		if err := s.UpdateDomainProvisioningStatus(domain, provStatus); err != nil {
+			return "UNKNOWN", err
+		}
+
+	}
+	return status.PropagationStatus, nil
 }

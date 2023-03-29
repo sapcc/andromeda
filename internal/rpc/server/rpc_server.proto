@@ -55,9 +55,12 @@ message ProvisioningStatusRequest {
     }
     Model model = 2;
     enum StatusType {
-      PENDING = 0;
-      ACTIVE = 1;
-      ERROR = 2;
+      ACTIVE = 0;
+      PENDING_CREATE = 1;
+      PENDING_UPDATE = 2;
+      PENDING_DELETE = 3;
+      DELETED = 4;
+      ERROR = 5;
     }
     StatusType status = 3;
   }

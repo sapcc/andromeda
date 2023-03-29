@@ -23,7 +23,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-//TxExecute is a handy wrapper for safely executing queries inside a closure
+// TxExecute is a handy wrapper for safely executing queries inside a closure
 func TxExecute(db *sqlx.DB, fn func(*sqlx.Tx) error) error {
 	// CockroachDB transactions must be embedded within a special retry wrapper
 	if db.DriverName() == "cockroachdb" {

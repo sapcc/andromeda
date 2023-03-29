@@ -20,7 +20,7 @@ import (
 	"context"
 	"fmt"
 
-	gtm "github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/configgtm"
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v5/pkg/gtm"
 	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/config"
@@ -36,6 +36,29 @@ func addTrafficTarget(property *gtm.Property, member *rpcmodels.Member) bool {
 		}
 	}
 	return false
+}
+
+func (s *AkamaiAgent) DeleteProperty(domain *rpcmodels.Domain, trafficManagementDomain string) error {
+	// Delete
+	logger.Infof("DeleteProperty(domain=%s, property=%s)", trafficManagementDomain, domain.GetFqdn())
+
+	property, err := s.gtm.GetProperty(context.Background(), domain.GetFqdn(), config.Global.AkamaiConfig.Domain)
+	if err != nil {
+		logger.Warnf("Property '%s' doesn't exist...", domain.GetFqdn())
+		return nil
+	}
+
+	ret, err := s.gtm.DeleteProperty(context.Background(), property, trafficManagementDomain)
+	if err != nil {
+		return fmt.Errorf("Request %s: %w", PrettyJson(property), err)
+	}
+
+	if !logger.V(logger.DebugLevel, nil) {
+		logger.Debugf("Request: %s\nResponse: %s",
+			PrettyJson(property),
+			PrettyJson(ret))
+	}
+	return nil
 }
 
 func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDomain string) error {

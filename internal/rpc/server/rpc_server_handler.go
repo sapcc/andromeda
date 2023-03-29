@@ -237,12 +237,11 @@ func populateMembers(u *RPCHandler, poolID string) ([]*rpcmodels.Member, error) 
 
 func (u *RPCHandler) GetDomains(ctx context.Context, request *SearchRequest, response *DomainsResponse) error {
 	sql := `SELECT id, admin_state_up, fqdn, mode, record_type, provisioning_status
-               FROM domain`
+               FROM domain WHERE provisioning_status != 'DELETED'`
 	if request.Pending {
-		sql += ` WHERE provisioning_status in ('PENDING_CREATE', 'PENDING_UPDATE', 'PENDING_DELETE')`
+		sql += ` AND provisioning_status in ('PENDING_CREATE', 'PENDING_UPDATE', 'PENDING_DELETE')`
 	}
-	sql = u.DB.Rebind(sql)
-	rows, err := u.QueryxWithIds(sql, request)
+	rows, err := u.QueryxWithIds(u.DB.Rebind(sql), request)
 
 	if err != nil {
 		logger.Error(err)
@@ -299,7 +298,8 @@ func (u *RPCHandler) UpdateProvisioningStatus(ctx context.Context, req *Provisio
 	var statusResult []*StatusResult
 	for _, provStatusReq := range req.GetProvisioningStatus() {
 		table := strings.ToLower(provStatusReq.GetModel().String())
-		sql := u.DB.Rebind(fmt.Sprintf(`UPDATE %s SET provisioning_status = ? WHERE id = ?`, table))
+
+		sql := u.DB.Rebind(fmt.Sprintf(`UPDATE %s SET provisioning_status = ?, updated_at = NOW() WHERE id = ?`, table))
 		_, err := u.DB.Exec(sql, provStatusReq.GetStatus().String(), provStatusReq.GetId())
 		if err != nil {
 			logger.Error(err)

@@ -20,7 +20,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v2/pkg/configgtm"
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v5/pkg/gtm"
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v5/pkg/session"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/logger"
 	"go-micro.dev/v4/metadata"
@@ -43,6 +44,7 @@ var PROPERTY_TYPE_MAP = map[string]string{
 }
 
 type AkamaiAgent struct {
+	session      *session.Session
 	gtm          gtm.GTM
 	gtmLock      sync.Sync
 	domainType   string
@@ -85,6 +87,7 @@ func ExecuteAkamaiAgent() error {
 			s, domainType := NewAkamaiSession(&config.Global.AkamaiConfig)
 			interval := time.Duration(config.Global.AkamaiConfig.SyncInterval)
 			akamai := AkamaiAgent{
+				s,
 				gtm.Client(*s),
 				memory.NewSync(),
 				domainType,
@@ -159,27 +162,37 @@ func (s *AkamaiAgent) pendingSync(domains []string) error {
 	trafficManagementDomain := config.Global.AkamaiConfig.Domain
 
 	for _, domain := range res {
-		logger.Infof("SyncDomain(%s) running...", domain.Id)
+		logger.Infof("status of %s", domain.Id)
+		s.syncMemberStatus(domain)
+
+		logger.Infof("pendingSync(%s) running...", domain.Id)
 		if err := s.gtmLock.Lock(trafficManagementDomain); err != nil {
 			return err
 		}
 
-		// Run Sync
-		if err := s.SyncProperty(domain, trafficManagementDomain); err != nil {
-			return err
+		if domain.ProvisioningStatus == "PENDING_DELETE" {
+			// Run Delete
+			if err := s.DeleteProperty(domain, trafficManagementDomain); err != nil {
+				return err
+			}
+		} else {
+			// Run Sync
+			if err := s.SyncProperty(domain, trafficManagementDomain); err != nil {
+				return err
+			}
 		}
 
 		// Wait for status propagation
 		var status string
 		for ok := true; ok; ok = status == "PENDING" {
 			time.Sleep(5 * time.Second)
-			status, err = s.syncStatus(domain)
+			status, err = s.syncProvisioningStatus(domain)
 			if err != nil {
 				return err
 			}
 		}
 
-		logger.Infof("SyncDomain(%s) finished with '%s'", domain.Id, status)
+		logger.Infof("pendingSync(%s) finished with '%s'", domain.Id, status)
 		if err := s.gtmLock.Unlock(trafficManagementDomain); err != nil {
 			return err
 		}
