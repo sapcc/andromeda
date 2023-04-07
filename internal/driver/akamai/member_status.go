@@ -21,6 +21,8 @@ import (
 	"net/http"
 	"time"
 
+	"go-micro.dev/v4/logger"
+
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/driver"
 	"github.com/sapcc/andromeda/internal/rpc/server"
@@ -80,6 +82,8 @@ func (s *AkamaiAgent) syncMemberStatus(domain *rpcmodels.Domain) error {
 
 			memberStatusRequests = append(memberStatusRequests,
 				driver.GetMemberStatusRequest(memberMap[ip.IP], status))
+
+			logger.Infof("status of %s: %+v/%+v, %f", domain.Id, ip.Alive, ip.HandedOut, ip.Score)
 		}
 	}
 

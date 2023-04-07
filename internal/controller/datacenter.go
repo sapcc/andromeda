@@ -19,12 +19,12 @@ package controller
 import (
 	"errors"
 	"fmt"
-	"github.com/jackc/pgerrcode"
-	"github.com/lib/pq"
 	"strings"
 
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 	"go-micro.dev/v4"
 
 	"github.com/sapcc/andromeda/db"
@@ -49,7 +49,7 @@ func (c DatacenterController) GetDatacenters(params datacenters.GetDatacentersPa
 			return datacenters.NewGetDatacentersBadRequest().WithPayload(utils.InvalidMarker)
 		}
 		if errors.Is(err, db.ErrPolicyForbidden) {
-			return utils.GetPolicyForbiddenResponse()
+			return datacenters.NewGetDatacentersDefault(403).WithPayload(utils.PolicyForbidden)
 		}
 		panic(err)
 	}
@@ -77,7 +77,7 @@ func (c DatacenterController) PostDatacenters(params datacenters.PostDatacenters
 		panic(err)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
-		return utils.GetPolicyForbiddenResponse()
+		return datacenters.NewPostDatacentersDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 	datacenter.ProjectID = &projectID
 
@@ -111,8 +111,9 @@ func (c DatacenterController) GetDatacentersDatacenterID(params datacenters.GetD
 		return datacenters.NewGetDatacentersDatacenterIDNotFound().WithPayload(utils.NotFound)
 	}
 
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *datacenter.ProjectID) {
-		return utils.GetPolicyForbiddenResponse()
+	// Allow public scope datacenters to be fetched
+	if "public" != *datacenter.Scope && !policy.Engine.AuthorizeRequest(params.HTTPRequest, *datacenter.ProjectID) {
+		return datacenters.NewGetDatacentersDatacenterIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 	return datacenters.NewGetDatacentersDatacenterIDOK().WithPayload(&datacenters.GetDatacentersDatacenterIDOKBody{Datacenter: &datacenter})
 }
@@ -125,7 +126,7 @@ func (c DatacenterController) PutDatacentersDatacenterID(params datacenters.PutD
 		return datacenters.NewPutDatacentersDatacenterIDNotFound().WithPayload(utils.NotFound)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *datacenter.ProjectID) {
-		return utils.GetPolicyForbiddenResponse()
+		return datacenters.NewPutDatacentersDatacenterIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
 	params.Datacenter.Datacenter.ID = params.DatacenterID
@@ -163,7 +164,7 @@ func (c DatacenterController) DeleteDatacentersDatacenterID(params datacenters.D
 		return datacenters.NewDeleteDatacentersDatacenterIDNotFound().WithPayload(utils.NotFound)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *datacenter.ProjectID) {
-		return utils.GetPolicyForbiddenResponse()
+		return datacenters.NewDeleteDatacentersDatacenterIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
 	sql := c.db.Rebind(`DELETE FROM datacenter WHERE id = ?`)

@@ -52,7 +52,7 @@ func (c MemberController) GetMembers(params members.GetMembersParams) middleware
 			return members.NewGetMembersBadRequest().WithPayload(utils.InvalidMarker)
 		}
 		if errors.Is(err, db.ErrPolicyForbidden) {
-			return utils.GetPolicyForbiddenResponse()
+			return members.NewGetMembersDefault(403).WithPayload(utils.PolicyForbidden)
 		}
 		panic(err)
 	}
@@ -83,7 +83,7 @@ func (c MemberController) PostMembers(params members.PostMembersParams) middlewa
 		panic(err)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
-		return utils.GetPolicyForbiddenResponse()
+		return members.NewPostMembersDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
 	pool := models.Pool{ID: *params.Member.Member.PoolID}
@@ -140,7 +140,7 @@ func (c MemberController) GetMembersMemberID(params members.GetMembersMemberIDPa
 	}
 
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *member.ProjectID) {
-		return utils.GetPolicyForbiddenResponse()
+		return members.NewGetMembersMemberIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 	return members.NewGetMembersMemberIDOK().
 		WithPayload(&members.GetMembersMemberIDOKBody{Member: &member})
@@ -153,7 +153,7 @@ func (c MemberController) PutMembersMemberID(params members.PutMembersMemberIDPa
 		return members.NewPutMembersMemberIDNotFound().WithPayload(utils.NotFound)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *member.ProjectID) {
-		return utils.GetPolicyForbiddenResponse()
+		return members.NewPutMembersMemberIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
 	if params.Member.Member.PoolID != nil && *params.Member.Member.PoolID != *member.PoolID {
@@ -197,7 +197,7 @@ func (c MemberController) DeleteMembersMemberID(params members.DeleteMembersMemb
 		return members.NewDeleteMembersMemberIDNotFound().WithPayload(utils.NotFound)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *member.ProjectID) {
-		return utils.GetPolicyForbiddenResponse()
+		return members.NewDeleteMembersMemberIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
 	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {

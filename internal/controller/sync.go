@@ -40,7 +40,7 @@ func (c SyncController) PostSync(params administrative.PostSyncParams) middlewar
 		panic(err)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
-		return utils.GetPolicyForbiddenResponse()
+		return administrative.NewPostSyncDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
 	var domainIDs []string

@@ -21,11 +21,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/go-sql-driver/mysql"
-
-	"github.com/jackc/pgconn"
-
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-sql-driver/mysql"
+	"github.com/jackc/pgconn"
 	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
 	"go-micro.dev/v4"
@@ -54,7 +52,7 @@ func (c MonitorController) GetMonitors(params monitors.GetMonitorsParams) middle
 			return monitors.NewGetMonitorsBadRequest().WithPayload(utils.InvalidMarker)
 		}
 		if errors.Is(err, db.ErrPolicyForbidden) {
-			return utils.GetPolicyForbiddenResponse()
+			return monitors.NewGetMonitorsDefault(403).WithPayload(utils.PolicyForbidden)
 		}
 		panic(err)
 	}
@@ -85,7 +83,7 @@ func (c MonitorController) PostMonitors(params monitors.PostMonitorsParams) midd
 		panic(err)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
-		return utils.GetPolicyForbiddenResponse()
+		return monitors.NewPostMonitorsDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 	monitor.ProjectID = &projectID
 
@@ -140,7 +138,7 @@ func (c MonitorController) GetMonitorsMonitorID(params monitors.GetMonitorsMonit
 	}
 
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *monitor.ProjectID) {
-		return utils.GetPolicyForbiddenResponse()
+		return monitors.NewGetMonitorsMonitorIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 	return monitors.NewGetMonitorsMonitorIDOK().WithPayload(&monitors.GetMonitorsMonitorIDOKBody{Monitor: &monitor})
 }
@@ -152,7 +150,7 @@ func (c MonitorController) PutMonitorsMonitorID(params monitors.PutMonitorsMonit
 		return monitors.NewPutMonitorsMonitorIDNotFound().WithPayload(utils.NotFound)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *monitor.ProjectID) {
-		return utils.GetPolicyForbiddenResponse()
+		return monitors.NewPutMonitorsMonitorIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
 	if params.Monitor.Monitor.PoolID != nil && *params.Monitor.Monitor.PoolID != *monitor.PoolID {
@@ -196,7 +194,7 @@ func (c MonitorController) DeleteMonitorsMonitorID(params monitors.DeleteMonitor
 		return monitors.NewDeleteMonitorsMonitorIDNotFound().WithPayload(utils.NotFound)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *monitor.ProjectID) {
-		return utils.GetPolicyForbiddenResponse()
+		return monitors.NewDeleteMonitorsMonitorIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
 	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {

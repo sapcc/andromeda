@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-sql-driver/mysql"
 	"github.com/sapcc/andromeda/models"
@@ -38,10 +37,6 @@ var (
 	DatacenterInUse          = &models.Error{Code: 409, Message: "datacenter is in use"}
 	MySQLForeignKeyViolation = &mysql.MySQLError{Number: 1451}
 )
-
-func GetPolicyForbiddenResponse() middleware.Responder {
-	return middleware.Error(403, PolicyForbidden)
-}
 
 func GetQuotaMetResponse(resource string) *models.Error {
 	return &models.Error{Code: 403, Message: fmt.Sprintf(

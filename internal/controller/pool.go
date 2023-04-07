@@ -48,7 +48,7 @@ func (c PoolController) GetPools(params pools.GetPoolsParams) middleware.Respond
 			return pools.NewGetPoolsBadRequest().WithPayload(utils.InvalidMarker)
 		}
 		if errors.Is(err, db.ErrPolicyForbidden) {
-			return utils.GetPolicyForbiddenResponse()
+			return pools.NewGetPoolsDefault(403).WithPayload(utils.PolicyForbidden)
 		}
 		panic(err)
 	}
@@ -86,7 +86,7 @@ func (c PoolController) PostPools(params pools.PostPoolsParams) middleware.Respo
 	}
 
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
-		return utils.GetPolicyForbiddenResponse()
+		return pools.NewPostPoolsDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 	pool.ProjectID = &projectID
 
@@ -138,7 +138,7 @@ func (c PoolController) GetPoolsPoolID(params pools.GetPoolsPoolIDParams) middle
 	}
 
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *pool.ProjectID) {
-		return utils.GetPolicyForbiddenResponse()
+		return pools.NewGetPoolsPoolIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 	return pools.NewGetPoolsPoolIDOK().WithPayload(&pools.GetPoolsPoolIDOKBody{Pool: &pool})
 }
@@ -151,7 +151,7 @@ func (c PoolController) PutPoolsPoolID(params pools.PutPoolsPoolIDParams) middle
 		return pools.NewPutPoolsPoolIDNotFound().WithPayload(utils.NotFound)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *pool.ProjectID) {
-		return utils.GetPolicyForbiddenResponse()
+		return pools.NewPutPoolsPoolIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
 	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
@@ -211,7 +211,7 @@ func (c PoolController) DeletePoolsPoolID(params pools.DeletePoolsPoolIDParams) 
 		return pools.NewDeletePoolsPoolIDNotFound().WithPayload(utils.NotFound)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *pool.ProjectID) {
-		return utils.GetPolicyForbiddenResponse()
+		return pools.NewDeletePoolsPoolIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
 	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {

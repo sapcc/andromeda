@@ -185,7 +185,12 @@ func (p *Pagination) Query(db *sqlx.DB, r *http.Request, filter []string) (*sqlx
 
 	//override project scope, ensures marker is not used for fetching others owner resources
 	if projectID != "" {
-		whereClauses = append(whereClauses, "project_id = :project_id")
+		// hardcoded to datacenter, which allows a public scope for sharing datacenters
+		if p.table == "datacenter" {
+			whereClauses = append(whereClauses, "scope = 'public' OR project_id = :project_id")
+		} else {
+			whereClauses = append(whereClauses, "project_id = :project_id")
+		}
 		markerObj["project_id"] = projectID
 	}
 

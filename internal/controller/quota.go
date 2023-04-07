@@ -19,11 +19,11 @@ package controller
 import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
-	"github.com/sapcc/andromeda/internal/utils"
 
 	"github.com/sapcc/andromeda/internal/auth"
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/policy"
+	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/models"
 	"github.com/sapcc/andromeda/restapi/operations/administrative"
 	"github.com/sapcc/andromeda/restapi/operations/domains"
@@ -67,7 +67,7 @@ func (c QuotaController) GetQuotas(params administrative.GetQuotasParams) middle
 		panic(err)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
-		return utils.GetPolicyForbiddenResponse()
+		return administrative.NewGetQuotasDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
 	responseQuotas, err := getQuotas(c.db, params.ProjectID)
@@ -83,7 +83,7 @@ func (c QuotaController) GetQuotasProjectID(params administrative.GetQuotasProje
 		panic(err)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
-		return utils.GetPolicyForbiddenResponse()
+		return administrative.NewGetQuotasProjectIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
 	responseQuotas, err := getQuotas(c.db, &params.ProjectID)
@@ -122,7 +122,7 @@ func (c QuotaController) GetQuotasDefaults(params administrative.GetQuotasDefaul
 		panic(err)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
-		return utils.GetPolicyForbiddenResponse()
+		return administrative.NewGetQuotasDefaultsDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
 	body := administrative.GetQuotasDefaultsOKBody{
@@ -143,7 +143,7 @@ func (c QuotaController) PutQuotasProjectID(params administrative.PutQuotasProje
 		panic(err)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
-		return utils.GetPolicyForbiddenResponse()
+		return administrative.NewPutQuotasProjectIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
 	// Set defaults
@@ -197,7 +197,7 @@ func (c QuotaController) DeleteQuotasProjectID(params administrative.DeleteQuota
 		panic(err)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
-		return utils.GetPolicyForbiddenResponse()
+		return administrative.NewDeleteQuotasProjectIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
 	sql := `DELETE FROM quota WHERE project_id = ?`

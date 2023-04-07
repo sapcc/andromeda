@@ -53,7 +53,7 @@ func (c DomainController) GetDomains(params domains.GetDomainsParams) middleware
 			return domains.NewGetDomainsDefault(400).WithPayload(utils.InvalidMarker)
 		}
 		if errors.Is(err, db.ErrPolicyForbidden) {
-			return utils.GetPolicyForbiddenResponse()
+			return domains.NewGetDomainsDefault(403).WithPayload(utils.PolicyForbidden)
 		}
 		panic(err)
 	}
@@ -87,7 +87,7 @@ func (c DomainController) PostDomains(params domains.PostDomainsParams) middlewa
 		panic(err)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
-		return utils.GetPolicyForbiddenResponse()
+		return domains.NewPostDomainsDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 	domain.ProjectID = &projectID
 	if domain.Pools == nil {
@@ -149,11 +149,11 @@ func (c DomainController) GetDomainsDomainID(params domains.GetDomainsDomainIDPa
 	// Get domain
 	domain := models.Domain{ID: params.DomainID, Pools: []strfmt.UUID{}}
 	if err := PopulateDomain(c.db, &domain, []string{"*"}); err != nil {
-		return domains.NewGetDomainsDefault(404).WithPayload(utils.NotFound)
+		return domains.NewGetDomainsDomainIDNotFound().WithPayload(utils.NotFound)
 	}
 
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *domain.ProjectID) {
-		return utils.GetPolicyForbiddenResponse()
+		return domains.NewGetDomainsDomainIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 	return domains.NewGetDomainsDomainIDOK().WithPayload(&domains.GetDomainsDomainIDOKBody{Domain: &domain})
 }
@@ -162,15 +162,15 @@ func (c DomainController) GetDomainsDomainID(params domains.GetDomainsDomainIDPa
 func (c DomainController) PutDomainsDomainID(params domains.PutDomainsDomainIDParams) middleware.Responder {
 	domain := models.Domain{Pools: []strfmt.UUID{}, ID: params.DomainID}
 	if err := PopulateDomain(c.db, &domain, []string{"*"}); err != nil {
-		return domains.NewGetDomainsDefault(404).WithPayload(utils.NotFound)
+		return domains.NewPutDomainsDomainIDNotFound().WithPayload(utils.NotFound)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *domain.ProjectID) {
-		return utils.GetPolicyForbiddenResponse()
+		return domains.NewPutDomainsDomainIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
 	if params.Domain.Domain.Provider != nil && *params.Domain.Domain.Provider != *domain.Provider {
 		// cannot change provider
-		return domains.NewGetDomainsDefault(404).WithPayload(utils.ProviderUnchangeable)
+		return domains.NewPutDomainsDomainIDNotFound().WithPayload(utils.ProviderUnchangeable)
 	}
 
 	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
@@ -219,11 +219,11 @@ func (c DomainController) PutDomainsDomainID(params domains.PutDomainsDomainIDPa
 		var rnfError *utils.ResourcesNotFoundError
 		if errors.As(err, &rnfError) {
 			errMsg := "Invalid value for 'pools': " + rnfError.Error()
-			return domains.NewGetDomainsDefault(400).WithPayload(
+			return domains.NewPutDomainsDomainIDBadRequest().WithPayload(
 				&models.Error{Code: 400, Message: errMsg})
 		}
 		if errors.Is(err, dbsql.ErrNoRows) {
-			return domains.NewGetDomainsDefault(404).WithPayload(utils.NotFound)
+			return domains.NewPutDomainsDomainIDNotFound().WithPayload(utils.NotFound)
 		}
 		// Unknown Error
 		panic(err)
@@ -241,16 +241,16 @@ func (c DomainController) PutDomainsDomainID(params domains.PutDomainsDomainIDPa
 func (c DomainController) DeleteDomainsDomainID(params domains.DeleteDomainsDomainIDParams) middleware.Responder {
 	domain := models.Domain{ID: params.DomainID}
 	if err := PopulateDomain(c.db, &domain, []string{"id", "project_id"}); err != nil {
-		return domains.NewGetDomainsDefault(404).WithPayload(utils.NotFound)
+		return domains.NewDeleteDomainsDomainIDNotFound().WithPayload(utils.NotFound)
 	}
 	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *domain.ProjectID) {
-		return utils.GetPolicyForbiddenResponse()
+		return domains.NewDeleteDomainsDomainIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
 	sql := c.db.Rebind(`UPDATE domain SET provisioning_status = 'PENDING_DELETE', updated_at = NOW() WHERE id = ?`)
 	res := c.db.MustExec(sql, params.DomainID)
 	if deleted, _ := res.RowsAffected(); deleted != 1 {
-		return domains.NewGetDomainsDefault(404).WithPayload(utils.NotFound)
+		return domains.NewDeleteDomainsDomainIDNotFound().WithPayload(utils.NotFound)
 	}
 	return domains.NewDeleteDomainsDomainIDNoContent()
 }
