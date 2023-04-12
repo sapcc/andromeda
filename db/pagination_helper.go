@@ -52,7 +52,7 @@ type Pagination struct {
 	  In: query
 	*/
 	pageReverse *bool
-	/*Comma-separated list of sort keys, optinally prefix with - to reverse sort order.
+	/*Comma-separated list of sort keys optionally prefix with - to reverse sort order.
 	  In: query
 	*/
 	sort *string
