@@ -2,7 +2,7 @@ module github.com/sapcc/andromeda
 
 go 1.19
 
-replace github.com/micro/protoc-gen-micro => go-micro.dev/v4/cmd/protoc-gen-micro/v4 v4.10.0
+replace github.com/micro/protoc-gen-micro => go-micro.dev/v4/cmd/protoc-gen-micro/v4 v4.10.1
 
 replace github.com/micro/go-micro => go-micro.dev/v4 v4.10.0
 
