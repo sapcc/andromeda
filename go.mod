@@ -39,7 +39,7 @@ require (
 	github.com/lib/pq v1.10.7
 	github.com/mcuadros/go-defaults v1.2.0
 	github.com/rs/cors v1.8.3
-	github.com/sapcc/go-api-declarations v1.5.0
+	github.com/sapcc/go-api-declarations v1.5.1
 	github.com/sapcc/go-bits v0.0.0-20230404144215-11076993c8aa
 	github.com/scottdware/go-bigip v0.0.0-20220517145708-9fe3e2f9f005
 	github.com/stretchr/testify v1.8.2
