@@ -21,8 +21,8 @@ require (
 	github.com/go-micro/plugins/v4/transport/nats v1.2.0
 	github.com/go-openapi/errors v0.20.3
 	github.com/go-openapi/loads v0.21.2
-	github.com/go-openapi/runtime v0.25.0
-	github.com/go-openapi/spec v0.20.8
+	github.com/go-openapi/runtime v0.26.0
+	github.com/go-openapi/spec v0.20.9
 	github.com/go-openapi/strfmt v0.21.7
 	github.com/go-openapi/swag v0.22.3
 	github.com/go-openapi/validate v0.22.1
@@ -63,7 +63,7 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/databus23/goslo.policy v0.0.0-20210929125152-81bf2876dbdb // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/docker/go-units v0.4.0 // indirect
+	github.com/docker/go-units v0.5.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/evanphx/json-patch/v5 v5.5.0 // indirect
 	github.com/felixge/httpsnoop v1.0.1 // indirect
@@ -131,8 +131,8 @@ require (
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	github.com/ztrue/tracerr v0.3.0 // indirect
 	go.mongodb.org/mongo-driver v1.11.3 // indirect
-	go.opentelemetry.io/otel v1.11.1 // indirect
-	go.opentelemetry.io/otel/trace v1.11.1 // indirect
+	go.opentelemetry.io/otel v1.14.0 // indirect
+	go.opentelemetry.io/otel/trace v1.14.0 // indirect
 	go.uber.org/ratelimit v0.2.0 // indirect
 	golang.org/x/crypto v0.6.0 // indirect
 	golang.org/x/mod v0.9.0 // indirect
