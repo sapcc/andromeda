@@ -1286,7 +1286,7 @@ definitions:
         default: ""
       country:
         type: string
-        maxLength: 255
+        maxLength: 2
         example: DE
         x-omitempty: false
         x-nullable: true
