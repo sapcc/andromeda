@@ -1,1 +1,0 @@
-export default {"theme":"theme-dark","endpoint":"https://identity-3.qa-de-3.cloud.sap/v3","overrideAndromedaEndpoint":"http://localhost:8080/v1","embeded":"false","helpMail":"andromeda-aaaajmn7tqusibe5bvrn476hfm@sap.org.slack.com","slackURL":"https://convergedcloud.slack.com/archives/C054RDUBWSG"}
