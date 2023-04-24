@@ -24,7 +24,7 @@ require (
 	github.com/go-openapi/validate v0.22.1
 	github.com/go-sql-driver/mysql v1.7.0
 	github.com/gophercloud/gophercloud v1.3.0
-	github.com/gophercloud/utils v0.0.0-20210216074907-f6de111f2eae
+	github.com/gophercloud/utils v0.0.0-20230418172808-6eab72e966e1
 	github.com/iancoleman/strcase v0.2.0
 	github.com/jackc/pgconn v1.14.0
 	github.com/jackc/pgerrcode v0.0.0-20220416144525-469b46aa5efa
@@ -84,6 +84,7 @@ require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect
+	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.2 // indirect
 	github.com/imdario/mergo v0.3.13 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
