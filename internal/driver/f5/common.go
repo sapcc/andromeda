@@ -48,7 +48,7 @@ func BigIPSupportsDNS(device *bigip.Device) error {
 }
 
 func GetBigIPSession() (*bigip.BigIP, error) {
-	parsedURL, err := url.Parse(config.Global.F5Config.Host)
+	parsedURL, err := url.Parse(config.Global.Default.Host)
 	if err != nil {
 		return nil, err
 	}
