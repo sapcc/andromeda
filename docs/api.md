@@ -408,8 +408,16 @@ GET /v1/datacenters
 |------|--------|------|---------|-----------| :------: |---------|-------------|
 | limit | `query` | integer | `int64` |  |  |  | Sets the page size. |
 | marker | `query` | uuid (formatted string) | `strfmt.UUID` |  |  |  | Pagination ID of the last item in the previous list. |
+| not-tags | `query` | []string | `[]string` |  |  |  | Filter for resources not having tags, multiple not-tags are considered as logical AND.
+Should be provided in a comma separated list. |
+| not-tags-any | `query` | []string | `[]string` |  |  |  | Filter for resources not having tags, multiple tags are considered as logical OR.
+Should be provided in a comma separated list. |
 | page_reverse | `query` | boolean | `bool` |  |  |  | Sets the page direction. |
 | sort | `query` | string | `string` |  |  |  | Comma-separated list of sort keys, optinally prefix with - to reverse sort order. |
+| tags | `query` | []string | `[]string` |  |  |  | Filter for tags, multiple tags are considered as logical AND. 
+Should be provided in a comma separated list. |
+| tags-any | `query` | []string | `[]string` |  |  |  | Filter for tags, multiple tags are considered as logical OR.
+Should be provided in a comma separated list. |
 
 #### All responses
 | Code | Status | Description | Has headers | Schema |
@@ -544,8 +552,16 @@ GET /v1/domains
 |------|--------|------|---------|-----------| :------: |---------|-------------|
 | limit | `query` | integer | `int64` |  |  |  | Sets the page size. |
 | marker | `query` | uuid (formatted string) | `strfmt.UUID` |  |  |  | Pagination ID of the last item in the previous list. |
+| not-tags | `query` | []string | `[]string` |  |  |  | Filter for resources not having tags, multiple not-tags are considered as logical AND.
+Should be provided in a comma separated list. |
+| not-tags-any | `query` | []string | `[]string` |  |  |  | Filter for resources not having tags, multiple tags are considered as logical OR.
+Should be provided in a comma separated list. |
 | page_reverse | `query` | boolean | `bool` |  |  |  | Sets the page direction. |
 | sort | `query` | string | `string` |  |  |  | Comma-separated list of sort keys, optinally prefix with - to reverse sort order. |
+| tags | `query` | []string | `[]string` |  |  |  | Filter for tags, multiple tags are considered as logical AND. 
+Should be provided in a comma separated list. |
+| tags-any | `query` | []string | `[]string` |  |  |  | Filter for tags, multiple tags are considered as logical OR.
+Should be provided in a comma separated list. |
 
 #### All responses
 | Code | Status | Description | Has headers | Schema |
@@ -680,9 +696,17 @@ GET /v1/members
 |------|--------|------|---------|-----------| :------: |---------|-------------|
 | limit | `query` | integer | `int64` |  |  |  | Sets the page size. |
 | marker | `query` | uuid (formatted string) | `strfmt.UUID` |  |  |  | Pagination ID of the last item in the previous list. |
+| not-tags | `query` | []string | `[]string` |  |  |  | Filter for resources not having tags, multiple not-tags are considered as logical AND.
+Should be provided in a comma separated list. |
+| not-tags-any | `query` | []string | `[]string` |  |  |  | Filter for resources not having tags, multiple tags are considered as logical OR.
+Should be provided in a comma separated list. |
 | page_reverse | `query` | boolean | `bool` |  |  |  | Sets the page direction. |
 | pool_id | `query` | uuid (formatted string) | `strfmt.UUID` |  |  |  | Pool ID of the members to fetch |
 | sort | `query` | string | `string` |  |  |  | Comma-separated list of sort keys, optinally prefix with - to reverse sort order. |
+| tags | `query` | []string | `[]string` |  |  |  | Filter for tags, multiple tags are considered as logical AND. 
+Should be provided in a comma separated list. |
+| tags-any | `query` | []string | `[]string` |  |  |  | Filter for tags, multiple tags are considered as logical OR.
+Should be provided in a comma separated list. |
 
 #### All responses
 | Code | Status | Description | Has headers | Schema |
@@ -817,9 +841,17 @@ GET /v1/monitors
 |------|--------|------|---------|-----------| :------: |---------|-------------|
 | limit | `query` | integer | `int64` |  |  |  | Sets the page size. |
 | marker | `query` | uuid (formatted string) | `strfmt.UUID` |  |  |  | Pagination ID of the last item in the previous list. |
+| not-tags | `query` | []string | `[]string` |  |  |  | Filter for resources not having tags, multiple not-tags are considered as logical AND.
+Should be provided in a comma separated list. |
+| not-tags-any | `query` | []string | `[]string` |  |  |  | Filter for resources not having tags, multiple tags are considered as logical OR.
+Should be provided in a comma separated list. |
 | page_reverse | `query` | boolean | `bool` |  |  |  | Sets the page direction. |
 | pool_id | `query` | uuid (formatted string) | `strfmt.UUID` |  |  |  | Pool ID of the monitors to fetch |
 | sort | `query` | string | `string` |  |  |  | Comma-separated list of sort keys, optinally prefix with - to reverse sort order. |
+| tags | `query` | []string | `[]string` |  |  |  | Filter for tags, multiple tags are considered as logical AND. 
+Should be provided in a comma separated list. |
+| tags-any | `query` | []string | `[]string` |  |  |  | Filter for tags, multiple tags are considered as logical OR.
+Should be provided in a comma separated list. |
 
 #### All responses
 | Code | Status | Description | Has headers | Schema |
@@ -954,8 +986,16 @@ GET /v1/pools
 |------|--------|------|---------|-----------| :------: |---------|-------------|
 | limit | `query` | integer | `int64` |  |  |  | Sets the page size. |
 | marker | `query` | uuid (formatted string) | `strfmt.UUID` |  |  |  | Pagination ID of the last item in the previous list. |
+| not-tags | `query` | []string | `[]string` |  |  |  | Filter for resources not having tags, multiple not-tags are considered as logical AND.
+Should be provided in a comma separated list. |
+| not-tags-any | `query` | []string | `[]string` |  |  |  | Filter for resources not having tags, multiple tags are considered as logical OR.
+Should be provided in a comma separated list. |
 | page_reverse | `query` | boolean | `bool` |  |  |  | Sets the page direction. |
 | sort | `query` | string | `string` |  |  |  | Comma-separated list of sort keys, optinally prefix with - to reverse sort order. |
+| tags | `query` | []string | `[]string` |  |  |  | Filter for tags, multiple tags are considered as logical AND. 
+Should be provided in a comma separated list. |
+| tags-any | `query` | []string | `[]string` |  |  |  | Filter for tags, multiple tags are considered as logical OR.
+Should be provided in a comma separated list. |
 
 #### All responses
 | Code | Status | Description | Has headers | Schema |
