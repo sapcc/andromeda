@@ -18,13 +18,13 @@ package restapi
 
 import (
 	"crypto/tls"
+	"github.com/rs/cors"
 	"net/http"
 
 	"github.com/didip/tollbooth"
 	"github.com/dre1080/recovr"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
-	"github.com/rs/cors"
 	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/auth"
@@ -76,15 +76,6 @@ func configureServer(s *http.Server, scheme, addr string) {
 // The middleware configuration is for the handler executors. These do not apply to the swagger.json document.
 // The middleware executes after routing but before authentication, binding and validation
 func setupMiddlewares(handler http.Handler) http.Handler {
-	if !config.Global.ApiSettings.DisableCors {
-		logger.Info("Initializing CORS middleware")
-		handler = cors.New(cors.Options{
-			AllowedOrigins: []string{"*"},
-			AllowedMethods: []string{"HEAD", "GET", "POST", "PUT", "DELETE"},
-			AllowedHeaders: []string{"Content-Type", "User-Agent", "X-Auth-Token"},
-		}).Handler(handler)
-	}
-
 	if rl := config.Global.ApiSettings.RateLimit; rl > .0 {
 		logger.Infof("Initializing rate limit middleware (rate_limit=%f)", rl)
 		limiter := tollbooth.NewLimiter(rl, nil)
@@ -114,5 +105,15 @@ func setupMiddlewares(handler http.Handler) http.Handler {
 // So this is a good place to plug in a panic handling middleware, logging and metrics
 func setupGlobalMiddleware(handler http.Handler) http.Handler {
 	handler = middlewares.HealthCheckMiddleware(handler)
+
+	if !config.Global.ApiSettings.DisableCors {
+		logger.Info("Initializing CORS middleware")
+		handler = cors.New(cors.Options{
+			AllowedOrigins: []string{"*"},
+			AllowedMethods: []string{"HEAD", "GET", "POST", "PUT", "DELETE"},
+			AllowedHeaders: []string{"Content-Type", "User-Agent", "X-Auth-Token"},
+		}).Handler(handler)
+	}
+
 	return recovr.New()(handler)
 }

@@ -17,11 +17,11 @@
 package policy
 
 import (
+	"github.com/sapcc/go-bits/gopherpolicy"
 	"net/http"
 
 	"go-micro.dev/v4/logger"
 
-	"github.com/sapcc/andromeda/internal/auth"
 	"github.com/sapcc/andromeda/internal/config"
 )
 
@@ -33,9 +33,8 @@ func (p gosloPolicyEngine) init() {
 	}
 }
 
-func (p gosloPolicyEngine) AuthorizeRequest(r *http.Request, target string) bool {
+func (p gosloPolicyEngine) AuthorizeRequest(r *http.Request, t *gopherpolicy.Token, target string) bool {
 	rule := RuleFromHTTPRequest(r)
-	t := auth.TokenFrom(r)
 
 	if t != nil {
 		t.Context.Request = map[string]string{
@@ -47,9 +46,8 @@ func (p gosloPolicyEngine) AuthorizeRequest(r *http.Request, target string) bool
 	return true
 }
 
-func (p gosloPolicyEngine) AuthorizeGetAllRequest(r *http.Request, target string) bool {
+func (p gosloPolicyEngine) AuthorizeGetAllRequest(r *http.Request, t *gopherpolicy.Token, target string) bool {
 	rule := RuleFromHTTPRequest(r)
-	t := auth.TokenFrom(r)
 
 	if t != nil {
 		t.Context.Request = map[string]string{

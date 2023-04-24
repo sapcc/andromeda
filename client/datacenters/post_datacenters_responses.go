@@ -104,6 +104,11 @@ func (o *PostDatacentersCreated) IsCode(code int) bool {
 	return code == 201
 }
 
+// Code gets the status code for the post datacenters created response
+func (o *PostDatacentersCreated) Code() int {
+	return 201
+}
+
 func (o *PostDatacentersCreated) Error() string {
 	return fmt.Sprintf("[POST /datacenters][%d] postDatacentersCreated  %+v", 201, o.Payload)
 }
@@ -167,6 +172,11 @@ func (o *PostDatacentersNotFound) IsCode(code int) bool {
 	return code == 404
 }
 
+// Code gets the status code for the post datacenters not found response
+func (o *PostDatacentersNotFound) Code() int {
+	return 404
+}
+
 func (o *PostDatacentersNotFound) Error() string {
 	return fmt.Sprintf("[POST /datacenters][%d] postDatacentersNotFound  %+v", 404, o.Payload)
 }
@@ -209,11 +219,6 @@ type PostDatacentersDefault struct {
 	Payload *models.Error
 }
 
-// Code gets the status code for the post datacenters default response
-func (o *PostDatacentersDefault) Code() int {
-	return o._statusCode
-}
-
 // IsSuccess returns true when this post datacenters default response has a 2xx status code
 func (o *PostDatacentersDefault) IsSuccess() bool {
 	return o._statusCode/100 == 2
@@ -237,6 +242,11 @@ func (o *PostDatacentersDefault) IsServerError() bool {
 // IsCode returns true when this post datacenters default response a status code equal to that given
 func (o *PostDatacentersDefault) IsCode(code int) bool {
 	return o._statusCode == code
+}
+
+// Code gets the status code for the post datacenters default response
+func (o *PostDatacentersDefault) Code() int {
+	return o._statusCode
 }
 
 func (o *PostDatacentersDefault) Error() string {

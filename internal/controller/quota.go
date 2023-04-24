@@ -22,7 +22,6 @@ import (
 
 	"github.com/sapcc/andromeda/internal/auth"
 	"github.com/sapcc/andromeda/internal/config"
-	"github.com/sapcc/andromeda/internal/policy"
 	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/models"
 	"github.com/sapcc/andromeda/restapi/operations/administrative"
@@ -62,11 +61,7 @@ func getQuotas(db *sqlx.DB, projectID *string) ([]*administrative.GetQuotasOKBod
 
 // GetQuotas GET /quotas
 func (c QuotaController) GetQuotas(params administrative.GetQuotasParams) middleware.Responder {
-	projectID, err := auth.ProjectScopeForRequest(params.HTTPRequest)
-	if err != nil {
-		panic(err)
-	}
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
+	if projectId, err := auth.Authenticate(params.HTTPRequest); err != nil || projectId != *params.ProjectID {
 		return administrative.NewGetQuotasDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
@@ -78,11 +73,7 @@ func (c QuotaController) GetQuotas(params administrative.GetQuotasParams) middle
 }
 
 func (c QuotaController) GetQuotasProjectID(params administrative.GetQuotasProjectIDParams) middleware.Responder {
-	projectID, err := auth.ProjectScopeForRequest(params.HTTPRequest)
-	if err != nil {
-		panic(err)
-	}
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
+	if projectId, err := auth.Authenticate(params.HTTPRequest); err != nil || projectId != params.ProjectID {
 		return administrative.NewGetQuotasProjectIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
@@ -117,11 +108,7 @@ func (c QuotaController) GetQuotasProjectID(params administrative.GetQuotasProje
 }
 
 func (c QuotaController) GetQuotasDefaults(params administrative.GetQuotasDefaultsParams) middleware.Responder {
-	projectID, err := auth.ProjectScopeForRequest(params.HTTPRequest)
-	if err != nil {
-		panic(err)
-	}
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
+	if _, err := auth.Authenticate(params.HTTPRequest); err != nil {
 		return administrative.NewGetQuotasDefaultsDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
@@ -138,11 +125,7 @@ func (c QuotaController) GetQuotasDefaults(params administrative.GetQuotasDefaul
 }
 
 func (c QuotaController) PutQuotasProjectID(params administrative.PutQuotasProjectIDParams) middleware.Responder {
-	projectID, err := auth.ProjectScopeForRequest(params.HTTPRequest)
-	if err != nil {
-		panic(err)
-	}
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
+	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || params.ProjectID != projectID {
 		return administrative.NewPutQuotasProjectIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
@@ -192,11 +175,7 @@ func (c QuotaController) PutQuotasProjectID(params administrative.PutQuotasProje
 }
 
 func (c QuotaController) DeleteQuotasProjectID(params administrative.DeleteQuotasProjectIDParams) middleware.Responder {
-	projectID, err := auth.ProjectScopeForRequest(params.HTTPRequest)
-	if err != nil {
-		panic(err)
-	}
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
+	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || params.ProjectID != projectID {
 		return administrative.NewDeleteQuotasProjectIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 

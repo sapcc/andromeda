@@ -33,7 +33,6 @@ import (
 	"github.com/sapcc/andromeda/db"
 	"github.com/sapcc/andromeda/internal/auth"
 	"github.com/sapcc/andromeda/internal/config"
-	"github.com/sapcc/andromeda/internal/policy"
 	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/models"
 	"github.com/sapcc/andromeda/restapi/operations/domains"
@@ -46,14 +45,18 @@ type DomainController struct {
 
 // GetDomains GET /domains
 func (c DomainController) GetDomains(params domains.GetDomainsParams) middleware.Responder {
-	pagination := db.NewPagination("domain", params.Limit, params.Marker, params.Sort, params.PageReverse)
-	rows, err := pagination.Query(c.db, params.HTTPRequest, nil)
+	filter := make(map[string]any, 0)
+	if projectId, err := auth.Authenticate(params.HTTPRequest); err != nil {
+		return domains.NewGetDomainsDefault(403).WithPayload(utils.PolicyForbidden)
+	} else if projectId != "" {
+		filter["project_id"] = projectId
+	}
+
+	pagination := db.Pagination(params)
+	rows, err := pagination.Query(c.db, "SELECT * FROM domain", filter)
 	if err != nil {
 		if errors.Is(err, db.ErrInvalidMarker) {
 			return domains.NewGetDomainsDefault(400).WithPayload(utils.InvalidMarker)
-		}
-		if errors.Is(err, db.ErrPolicyForbidden) {
-			return domains.NewGetDomainsDefault(403).WithPayload(utils.PolicyForbidden)
 		}
 		panic(err)
 	}
@@ -74,7 +77,7 @@ func (c DomainController) GetDomains(params domains.GetDomainsParams) middleware
 		}
 		_domains = append(_domains, &domain)
 	}
-	_links := pagination.GetLinks(_domains, params.HTTPRequest)
+	_links := pagination.GetLinks(_domains)
 	payload := domains.GetDomainsOKBody{Domains: _domains, Links: _links}
 	return domains.NewGetDomainsOK().WithPayload(&payload)
 }
@@ -82,14 +85,14 @@ func (c DomainController) GetDomains(params domains.GetDomainsParams) middleware
 // PostDomains POST /domains
 func (c DomainController) PostDomains(params domains.PostDomainsParams) middleware.Responder {
 	domain := params.Domain.Domain
-	projectID, err := auth.ProjectScopeForRequest(params.HTTPRequest)
+
+	projectID, err := auth.Authenticate(params.HTTPRequest)
 	if err != nil {
-		panic(err)
-	}
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
 		return domains.NewPostDomainsDefault(403).WithPayload(utils.PolicyForbidden)
+	} else if projectID != "" {
+		domain.ProjectID = &projectID
 	}
-	domain.ProjectID = &projectID
+
 	if domain.Pools == nil {
 		domain.Pools = []strfmt.UUID{}
 	}
@@ -148,13 +151,14 @@ func (c DomainController) PostDomains(params domains.PostDomainsParams) middlewa
 func (c DomainController) GetDomainsDomainID(params domains.GetDomainsDomainIDParams) middleware.Responder {
 	// Get domain
 	domain := models.Domain{ID: params.DomainID, Pools: []strfmt.UUID{}}
+
 	if err := PopulateDomain(c.db, &domain, []string{"*"}); err != nil {
 		return domains.NewGetDomainsDomainIDNotFound().WithPayload(utils.NotFound)
 	}
-
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *domain.ProjectID) {
+	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || projectID != *domain.ProjectID {
 		return domains.NewGetDomainsDomainIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
+
 	return domains.NewGetDomainsDomainIDOK().WithPayload(&domains.GetDomainsDomainIDOKBody{Domain: &domain})
 }
 
@@ -164,7 +168,7 @@ func (c DomainController) PutDomainsDomainID(params domains.PutDomainsDomainIDPa
 	if err := PopulateDomain(c.db, &domain, []string{"*"}); err != nil {
 		return domains.NewPutDomainsDomainIDNotFound().WithPayload(utils.NotFound)
 	}
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *domain.ProjectID) {
+	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || projectID != *domain.ProjectID {
 		return domains.NewPutDomainsDomainIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
@@ -243,7 +247,7 @@ func (c DomainController) DeleteDomainsDomainID(params domains.DeleteDomainsDoma
 	if err := PopulateDomain(c.db, &domain, []string{"id", "project_id"}); err != nil {
 		return domains.NewDeleteDomainsDomainIDNotFound().WithPayload(utils.NotFound)
 	}
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *domain.ProjectID) {
+	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || projectID != *domain.ProjectID {
 		return domains.NewDeleteDomainsDomainIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 

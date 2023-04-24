@@ -104,6 +104,11 @@ func (o *PostDomainsCreated) IsCode(code int) bool {
 	return code == 201
 }
 
+// Code gets the status code for the post domains created response
+func (o *PostDomainsCreated) Code() int {
+	return 201
+}
+
 func (o *PostDomainsCreated) Error() string {
 	return fmt.Sprintf("[POST /domains][%d] postDomainsCreated  %+v", 201, o.Payload)
 }
@@ -167,6 +172,11 @@ func (o *PostDomainsBadRequest) IsCode(code int) bool {
 	return code == 400
 }
 
+// Code gets the status code for the post domains bad request response
+func (o *PostDomainsBadRequest) Code() int {
+	return 400
+}
+
 func (o *PostDomainsBadRequest) Error() string {
 	return fmt.Sprintf("[POST /domains][%d] postDomainsBadRequest  %+v", 400, o.Payload)
 }
@@ -209,11 +219,6 @@ type PostDomainsDefault struct {
 	Payload *models.Error
 }
 
-// Code gets the status code for the post domains default response
-func (o *PostDomainsDefault) Code() int {
-	return o._statusCode
-}
-
 // IsSuccess returns true when this post domains default response has a 2xx status code
 func (o *PostDomainsDefault) IsSuccess() bool {
 	return o._statusCode/100 == 2
@@ -237,6 +242,11 @@ func (o *PostDomainsDefault) IsServerError() bool {
 // IsCode returns true when this post domains default response a status code equal to that given
 func (o *PostDomainsDefault) IsCode(code int) bool {
 	return o._statusCode == code
+}
+
+// Code gets the status code for the post domains default response
+func (o *PostDomainsDefault) Code() int {
+	return o._statusCode
 }
 
 func (o *PostDomainsDefault) Error() string {

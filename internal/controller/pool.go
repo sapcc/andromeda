@@ -28,7 +28,6 @@ import (
 
 	"github.com/sapcc/andromeda/db"
 	"github.com/sapcc/andromeda/internal/auth"
-	"github.com/sapcc/andromeda/internal/policy"
 	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/models"
 	"github.com/sapcc/andromeda/restapi/operations/pools"
@@ -41,14 +40,18 @@ type PoolController struct {
 
 // GetPools GET /pools
 func (c PoolController) GetPools(params pools.GetPoolsParams) middleware.Responder {
-	pagination := db.NewPagination("pool", params.Limit, params.Marker, params.Sort, params.PageReverse)
-	rows, err := pagination.Query(c.db, params.HTTPRequest, nil)
+	filter := make(map[string]any, 0)
+	if projectId, err := auth.Authenticate(params.HTTPRequest); err != nil {
+		return pools.NewGetPoolsDefault(403).WithPayload(utils.PolicyForbidden)
+	} else if projectId != "" {
+		filter["project_id"] = projectId
+	}
+
+	pagination := db.Pagination(params)
+	rows, err := pagination.Query(c.db, "SELECT * FROM pool", filter)
 	if err != nil {
 		if errors.Is(err, db.ErrInvalidMarker) {
 			return pools.NewGetPoolsBadRequest().WithPayload(utils.InvalidMarker)
-		}
-		if errors.Is(err, db.ErrPolicyForbidden) {
-			return pools.NewGetPoolsDefault(403).WithPayload(utils.PolicyForbidden)
 		}
 		panic(err)
 	}
@@ -72,7 +75,7 @@ func (c PoolController) GetPools(params pools.GetPoolsParams) middleware.Respond
 		}
 		_pools = append(_pools, &pool)
 	}
-	_links := pagination.GetLinks(_pools, params.HTTPRequest)
+	_links := pagination.GetLinks(_pools)
 	payload := pools.GetPoolsOKBody{Pools: _pools, Links: _links}
 	return pools.NewGetPoolsOK().WithPayload(&payload)
 }
@@ -85,10 +88,11 @@ func (c PoolController) PostPools(params pools.PostPoolsParams) middleware.Respo
 		panic(err)
 	}
 
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
+	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil {
 		return pools.NewPostPoolsDefault(403).WithPayload(utils.PolicyForbidden)
+	} else if projectID != "" {
+		pool.ProjectID = &projectID
 	}
-	pool.ProjectID = &projectID
 
 	// Set default values
 	if err := utils.SetModelDefaults(pool); err != nil {
@@ -137,7 +141,7 @@ func (c PoolController) GetPoolsPoolID(params pools.GetPoolsPoolIDParams) middle
 		return pools.NewGetPoolsPoolIDNotFound().WithPayload(utils.NotFound)
 	}
 
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *pool.ProjectID) {
+	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || projectID != *pool.ProjectID {
 		return pools.NewGetPoolsPoolIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 	return pools.NewGetPoolsPoolIDOK().WithPayload(&pools.GetPoolsPoolIDOKBody{Pool: &pool})
@@ -150,7 +154,7 @@ func (c PoolController) PutPoolsPoolID(params pools.PutPoolsPoolIDParams) middle
 	if err := PopulatePool(c.db, &pool, []string{"id", "project_id"}, false); err != nil {
 		return pools.NewPutPoolsPoolIDNotFound().WithPayload(utils.NotFound)
 	}
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *pool.ProjectID) {
+	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || projectID != *pool.ProjectID {
 		return pools.NewPutPoolsPoolIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
@@ -210,7 +214,7 @@ func (c PoolController) DeletePoolsPoolID(params pools.DeletePoolsPoolIDParams) 
 	if err := PopulatePool(c.db, &pool, []string{"id", "project_id"}, false); err != nil {
 		return pools.NewDeletePoolsPoolIDNotFound().WithPayload(utils.NotFound)
 	}
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *pool.ProjectID) {
+	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || projectID != *pool.ProjectID {
 		return pools.NewDeletePoolsPoolIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 

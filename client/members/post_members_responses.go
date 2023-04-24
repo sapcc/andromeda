@@ -110,6 +110,11 @@ func (o *PostMembersCreated) IsCode(code int) bool {
 	return code == 201
 }
 
+// Code gets the status code for the post members created response
+func (o *PostMembersCreated) Code() int {
+	return 201
+}
+
 func (o *PostMembersCreated) Error() string {
 	return fmt.Sprintf("[POST /members][%d] postMembersCreated  %+v", 201, o.Payload)
 }
@@ -171,6 +176,11 @@ func (o *PostMembersBadRequest) IsServerError() bool {
 // IsCode returns true when this post members bad request response a status code equal to that given
 func (o *PostMembersBadRequest) IsCode(code int) bool {
 	return code == 400
+}
+
+// Code gets the status code for the post members bad request response
+func (o *PostMembersBadRequest) Code() int {
+	return 400
 }
 
 func (o *PostMembersBadRequest) Error() string {
@@ -236,6 +246,11 @@ func (o *PostMembersNotFound) IsCode(code int) bool {
 	return code == 404
 }
 
+// Code gets the status code for the post members not found response
+func (o *PostMembersNotFound) Code() int {
+	return 404
+}
+
 func (o *PostMembersNotFound) Error() string {
 	return fmt.Sprintf("[POST /members][%d] postMembersNotFound  %+v", 404, o.Payload)
 }
@@ -278,11 +293,6 @@ type PostMembersDefault struct {
 	Payload *models.Error
 }
 
-// Code gets the status code for the post members default response
-func (o *PostMembersDefault) Code() int {
-	return o._statusCode
-}
-
 // IsSuccess returns true when this post members default response has a 2xx status code
 func (o *PostMembersDefault) IsSuccess() bool {
 	return o._statusCode/100 == 2
@@ -306,6 +316,11 @@ func (o *PostMembersDefault) IsServerError() bool {
 // IsCode returns true when this post members default response a status code equal to that given
 func (o *PostMembersDefault) IsCode(code int) bool {
 	return o._statusCode == code
+}
+
+// Code gets the status code for the post members default response
+func (o *PostMembersDefault) Code() int {
+	return o._statusCode
 }
 
 func (o *PostMembersDefault) Error() string {

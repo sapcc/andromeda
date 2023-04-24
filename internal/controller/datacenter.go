@@ -29,7 +29,6 @@ import (
 
 	"github.com/sapcc/andromeda/db"
 	"github.com/sapcc/andromeda/internal/auth"
-	"github.com/sapcc/andromeda/internal/policy"
 	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/models"
 	"github.com/sapcc/andromeda/restapi/operations/datacenters"
@@ -42,14 +41,18 @@ type DatacenterController struct {
 
 // GetDatacenters GET /datacenters
 func (c DatacenterController) GetDatacenters(params datacenters.GetDatacentersParams) middleware.Responder {
-	pagination := db.NewPagination("datacenter", params.Limit, params.Marker, params.Sort, params.PageReverse)
-	rows, err := pagination.Query(c.db, params.HTTPRequest, nil)
+	filter := make(map[string]any, 0)
+	if projectId, err := auth.Authenticate(params.HTTPRequest); err != nil {
+		return datacenters.NewGetDatacentersDefault(403).WithPayload(utils.PolicyForbidden)
+	} else if projectId != "" {
+		filter["project_id"] = projectId
+	}
+
+	pagination := db.Pagination(params)
+	rows, err := pagination.Query(c.db, "SELECT * FROM datacenter", filter)
 	if err != nil {
 		if errors.Is(err, db.ErrInvalidMarker) {
 			return datacenters.NewGetDatacentersBadRequest().WithPayload(utils.InvalidMarker)
-		}
-		if errors.Is(err, db.ErrPolicyForbidden) {
-			return datacenters.NewGetDatacentersDefault(403).WithPayload(utils.PolicyForbidden)
 		}
 		panic(err)
 	}
@@ -64,7 +67,7 @@ func (c DatacenterController) GetDatacenters(params datacenters.GetDatacentersPa
 		_datacenters = append(_datacenters, &datacenter)
 	}
 
-	_links := pagination.GetLinks(_datacenters, params.HTTPRequest)
+	_links := pagination.GetLinks(_datacenters)
 	payload := datacenters.GetDatacentersOKBody{Datacenters: _datacenters, Links: _links}
 	return datacenters.NewGetDatacentersOK().WithPayload(&payload)
 }
@@ -72,14 +75,12 @@ func (c DatacenterController) GetDatacenters(params datacenters.GetDatacentersPa
 // PostDatacenters POST /datacenters
 func (c DatacenterController) PostDatacenters(params datacenters.PostDatacentersParams) middleware.Responder {
 	datacenter := params.Datacenter.Datacenter
-	projectID, err := auth.ProjectScopeForRequest(params.HTTPRequest)
-	if err != nil {
-		panic(err)
-	}
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
+
+	if projectId, err := auth.Authenticate(params.HTTPRequest); err != nil {
 		return datacenters.NewPostDatacentersDefault(403).WithPayload(utils.PolicyForbidden)
+	} else if projectId != "" {
+		datacenter.ProjectID = &projectId
 	}
-	datacenter.ProjectID = &projectID
 
 	// Set default values
 	if err := utils.SetModelDefaults(datacenter); err != nil {
@@ -111,9 +112,13 @@ func (c DatacenterController) GetDatacentersDatacenterID(params datacenters.GetD
 		return datacenters.NewGetDatacentersDatacenterIDNotFound().WithPayload(utils.NotFound)
 	}
 
-	// Allow public scope datacenters to be fetched
-	if "public" != *datacenter.Scope && !policy.Engine.AuthorizeRequest(params.HTTPRequest, *datacenter.ProjectID) {
-		return datacenters.NewGetDatacentersDatacenterIDDefault(403).WithPayload(utils.PolicyForbidden)
+	if "public" != *datacenter.Scope {
+		// Allow public scope datacenters to be fetched
+		if projectId, err := auth.Authenticate(params.HTTPRequest); err != nil {
+			return datacenters.NewGetDatacentersDatacenterIDDefault(403).WithPayload(utils.PolicyForbidden)
+		} else if projectId != "" && projectId != *datacenter.ProjectID {
+			return datacenters.NewGetDatacentersDatacenterIDDefault(403).WithPayload(utils.PolicyForbidden)
+		}
 	}
 	return datacenters.NewGetDatacentersDatacenterIDOK().WithPayload(&datacenters.GetDatacentersDatacenterIDOKBody{Datacenter: &datacenter})
 }
@@ -125,7 +130,7 @@ func (c DatacenterController) PutDatacentersDatacenterID(params datacenters.PutD
 	if err != nil {
 		return datacenters.NewPutDatacentersDatacenterIDNotFound().WithPayload(utils.NotFound)
 	}
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *datacenter.ProjectID) {
+	if projectId, err := auth.Authenticate(params.HTTPRequest); err != nil || *datacenter.ProjectID != projectId {
 		return datacenters.NewPutDatacentersDatacenterIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
@@ -163,7 +168,7 @@ func (c DatacenterController) DeleteDatacentersDatacenterID(params datacenters.D
 	if err := PopulateDatacenter(c.db, &datacenter, []string{"project_id"}); err != nil {
 		return datacenters.NewDeleteDatacentersDatacenterIDNotFound().WithPayload(utils.NotFound)
 	}
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *datacenter.ProjectID) {
+	if projectId, err := auth.Authenticate(params.HTTPRequest); err != nil || *datacenter.ProjectID != projectId {
 		return datacenters.NewDeleteDatacentersDatacenterIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 

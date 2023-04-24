@@ -110,6 +110,11 @@ func (o *PutMembersMemberIDAccepted) IsCode(code int) bool {
 	return code == 202
 }
 
+// Code gets the status code for the put members member Id accepted response
+func (o *PutMembersMemberIDAccepted) Code() int {
+	return 202
+}
+
 func (o *PutMembersMemberIDAccepted) Error() string {
 	return fmt.Sprintf("[PUT /members/{member_id}][%d] putMembersMemberIdAccepted  %+v", 202, o.Payload)
 }
@@ -171,6 +176,11 @@ func (o *PutMembersMemberIDBadRequest) IsServerError() bool {
 // IsCode returns true when this put members member Id bad request response a status code equal to that given
 func (o *PutMembersMemberIDBadRequest) IsCode(code int) bool {
 	return code == 400
+}
+
+// Code gets the status code for the put members member Id bad request response
+func (o *PutMembersMemberIDBadRequest) Code() int {
+	return 400
 }
 
 func (o *PutMembersMemberIDBadRequest) Error() string {
@@ -236,6 +246,11 @@ func (o *PutMembersMemberIDNotFound) IsCode(code int) bool {
 	return code == 404
 }
 
+// Code gets the status code for the put members member Id not found response
+func (o *PutMembersMemberIDNotFound) Code() int {
+	return 404
+}
+
 func (o *PutMembersMemberIDNotFound) Error() string {
 	return fmt.Sprintf("[PUT /members/{member_id}][%d] putMembersMemberIdNotFound  %+v", 404, o.Payload)
 }
@@ -278,11 +293,6 @@ type PutMembersMemberIDDefault struct {
 	Payload *models.Error
 }
 
-// Code gets the status code for the put members member ID default response
-func (o *PutMembersMemberIDDefault) Code() int {
-	return o._statusCode
-}
-
 // IsSuccess returns true when this put members member ID default response has a 2xx status code
 func (o *PutMembersMemberIDDefault) IsSuccess() bool {
 	return o._statusCode/100 == 2
@@ -306,6 +316,11 @@ func (o *PutMembersMemberIDDefault) IsServerError() bool {
 // IsCode returns true when this put members member ID default response a status code equal to that given
 func (o *PutMembersMemberIDDefault) IsCode(code int) bool {
 	return o._statusCode == code
+}
+
+// Code gets the status code for the put members member ID default response
+func (o *PutMembersMemberIDDefault) Code() int {
+	return o._statusCode
 }
 
 func (o *PutMembersMemberIDDefault) Error() string {

@@ -103,6 +103,11 @@ func (o *GetDatacentersDatacenterIDOK) IsCode(code int) bool {
 	return code == 200
 }
 
+// Code gets the status code for the get datacenters datacenter Id o k response
+func (o *GetDatacentersDatacenterIDOK) Code() int {
+	return 200
+}
+
 func (o *GetDatacentersDatacenterIDOK) Error() string {
 	return fmt.Sprintf("[GET /datacenters/{datacenter_id}][%d] getDatacentersDatacenterIdOK  %+v", 200, o.Payload)
 }
@@ -166,6 +171,11 @@ func (o *GetDatacentersDatacenterIDNotFound) IsCode(code int) bool {
 	return code == 404
 }
 
+// Code gets the status code for the get datacenters datacenter Id not found response
+func (o *GetDatacentersDatacenterIDNotFound) Code() int {
+	return 404
+}
+
 func (o *GetDatacentersDatacenterIDNotFound) Error() string {
 	return fmt.Sprintf("[GET /datacenters/{datacenter_id}][%d] getDatacentersDatacenterIdNotFound  %+v", 404, o.Payload)
 }
@@ -208,11 +218,6 @@ type GetDatacentersDatacenterIDDefault struct {
 	Payload *models.Error
 }
 
-// Code gets the status code for the get datacenters datacenter ID default response
-func (o *GetDatacentersDatacenterIDDefault) Code() int {
-	return o._statusCode
-}
-
 // IsSuccess returns true when this get datacenters datacenter ID default response has a 2xx status code
 func (o *GetDatacentersDatacenterIDDefault) IsSuccess() bool {
 	return o._statusCode/100 == 2
@@ -236,6 +241,11 @@ func (o *GetDatacentersDatacenterIDDefault) IsServerError() bool {
 // IsCode returns true when this get datacenters datacenter ID default response a status code equal to that given
 func (o *GetDatacentersDatacenterIDDefault) IsCode(code int) bool {
 	return o._statusCode == code
+}
+
+// Code gets the status code for the get datacenters datacenter ID default response
+func (o *GetDatacentersDatacenterIDDefault) Code() int {
+	return o._statusCode
 }
 
 func (o *GetDatacentersDatacenterIDDefault) Error() string {

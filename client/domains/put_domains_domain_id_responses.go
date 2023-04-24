@@ -110,6 +110,11 @@ func (o *PutDomainsDomainIDAccepted) IsCode(code int) bool {
 	return code == 202
 }
 
+// Code gets the status code for the put domains domain Id accepted response
+func (o *PutDomainsDomainIDAccepted) Code() int {
+	return 202
+}
+
 func (o *PutDomainsDomainIDAccepted) Error() string {
 	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdAccepted  %+v", 202, o.Payload)
 }
@@ -171,6 +176,11 @@ func (o *PutDomainsDomainIDBadRequest) IsServerError() bool {
 // IsCode returns true when this put domains domain Id bad request response a status code equal to that given
 func (o *PutDomainsDomainIDBadRequest) IsCode(code int) bool {
 	return code == 400
+}
+
+// Code gets the status code for the put domains domain Id bad request response
+func (o *PutDomainsDomainIDBadRequest) Code() int {
+	return 400
 }
 
 func (o *PutDomainsDomainIDBadRequest) Error() string {
@@ -236,6 +246,11 @@ func (o *PutDomainsDomainIDNotFound) IsCode(code int) bool {
 	return code == 404
 }
 
+// Code gets the status code for the put domains domain Id not found response
+func (o *PutDomainsDomainIDNotFound) Code() int {
+	return 404
+}
+
 func (o *PutDomainsDomainIDNotFound) Error() string {
 	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdNotFound  %+v", 404, o.Payload)
 }
@@ -278,11 +293,6 @@ type PutDomainsDomainIDDefault struct {
 	Payload *models.Error
 }
 
-// Code gets the status code for the put domains domain ID default response
-func (o *PutDomainsDomainIDDefault) Code() int {
-	return o._statusCode
-}
-
 // IsSuccess returns true when this put domains domain ID default response has a 2xx status code
 func (o *PutDomainsDomainIDDefault) IsSuccess() bool {
 	return o._statusCode/100 == 2
@@ -306,6 +316,11 @@ func (o *PutDomainsDomainIDDefault) IsServerError() bool {
 // IsCode returns true when this put domains domain ID default response a status code equal to that given
 func (o *PutDomainsDomainIDDefault) IsCode(code int) bool {
 	return o._statusCode == code
+}
+
+// Code gets the status code for the put domains domain ID default response
+func (o *PutDomainsDomainIDDefault) Code() int {
+	return o._statusCode
 }
 
 func (o *PutDomainsDomainIDDefault) Error() string {

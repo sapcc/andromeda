@@ -98,6 +98,11 @@ func (o *PutQuotasProjectIDAccepted) IsCode(code int) bool {
 	return code == 202
 }
 
+// Code gets the status code for the put quotas project Id accepted response
+func (o *PutQuotasProjectIDAccepted) Code() int {
+	return 202
+}
+
 func (o *PutQuotasProjectIDAccepted) Error() string {
 	return fmt.Sprintf("[PUT /quotas/{project_id}][%d] putQuotasProjectIdAccepted  %+v", 202, o.Payload)
 }
@@ -140,11 +145,6 @@ type PutQuotasProjectIDDefault struct {
 	Payload *models.Error
 }
 
-// Code gets the status code for the put quotas project ID default response
-func (o *PutQuotasProjectIDDefault) Code() int {
-	return o._statusCode
-}
-
 // IsSuccess returns true when this put quotas project ID default response has a 2xx status code
 func (o *PutQuotasProjectIDDefault) IsSuccess() bool {
 	return o._statusCode/100 == 2
@@ -168,6 +168,11 @@ func (o *PutQuotasProjectIDDefault) IsServerError() bool {
 // IsCode returns true when this put quotas project ID default response a status code equal to that given
 func (o *PutQuotasProjectIDDefault) IsCode(code int) bool {
 	return o._statusCode == code
+}
+
+// Code gets the status code for the put quotas project ID default response
+func (o *PutQuotasProjectIDDefault) Code() int {
+	return o._statusCode
 }
 
 func (o *PutQuotasProjectIDDefault) Error() string {

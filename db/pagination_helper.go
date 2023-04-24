@@ -26,50 +26,61 @@ import (
 
 	"github.com/go-openapi/strfmt"
 	"github.com/jmoiron/sqlx"
-	"github.com/sapcc/andromeda/internal/auth"
 	"github.com/sapcc/andromeda/internal/config"
-	"github.com/sapcc/andromeda/internal/policy"
 	"github.com/sapcc/andromeda/models"
 )
 
-var DefaultSortKeys = []string{"id", "created_at"}
-
 var (
-	ErrInvalidMarker   = errors.New("invalid marker")
-	ErrPolicyForbidden = errors.New("forbidden by policy")
+	sortDirKeyRegex  = regexp.MustCompile("^[a-z0-9_]+$")
+	defaultSortKeys  = []string{"id", "created_at"}
+	ErrInvalidMarker = errors.New("invalid marker")
 )
 
 type Pagination struct {
+
+	// HTTP Request Object
+	HTTPRequest *http.Request `json:"-"`
+
 	/*Sets the page size.
 	  In: query
 	*/
-	limit *int64
+	Limit *int64
 	/*Pagination ID of the last item in the previous list.
 	  In: query
 	*/
-	marker *strfmt.UUID
+	Marker *strfmt.UUID
+	/*Filter for resources not having tags, multiple not-tags are considered as logical AND.
+	Should be provided in a comma separated list.
+
+	  In: query
+	*/
+	NotTags []string
+	/*Filter for resources not having tags, multiple tags are considered as logical OR.
+	Should be provided in a comma separated list.
+
+	  In: query
+	*/
+	NotTagsAny []string
 	/*Sets the page direction.
 	  In: query
 	*/
-	pageReverse *bool
-	/*Comma-separated list of sort keys optionally prefix with - to reverse sort order.
+	PageReverse *bool
+	/*Comma-separated list of sort keys, optionally prefix with - to reverse sort order.
 	  In: query
 	*/
-	sort *string
+	Sort *string
+	/*Filter for tags, multiple tags are considered as logical AND.
+	Should be provided in a comma separated list.
 
-	table string
-	r     *regexp.Regexp
-}
+	  In: query
+	*/
+	Tags []string
+	/*Filter for tags, multiple tags are considered as logical OR.
+	Should be provided in a comma separated list.
 
-func NewPagination(Table string, Limit *int64, Marker *strfmt.UUID, Sort *string, pageReverse *bool) *Pagination {
-	return &Pagination{
-		limit:       Limit,
-		marker:      Marker,
-		sort:        Sort,
-		pageReverse: pageReverse,
-		table:       Table,
-		r:           regexp.MustCompile("^[a-z0-9_]+$"),
-	}
+	  In: query
+	*/
+	TagsAny []string
 }
 
 func stripDesc(sortDirKey string) (string, bool) {
@@ -78,34 +89,46 @@ func stripDesc(sortDirKey string) (string, bool) {
 }
 
 // Query pagination helper that also includes policy query filter
-func (p *Pagination) Query(db *sqlx.DB, r *http.Request, filter []string) (*sqlx.Rows, error) {
+func (p *Pagination) Query(db *sqlx.DB, query string, filter map[string]any) (*sqlx.Rows, error) {
 	var sortDirKeys []string
 	var whereClauses []string
 	var orderBy string
-	markerObj := make(map[string]interface{})
+	var pageReverse bool
 
-	projectID, err := auth.ProjectScopeForRequest(r)
-	if err != nil {
-		return nil, err
-	}
-	if policy.Engine.AuthorizeGetAllRequest(r, projectID) {
-		// Allow fetch of all resources
-		projectID = ""
-	} else if !policy.Engine.AuthorizeRequest(r, projectID) {
-		return nil, ErrPolicyForbidden
+	// add filter
+	for key := range filter {
+		whereClauses = append(whereClauses, fmt.Sprintf("%s = @%s", key, key))
 	}
 
-	query := fmt.Sprintf(`SELECT * FROM %s`, p.table)
+	// tags Filter
+	if p.Tags != nil {
+		whereClauses = append(whereClauses, "tags @> @tags")
+		filter["tags"] = p.Tags
+	}
+	if p.TagsAny != nil {
+		whereClauses = append(whereClauses, "tags && @tags_any")
+		filter["tags_any"] = p.TagsAny
+	}
+	if p.NotTags != nil {
+		whereClauses = append(whereClauses, "NOT ( tags @> @not_tags )")
+		filter["not_tags"] = p.NotTags
+	}
+	if p.NotTagsAny != nil {
+		whereClauses = append(whereClauses, "NOT ( tags && @not_tags_any )")
+		filter["not_tags_any"] = p.NotTagsAny
+	}
 
-	//add filter
-	whereClauses = append(whereClauses, filter...)
+	// page reverse
+	if p.PageReverse != nil {
+		pageReverse = *p.PageReverse
+	}
 
 	//add sorting
-	if !config.Global.ApiSettings.DisableSorting && p.sort != nil {
-		sortDirKeys = strings.Split(*p.sort, ",")
+	if !config.Global.ApiSettings.DisableSorting && p.Sort != nil {
+		sortDirKeys = strings.Split(*p.Sort, ",")
 
 		// Add default sort keys (if not existing)
-		for _, defaultSortKey := range DefaultSortKeys {
+		for _, defaultSortKey := range defaultSortKeys {
 			found := false
 			for _, paramSortKey := range sortDirKeys {
 				sortKey, _ := stripDesc(paramSortKey)
@@ -121,21 +144,23 @@ func (p *Pagination) Query(db *sqlx.DB, r *http.Request, filter []string) (*sqlx
 		}
 	} else {
 		// Creates a copy
-		sortDirKeys = append(sortDirKeys, DefaultSortKeys...)
+		sortDirKeys = append(sortDirKeys, defaultSortKeys...)
 	}
 
-	//always order to ensure stable result
+	// always order to ensure stable result
 	orderBy += " ORDER BY "
 	for i, sortDirKey := range sortDirKeys {
 		// Input sanitation
-		if !p.r.MatchString(sortDirKey) {
+		if !sortDirKeyRegex.MatchString(sortDirKey) {
 			continue
 		}
 
-		if sortKey, ok := stripDesc(sortDirKey); ok {
-			orderBy += fmt.Sprintf("%s DESC", sortKey)
+		sortKey, desc := stripDesc(sortDirKey)
+		orderBy += sortKey
+		if (desc && !pageReverse) || (!desc && pageReverse) {
+			orderBy += " DESC"
 		} else {
-			orderBy += sortDirKey
+			orderBy += " ASC"
 		}
 
 		if i < len(sortDirKeys)-1 {
@@ -143,19 +168,13 @@ func (p *Pagination) Query(db *sqlx.DB, r *http.Request, filter []string) (*sqlx
 		}
 	}
 
-	if !config.Global.ApiSettings.DisablePagination && p.marker != nil {
-		sql := db.Rebind(fmt.Sprintf(`SELECT * FROM %s WHERE id=?`, p.table))
-		rows, err := db.Queryx(sql, p.marker)
-		if err != nil {
+	if !config.Global.ApiSettings.DisablePagination && p.Marker != nil {
+		sql := db.Rebind(fmt.Sprintf(`%s WHERE id = ?`, query))
+		if err := db.Get(&filter, sql, p.Marker); err != nil {
 			return nil, err
 		}
-		for rows.Next() {
-			if err := rows.MapScan(markerObj); err != nil {
-				return nil, err
-			}
-		}
 
-		if len(markerObj) == 0 {
+		if len(filter) == 0 {
 			return nil, ErrInvalidMarker
 		}
 
@@ -183,6 +202,7 @@ func (p *Pagination) Query(db *sqlx.DB, r *http.Request, filter []string) (*sqlx
 		whereClauses = append(whereClauses, sortWhereClauses.String())
 	}
 
+	/* TODO
 	//override project scope, ensures marker is not used for fetching others owner resources
 	if projectID != "" {
 		// hardcoded to datacenter, which allows a public scope for sharing datacenters
@@ -193,6 +213,7 @@ func (p *Pagination) Query(db *sqlx.DB, r *http.Request, filter []string) (*sqlx
 		}
 		markerObj["project_id"] = projectID
 	}
+	*/
 
 	//add WHERE
 	if len(whereClauses) > 0 {
@@ -202,16 +223,17 @@ func (p *Pagination) Query(db *sqlx.DB, r *http.Request, filter []string) (*sqlx
 	//add ORDER BY
 	query += orderBy
 
-	var limit = config.Global.ApiSettings.PaginationMaxLimit
-	if p.limit != nil && *p.limit < config.Global.ApiSettings.PaginationMaxLimit {
-		limit = *p.limit
+	// maximum limit
+	var maxLimit = config.Global.ApiSettings.PaginationMaxLimit
+	if p.Limit == nil || (p.Limit != nil && *p.Limit > maxLimit) {
+		p.Limit = &maxLimit
 	}
-	query += fmt.Sprintf(" LIMIT %d", limit)
+	query += fmt.Sprint(" LIMIT ", *p.Limit)
 
-	return db.NamedQuery(query, markerObj)
+	return db.NamedQuery(query, filter)
 }
 
-func (p *Pagination) GetLinks(modelList interface{}, r *http.Request) []*models.Link {
+func (p *Pagination) GetLinks(modelList any) []*models.Link {
 	var links []*models.Link
 	if reflect.TypeOf(modelList).Kind() != reflect.Slice {
 		return nil
@@ -223,20 +245,21 @@ func (p *Pagination) GetLinks(modelList interface{}, r *http.Request) []*models.
 		first := s.Index(0).Elem().FieldByName("ID").String()
 		last := s.Index(s.Len() - 1).Elem().FieldByName("ID").String()
 
-		if p.sort != nil {
-			prevAttr = append(prevAttr, fmt.Sprintf("sort=%s", *p.sort))
-		}
-		if p.limit != nil {
-			prevAttr = append(prevAttr, fmt.Sprintf("limit=%d", *p.limit))
+		for key, val := range p.HTTPRequest.URL.Query() {
+			if key == "marker" || key == "page_reverse" {
+				continue
+			}
+			prevAttr = append(prevAttr, fmt.Sprint(key, "=", val[0]))
 		}
 
-		// Make a copy
+		// Make a shallow copy
 		nextAttr = append(prevAttr[:0:0], prevAttr...)
 
 		// Previous link of marker supplied
-		if p.marker != nil {
+		if p.Marker != nil {
 			prevAttr = append(prevAttr, fmt.Sprintf("marker=%s", first), "page_reverse=True")
-			prevUrl := fmt.Sprintf("%s%s?%s", config.Global.Default.ApiBaseURL, r.URL.Path, strings.Join(prevAttr, "&"))
+			prevUrl := fmt.Sprint(config.GetApiBaseUrl(p.HTTPRequest), p.HTTPRequest.URL.Path,
+				"?", strings.Join(prevAttr, "&"))
 
 			links = append(links, &models.Link{
 				Href: strfmt.URI(prevUrl),
@@ -245,9 +268,10 @@ func (p *Pagination) GetLinks(modelList interface{}, r *http.Request) []*models.
 		}
 
 		// Next link of limit < size(fetched items)
-		if p.limit != nil && int64(s.Len()) >= *p.limit {
+		if p.Limit != nil && int64(s.Len()) >= *p.Limit {
 			nextAttr = append(nextAttr, fmt.Sprintf("marker=%s", last))
-			nextUrl := fmt.Sprintf("%s%s?%s", config.Global.Default.ApiBaseURL, r.URL.Path, strings.Join(nextAttr, "&"))
+			nextUrl := fmt.Sprint(config.GetApiBaseUrl(p.HTTPRequest), p.HTTPRequest.URL.Path,
+				"?", strings.Join(nextAttr, "&"))
 			links = append(links, &models.Link{
 				Href: strfmt.URI(nextUrl),
 				Rel:  "next",

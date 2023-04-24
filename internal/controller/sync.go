@@ -23,7 +23,6 @@ import (
 	"go-micro.dev/v4"
 
 	"github.com/sapcc/andromeda/internal/auth"
-	"github.com/sapcc/andromeda/internal/policy"
 	"github.com/sapcc/andromeda/internal/rpc/worker"
 	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/restapi/operations/administrative"
@@ -35,11 +34,7 @@ type SyncController struct {
 
 // PostSync POST /sync
 func (c SyncController) PostSync(params administrative.PostSyncParams) middleware.Responder {
-	projectID, err := auth.ProjectScopeForRequest(params.HTTPRequest)
-	if err != nil {
-		panic(err)
-	}
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
+	if _, err := auth.Authenticate(params.HTTPRequest); err != nil {
 		return administrative.NewPostSyncDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 

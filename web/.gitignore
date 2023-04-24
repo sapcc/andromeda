@@ -19,7 +19,9 @@
 .env.production.local
 secretProps.js
 public/App*.js
+public/App*.js.map
 public/chunk*.js
+public/chunk*.js.map
 public/build.js
 public/build.js.map
 

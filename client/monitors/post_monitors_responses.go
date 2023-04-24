@@ -110,6 +110,11 @@ func (o *PostMonitorsCreated) IsCode(code int) bool {
 	return code == 201
 }
 
+// Code gets the status code for the post monitors created response
+func (o *PostMonitorsCreated) Code() int {
+	return 201
+}
+
 func (o *PostMonitorsCreated) Error() string {
 	return fmt.Sprintf("[POST /monitors][%d] postMonitorsCreated  %+v", 201, o.Payload)
 }
@@ -171,6 +176,11 @@ func (o *PostMonitorsBadRequest) IsServerError() bool {
 // IsCode returns true when this post monitors bad request response a status code equal to that given
 func (o *PostMonitorsBadRequest) IsCode(code int) bool {
 	return code == 400
+}
+
+// Code gets the status code for the post monitors bad request response
+func (o *PostMonitorsBadRequest) Code() int {
+	return 400
 }
 
 func (o *PostMonitorsBadRequest) Error() string {
@@ -236,6 +246,11 @@ func (o *PostMonitorsNotFound) IsCode(code int) bool {
 	return code == 404
 }
 
+// Code gets the status code for the post monitors not found response
+func (o *PostMonitorsNotFound) Code() int {
+	return 404
+}
+
 func (o *PostMonitorsNotFound) Error() string {
 	return fmt.Sprintf("[POST /monitors][%d] postMonitorsNotFound  %+v", 404, o.Payload)
 }
@@ -278,11 +293,6 @@ type PostMonitorsDefault struct {
 	Payload *models.Error
 }
 
-// Code gets the status code for the post monitors default response
-func (o *PostMonitorsDefault) Code() int {
-	return o._statusCode
-}
-
 // IsSuccess returns true when this post monitors default response has a 2xx status code
 func (o *PostMonitorsDefault) IsSuccess() bool {
 	return o._statusCode/100 == 2
@@ -306,6 +316,11 @@ func (o *PostMonitorsDefault) IsServerError() bool {
 // IsCode returns true when this post monitors default response a status code equal to that given
 func (o *PostMonitorsDefault) IsCode(code int) bool {
 	return o._statusCode == code
+}
+
+// Code gets the status code for the post monitors default response
+func (o *PostMonitorsDefault) Code() int {
+	return o._statusCode
 }
 
 func (o *PostMonitorsDefault) Error() string {

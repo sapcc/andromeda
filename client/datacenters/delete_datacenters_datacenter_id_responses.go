@@ -99,6 +99,11 @@ func (o *DeleteDatacentersDatacenterIDNoContent) IsCode(code int) bool {
 	return code == 204
 }
 
+// Code gets the status code for the delete datacenters datacenter Id no content response
+func (o *DeleteDatacentersDatacenterIDNoContent) Code() int {
+	return 204
+}
+
 func (o *DeleteDatacentersDatacenterIDNoContent) Error() string {
 	return fmt.Sprintf("[DELETE /datacenters/{datacenter_id}][%d] deleteDatacentersDatacenterIdNoContent ", 204)
 }
@@ -151,6 +156,11 @@ func (o *DeleteDatacentersDatacenterIDNotFound) IsCode(code int) bool {
 	return code == 404
 }
 
+// Code gets the status code for the delete datacenters datacenter Id not found response
+func (o *DeleteDatacentersDatacenterIDNotFound) Code() int {
+	return 404
+}
+
 func (o *DeleteDatacentersDatacenterIDNotFound) Error() string {
 	return fmt.Sprintf("[DELETE /datacenters/{datacenter_id}][%d] deleteDatacentersDatacenterIdNotFound  %+v", 404, o.Payload)
 }
@@ -193,11 +203,6 @@ type DeleteDatacentersDatacenterIDDefault struct {
 	Payload *models.Error
 }
 
-// Code gets the status code for the delete datacenters datacenter ID default response
-func (o *DeleteDatacentersDatacenterIDDefault) Code() int {
-	return o._statusCode
-}
-
 // IsSuccess returns true when this delete datacenters datacenter ID default response has a 2xx status code
 func (o *DeleteDatacentersDatacenterIDDefault) IsSuccess() bool {
 	return o._statusCode/100 == 2
@@ -221,6 +226,11 @@ func (o *DeleteDatacentersDatacenterIDDefault) IsServerError() bool {
 // IsCode returns true when this delete datacenters datacenter ID default response a status code equal to that given
 func (o *DeleteDatacentersDatacenterIDDefault) IsCode(code int) bool {
 	return o._statusCode == code
+}
+
+// Code gets the status code for the delete datacenters datacenter ID default response
+func (o *DeleteDatacentersDatacenterIDDefault) Code() int {
+	return o._statusCode
 }
 
 func (o *DeleteDatacentersDatacenterIDDefault) Error() string {

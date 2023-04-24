@@ -103,6 +103,11 @@ func (o *GetPoolsPoolIDOK) IsCode(code int) bool {
 	return code == 200
 }
 
+// Code gets the status code for the get pools pool Id o k response
+func (o *GetPoolsPoolIDOK) Code() int {
+	return 200
+}
+
 func (o *GetPoolsPoolIDOK) Error() string {
 	return fmt.Sprintf("[GET /pools/{pool_id}][%d] getPoolsPoolIdOK  %+v", 200, o.Payload)
 }
@@ -166,6 +171,11 @@ func (o *GetPoolsPoolIDNotFound) IsCode(code int) bool {
 	return code == 404
 }
 
+// Code gets the status code for the get pools pool Id not found response
+func (o *GetPoolsPoolIDNotFound) Code() int {
+	return 404
+}
+
 func (o *GetPoolsPoolIDNotFound) Error() string {
 	return fmt.Sprintf("[GET /pools/{pool_id}][%d] getPoolsPoolIdNotFound  %+v", 404, o.Payload)
 }
@@ -208,11 +218,6 @@ type GetPoolsPoolIDDefault struct {
 	Payload *models.Error
 }
 
-// Code gets the status code for the get pools pool ID default response
-func (o *GetPoolsPoolIDDefault) Code() int {
-	return o._statusCode
-}
-
 // IsSuccess returns true when this get pools pool ID default response has a 2xx status code
 func (o *GetPoolsPoolIDDefault) IsSuccess() bool {
 	return o._statusCode/100 == 2
@@ -236,6 +241,11 @@ func (o *GetPoolsPoolIDDefault) IsServerError() bool {
 // IsCode returns true when this get pools pool ID default response a status code equal to that given
 func (o *GetPoolsPoolIDDefault) IsCode(code int) bool {
 	return o._statusCode == code
+}
+
+// Code gets the status code for the get pools pool ID default response
+func (o *GetPoolsPoolIDDefault) Code() int {
+	return o._statusCode
 }
 
 func (o *GetPoolsPoolIDDefault) Error() string {

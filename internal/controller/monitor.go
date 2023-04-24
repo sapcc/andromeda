@@ -30,7 +30,6 @@ import (
 
 	"github.com/sapcc/andromeda/db"
 	"github.com/sapcc/andromeda/internal/auth"
-	"github.com/sapcc/andromeda/internal/policy"
 	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/models"
 	"github.com/sapcc/andromeda/restapi/operations/monitors"
@@ -43,16 +42,29 @@ type MonitorController struct {
 
 // GetMonitors GET /monitors
 func (c MonitorController) GetMonitors(params monitors.GetMonitorsParams) middleware.Responder {
-	pagination := db.NewPagination("monitor", params.Limit, params.Marker, params.Sort, params.PageReverse)
-	// filter for pool_id, pool_id is safe and type validated
-	filter := []string{fmt.Sprintf("pool_id = '%s'", params.PoolID)}
-	rows, err := pagination.Query(c.db, params.HTTPRequest, filter)
+	filter := make(map[string]any, 0)
+	if projectId, err := auth.Authenticate(params.HTTPRequest); err != nil {
+		return monitors.NewGetMonitorsDefault(403).WithPayload(utils.PolicyForbidden)
+	} else if projectId != "" {
+		filter["project_id"] = projectId
+	}
+
+	pagination := db.Pagination{
+		HTTPRequest: params.HTTPRequest,
+		Limit:       params.Limit,
+		Marker:      params.Marker,
+		NotTags:     params.NotTags,
+		NotTagsAny:  params.NotTagsAny,
+		PageReverse: params.PageReverse,
+		Sort:        params.Sort,
+		Tags:        params.Tags,
+		TagsAny:     params.TagsAny,
+	}
+	filter["pool_id"] = params.PoolID
+	rows, err := pagination.Query(c.db, "SELECT * from monitor", filter)
 	if err != nil {
 		if errors.Is(err, db.ErrInvalidMarker) {
 			return monitors.NewGetMonitorsBadRequest().WithPayload(utils.InvalidMarker)
-		}
-		if errors.Is(err, db.ErrPolicyForbidden) {
-			return monitors.NewGetMonitorsDefault(403).WithPayload(utils.PolicyForbidden)
 		}
 		panic(err)
 	}
@@ -66,7 +78,7 @@ func (c MonitorController) GetMonitors(params monitors.GetMonitorsParams) middle
 		}
 		_monitors = append(_monitors, &monitor)
 	}
-	_links := pagination.GetLinks(_monitors, params.HTTPRequest)
+	_links := pagination.GetLinks(_monitors)
 	payload := monitors.GetMonitorsOKBody{Monitors: _monitors, Links: _links}
 	return monitors.NewGetMonitorsOK().WithPayload(&payload)
 }
@@ -78,17 +90,14 @@ func (c MonitorController) PostMonitors(params monitors.PostMonitorsParams) midd
 		return monitors.NewPostMonitorsBadRequest().WithPayload(utils.PoolIDRequired)
 	}
 
-	projectID, err := auth.ProjectScopeForRequest(params.HTTPRequest)
-	if err != nil {
-		panic(err)
-	}
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
+	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil {
 		return monitors.NewPostMonitorsDefault(403).WithPayload(utils.PolicyForbidden)
+	} else if projectID != "" {
+		monitor.ProjectID = &projectID
 	}
-	monitor.ProjectID = &projectID
 
 	pool := models.Pool{ID: *monitor.PoolID}
-	if err := PopulatePool(c.db, &pool, []string{"project_id"}, false); err != nil || *pool.ProjectID != projectID {
+	if err := PopulatePool(c.db, &pool, []string{"project_id"}, false); err != nil || *pool.ProjectID != *monitor.ProjectID {
 		return monitors.NewPostMonitorsNotFound().WithPayload(utils.GetErrorPoolNotFound(monitor.PoolID))
 	}
 
@@ -137,7 +146,7 @@ func (c MonitorController) GetMonitorsMonitorID(params monitors.GetMonitorsMonit
 		return monitors.NewGetMonitorsMonitorIDNotFound().WithPayload(utils.NotFound)
 	}
 
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *monitor.ProjectID) {
+	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || projectID != *monitor.ProjectID {
 		return monitors.NewGetMonitorsMonitorIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 	return monitors.NewGetMonitorsMonitorIDOK().WithPayload(&monitors.GetMonitorsMonitorIDOKBody{Monitor: &monitor})
@@ -149,7 +158,7 @@ func (c MonitorController) PutMonitorsMonitorID(params monitors.PutMonitorsMonit
 	if err := PopulateMonitor(c.db, &monitor, []string{"project_id", "pool_id"}); err != nil {
 		return monitors.NewPutMonitorsMonitorIDNotFound().WithPayload(utils.NotFound)
 	}
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *monitor.ProjectID) {
+	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || projectID != *monitor.ProjectID {
 		return monitors.NewPutMonitorsMonitorIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
@@ -193,7 +202,7 @@ func (c MonitorController) DeleteMonitorsMonitorID(params monitors.DeleteMonitor
 	if err := PopulateMonitor(c.db, &monitor, []string{"project_id", "pool_id"}); err != nil {
 		return monitors.NewDeleteMonitorsMonitorIDNotFound().WithPayload(utils.NotFound)
 	}
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *monitor.ProjectID) {
+	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || projectID != *monitor.ProjectID {
 		return monitors.NewDeleteMonitorsMonitorIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 

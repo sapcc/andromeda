@@ -99,6 +99,11 @@ func (o *DeleteQuotasProjectIDNoContent) IsCode(code int) bool {
 	return code == 204
 }
 
+// Code gets the status code for the delete quotas project Id no content response
+func (o *DeleteQuotasProjectIDNoContent) Code() int {
+	return 204
+}
+
 func (o *DeleteQuotasProjectIDNoContent) Error() string {
 	return fmt.Sprintf("[DELETE /quotas/{project_id}][%d] deleteQuotasProjectIdNoContent ", 204)
 }
@@ -151,6 +156,11 @@ func (o *DeleteQuotasProjectIDNotFound) IsCode(code int) bool {
 	return code == 404
 }
 
+// Code gets the status code for the delete quotas project Id not found response
+func (o *DeleteQuotasProjectIDNotFound) Code() int {
+	return 404
+}
+
 func (o *DeleteQuotasProjectIDNotFound) Error() string {
 	return fmt.Sprintf("[DELETE /quotas/{project_id}][%d] deleteQuotasProjectIdNotFound  %+v", 404, o.Payload)
 }
@@ -193,11 +203,6 @@ type DeleteQuotasProjectIDDefault struct {
 	Payload *models.Error
 }
 
-// Code gets the status code for the delete quotas project ID default response
-func (o *DeleteQuotasProjectIDDefault) Code() int {
-	return o._statusCode
-}
-
 // IsSuccess returns true when this delete quotas project ID default response has a 2xx status code
 func (o *DeleteQuotasProjectIDDefault) IsSuccess() bool {
 	return o._statusCode/100 == 2
@@ -221,6 +226,11 @@ func (o *DeleteQuotasProjectIDDefault) IsServerError() bool {
 // IsCode returns true when this delete quotas project ID default response a status code equal to that given
 func (o *DeleteQuotasProjectIDDefault) IsCode(code int) bool {
 	return o._statusCode == code
+}
+
+// Code gets the status code for the delete quotas project ID default response
+func (o *DeleteQuotasProjectIDDefault) Code() int {
+	return o._statusCode
 }
 
 func (o *DeleteQuotasProjectIDDefault) Error() string {

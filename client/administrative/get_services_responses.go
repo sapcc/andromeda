@@ -98,6 +98,11 @@ func (o *GetServicesOK) IsCode(code int) bool {
 	return code == 200
 }
 
+// Code gets the status code for the get services o k response
+func (o *GetServicesOK) Code() int {
+	return 200
+}
+
 func (o *GetServicesOK) Error() string {
 	return fmt.Sprintf("[GET /services][%d] getServicesOK  %+v", 200, o.Payload)
 }
@@ -140,11 +145,6 @@ type GetServicesDefault struct {
 	Payload *models.Error
 }
 
-// Code gets the status code for the get services default response
-func (o *GetServicesDefault) Code() int {
-	return o._statusCode
-}
-
 // IsSuccess returns true when this get services default response has a 2xx status code
 func (o *GetServicesDefault) IsSuccess() bool {
 	return o._statusCode/100 == 2
@@ -168,6 +168,11 @@ func (o *GetServicesDefault) IsServerError() bool {
 // IsCode returns true when this get services default response a status code equal to that given
 func (o *GetServicesDefault) IsCode(code int) bool {
 	return o._statusCode == code
+}
+
+// Code gets the status code for the get services default response
+func (o *GetServicesDefault) Code() int {
+	return o._statusCode
 }
 
 func (o *GetServicesDefault) Error() string {

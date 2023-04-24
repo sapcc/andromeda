@@ -104,6 +104,11 @@ func (o *PutDatacentersDatacenterIDAccepted) IsCode(code int) bool {
 	return code == 202
 }
 
+// Code gets the status code for the put datacenters datacenter Id accepted response
+func (o *PutDatacentersDatacenterIDAccepted) Code() int {
+	return 202
+}
+
 func (o *PutDatacentersDatacenterIDAccepted) Error() string {
 	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] putDatacentersDatacenterIdAccepted  %+v", 202, o.Payload)
 }
@@ -167,6 +172,11 @@ func (o *PutDatacentersDatacenterIDNotFound) IsCode(code int) bool {
 	return code == 404
 }
 
+// Code gets the status code for the put datacenters datacenter Id not found response
+func (o *PutDatacentersDatacenterIDNotFound) Code() int {
+	return 404
+}
+
 func (o *PutDatacentersDatacenterIDNotFound) Error() string {
 	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] putDatacentersDatacenterIdNotFound  %+v", 404, o.Payload)
 }
@@ -209,11 +219,6 @@ type PutDatacentersDatacenterIDDefault struct {
 	Payload *models.Error
 }
 
-// Code gets the status code for the put datacenters datacenter ID default response
-func (o *PutDatacentersDatacenterIDDefault) Code() int {
-	return o._statusCode
-}
-
 // IsSuccess returns true when this put datacenters datacenter ID default response has a 2xx status code
 func (o *PutDatacentersDatacenterIDDefault) IsSuccess() bool {
 	return o._statusCode/100 == 2
@@ -237,6 +242,11 @@ func (o *PutDatacentersDatacenterIDDefault) IsServerError() bool {
 // IsCode returns true when this put datacenters datacenter ID default response a status code equal to that given
 func (o *PutDatacentersDatacenterIDDefault) IsCode(code int) bool {
 	return o._statusCode == code
+}
+
+// Code gets the status code for the put datacenters datacenter ID default response
+func (o *PutDatacentersDatacenterIDDefault) Code() int {
+	return o._statusCode
 }
 
 func (o *PutDatacentersDatacenterIDDefault) Error() string {

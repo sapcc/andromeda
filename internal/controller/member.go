@@ -30,7 +30,6 @@ import (
 
 	"github.com/sapcc/andromeda/db"
 	"github.com/sapcc/andromeda/internal/auth"
-	"github.com/sapcc/andromeda/internal/policy"
 	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/models"
 	"github.com/sapcc/andromeda/restapi/operations/members"
@@ -43,16 +42,29 @@ type MemberController struct {
 
 // GetMembers GET /members
 func (c MemberController) GetMembers(params members.GetMembersParams) middleware.Responder {
-	pagination := db.NewPagination("member", params.Limit, params.Marker, params.Sort, params.PageReverse)
-	// filter for pool_id, pool_id is safe and type validated
-	filter := []string{fmt.Sprintf("pool_id = '%s'", params.PoolID)}
-	rows, err := pagination.Query(c.db, params.HTTPRequest, filter)
+	filter := make(map[string]any, 0)
+	if projectId, err := auth.Authenticate(params.HTTPRequest); err != nil {
+		return members.NewGetMembersDefault(403).WithPayload(utils.PolicyForbidden)
+	} else if projectId != "" {
+		filter["project_id"] = projectId
+	}
+
+	pagination := db.Pagination{
+		HTTPRequest: params.HTTPRequest,
+		Limit:       params.Limit,
+		Marker:      params.Marker,
+		NotTags:     params.NotTags,
+		NotTagsAny:  params.NotTagsAny,
+		PageReverse: params.PageReverse,
+		Sort:        params.Sort,
+		Tags:        params.Tags,
+		TagsAny:     params.TagsAny,
+	}
+	filter["pool_id"] = params.PoolID
+	rows, err := pagination.Query(c.db, "SELECT * FROM member", filter)
 	if err != nil {
 		if errors.Is(err, db.ErrInvalidMarker) {
 			return members.NewGetMembersBadRequest().WithPayload(utils.InvalidMarker)
-		}
-		if errors.Is(err, db.ErrPolicyForbidden) {
-			return members.NewGetMembersDefault(403).WithPayload(utils.PolicyForbidden)
 		}
 		panic(err)
 	}
@@ -66,7 +78,7 @@ func (c MemberController) GetMembers(params members.GetMembersParams) middleware
 		}
 		_members = append(_members, &member)
 	}
-	_links := pagination.GetLinks(_members, params.HTTPRequest)
+	_links := pagination.GetLinks(_members)
 	payload := members.GetMembersOKBody{Members: _members, Links: _links}
 	return members.NewGetMembersOK().WithPayload(&payload)
 }
@@ -77,16 +89,13 @@ func (c MemberController) PostMembers(params members.PostMembersParams) middlewa
 		return members.NewPostMembersBadRequest().WithPayload(utils.PoolIDRequired)
 	}
 
-	member := params.Member.Member
-	projectID, err := auth.ProjectScopeForRequest(params.HTTPRequest)
+	projectID, err := auth.Authenticate(params.HTTPRequest)
 	if err != nil {
-		panic(err)
-	}
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
 		return members.NewPostMembersDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
-	pool := models.Pool{ID: *params.Member.Member.PoolID}
+	member := params.Member.Member
+	pool := models.Pool{ID: *member.PoolID}
 	if err := PopulatePool(c.db, &pool, []string{"project_id"}, false); err != nil || *pool.ProjectID != projectID {
 		return members.NewPostMembersNotFound().WithPayload(utils.GetErrorPoolNotFound(&pool.ID))
 	}
@@ -139,7 +148,7 @@ func (c MemberController) GetMembersMemberID(params members.GetMembersMemberIDPa
 		return members.NewGetMembersMemberIDNotFound().WithPayload(utils.NotFound)
 	}
 
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *member.ProjectID) {
+	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || projectID != *member.ProjectID {
 		return members.NewGetMembersMemberIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 	return members.NewGetMembersMemberIDOK().
@@ -152,7 +161,7 @@ func (c MemberController) PutMembersMemberID(params members.PutMembersMemberIDPa
 	if err := PopulateMember(c.db, &member, []string{"project_id", "pool_id"}); err != nil {
 		return members.NewPutMembersMemberIDNotFound().WithPayload(utils.NotFound)
 	}
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *member.ProjectID) {
+	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || projectID != *member.ProjectID {
 		return members.NewPutMembersMemberIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
@@ -196,7 +205,7 @@ func (c MemberController) DeleteMembersMemberID(params members.DeleteMembersMemb
 	if err := PopulateMember(c.db, &member, []string{"project_id", "pool_id"}); err != nil {
 		return members.NewDeleteMembersMemberIDNotFound().WithPayload(utils.NotFound)
 	}
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, *member.ProjectID) {
+	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || projectID != *member.ProjectID {
 		return members.NewDeleteMembersMemberIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 

@@ -103,6 +103,11 @@ func (o *GetQuotasProjectIDOK) IsCode(code int) bool {
 	return code == 200
 }
 
+// Code gets the status code for the get quotas project Id o k response
+func (o *GetQuotasProjectIDOK) Code() int {
+	return 200
+}
+
 func (o *GetQuotasProjectIDOK) Error() string {
 	return fmt.Sprintf("[GET /quotas/{project_id}][%d] getQuotasProjectIdOK  %+v", 200, o.Payload)
 }
@@ -166,6 +171,11 @@ func (o *GetQuotasProjectIDNotFound) IsCode(code int) bool {
 	return code == 404
 }
 
+// Code gets the status code for the get quotas project Id not found response
+func (o *GetQuotasProjectIDNotFound) Code() int {
+	return 404
+}
+
 func (o *GetQuotasProjectIDNotFound) Error() string {
 	return fmt.Sprintf("[GET /quotas/{project_id}][%d] getQuotasProjectIdNotFound  %+v", 404, o.Payload)
 }
@@ -208,11 +218,6 @@ type GetQuotasProjectIDDefault struct {
 	Payload *models.Error
 }
 
-// Code gets the status code for the get quotas project ID default response
-func (o *GetQuotasProjectIDDefault) Code() int {
-	return o._statusCode
-}
-
 // IsSuccess returns true when this get quotas project ID default response has a 2xx status code
 func (o *GetQuotasProjectIDDefault) IsSuccess() bool {
 	return o._statusCode/100 == 2
@@ -236,6 +241,11 @@ func (o *GetQuotasProjectIDDefault) IsServerError() bool {
 // IsCode returns true when this get quotas project ID default response a status code equal to that given
 func (o *GetQuotasProjectIDDefault) IsCode(code int) bool {
 	return o._statusCode == code
+}
+
+// Code gets the status code for the get quotas project ID default response
+func (o *GetQuotasProjectIDDefault) Code() int {
+	return o._statusCode
 }
 
 func (o *GetQuotasProjectIDDefault) Error() string {

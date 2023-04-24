@@ -23,7 +23,6 @@ import (
 	"go-micro.dev/v4"
 
 	"github.com/sapcc/andromeda/internal/auth"
-	"github.com/sapcc/andromeda/internal/policy"
 	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/models"
 	"github.com/sapcc/andromeda/restapi/operations/administrative"
@@ -44,11 +43,7 @@ func getMetadata(metadata map[string]string, key string) string {
 
 // GetServices GET /services
 func (c ServiceController) GetServices(params administrative.GetServicesParams) middleware.Responder {
-	projectID, err := auth.ProjectScopeForRequest(params.HTTPRequest)
-	if err != nil {
-		panic(err)
-	}
-	if !policy.Engine.AuthorizeRequest(params.HTTPRequest, projectID) {
+	if _, err := auth.Authenticate(params.HTTPRequest); err != nil {
 		return administrative.NewGetServicesDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 

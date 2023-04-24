@@ -17,22 +17,23 @@
 package policy
 
 import (
+	"github.com/sapcc/go-bits/gopherpolicy"
 	"net/http"
 
 	openapiMiddleware "github.com/go-openapi/runtime/middleware"
 	"go-micro.dev/v4/logger"
 )
 
-//global policy engine
+// global policy engine
 var Engine policy
 
 type policy interface {
 	//init initalizer
 	init()
 	//Authorize (get_one/get_all/post/put/delete) for target(tenant)
-	AuthorizeRequest(r *http.Request, target string) bool
+	AuthorizeRequest(r *http.Request, t *gopherpolicy.Token, target string) bool
 	//Authorize (get_all-global) for target(tenant)
-	AuthorizeGetAllRequest(r *http.Request, target string) bool
+	AuthorizeGetAllRequest(r *http.Request, t *gopherpolicy.Token, target string) bool
 }
 
 func SetPolicyEngine(engine string) {
@@ -50,7 +51,7 @@ func SetPolicyEngine(engine string) {
 	}
 }
 
-//RuleFromHTTPRequest returns policy rule key associated to a http request
+// RuleFromHTTPRequest returns policy rule key associated to a http request
 func RuleFromHTTPRequest(r *http.Request) string {
 	if mr := openapiMiddleware.MatchedRouteFrom(r); mr != nil {
 		// Access x-vendor attributes of the swagger request

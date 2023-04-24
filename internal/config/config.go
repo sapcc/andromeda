@@ -18,6 +18,8 @@ package config
 
 import (
 	"errors"
+	"net/http"
+	"net/url"
 	"os"
 	"strings"
 
@@ -145,14 +147,15 @@ type Andromeda struct {
 }
 
 type ApiSettings struct {
-	PolicyFile         string  `short:"p" json:"policy-file" description:"Use policy file" default:"policy.json"`
-	AuthStrategy       string  `json:"auth_strategy" description:"The auth strategy for API requests, currently supported: [keystone, none]"`
-	PolicyEngine       string  `json:"policy_engine" description:"Policy engine to use, currently supported: [goslo, noop]"`
-	DisablePagination  bool    `json:"disable_pagination" description:"Disable the usage of pagination"`
-	DisableSorting     bool    `json:"disable_sorting" description:"Disable the usage of sorting"`
-	PaginationMaxLimit int64   `json:"pagination_max_limit" default:"1000" description:"The maximum number of items returned in a single response."`
-	RateLimit          float64 `json:"rate_limit" default:"100" description:"Maximum number of requests to limit per second."`
-	DisableCors        bool    `json:"disable_cors" description:"Stops sending Access-Control-Allow-Origin Header to allow cross-origin requests."`
+	PolicyFile                string  `short:"p" json:"policy-file" description:"Use policy file" default:"policy.json"`
+	AuthStrategy              string  `json:"auth_strategy" description:"The auth strategy for API requests, currently supported: [keystone, none]"`
+	PolicyEngine              string  `json:"policy_engine" description:"Policy engine to use, currently supported: [goslo, noop]"`
+	DisablePagination         bool    `json:"disable_pagination" description:"Disable the usage of pagination"`
+	DisableSorting            bool    `json:"disable_sorting" description:"Disable the usage of sorting"`
+	PaginationMaxLimit        int64   `json:"pagination_max_limit" default:"1000" description:"The maximum number of items returned in a single response."`
+	RateLimit                 float64 `json:"rate_limit" default:"100" description:"Maximum number of requests to limit per second."`
+	DisableCors               bool    `json:"disable_cors" description:"Stops sending Access-Control-Allow-Origin Header to allow cross-origin requests."`
+	EnableProxyHeadersParsing bool    `long:"enable-proxy-headers-parsing" ini-name:"enable_proxy_headers_parsing" description:"Try parsing proxy headers for http scheme and base url."`
 }
 
 type Quota struct {
@@ -165,6 +168,7 @@ type Quota struct {
 }
 
 type Default struct {
+	Host         string `long:"hostname" ini-name:"host" description:"Hostname used by the server/agent. Defaults to auto-discovery."`
 	ApiBaseURL   string `json:"api_base_uri" description:"Base URI for the API for use in pagination links. This will be autodetected from the request if not overridden here."`
 	TransportURL string `json:"transport_url" description:"The network address and optional user credentials for connecting to the messaging backend."`
 }
@@ -174,7 +178,6 @@ type Database struct {
 }
 
 type F5Config struct {
-	Host             string `json:"host"`
 	DNSServerAddress string `json:"dns_server_address"`
 	ValidateCert     bool   `json:"validate_certificates"`
 }
@@ -197,4 +200,24 @@ type Audit struct {
 type HouseKeeping struct {
 	Enabled     bool  `json:"enabled" description:"Enables house keeping."`
 	DeleteAfter int64 `json:"delete_after" default:"600" description:"Minimum seconds elapsed after cleanup of a deleted domain."`
+}
+
+func GetApiBaseUrl(r *http.Request) string {
+	var baseUrl url.URL
+
+	baseUrl.Scheme = "http"
+	if r.TLS != nil {
+		baseUrl.Scheme = "https"
+	}
+	baseUrl.Host = Global.Default.Host
+	if Global.ApiSettings.EnableProxyHeadersParsing {
+		if proto := r.Header.Get("X-Forwarded-Proto"); proto != "" {
+			baseUrl.Scheme = proto
+		}
+		if host := r.Header.Get("X-Forwarded-Host"); host != "" {
+			baseUrl.Host = host
+		}
+	}
+
+	return baseUrl.String()
 }

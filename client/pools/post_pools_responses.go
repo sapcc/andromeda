@@ -104,6 +104,11 @@ func (o *PostPoolsCreated) IsCode(code int) bool {
 	return code == 201
 }
 
+// Code gets the status code for the post pools created response
+func (o *PostPoolsCreated) Code() int {
+	return 201
+}
+
 func (o *PostPoolsCreated) Error() string {
 	return fmt.Sprintf("[POST /pools][%d] postPoolsCreated  %+v", 201, o.Payload)
 }
@@ -167,6 +172,11 @@ func (o *PostPoolsBadRequest) IsCode(code int) bool {
 	return code == 400
 }
 
+// Code gets the status code for the post pools bad request response
+func (o *PostPoolsBadRequest) Code() int {
+	return 400
+}
+
 func (o *PostPoolsBadRequest) Error() string {
 	return fmt.Sprintf("[POST /pools][%d] postPoolsBadRequest  %+v", 400, o.Payload)
 }
@@ -209,11 +219,6 @@ type PostPoolsDefault struct {
 	Payload *models.Error
 }
 
-// Code gets the status code for the post pools default response
-func (o *PostPoolsDefault) Code() int {
-	return o._statusCode
-}
-
 // IsSuccess returns true when this post pools default response has a 2xx status code
 func (o *PostPoolsDefault) IsSuccess() bool {
 	return o._statusCode/100 == 2
@@ -237,6 +242,11 @@ func (o *PostPoolsDefault) IsServerError() bool {
 // IsCode returns true when this post pools default response a status code equal to that given
 func (o *PostPoolsDefault) IsCode(code int) bool {
 	return o._statusCode == code
+}
+
+// Code gets the status code for the post pools default response
+func (o *PostPoolsDefault) Code() int {
+	return o._statusCode
 }
 
 func (o *PostPoolsDefault) Error() string {

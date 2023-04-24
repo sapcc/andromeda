@@ -99,6 +99,11 @@ func (o *GetQuotasOK) IsCode(code int) bool {
 	return code == 200
 }
 
+// Code gets the status code for the get quotas o k response
+func (o *GetQuotasOK) Code() int {
+	return 200
+}
+
 func (o *GetQuotasOK) Error() string {
 	return fmt.Sprintf("[GET /quotas][%d] getQuotasOK  %+v", 200, o.Payload)
 }
@@ -141,11 +146,6 @@ type GetQuotasDefault struct {
 	Payload *models.Error
 }
 
-// Code gets the status code for the get quotas default response
-func (o *GetQuotasDefault) Code() int {
-	return o._statusCode
-}
-
 // IsSuccess returns true when this get quotas default response has a 2xx status code
 func (o *GetQuotasDefault) IsSuccess() bool {
 	return o._statusCode/100 == 2
@@ -169,6 +169,11 @@ func (o *GetQuotasDefault) IsServerError() bool {
 // IsCode returns true when this get quotas default response a status code equal to that given
 func (o *GetQuotasDefault) IsCode(code int) bool {
 	return o._statusCode == code
+}
+
+// Code gets the status code for the get quotas default response
+func (o *GetQuotasDefault) Code() int {
+	return o._statusCode
 }
 
 func (o *GetQuotasDefault) Error() string {

@@ -98,6 +98,11 @@ func (o *PostSyncAccepted) IsCode(code int) bool {
 	return code == 202
 }
 
+// Code gets the status code for the post sync accepted response
+func (o *PostSyncAccepted) Code() int {
+	return 202
+}
+
 func (o *PostSyncAccepted) Error() string {
 	return fmt.Sprintf("[POST /sync][%d] postSyncAccepted ", 202)
 }
@@ -129,11 +134,6 @@ type PostSyncDefault struct {
 	Payload *models.Error
 }
 
-// Code gets the status code for the post sync default response
-func (o *PostSyncDefault) Code() int {
-	return o._statusCode
-}
-
 // IsSuccess returns true when this post sync default response has a 2xx status code
 func (o *PostSyncDefault) IsSuccess() bool {
 	return o._statusCode/100 == 2
@@ -157,6 +157,11 @@ func (o *PostSyncDefault) IsServerError() bool {
 // IsCode returns true when this post sync default response a status code equal to that given
 func (o *PostSyncDefault) IsCode(code int) bool {
 	return o._statusCode == code
+}
+
+// Code gets the status code for the post sync default response
+func (o *PostSyncDefault) Code() int {
+	return o._statusCode
 }
 
 func (o *PostSyncDefault) Error() string {

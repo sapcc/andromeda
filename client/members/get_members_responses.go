@@ -104,6 +104,11 @@ func (o *GetMembersOK) IsCode(code int) bool {
 	return code == 200
 }
 
+// Code gets the status code for the get members o k response
+func (o *GetMembersOK) Code() int {
+	return 200
+}
+
 func (o *GetMembersOK) Error() string {
 	return fmt.Sprintf("[GET /members][%d] getMembersOK  %+v", 200, o.Payload)
 }
@@ -167,6 +172,11 @@ func (o *GetMembersBadRequest) IsCode(code int) bool {
 	return code == 400
 }
 
+// Code gets the status code for the get members bad request response
+func (o *GetMembersBadRequest) Code() int {
+	return 400
+}
+
 func (o *GetMembersBadRequest) Error() string {
 	return fmt.Sprintf("[GET /members][%d] getMembersBadRequest  %+v", 400, o.Payload)
 }
@@ -209,11 +219,6 @@ type GetMembersDefault struct {
 	Payload *models.Error
 }
 
-// Code gets the status code for the get members default response
-func (o *GetMembersDefault) Code() int {
-	return o._statusCode
-}
-
 // IsSuccess returns true when this get members default response has a 2xx status code
 func (o *GetMembersDefault) IsSuccess() bool {
 	return o._statusCode/100 == 2
@@ -237,6 +242,11 @@ func (o *GetMembersDefault) IsServerError() bool {
 // IsCode returns true when this get members default response a status code equal to that given
 func (o *GetMembersDefault) IsCode(code int) bool {
 	return o._statusCode == code
+}
+
+// Code gets the status code for the get members default response
+func (o *GetMembersDefault) Code() int {
+	return o._statusCode
 }
 
 func (o *GetMembersDefault) Error() string {
