@@ -15,7 +15,7 @@ const DatacenterMenu = ({formState, setFormState, setError}) => {
         hasNextPage,
         fetchNextPage,
         isFetching
-    } = useInfiniteQuery(["datacenters", endpoint], fetchAll, {
+    } = useInfiniteQuery(["datacenters"], fetchAll, {
         getNextPageParam: nextPageParam,
         meta: auth,
         onError: setError

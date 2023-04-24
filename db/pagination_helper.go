@@ -97,7 +97,7 @@ func (p *Pagination) Query(db *sqlx.DB, query string, filter map[string]any) (*s
 
 	// add filter
 	for key := range filter {
-		whereClauses = append(whereClauses, fmt.Sprintf("%s = @%s", key, key))
+		whereClauses = append(whereClauses, fmt.Sprintf("%s = :%s", key, key))
 	}
 
 	// tags Filter
