@@ -14,14 +14,14 @@ const MonitorListItem = ({monitor, setError}) => {
     const queryClient = useQueryClient()
     const createdAt = useMemo(() => {
         if (monitor.created_at) {
-            return DateTime.fromSQL(monitor.created_at).toLocaleString(
+            return DateTime.fromISO(monitor.created_at).toLocaleString(
                 DateTime.DATETIME_SHORT
             )
         }
     }, [monitor.created_at])
     const updatedAt = useMemo(() => {
         if (monitor.updated_at) {
-            return DateTime.fromSQL(monitor.updated_at).toLocaleString(
+            return DateTime.fromISO(monitor.updated_at).toLocaleString(
                 DateTime.DATETIME_SHORT
             )
         }

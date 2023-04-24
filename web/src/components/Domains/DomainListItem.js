@@ -14,14 +14,14 @@ const DomainListItem = ({domain, setError}) => {
     const queryClient = useQueryClient()
     const createdAt = useMemo(() => {
         if (domain.created_at) {
-            return DateTime.fromSQL(domain.created_at).toLocaleString(
+            return DateTime.fromISO(domain.created_at).toLocaleString(
                 DateTime.DATETIME_SHORT
             )
         }
     }, [domain.created_at])
     const updatedAt = useMemo(() => {
         if (domain.updated_at) {
-            return DateTime.fromSQL(domain.updated_at).toLocaleString(
+            return DateTime.fromISO(domain.updated_at).toLocaleString(
                 DateTime.DATETIME_SHORT
             )
         }
@@ -48,7 +48,7 @@ const DomainListItem = ({domain, setError}) => {
             },
             {
                 onSuccess: () => {
-                    const queryKey = ["domains", endpoint]
+                    const queryKey = ["domains"]
                     queryClient
                         .setQueryDefaults(queryKey, {refetchInterval: 5000})
                     queryClient

@@ -27,8 +27,8 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint}) => {
     const [credentials, setCredentials] = useState({
         username: undefined,
         password: undefined,
-        domain: "monsoon3",
-        project: "cc-demo",
+        domain: "ccadmin",
+        project: "cloud_admin",
     })
 
     const onSubmit = (event) => {

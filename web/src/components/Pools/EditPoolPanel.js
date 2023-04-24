@@ -41,7 +41,7 @@ const EditPoolPanel = ({closeCallback}) => {
             {
                 onSuccess: (data) => {
                     queryClient
-                        .setQueryData(["pools", data.pool.id, endpoint], data)
+                        .setQueryData(["pools", data.pool.id], data)
                     queryClient
                         .invalidateQueries("pools")
                         .then(closeCallback)

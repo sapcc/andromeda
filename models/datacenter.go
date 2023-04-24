@@ -49,7 +49,7 @@ type Datacenter struct {
 
 	// country
 	// Example: DE
-	// Max Length: 255
+	// Max Length: 2
 	Country *string `json:"country"`
 
 	// The UTC date and timestamp when the resource was created.
@@ -188,7 +188,7 @@ func (m *Datacenter) validateCountry(formats strfmt.Registry) error {
 		return nil
 	}
 
-	if err := validate.MaxLength("country", "body", *m.Country, 255); err != nil {
+	if err := validate.MaxLength("country", "body", *m.Country, 2); err != nil {
 		return err
 	}
 

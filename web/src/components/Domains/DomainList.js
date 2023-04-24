@@ -51,7 +51,7 @@ const DomainList = ({domains}) => {
         <>
             {/* Error Bar */}
             <Error error={error} />
-            test
+
             {/* Loading indicator for page content */}
             <Loading isLoading={isLoading} />
 

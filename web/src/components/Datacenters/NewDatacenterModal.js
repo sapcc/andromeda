@@ -41,7 +41,7 @@ const NewDatacenterModal = () => {
             {
                 onSuccess: (data) => {
                     queryClient
-                        .setQueryData(["datacenters", data.datacenter.id, endpoint], data)
+                        .setQueryData(["datacenters", data.datacenter.id], data)
                     queryClient
                         .invalidateQueries("datacenters")
                         .then(closeNewDatacenterModal)

@@ -15,14 +15,14 @@ const PoolListItem = ({pool, setSelectedPool, isActive, setError}) => {
     const queryClient = useQueryClient()
     const createdAt = useMemo(() => {
         if (pool.created_at) {
-            return DateTime.fromSQL(pool.created_at).toLocaleString(
+            return DateTime.fromISO(pool.created_at).toLocaleString(
                 DateTime.DATETIME_SHORT
             )
         }
     }, [pool.created_at])
     const updatedAt = useMemo(() => {
         if (pool.updated_at) {
-            return DateTime.fromSQL(pool.updated_at).toLocaleString(
+            return DateTime.fromISO(pool.updated_at).toLocaleString(
                 DateTime.DATETIME_SHORT
             )
         }

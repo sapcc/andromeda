@@ -189,6 +189,7 @@ const build = async () => {
         `export default ${JSON.stringify(appProps())}`
       )
 
+      /*
       let { host, port } = await ctx.serve({
         servedir: "public",
       })
@@ -218,13 +219,14 @@ const build = async () => {
         // Forward the body of the request to esbuild
         req.pipe(proxyReq, { end: true })
       }).listen(parseInt(process.env.PORT))
+      */
 
-      /*
-              host: "127.0.0.1",
+
+      let { host, port } = await ctx.serve({
+        host: "0.0.0.0",
         port: parseInt(process.env.PORT),
-
-       */
-
+        servedir: "public",
+      })
       console.log("serve on", `${host}:${port}`)
     }
   } else {

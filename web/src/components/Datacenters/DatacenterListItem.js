@@ -14,14 +14,14 @@ const DatacenterListItem = ({datacenter, setError}) => {
     const queryClient = useQueryClient()
     const createdAt = useMemo(() => {
         if (datacenter.created_at) {
-            return DateTime.fromSQL(datacenter.created_at).toLocaleString(
+            return DateTime.fromISO(datacenter.created_at).toLocaleString(
                 DateTime.DATETIME_SHORT
             )
         }
     }, [datacenter.created_at])
     const updatedAt = useMemo(() => {
         if (datacenter.updated_at) {
-            return DateTime.fromSQL(datacenter.updated_at).toLocaleString(
+            return DateTime.fromISO(datacenter.updated_at).toLocaleString(
                 DateTime.DATETIME_SHORT
             )
         }
@@ -47,7 +47,7 @@ const DatacenterListItem = ({datacenter, setError}) => {
             },
             {
                 onSuccess: () => {
-                    const queryKey = ["datacenters", endpoint]
+                    const queryKey = ["datacenters"]
                     queryClient
                         .setQueryDefaults(queryKey, {refetchInterval: 5000})
                     // refetch datacenters

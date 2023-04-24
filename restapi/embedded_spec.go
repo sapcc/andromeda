@@ -1592,7 +1592,7 @@ func init() {
         "country": {
           "type": "string",
           "default": "",
-          "maxLength": 255,
+          "maxLength": 2,
           "x-nullable": true,
           "x-omitempty": false,
           "example": "DE"
@@ -4087,7 +4087,7 @@ func init() {
         "country": {
           "type": "string",
           "default": "",
-          "maxLength": 255,
+          "maxLength": 2,
           "x-nullable": true,
           "x-omitempty": false,
           "example": "DE"
