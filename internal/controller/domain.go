@@ -89,7 +89,7 @@ func (c DomainController) PostDomains(params domains.PostDomainsParams) middlewa
 	projectID, err := auth.Authenticate(params.HTTPRequest)
 	if err != nil {
 		return domains.NewPostDomainsDefault(403).WithPayload(utils.PolicyForbidden)
-	} else if projectID != "" {
+	} else {
 		domain.ProjectID = &projectID
 	}
 

@@ -78,7 +78,7 @@ func (c DatacenterController) PostDatacenters(params datacenters.PostDatacenters
 
 	if projectId, err := auth.Authenticate(params.HTTPRequest); err != nil {
 		return datacenters.NewPostDatacentersDefault(403).WithPayload(utils.PolicyForbidden)
-	} else if projectId != "" {
+	} else {
 		datacenter.ProjectID = &projectId
 	}
 

@@ -22,6 +22,7 @@ import (
 
 	"github.com/go-openapi/loads"
 	"github.com/iancoleman/strcase"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/suite"
 	"github.com/xo/dburl"
@@ -36,6 +37,7 @@ import (
 type SuiteTest struct {
 	suite.Suite
 	dbUrl string
+	db    *sqlx.DB
 	c     *Controller
 }
 
@@ -49,16 +51,19 @@ func (t *SuiteTest) SetupSuite() {
 
 	t.dbUrl = os.Getenv("DB_URL")
 	if t.dbUrl == "" {
-		t.dbUrl = "mysql://root:root@localhost/test_suite_controller?sql_mode=%27ANSI_QUOTES%27"
+		t.dbUrl = "mysql://localhost/test_suite_controller?sql_mode=%27ANSI_QUOTES%27"
 	}
 
 	u, _ := dburl.Parse(t.dbUrl)
-	_db, err := sqlx.Connect(u.Driver, u.DSN)
+	if u.Driver == "postgres" {
+		u.Driver = "pgx"
+	}
+	t.db, err = sqlx.Connect(u.Driver, u.DSN)
 	if err != nil {
 		t.FailNow("Failed connecting to Database", err)
 	}
 
-	_db.MapperFunc(strcase.ToSnake)
+	t.db.MapperFunc(strcase.ToSnake)
 	policy.SetPolicyEngine("noop")
 
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
@@ -72,32 +77,23 @@ func (t *SuiteTest) SetupSuite() {
 
 	// initialize controller
 	t.c = &Controller{
-		DomainController{_db, nil},
-		PoolController{_db, nil},
-		DatacenterController{_db, nil},
-		MemberController{_db, nil},
-		MonitorController{_db, nil},
-		ServiceController{_db, nil},
-		QuotaController{_db},
+		DomainController{t.db, nil},
+		PoolController{t.db, nil},
+		DatacenterController{t.db, nil},
+		MemberController{t.db, nil},
+		MonitorController{t.db, nil},
+		ServiceController{t.db, nil},
+		QuotaController{t.db},
 		SyncController{nil},
 	}
-}
 
-// Run After All Test Done
-func (t *SuiteTest) TearDownSuite() {
-}
-
-// Run Before a Test
-func (t *SuiteTest) BeforeTest(suiteName, testName string) {
-	// Run migration
 	if err := migration.Migrate(t.dbUrl); err != nil {
 		t.FailNow("Failed migration", err)
 	}
 }
 
-// Run After a Test
-func (t *SuiteTest) AfterTest(suiteName, testName string) {
-	// Drop Table
+// Run After All Test Done
+func (t *SuiteTest) TearDownSuite() {
 	if err := migration.Rollback(t.dbUrl); err != nil {
 		t.FailNow("Failed rollback", err)
 	}

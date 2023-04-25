@@ -17,6 +17,9 @@
 package controller
 
 import (
+	dbsql "database/sql"
+	"errors"
+
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
 
@@ -61,7 +64,7 @@ func getQuotas(db *sqlx.DB, projectID *string) ([]*administrative.GetQuotasOKBod
 
 // GetQuotas GET /quotas
 func (c QuotaController) GetQuotas(params administrative.GetQuotasParams) middleware.Responder {
-	if projectId, err := auth.Authenticate(params.HTTPRequest); err != nil || projectId != *params.ProjectID {
+	if _, err := auth.Authenticate(params.HTTPRequest); err != nil {
 		return administrative.NewGetQuotasDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
@@ -73,35 +76,23 @@ func (c QuotaController) GetQuotas(params administrative.GetQuotasParams) middle
 }
 
 func (c QuotaController) GetQuotasProjectID(params administrative.GetQuotasProjectIDParams) middleware.Responder {
-	if projectId, err := auth.Authenticate(params.HTTPRequest); err != nil || projectId != params.ProjectID {
+	if _, err := auth.Authenticate(params.HTTPRequest); err != nil {
 		return administrative.NewGetQuotasProjectIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
-	responseQuotas, err := getQuotas(c.db, &params.ProjectID)
-	if err != nil || len(responseQuotas) == 0 {
-		return administrative.NewGetQuotasProjectIDNotFound().WithPayload(utils.NotFound)
-	}
-
-	body := administrative.GetQuotasProjectIDOKBody{
-		Quota: struct {
-			models.Quota
-			models.QuotaUsage
-		}{
-			Quota: models.Quota{
-				Datacenter: responseQuotas[0].Datacenter,
-				Domain:     responseQuotas[0].Domain,
-				Member:     responseQuotas[0].Member,
-				Monitor:    responseQuotas[0].Monitor,
-				Pool:       responseQuotas[0].Pool,
-			},
-			QuotaUsage: models.QuotaUsage{
-				InUseDatacenter: responseQuotas[0].InUseDatacenter,
-				InUseDomain:     responseQuotas[0].InUseDomain,
-				InUseMember:     responseQuotas[0].InUseMember,
-				InUseMonitor:    responseQuotas[0].InUseMonitor,
-				InUsePool:       responseQuotas[0].InUsePool,
-			},
-		},
+	body := administrative.GetQuotasProjectIDOKBody{}
+	sql := c.db.Rebind(`
+		SELECT 
+    		domain, pool, member, monitor, datacenter, 
+    		in_use_domain, in_use_pool, in_use_member, in_use_monitor, in_use_datacenter 
+		FROM quota
+		WHERE project_id = ?
+	`)
+	if err := c.db.Get(&body.Quota, sql, &params.ProjectID); err != nil {
+		if errors.Is(err, dbsql.ErrNoRows) {
+			return administrative.NewGetQuotasProjectIDNotFound().WithPayload(utils.NotFound)
+		}
+		panic(err)
 	}
 	return administrative.NewGetQuotasProjectIDOK().WithPayload(&body)
 
@@ -125,7 +116,7 @@ func (c QuotaController) GetQuotasDefaults(params administrative.GetQuotasDefaul
 }
 
 func (c QuotaController) PutQuotasProjectID(params administrative.PutQuotasProjectIDParams) middleware.Responder {
-	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || params.ProjectID != projectID {
+	if _, err := auth.Authenticate(params.HTTPRequest); err != nil {
 		return administrative.NewPutQuotasProjectIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
@@ -151,7 +142,9 @@ func (c QuotaController) PutQuotasProjectID(params administrative.PutQuotasProje
 		ProjectID *string
 	}{params.Quota.Quota, &params.ProjectID}
 
-	sql := `
+	var sql string
+	if c.db.DriverName() == "mysql" {
+		sql = `
 			INSERT INTO quota SET
 				domain = :domain,
 				pool = :pool,
@@ -166,6 +159,20 @@ func (c QuotaController) PutQuotasProjectID(params administrative.PutQuotasProje
 				monitor = COALESCE(:monitor, monitor),
 				datacenter = COALESCE(:datacenter, datacenter)
 		`
+	} else {
+		sql = `
+			INSERT INTO quota
+				(domain, pool, member, monitor, datacenter, project_id)
+			VALUES 
+			    (:domain, :pool, :member, :monitor, :datacenter, :project_id)
+			ON CONFLICT (project_id) DO UPDATE SET 
+				domain = COALESCE(:domain, quota.domain),
+				pool = COALESCE(:pool, quota.pool),
+				member = COALESCE(:member, quota.member), 
+				monitor = COALESCE(:monitor, quota.monitor),
+				datacenter = COALESCE(:datacenter, quota.datacenter)
+		`
+	}
 	if _, err := c.db.NamedExec(sql, quota); err != nil {
 		panic(err)
 	}
@@ -175,11 +182,11 @@ func (c QuotaController) PutQuotasProjectID(params administrative.PutQuotasProje
 }
 
 func (c QuotaController) DeleteQuotasProjectID(params administrative.DeleteQuotasProjectIDParams) middleware.Responder {
-	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || params.ProjectID != projectID {
+	if _, err := auth.Authenticate(params.HTTPRequest); err != nil {
 		return administrative.NewDeleteQuotasProjectIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
-	sql := `DELETE FROM quota WHERE project_id = ?`
+	sql := c.db.Rebind(`DELETE FROM quota WHERE project_id = ?`)
 	res := c.db.MustExec(sql, params.ProjectID)
 	if deleted, _ := res.RowsAffected(); deleted != 1 {
 		return administrative.NewDeleteQuotasProjectIDNotFound().WithPayload(utils.NotFound)

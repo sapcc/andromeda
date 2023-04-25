@@ -49,13 +49,13 @@ func (t *SuiteTest) TestDomains() {
 	res = dc.PostDomains(domains.PostDomainsParams{Domain: domain})
 	rr = httptest.NewRecorder()
 	res.WriteResponse(rr, runtime.JSONProducer())
-	assert.Equal(t.T(), rr.Code, http.StatusCreated, rr.Body)
+	assert.Equal(t.T(), http.StatusCreated, rr.Code, rr.Body)
 
 	// Get all domains
 	res = dc.GetDomains(domains.GetDomainsParams{})
 	rr = httptest.NewRecorder()
 	res.WriteResponse(rr, runtime.JSONProducer())
-	assert.Equal(t.T(), rr.Code, http.StatusOK, rr.Body)
+	assert.Equal(t.T(), http.StatusOK, rr.Code, rr.Body)
 
 	domainsResponse := domains.GetDomainsOKBody{}
 	_ = domainsResponse.UnmarshalBinary(rr.Body.Bytes())

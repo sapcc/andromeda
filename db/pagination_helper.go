@@ -245,11 +245,13 @@ func (p *Pagination) GetLinks(modelList any) []*models.Link {
 		first := s.Index(0).Elem().FieldByName("ID").String()
 		last := s.Index(s.Len() - 1).Elem().FieldByName("ID").String()
 
-		for key, val := range p.HTTPRequest.URL.Query() {
-			if key == "marker" || key == "page_reverse" {
-				continue
+		if p.HTTPRequest != nil {
+			for key, val := range p.HTTPRequest.URL.Query() {
+				if key == "marker" || key == "page_reverse" {
+					continue
+				}
+				prevAttr = append(prevAttr, fmt.Sprint(key, "=", val[0]))
 			}
-			prevAttr = append(prevAttr, fmt.Sprint(key, "=", val[0]))
 		}
 
 		// Make a shallow copy

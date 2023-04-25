@@ -14,11 +14,18 @@
  *   limitations under the License.
  */
 
-DROP TABLE IF EXISTS domain;
-DROP TABLE IF EXISTS pool;
-DROP TABLE IF EXISTS pool_domain_membership;
-DROP TABLE IF EXISTS datacenter;
-DROP TABLE IF EXISTS monitor;
-DROP TABLE IF EXISTS member;
-DROP TABLE IF EXISTS quota;
 DROP TABLE IF EXISTS agent;
+
+DROP TABLE IF EXISTS quota;
+
+DROP TABLE IF EXISTS monitor;
+
+DROP TABLE IF EXISTS member;
+
+DROP TABLE IF EXISTS datacenter;
+
+DROP TABLE IF EXISTS domain_pool_relation;
+
+DROP TABLE IF EXISTS pool;
+
+DROP TABLE IF EXISTS domain;

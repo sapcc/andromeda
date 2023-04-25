@@ -83,14 +83,11 @@ func (c PoolController) GetPools(params pools.GetPoolsParams) middleware.Respond
 // PostPools POST /pools
 func (c PoolController) PostPools(params pools.PostPoolsParams) middleware.Responder {
 	pool := params.Pool.Pool
-	projectID, err := auth.ProjectScopeForRequest(params.HTTPRequest)
-	if err != nil {
-		panic(err)
-	}
 
-	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil {
+	projectID, err := auth.Authenticate(params.HTTPRequest)
+	if err != nil {
 		return pools.NewPostPoolsDefault(403).WithPayload(utils.PolicyForbidden)
-	} else if projectID != "" {
+	} else {
 		pool.ProjectID = &projectID
 	}
 
@@ -117,7 +114,7 @@ func (c PoolController) PostPools(params pools.PostPoolsParams) middleware.Respo
 
 		stmt, _ := tx.PrepareNamed(sql)
 		if err := stmt.Get(pool, pool); err != nil {
-			panic(err)
+			return err
 		}
 
 		for _, domainId := range params.Pool.Pool.Domains {
