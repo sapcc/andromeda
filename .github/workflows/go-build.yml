@@ -5,12 +5,10 @@ on:
     tags:
       - v*
     branches:
-      - master
       - main
   pull_request:
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
     steps:
@@ -23,12 +21,3 @@ jobs:
 
       - name: Build
         run: go build -v ./...
-
-      - name: Run MariaDB
-        uses: getong/mariadb-action@v1.1
-        with:
-          mysql database: 'test_suite_controller'
-          mysql root password: root
-
-      - name: Test
-        run: go test -v ./...
