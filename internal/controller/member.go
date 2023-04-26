@@ -210,7 +210,7 @@ func (c MemberController) DeleteMembersMemberID(params members.DeleteMembersMemb
 	}
 
 	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
-		sql := tx.Rebind(`DELETE FROM member WHERE id = ?`)
+		sql := tx.Rebind(`UPDATE member SET provisioning_status = 'PENDING_DELETE', updated_at = NOW() WHERE id = ?`)
 		res := tx.MustExec(sql, params.MemberID)
 		if deleted, _ := res.RowsAffected(); deleted != 1 {
 			return EmptyResultError

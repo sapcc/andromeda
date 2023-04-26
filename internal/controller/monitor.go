@@ -177,7 +177,8 @@ func (c MonitorController) PutMonitorsMonitorID(params monitors.PutMonitorsMonit
 			send = COALESCE(:send, send),
 			timeout = COALESCE(:timeout, timeout),
 			type = COALESCE(:type, type),
-		    updated_at = NOW()
+		    updated_at = NOW(),
+		    provisioning_status = 'PENDING_UPDATE'
 		WHERE id = :id
 	`
 
@@ -207,7 +208,7 @@ func (c MonitorController) DeleteMonitorsMonitorID(params monitors.DeleteMonitor
 	}
 
 	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
-		sql := tx.Rebind(`DELETE FROM monitor WHERE id = ?`)
+		sql := tx.Rebind(`UPDATE monitor SET provisioning_status = 'PENDING_DELETE', updated_at = NOW() WHERE id = ?`)
 		res := c.db.MustExec(sql, params.MonitorID)
 		if deleted, _ := res.RowsAffected(); deleted != 1 {
 			return EmptyResultError

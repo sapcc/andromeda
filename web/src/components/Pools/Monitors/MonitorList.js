@@ -1,18 +1,9 @@
 import React, {useState} from "react"
 
-import {
-    Box,
-    Button,
-    DataGrid,
-    DataGridHeadCell,
-    DataGridRow,
-    Message,
-    Spinner,
-    Stack,
-} from "juno-ui-components"
+import {Box, Button, DataGrid, DataGridHeadCell, DataGridRow, Stack,} from "juno-ui-components"
 import MonitorListItem from "./MonitorListItem"
 import {authStore, useStore} from "../../../store"
-import { currentState, push } from "url-state-provider"
+import {currentState, push} from "url-state-provider"
 import {fetchAll, nextPageParam} from "../../../actions";
 import {useInfiniteQuery} from '@tanstack/react-query';
 import {Error, Loading} from "../../Components";
@@ -31,7 +22,7 @@ const MonitorList = ({poolID, setSelectedPool}) => {
         isFetching,
         isFetchingNextPage,
     } = useInfiniteQuery(
-        [`monitors`, {pool_id: poolID}],
+        ["monitors", {pool_id: poolID}],
         fetchAll,
         {
             getNextPageParam: nextPageParam,

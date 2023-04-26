@@ -299,7 +299,7 @@ func (u *RPCHandler) UpdateProvisioningStatus(ctx context.Context, req *Provisio
 	for _, provStatusReq := range req.GetProvisioningStatus() {
 		table := strings.ToLower(provStatusReq.GetModel().String())
 
-		sql := u.DB.Rebind(fmt.Sprintf(`UPDATE %s SET provisioning_status = ?, updated_at = NOW() WHERE id = ?`, table))
+		sql := u.DB.Rebind(fmt.Sprintf(`UPDATE %s SET provisioning_status = ?, updated_at = NOW() WHERE id = ? AND provisioning_status != 'ERROR'`, table))
 		_, err := u.DB.Exec(sql, provStatusReq.GetStatus().String(), provStatusReq.GetId())
 		if err != nil {
 			logger.Error(err)

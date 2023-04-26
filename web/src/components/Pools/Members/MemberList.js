@@ -22,7 +22,7 @@ const MemberList = ({poolID, setSelectedPool}) => {
         isFetching,
         isFetchingNextPage,
     } = useInfiniteQuery(
-        [`members`, {pool_id: poolID}],
+        ["members", {pool_id: poolID}],
         fetchAll,
         {
             getNextPageParam: nextPageParam,

@@ -283,12 +283,12 @@ func UpdateCascadePool(tx *sqlx.Tx, poolID strfmt.UUID, provisioningStatus strin
 		sql = tx.Rebind(`
 			UPDATE domain
 			JOIN domain_pool_relation dpr on domain.id = dpr.domain_id
-			SET provisioning_status = 'PENDING_UPDATE'
+			SET provisioning_status = 'PENDING_UPDATE', updated_at = NOW()
 			WHERE dpr.pool_id = ?`)
 	} else {
 		sql = tx.Rebind(`
 			UPDATE domain
-			SET provisioning_status = 'PENDING_UPDATE'
+			SET provisioning_status = 'PENDING_UPDATE', updated_at = NOW()
 			FROM domain_pool_relation
 			WHERE domain.id = domain_pool_relation.domain_id AND domain_pool_relation.pool_id = ?`)
 	}
@@ -296,11 +296,7 @@ func UpdateCascadePool(tx *sqlx.Tx, poolID strfmt.UUID, provisioningStatus strin
 		return err
 	}
 
-	if provisioningStatus == "PENDING_DELETE" {
-		sql = `DELETE FROM pool WHERE id = ?`
-	} else {
-		sql = fmt.Sprintf(`UPDATE pool SET provisioning_status = '%s' WHERE id = ?`, provisioningStatus)
-	}
+	sql = fmt.Sprintf(`UPDATE pool SET provisioning_status = '%s' WHERE id = ?`, provisioningStatus)
 	if _, err := tx.Exec(tx.Rebind(sql), poolID); err != nil {
 		return err
 	}

@@ -73,7 +73,7 @@ export const ListItemStatus = ({data}) => {
         if ("status" in data) {
             return <Badge
                 text={data.status}
-                variant={data.status === "ONLINE" ? "info" : "danger"}
+                variant={data.status === "ONLINE" ? "info" : (data.status === "UNKNOWN" ? "warning" : "danger") }
             />
         } else {
             return <Badge
@@ -83,7 +83,7 @@ export const ListItemStatus = ({data}) => {
         }
     } else {
         return <Badge
-            variant={["PENDING_DELETE", "DELETED"].includes(
+            variant={["PENDING_DELETE", "DELETED", "ERROR"].includes(
                 data.provisioning_status) ? "danger" : "warning"}
                 text={data.provisioning_status}
             />

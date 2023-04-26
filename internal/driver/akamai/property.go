@@ -19,6 +19,8 @@ package akamai
 import (
 	"context"
 	"fmt"
+	"github.com/sapcc/andromeda/internal/driver"
+	"github.com/sapcc/andromeda/internal/rpc/server"
 
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v5/pkg/gtm"
 	"go-micro.dev/v4/logger"
@@ -147,6 +149,12 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 		case rpcmodels.Monitor_TCP:
 			livenessTest.RequestString = monitor.GetSend()
 			livenessTest.ResponseString = monitor.GetReceive()
+		default:
+			driver.UpdateProvisioningStatus(s.rpc,
+				[]*server.ProvisioningStatusRequest_ProvisioningStatus{
+					driver.GetProvisioningStatusRequest(monitor.Id, "MONITOR", "ERROR"),
+				})
+			continue
 		}
 		property.LivenessTests = append(property.LivenessTests, &livenessTest)
 	}

@@ -113,6 +113,8 @@ func ExecuteAkamaiAgent() error {
 			}
 
 			go akamai.WorkerThread()
+			// sync immediately
+			akamai.forceSync <- nil
 			return nil
 		}),
 	)

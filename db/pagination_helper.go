@@ -97,7 +97,11 @@ func (p *Pagination) Query(db *sqlx.DB, query string, filter map[string]any) (*s
 
 	// add filter
 	for key := range filter {
-		whereClauses = append(whereClauses, fmt.Sprintf("%s = :%s", key, key))
+		if strings.HasSuffix(query, "datacenter") {
+			whereClauses = append(whereClauses, fmt.Sprintf("( %s = :%s OR scope = 'public')", key, key))
+		} else {
+			whereClauses = append(whereClauses, fmt.Sprintf("%s = :%s", key, key))
+		}
 	}
 
 	// tags Filter

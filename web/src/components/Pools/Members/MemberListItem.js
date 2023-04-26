@@ -1,13 +1,13 @@
 import React from "react"
 
-import {DataGridCell, DataGridRow, Icon, Spinner, Stack} from "juno-ui-components"
+import {DataGridCell, DataGridRow, Icon, Stack} from "juno-ui-components"
 import {authStore, useStore} from "../../../store"
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {currentState, push} from "url-state-provider"
 import {deleteItem, fetchItem} from "../../../actions"
 import {ListItemSpinner, ListItemStatus} from "../../Components";
 
-const MemberListItem = ({ member, setError }) => {
+const MemberListItem = ({member, setError}) => {
     const urlStateKey = useStore((state) => state.urlStateKey)
     const auth = authStore((state) => state.auth)
     const queryClient = useQueryClient()
@@ -41,7 +41,7 @@ const MemberListItem = ({ member, setError }) => {
             },
             {
                 onSuccess: () => {
-                    const queryKey = ["members", {pool_id: poolID}]
+                    const queryKey= ["members", {pool_id: member.pool_id}]
                     queryClient
                         .setQueryDefaults(queryKey, {refetchInterval: 5000})
                     queryClient

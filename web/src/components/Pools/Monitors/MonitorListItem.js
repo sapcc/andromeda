@@ -48,7 +48,7 @@ const MonitorListItem = ({monitor, setError}) => {
             },
             {
                 onSuccess: () => {
-                    const queryKey = ["monitors", {pool_id: monitor.poolID}]
+                    const queryKey = ["monitors", {pool_id: monitor.pool_id}]
                     queryClient
                         .setQueryDefaults(queryKey, {refetchInterval: 5000})
                     queryClient
