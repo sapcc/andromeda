@@ -19,6 +19,7 @@ package controller
 import (
 	"errors"
 	"fmt"
+	"go-micro.dev/v4/logger"
 	"strings"
 
 	"github.com/go-openapi/runtime/middleware"
@@ -137,6 +138,7 @@ func (c MemberController) PostMembers(params members.PostMembersParams) middlewa
 		panic(err)
 	}
 
+	_ = PendingSync(c.sv)
 	return members.NewPostMembersCreated().
 		WithPayload(&members.PostMembersCreatedBody{Member: member})
 }
@@ -195,6 +197,7 @@ func (c MemberController) PutMembersMemberID(params members.PutMembersMemberIDPa
 		panic(err)
 	}
 
+	logger.Info(PendingSync(c.sv))
 	return members.NewPutMembersMemberIDAccepted().
 		WithPayload(&members.PutMembersMemberIDAcceptedBody{Member: &member})
 }
@@ -223,6 +226,7 @@ func (c MemberController) DeleteMembersMemberID(params members.DeleteMembersMemb
 		panic(err)
 	}
 
+	_ = PendingSync(c.sv)
 	return members.NewDeleteMembersMemberIDNoContent()
 }
 

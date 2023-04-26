@@ -74,5 +74,7 @@ func (t *SuiteTest) TestMembers() {
 	assert.Equal(t.T(), http.StatusNoContent, rr.Code, rr.Body)
 
 	// Cleanup
-	t.deletePool(poolID)
+	if _, err := t.db.Exec("DELETE FROM pool"); err != nil {
+		t.FailNow(err.Error())
+	}
 }

@@ -18,6 +18,7 @@ package akamai
 
 import (
 	"context"
+	"github.com/sapcc/andromeda/internal/rpcmodels"
 	"time"
 
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v5/pkg/gtm"
@@ -185,6 +186,27 @@ func (s *AkamaiAgent) pendingSync(domains []string) error {
 	// TODO: support multiple trafficManagementDomains due to limit of 100 properties
 	trafficManagementDomain := config.Global.AkamaiConfig.Domain
 
+	// Sync all required datacenters first
+	var datacenters []*rpcmodels.Datacenter
+	for _, domain := range res {
+		datacenters = append(datacenters, domain.Datacenters...)
+	}
+	for _, datacenter := range datacenters {
+		if _, err = s.SyncDatacenter(datacenter, false); err != nil {
+			return err
+		}
+
+		// Wait for status propagation
+		var status string
+		for ok := true; ok; ok = status == "PENDING" {
+			time.Sleep(5 * time.Second)
+			status, err = s.syncProvisioningStatus(nil)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
 	for _, domain := range res {
 		logger.Infof("pendingSync(%s) running...", domain.Id)
 		if err := s.gtmLock.Lock(trafficManagementDomain); err != nil {
@@ -222,6 +244,7 @@ func (s *AkamaiAgent) pendingSync(domains []string) error {
 }
 
 func (s *AkamaiAgent) ForceSync(ctx context.Context, request *worker.SyncRequest) error {
+	logger.Infof("Got Sync request %v", request)
 	md, _ := metadata.FromContext(ctx)
 	if domainId, ok := md.Get("domain"); ok {
 		s.forceSync <- []string{domainId}

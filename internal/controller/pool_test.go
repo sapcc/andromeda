@@ -83,6 +83,8 @@ func (t *SuiteTest) TestPools() {
 	res.WriteResponse(rr, runtime.JSONProducer())
 	assert.Equal(t.T(), rr.Code, http.StatusOK, rr.Body)
 
-	// Delete pool
-	t.deletePool(poolID)
+	// cleanup pool
+	if _, err := t.db.Exec("DELETE FROM pool"); err != nil {
+		t.FailNow(err.Error())
+	}
 }

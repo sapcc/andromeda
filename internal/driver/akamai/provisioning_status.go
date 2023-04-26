@@ -80,11 +80,20 @@ func (s *AkamaiAgent) syncProvisioningStatus(domain *rpcmodels.Domain) (string, 
 	case "PENDING":
 		logger.Debug("Akamai Backend: pending configuration change")
 	case "DENIED":
+		if domain == nil {
+			logger.Error("Akamai Backend: configuration change failed")
+			return status.PropagationStatus, nil
+		}
+
 		logger.Errorf("Domain %s failed syncing: %s", domain.Id, status.Message)
 		if err := s.UpdateDomainProvisioningStatus(domain, "ERROR"); err != nil {
 			return "UNKNOWN", err
 		}
 	case "COMPLETE":
+		if domain == nil {
+			logger.Info("Akamai Backend: configuration change completed")
+			return status.PropagationStatus, nil
+		}
 		logger.Infof("Domain %s has been propagated", domain.Id)
 		provStatus := "ACTIVE"
 		if domain.ProvisioningStatus == "PENDING_DELETE" {

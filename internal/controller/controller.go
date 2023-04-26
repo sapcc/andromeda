@@ -17,6 +17,8 @@
 package controller
 
 import (
+	"context"
+	"github.com/sapcc/andromeda/internal/rpc/worker"
 	"os"
 	"time"
 
@@ -66,4 +68,14 @@ func New(db *sqlx.DB) *Controller {
 		SyncController{sv},
 	}
 	return &c
+}
+
+func PendingSync(service micro.Service) error {
+	if service == nil {
+		return nil
+	}
+	return micro.NewEvent("andromeda.sync", service.Client()).
+		Publish(context.Background(), &worker.SyncRequest{
+			DomainIds: nil,
+		})
 }
