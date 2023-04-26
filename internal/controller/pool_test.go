@@ -44,14 +44,6 @@ func (t *SuiteTest) createPool() strfmt.UUID {
 	return poolResponse.Pool.ID
 }
 
-func (t *SuiteTest) deletePool(poolID strfmt.UUID) {
-	// Delete specific pool
-	res := t.c.Pools.DeletePoolsPoolID(pools.DeletePoolsPoolIDParams{PoolID: poolID})
-	rr := httptest.NewRecorder()
-	res.WriteResponse(rr, runtime.JSONProducer())
-	assert.Equal(t.T(), rr.Code, http.StatusNoContent, rr.Body)
-}
-
 func (t *SuiteTest) TestPools() {
 	rr := httptest.NewRecorder()
 
