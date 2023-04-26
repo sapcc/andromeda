@@ -188,40 +188,6 @@ const build = async () => {
         `./${outdir}/appProps.js`,
         `export default ${JSON.stringify(appProps())}`
       )
-
-      /*
-      let { host, port } = await ctx.serve({
-        servedir: "public",
-      })
-      createServer((req, res) => {
-        const options = {
-          hostname: host,
-          port: port,
-          path: req.url,
-          method: req.method,
-          headers: req.headers,
-        }
-
-        // Forward each incoming request to esbuild
-        const proxyReq = request(options, proxyRes => {
-          const headers = {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "POST, GET, PUT, DELETE",
-            "Access-Control-Max-Age": 2592000,
-          };
-
-          // Otherwise, forward the response from esbuild to the client
-          console.log(proxyRes.headers)
-          res.writeHead(proxyRes.statusCode, proxyRes.headers)
-          proxyRes.pipe(res, { end: true })
-        })
-
-        // Forward the body of the request to esbuild
-        req.pipe(proxyReq, { end: true })
-      }).listen(parseInt(process.env.PORT))
-      */
-
-
       let { host, port } = await ctx.serve({
         host: "0.0.0.0",
         port: parseInt(process.env.PORT),

@@ -18,6 +18,7 @@
 .env.test.local
 .env.production.local
 secretProps.js
+secretProps.json
 public/App*.js
 public/App*.js.map
 public/chunk*.js

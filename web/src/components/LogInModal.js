@@ -5,18 +5,17 @@ import {
     ButtonRow,
     Form,
     IntroBox,
-    LoadingIndicator,
+    LoadingIndicator, MainTabs,
     Modal,
     SelectOption,
     SelectRow,
-    Stack,
+    Stack, Tab, TabList, TabPanel,
     TextInputRow
 } from "juno-ui-components"
 import {authStore, useStore} from "../store"
 import {currentState, push} from "url-state-provider";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {login} from "../actions";
-import heroImage from "../img/app_bg_example.svg?url"
 import {Error, Loading} from "./Components";
 
 const LogInModal = ({keystoneEndpoint, overrideEndpoint}) => {
@@ -24,18 +23,19 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint}) => {
     const setAuth = authStore((state) => state.setAuth)
     const queryClient = useQueryClient()
     const {mutate, isLoading, error} = useMutation(login)
+    const [showCredentials, setShowCredentials] = useState(false)
     const [credentials, setCredentials] = useState({
         username: undefined,
         password: undefined,
-        domain: "ccadmin",
-        project: "cloud_admin",
+        domain: "monsoon3",
+        project: "cc-demo",
     })
 
     const onSubmit = (event) => {
         event.preventDefault();
         mutate({
                 endpoint: keystoneEndpoint,
-                credentials
+                ...credentials
             },
             {
                 onSuccess: ([token, data]) => {
@@ -74,10 +74,15 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint}) => {
             closeable={false}
             open
         >
+            {/* Some nice animations */}
+            <div className="galaxy">
+                <div className="stars" />
+            </div>
+
             <IntroBox
-                heroImage={`url(${heroImage})`}
-                text="Log in using your OpenStack Credentials."
                 variant="hero"
+                title="Andromeda"
+                text="Global Load Balancing as a Service."
             />
 
             {/* Error Bar */}
@@ -87,8 +92,9 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint}) => {
             <Loading isLoading={isLoading} />
 
             <Form onSubmit={onSubmit}>
-                <Stack distribution="between">
+                <Stack distribution="between" gap="2" className="pt-2">
                     <SelectRow
+                        className="flex-auto"
                         label="Domain"
                         name="domain"
                         disabled={isLoading}
@@ -99,42 +105,50 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint}) => {
                         <SelectOption key="ccadmin" value="ccadmin" label="ccadmin" />
                     </SelectRow>
                     <TextInputRow
+                        className="flex-auto"
                         label="Project"
                         name="project"
                         value={credentials.project}
                         disabled={isLoading}
                         onChange={handleChange}
-                        required
+                    />
+                    <Button
+                        className="flex-none jn-relative jn-mb-2"
+                        icon="manageAccounts"
+                        onClick={() => setShowCredentials(!showCredentials)}
                     />
                 </Stack>
-                <TextInputRow
-                    label="User Name"
-                    name="username"
-                    value={credentials.username}
-                    disabled={isLoading}
-                    onChange={handleChange}
-                    required
-                />
-                <TextInputRow
-                    label="Password"
-                    name="password"
-                    type="password"
-                    value={credentials.password}
-                    disabled={isLoading}
-                    onChange={handleChange}
-                    required
-                />
-                <div className="jn-py-2">
-                    <ButtonRow name="Default ButtonRow" className="jn-justify-end">
-                        <Button
-                            label="Connect"
-                            title="Connect"
-                            variant="primary"
-                            type="submit"
-                            onClick={onSubmit}
+                {showCredentials && (
+                    <div>
+                        <TextInputRow
+                            label="User Name"
+                            name="username"
+                            value={credentials.username}
+                            disabled={isLoading}
+                            onChange={handleChange}
+                            required
                         />
-                    </ButtonRow>
-                </div>
+                        <TextInputRow
+                            label="Password"
+                            name="password"
+                            type="password"
+                            value={credentials.password}
+                            disabled={isLoading}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+            )}
+                <ButtonRow name="Default ButtonRow" className="jn-justify-end pt-2">
+                    <Button
+                        icon="openInBrowser"
+                        label={`Enter ${credentials.domain}`}
+                        variant="primary"
+                        type="submit"
+                        disabled={isLoading}
+                        onClick={onSubmit}
+                    />
+                </ButtonRow>
             </Form>
         </Modal>
     )

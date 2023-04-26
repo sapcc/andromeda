@@ -1,6 +1,16 @@
 import React, {useMemo} from "react";
 
-import {Badge, Button, Message, Spinner, Stack} from "juno-ui-components";
+import {
+    Badge,
+    Button,
+    Message,
+    Pill,
+    Spinner,
+    Stack,
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger
+} from "juno-ui-components";
 
 export const Error = ({error}) => {
     if (error) {
@@ -94,24 +104,37 @@ export const HeaderUser = ({ auth, logout }) => {
 
     return (
         <Stack alignment="center" className="ml-auto" distribution="end">
-            <div className="mr-4">
-                <Stack alignment="center">
-                    <div
-                        style={{
-                            background: `url(https://avatars.wdf.sap.corp/avatar/${sapID}?size=24x24) no-repeat`,
-                            backgroundSize: `cover`,
-                        }}
-                        className={avatarCss}
-                    />
-                    {<span>{sapID}</span>}
-                </Stack>
-            </div>
+                <Tooltip triggerEvent="hover">
+                    <TooltipTrigger>
+                        <div className="mr-4">
+                            <Stack alignment="center">
+                                <div
+                                    style={{
+                                        background: `url(https://avatars.wdf.sap.corp/avatar/${sapID}?size=24x24) no-repeat`,
+                                        backgroundSize: `cover`,
+                                    }}
+                                    className={avatarCss}
+                                />
+                                {<span>{sapID}</span>}
+                            </Stack>
+                        </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        {auth.project.name}@{auth.project.domain.name}
+                    </TooltipContent>
+                </Tooltip>
+
 
             <Button
                 label="Logout"
+                icon="exitToApp"
                 size="small"
                 onClick={logout}
             />
         </Stack>
     )
 }
+
+/*
+
+ */

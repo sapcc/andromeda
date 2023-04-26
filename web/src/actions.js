@@ -128,26 +128,32 @@ export const createItem = ({key, endpoint, formState, token}) => {
         })
 }
 
-export const login = ({endpoint, credentials}) => {
+export const login = ({endpoint, username, password, domain, project}) => {
+    const identity = (username && password) ?
+        {
+            methods: ["password"],
+            password: {
+                user: {
+                    name: username,
+                    domain: {
+                        name: domain,
+                    },
+                    password: password,
+                }
+            }
+        } : {
+            "methods": ["external"],
+            "external": {}
+        }
+
     const auth = {
         auth: {
-            identity: {
-                methods: ["password"],
-                password: {
-                    user: {
-                        name: credentials.username,
-                        domain: {
-                            name: credentials.domain,
-                        },
-                        password: credentials.password,
-                    }
-                }
-            },
+            identity: identity,
             scope: {
                 project: {
-                    name: credentials.project,
+                    name: project,
                     domain: {
-                        name: credentials.domain
+                        name: domain
                     }
                 }
             }
@@ -158,6 +164,7 @@ export const login = ({endpoint, credentials}) => {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
+            "X-User-Domain-Name": domain,
             Accept: "application/json",
         },
         body: sendBody,
