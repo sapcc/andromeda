@@ -103,33 +103,33 @@ export const HeaderUser = ({ auth, logout }) => {
     const sapID = useMemo(() => auth?.user.name || "", [auth])
 
     return (
-        <Stack alignment="center" className="ml-auto" distribution="end">
-            <a href={`${auth.endpoint}/docs`} target="_blank">
-                <Badge
-                    text="API Docs"
-                    icon="openInNew"
-                />
-            </a>
-
+        <Stack alignment="center" className="ml-auto" distribution="end" gap="4">
             <Tooltip triggerEvent="hover">
                 <TooltipTrigger>
-                    <div className="jn-mx-4">
-                        <Stack alignment="center">
-                            <div
-                                style={{
-                                    background: `url(https://avatars.wdf.sap.corp/avatar/${sapID}?size=24x24) no-repeat`,
-                                    backgroundSize: `cover`,
-                                }}
-                                className={avatarCss}
-                            />
-                            {<span>{sapID}</span>}
-                        </Stack>
-                    </div>
+                    <Stack alignment="center">
+                        <div
+                            style={{
+                                background: `url(https://avatars.wdf.sap.corp/avatar/${sapID}?size=24x24) no-repeat`,
+                                backgroundSize: `cover`,
+                            }}
+                            className={avatarCss}
+                        />
+                        {<span>{sapID}</span>}
+                    </Stack>
                 </TooltipTrigger>
                 <TooltipContent>
                     {auth.project.name}@{auth.project.domain.name}
                 </TooltipContent>
             </Tooltip>
+
+            <Button
+                href={`${auth.endpoint}/docs`}
+                target="_blank"
+                icon="openInNew"
+                label="API"
+                variant="subdued"
+                size="small"
+            />
 
             <Button
                 label="Logout"
