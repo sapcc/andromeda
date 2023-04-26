@@ -104,29 +104,36 @@ export const HeaderUser = ({ auth, logout }) => {
 
     return (
         <Stack alignment="center" className="ml-auto" distribution="end">
-                <Tooltip triggerEvent="hover">
-                    <TooltipTrigger>
-                        <div className="mr-4">
-                            <Stack alignment="center">
-                                <div
-                                    style={{
-                                        background: `url(https://avatars.wdf.sap.corp/avatar/${sapID}?size=24x24) no-repeat`,
-                                        backgroundSize: `cover`,
-                                    }}
-                                    className={avatarCss}
-                                />
-                                {<span>{sapID}</span>}
-                            </Stack>
-                        </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                        {auth.project.name}@{auth.project.domain.name}
-                    </TooltipContent>
-                </Tooltip>
+            <a href={`${auth.endpoint}/docs`} target="_blank">
+                <Badge
+                    text="API Docs"
+                    icon="openInNew"
+                />
+            </a>
 
+            <Tooltip triggerEvent="hover">
+                <TooltipTrigger>
+                    <div className="jn-mx-4">
+                        <Stack alignment="center">
+                            <div
+                                style={{
+                                    background: `url(https://avatars.wdf.sap.corp/avatar/${sapID}?size=24x24) no-repeat`,
+                                    backgroundSize: `cover`,
+                                }}
+                                className={avatarCss}
+                            />
+                            {<span>{sapID}</span>}
+                        </Stack>
+                    </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                    {auth.project.name}@{auth.project.domain.name}
+                </TooltipContent>
+            </Tooltip>
 
             <Button
                 label="Logout"
+                variant="primary-danger"
                 icon="exitToApp"
                 size="small"
                 onClick={logout}
