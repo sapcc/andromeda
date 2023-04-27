@@ -129,7 +129,7 @@ export const createItem = ({key, endpoint, formState, token}) => {
 }
 
 export const login = ({endpoint, username, password, domain, project}) => {
-    const identity = (username && password) ?
+    const identity = (username || password) ?
         {
             methods: ["password"],
             password: {

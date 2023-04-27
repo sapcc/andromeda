@@ -5,18 +5,17 @@ import {
     ButtonRow,
     Form,
     IntroBox,
-    LoadingIndicator, MainTabs,
     Modal,
     SelectOption,
     SelectRow,
-    Stack, Tab, TabList, TabPanel,
+    Stack,
     TextInputRow
 } from "juno-ui-components"
 import {authStore, useStore} from "../store"
 import {currentState, push} from "url-state-provider";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {login} from "../actions";
-import {Error, Loading} from "./Components";
+import {Error} from "./Components";
 
 const LogInModal = ({keystoneEndpoint, overrideEndpoint}) => {
     const urlStateKey = useStore((state) => state.urlStateKey)
@@ -24,6 +23,7 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint}) => {
     const queryClient = useQueryClient()
     const {mutate, isLoading, error} = useMutation(login)
     const [showCredentials, setShowCredentials] = useState(false)
+    const [mounted, setMounted] = useState(false)
     const [credentials, setCredentials] = useState({
         username: undefined,
         password: undefined,
@@ -55,8 +55,11 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint}) => {
                             .find(endpoint => endpoint.interface === "public")
                             .url
                     }
-                    setAuth(auth)
-                    queryClient.invalidateQueries().then()
+                    setMounted(false)
+                    setTimeout(function() { //Start the timer
+                        setAuth(auth)
+                        queryClient.invalidateQueries().then()
+                    }.bind(this), 700)
                     const urlState = currentState(urlStateKey)
                     push(urlStateKey, {...urlState, currentModal: ""})
                 }
@@ -66,11 +69,17 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint}) => {
 
     const handleChange = (event) => {
         setCredentials({...credentials, [event.target.name]: event.target.value});
-    };
+    }
+
+    React.useEffect(() => {
+        // used for animation
+        setMounted(true)
+    }, []);
 
     return (
         <Modal
             title="Andromeda"
+            className={`transition-opacity delay-150 duration-700 ${mounted?"opacity-100":"opacity-0"}`}
             closeable={false}
             open
         >
@@ -87,9 +96,6 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint}) => {
 
             {/* Error Bar */}
             <Error error={error}/>
-
-            {/* Loading indicator for page content */}
-            <Loading isLoading={isLoading} />
 
             <Form onSubmit={onSubmit}>
                 <Stack distribution="between" gap="2" className="pt-2">
@@ -145,7 +151,8 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint}) => {
                         label={`Enter ${credentials.domain}`}
                         variant="primary"
                         type="submit"
-                        disabled={isLoading}
+                        disabled={isLoading || !mounted}
+                        progress={isLoading || !mounted}
                         onClick={onSubmit}
                     />
                 </ButtonRow>
