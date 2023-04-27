@@ -38,7 +38,7 @@ func NewQuotaController(db *sqlx.DB) *quotaController {
 	return &quotaController{db: db}
 }
 
-//quotaResponseWriter is a wrapper of regular ResponseWriter
+// quotaResponseWriter is a wrapper of regular ResponseWriter
 type quotaResponseWriter struct {
 	http.ResponseWriter
 	resource  string
@@ -51,7 +51,7 @@ func (qc *quotaController) NewQuotaResponseWriter(w http.ResponseWriter, r strin
 	return &quotaResponseWriter{w, r, a, p, qc.db}
 }
 
-//WriteHeader
+// WriteHeader
 func (qrw *quotaResponseWriter) WriteHeader(code int) {
 	qrw.ResponseWriter.WriteHeader(code)
 
@@ -63,11 +63,11 @@ func (qrw *quotaResponseWriter) WriteHeader(code int) {
 	}
 
 	var conflictStatement string
-	if qrw.db.DriverName() == "postgres" {
-		conflictStatement = fmt.Sprintf("ON CONFLICT (project_id) DO UPDATE SET in_use_%s = quota.in_use_%s %c 1",
+	if qrw.db.DriverName() == "mysql" {
+		conflictStatement = fmt.Sprintf("ON DUPLICATE KEY UPDATE in_use_%s = in_use_%s %c 1",
 			qrw.resource, qrw.resource, operator)
 	} else {
-		conflictStatement = fmt.Sprintf("ON DUPLICATE KEY UPDATE in_use_%s = in_use_%s %c 1",
+		conflictStatement = fmt.Sprintf("ON CONFLICT (project_id) DO UPDATE SET in_use_%s = quota.in_use_%s %c 1",
 			qrw.resource, qrw.resource, operator)
 	}
 	sql := qrw.db.Rebind(fmt.Sprintf(
@@ -82,12 +82,12 @@ func (qrw *quotaResponseWriter) WriteHeader(code int) {
 			config.Global.Quota.DefaultQuotaMonitor,
 			config.Global.Quota.DefaultQuotaDatacenter,
 			qrw.projectID); err != nil {
-			panic(err)
+			logger.Warnf("Failed updating quota: %v", err)
 		}
 	}
 }
 
-//QuotaHandler provides the quota enforcement.
+// QuotaHandler provides the quota enforcement.
 func (qc *quotaController) QuotaHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		target := strings.Split(policy.RuleFromHTTPRequest(r), ":")

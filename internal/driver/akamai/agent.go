@@ -18,6 +18,7 @@ package akamai
 
 import (
 	"context"
+	"github.com/sapcc/andromeda/internal/driver"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
 	"time"
 
@@ -57,13 +58,11 @@ type AkamaiAgent struct {
 	executing        bool
 }
 
-// All methods of Sync will be executed when
-// a message is received
 type Sync struct {
 	akamai *AkamaiAgent
 }
 
-// Method can be of any name
+// Process Method can be of any name
 func (s *Sync) Process(ctx context.Context, request *worker.SyncRequest) error {
 	md, _ := metadata.FromContext(ctx)
 	logger.Infof("[Sync] Received sync request %+v with metadata %+v", request.DomainIds, md)
@@ -122,7 +121,7 @@ func ExecuteAkamaiAgent() error {
 
 	// Sync
 	if err := micro.RegisterSubscriber("andromeda.sync",
-		service.Server(), syncer.Process); err != nil {
+		service.Server(), new(Sync)); err != nil {
 		logger.Error(err)
 	}
 
@@ -171,7 +170,7 @@ func (s *AkamaiAgent) pendingSync(domains []string) error {
 		PageNumber:     0,
 		ResultPerPage:  1,
 		FullyPopulated: true,
-		Pending:        len(domains) == 0,
+		Pending:        domains == nil,
 		Ids:            domains,
 	})
 	if err != nil {
@@ -208,6 +207,7 @@ func (s *AkamaiAgent) pendingSync(domains []string) error {
 	}
 
 	for _, domain := range res {
+		var provRequests ProvRequests
 		logger.Infof("pendingSync(%s) running...", domain.Id)
 		if err := s.gtmLock.Lock(trafficManagementDomain); err != nil {
 			return err
@@ -218,9 +218,10 @@ func (s *AkamaiAgent) pendingSync(domains []string) error {
 			if err := s.DeleteProperty(domain, trafficManagementDomain); err != nil {
 				return err
 			}
+			provRequests = s.CascadeUpdateDomainProvisioningStatus(domain, "DELETED")
 		} else {
 			// Run Sync
-			if err := s.SyncProperty(domain, trafficManagementDomain); err != nil {
+			if provRequests, err = s.SyncProperty(domain, trafficManagementDomain); err != nil {
 				return err
 			}
 		}
@@ -231,9 +232,10 @@ func (s *AkamaiAgent) pendingSync(domains []string) error {
 			time.Sleep(5 * time.Second)
 			status, err = s.syncProvisioningStatus(domain)
 			if err != nil {
-				return err
+				logger.Error(err)
 			}
 		}
+		driver.UpdateProvisioningStatus(s.rpc, provRequests)
 
 		logger.Infof("pendingSync(%s) finished with '%s'", domain.Id, status)
 		if err := s.gtmLock.Unlock(trafficManagementDomain); err != nil {

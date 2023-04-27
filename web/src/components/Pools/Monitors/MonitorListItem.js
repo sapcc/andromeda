@@ -36,6 +36,12 @@ const MonitorListItem = ({monitor, setError}) => {
             currentPanel: "Monitor",
             id: monitor.id,
         })
+        queryClient
+            .setQueryDefaults(["monitors", {pool_id: monitor.pool_id}], {refetchInterval: 5000})
+        queryClient
+            .setQueryDefaults(["monitors"], {refetchInterval: 5000})
+        queryClient
+            .setQueryDefaults(["domains"], {refetchInterval: 5000})
     }
 
     const handleDeleteMonitorClick = () => {
@@ -55,7 +61,9 @@ const MonitorListItem = ({monitor, setError}) => {
                         .invalidateQueries(queryKey)
                         .then()
                 },
-                onError: setError
+                onError: (err) => {
+                    setError(err)
+                }
             }
         )
     }
@@ -63,7 +71,7 @@ const MonitorListItem = ({monitor, setError}) => {
     return (
         <DataGridRow>
             <DataGridCell>
-                <ListItemSpinner data={monitor} />
+                <ListItemSpinner data={monitor} maxLength="6" />
             </DataGridCell>
             <DataGridCell>{createdAt}</DataGridCell>
             <DataGridCell>{updatedAt}</DataGridCell>

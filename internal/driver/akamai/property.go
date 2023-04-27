@@ -19,10 +19,8 @@ package akamai
 import (
 	"context"
 	"fmt"
-	"github.com/sapcc/andromeda/internal/driver"
-	"github.com/sapcc/andromeda/internal/rpc/server"
-
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v5/pkg/gtm"
+	"github.com/sapcc/andromeda/internal/driver"
 	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/config"
@@ -63,7 +61,7 @@ func (s *AkamaiAgent) DeleteProperty(domain *rpcmodels.Domain, trafficManagement
 	return nil
 }
 
-func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDomain string) error {
+func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDomain string) (provRequests ProvRequests, err error) {
 	var members []*rpcmodels.Member
 	var monitors []*rpcmodels.Monitor
 
@@ -71,8 +69,15 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 	if len(pools) > 0 {
 		// flatten Members and Monitors
 		for _, pool := range pools {
+			if pool.ProvisioningStatus == "PENDING_DELETE" {
+				provRequests = append(provRequests,
+					driver.GetProvisioningStatusRequest(pool.Id, "POOL", "DELETE"))
+				continue
+			}
 			members = append(members, pool.GetMembers()...)
 			monitors = append(monitors, pool.GetMonitors()...)
+			provRequests = append(provRequests,
+				driver.GetProvisioningStatusRequest(pool.Id, "POOL", "ACTIVE"))
 		}
 	}
 
@@ -91,6 +96,12 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 
 	// Add new Members
 	for _, member := range members {
+		if member.ProvisioningStatus == "PENDING_DELETE" {
+			provRequests = append(provRequests,
+				driver.GetProvisioningStatusRequest(member.Id, "MEMBER", "DELETE"))
+			continue
+		}
+
 		// Add member to existing traffic target within the same Datacenter
 		if addTrafficTarget(&property, member) {
 			continue
@@ -115,20 +126,27 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 			}
 
 			// Sync datacenter first
-			var err error
 			aDatacenter, err = s.SyncDatacenter(aDatacenter, false)
 			if err != nil {
-				return err
+				return
 			}
 
 			// DatacenterId is a unique number for an akamai datacenter
 			trafficTarget.DatacenterId = int(aDatacenter.GetMeta())
 		}
 		property.TrafficTargets = append(property.TrafficTargets, &trafficTarget)
+		provRequests = append(provRequests,
+			driver.GetProvisioningStatusRequest(member.Id, "MEMBER", "ACTIVE"))
 	}
 
 	// Add new Monitors
 	for _, monitor := range monitors {
+		if monitor.ProvisioningStatus == "PENDING_DELETE" {
+			provRequests = append(provRequests,
+				driver.GetProvisioningStatusRequest(monitor.Id, "MONITOR", "DELETED"))
+			continue
+		}
+
 		livenessTest := gtm.LivenessTest{
 			Name:               monitor.GetId(),
 			TestObjectProtocol: MONITOR_LIVENESS_TYPE_MAP[monitor.GetType()],
@@ -150,24 +168,28 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 			livenessTest.RequestString = monitor.GetSend()
 			livenessTest.ResponseString = monitor.GetReceive()
 		default:
-			driver.UpdateProvisioningStatus(s.rpc,
-				[]*server.ProvisioningStatusRequest_ProvisioningStatus{
-					driver.GetProvisioningStatusRequest(monitor.Id, "MONITOR", "ERROR"),
-				})
+			// unsupported type
+			provRequests = append(provRequests,
+				driver.GetProvisioningStatusRequest(monitor.Id, "MONITOR", "ERROR"))
 			continue
 		}
 		property.LivenessTests = append(property.LivenessTests, &livenessTest)
+		provRequests = append(provRequests,
+			driver.GetProvisioningStatusRequest(monitor.Id, "MONITOR", "ACTIVE"))
 	}
+
+	provRequests = append(provRequests,
+		driver.GetProvisioningStatusRequest(domain.Id, "DOMAIN", "ACTIVE"))
 
 	// Pre-Validation
 	if len(property.TrafficTargets) == 0 {
-		// Need traffictargets with datacenters
+		// Need traffictargets with datacenters before posting
 		logger.Debugf("Skipping Property '%s': No traffic targets", property.Name)
-		return nil
+		return
 	}
 
-	existingProperty, err := s.gtm.GetProperty(context.Background(), property.Name, config.Global.AkamaiConfig.Domain)
-	if err != nil {
+	existingProperty, err2 := s.gtm.GetProperty(context.Background(), property.Name, config.Global.AkamaiConfig.Domain)
+	if err2 != nil {
 		logger.Debugf("Property '%s' doesn't exist, creating...", property.Name)
 	}
 
@@ -191,14 +213,15 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 		"LivenessTests.TestObjectProtocol",
 	}
 	if utils.DeepEqualFields(&property, existingProperty, fieldsToCompare) {
-		return nil
+		return
 	}
 
 	// Update
 	logger.Infof("UpdateProperty(domain=%s, property=%s)", trafficManagementDomain, property.Name)
-	ret, err := s.gtm.UpdateProperty(context.Background(), &property, trafficManagementDomain)
-	if err != nil {
-		return fmt.Errorf("Request %s: %w", PrettyJson(property), err)
+	ret, err3 := s.gtm.UpdateProperty(context.Background(), &property, trafficManagementDomain)
+	if err3 != nil {
+		err = fmt.Errorf("Request %s: %w", PrettyJson(property), err3)
+		return
 	}
 
 	if !logger.V(logger.DebugLevel, nil) {
@@ -206,5 +229,5 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 			PrettyJson(property),
 			PrettyJson(ret))
 	}
-	return nil
+	return
 }

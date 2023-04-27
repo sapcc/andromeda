@@ -298,12 +298,25 @@ func (u *RPCHandler) UpdateProvisioningStatus(ctx context.Context, req *Provisio
 	var statusResult []*StatusResult
 	for _, provStatusReq := range req.GetProvisioningStatus() {
 		table := strings.ToLower(provStatusReq.GetModel().String())
+		provStatus := provStatusReq.GetStatus().String()
 
-		sql := u.DB.Rebind(fmt.Sprintf(`UPDATE %s SET provisioning_status = ?, updated_at = NOW() WHERE id = ? AND provisioning_status != 'ERROR'`, table))
-		_, err := u.DB.Exec(sql, provStatusReq.GetStatus().String(), provStatusReq.GetId())
+		var sql string
+		var err error
+		if provStatus == "DELETED" {
+			sql = u.DB.Rebind(fmt.Sprintf(`DELETE FROM %s WHERE id = ?`, table))
+			_, err = u.DB.Exec(sql, provStatusReq.GetId())
+		} else {
+			sql = u.DB.Rebind(fmt.Sprintf(`UPDATE %s SET provisioning_status = ?, updated_at = NOW() WHERE id = ?`, table))
+			if provStatus != "ERROR" {
+				// only update non-error prov-status
+				sql += " AND provisioning_status != 'ERROR'"
+			}
+			_, err = u.DB.Exec(sql, provStatus, provStatusReq.GetId())
+		}
 		if err != nil {
 			logger.Error(err)
 		}
+
 		statusResult = append(statusResult, &StatusResult{
 			Id:      provStatusReq.GetId(),
 			Success: err == nil,

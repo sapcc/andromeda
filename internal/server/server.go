@@ -61,6 +61,9 @@ func ExecuteServer(server *restapi.Server) error {
 	if err != nil {
 		return err
 	}
+	if u.Driver == "postgres" {
+		u.Driver = "pgx"
+	}
 	db := sqlx.MustConnect(u.Driver, u.DSN)
 
 	// Mapper function for SQL name mapping, snake_case table names

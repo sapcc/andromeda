@@ -24,12 +24,10 @@ import (
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/utils/openstack/clientconfig"
-	"github.com/sapcc/go-bits/audittools"
-	"github.com/sapcc/go-bits/gopherpolicy"
-	"go-micro.dev/v4/logger"
-
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/policy"
+	"github.com/sapcc/go-bits/audittools"
+	"github.com/sapcc/go-bits/gopherpolicy"
 )
 
 var (
@@ -67,11 +65,13 @@ func KeystoneMiddleware(next http.Handler) (http.Handler, error) {
 			http.Error(w, "unauthorized", 401)
 		}
 
-		if t.Enforcer != nil {
-			t.Context.Logger = logger.Infof
-			logger.Debug("token has auth = %v", t.Context.Auth)
-			logger.Debug("token has roles = %v", t.Context.Roles)
-		}
+		/*
+			if t.Enforcer != nil {
+				t.Context.Logger = logger.Infof
+				logger.Debug("token has auth = %v", t.Context.Auth)
+				logger.Debug("token has roles = %v", t.Context.Roles)
+			}
+		*/
 
 		ctx := context.WithValue(r.Context(), projectContextKey, t)
 		r = r.WithContext(ctx)

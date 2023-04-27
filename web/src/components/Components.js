@@ -1,16 +1,17 @@
-import React, {useMemo} from "react";
+import React, {useMemo, useState} from "react";
 
 import {
     Badge,
     Button,
+    Icon,
     Message,
-    Pill,
     Spinner,
-    Stack,
+    Stack, Toast,
     Tooltip,
     TooltipContent,
     TooltipTrigger
 } from "juno-ui-components";
+import {useStore} from "../store";
 
 export const Error = ({error}) => {
     if (error) {
@@ -55,15 +56,46 @@ const backgroundClass = (variant) => {
     }
 }
 
-export const ListItemSpinner = ({data, onClick, className}) => {
+export async function copyTextToClipboard(text) {
+    if ('clipboard' in navigator) {
+        return await navigator.clipboard.writeText(text);
+    } else {
+        return document.execCommand('copy', true, text);
+    }
+}
+
+export const ListItemSpinner = ({data, onClick, className, maxLength=10}) => {
+    const id = data.name || data.id
+    const [showToast, setToast] = useState(false)
+
     return (
         <Stack
             alignment="center"
             className={`${className} ${backgroundClass(data.provisioning_status)} jn-font-bold`}
             onClick={onClick}>
-            {["ACTIVE", "DELETED"].includes(data.provisioning_status) || <Spinner
+            {["ACTIVE", "DELETED", "ERROR"].includes(data.provisioning_status) || <Spinner
                 variant={variantClass(data.provisioning_status)} size="small"/>}
-            {data.name || data.id}
+            {id.length > maxLength ? (
+                <Tooltip triggerEvent="hover">
+                    <TooltipTrigger asChild>
+                        {id.substring(0, maxLength)}...
+                    </TooltipTrigger>
+                    <TooltipContent>{id}</TooltipContent>
+                </Tooltip>
+                ) : id}
+            {(!data.name) && (
+                <div>
+                    {showToast && <Toast text="Copied!" className="absolute"/>}
+                    <Icon size="16" icon="contentCopy" onClick={() => {
+                        copyTextToClipboard(id).then(() => {
+                            setToast(true)
+                        setTimeout(function () { //Start the timer
+                            setToast(false)
+                        }.bind(this), 1000)
+                    })
+                    }} />
+                </div>
+            )}
         </Stack>
     )
 }

@@ -18,6 +18,7 @@ package akamai
 
 import (
 	"context"
+	"fmt"
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/driver"
 	"github.com/sapcc/andromeda/internal/rpc/server"
@@ -25,8 +26,10 @@ import (
 	"go-micro.dev/v4/logger"
 )
 
-func (s *AkamaiAgent) UpdateDomainProvisioningStatus(domain *rpcmodels.Domain, value string) error {
-	var provisioningStatusRequests []*server.ProvisioningStatusRequest_ProvisioningStatus
+type ProvRequests []*server.ProvisioningStatusRequest_ProvisioningStatus
+
+func (s *AkamaiAgent) CascadeUpdateDomainProvisioningStatus(domain *rpcmodels.Domain, value string) ProvRequests {
+	var provisioningStatusRequests ProvRequests
 
 	provisioningStatusRequests = append(provisioningStatusRequests,
 		driver.GetProvisioningStatusRequest(domain.Id, "DOMAIN", value))
@@ -62,8 +65,7 @@ func (s *AkamaiAgent) UpdateDomainProvisioningStatus(domain *rpcmodels.Domain, v
 		}
 	}
 
-	driver.UpdateProvisioningStatus(s.rpc, provisioningStatusRequests)
-	return nil
+	return provisioningStatusRequests
 }
 
 func (s *AkamaiAgent) syncProvisioningStatus(domain *rpcmodels.Domain) (string, error) {
@@ -85,27 +87,16 @@ func (s *AkamaiAgent) syncProvisioningStatus(domain *rpcmodels.Domain) (string, 
 			return status.PropagationStatus, nil
 		}
 
-		logger.Errorf("Domain %s failed syncing: %s", domain.Id, status.Message)
-		if err := s.UpdateDomainProvisioningStatus(domain, "ERROR"); err != nil {
-			return "UNKNOWN", err
-		}
+		return status.PropagationStatus, fmt.Errorf("Domain %s failed syncing: %s", domain.Id, status.Message)
 	case "COMPLETE":
 		if domain == nil {
 			logger.Info("Akamai Backend: configuration change completed")
 			return status.PropagationStatus, nil
 		}
 		logger.Infof("Domain %s has been propagated", domain.Id)
-		provStatus := "ACTIVE"
-		if domain.ProvisioningStatus == "PENDING_DELETE" {
-			provStatus = "DELETED"
-		} else if err := s.syncMemberStatus(domain); err != nil {
+		if err := s.syncMemberStatus(domain); err != nil {
 			logger.Warn(err)
 		}
-
-		if err := s.UpdateDomainProvisioningStatus(domain, provStatus); err != nil {
-			return "UNKNOWN", err
-		}
-
 	}
 	return status.PropagationStatus, nil
 }

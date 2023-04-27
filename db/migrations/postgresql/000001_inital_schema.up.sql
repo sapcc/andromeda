@@ -96,7 +96,7 @@ CREATE TABLE monitor
     created_at          TIMESTAMP    NOT NULL DEFAULT now(),
     updated_at          TIMESTAMP    NOT NULL DEFAULT now(),
     interval            BIGINT       NOT NULL,
-    pool_id UUID NOT NULL UNIQUE REFERENCES pool ON DELETE CASCADE,
+    pool_id             UUID NOT NULL REFERENCES pool ON DELETE CASCADE,
     receive             VARCHAR(255) NULL,
     send                VARCHAR(255) NULL,
     timeout             BIGINT       NULL,
