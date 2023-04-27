@@ -688,6 +688,8 @@ github.com/sapcc/go-api-declarations v1.5.1 h1:K0dn7gy9uvBRn3qBUHOYli4J3eJCRrTBI
 github.com/sapcc/go-api-declarations v1.5.1/go.mod h1:3OCDo75YJwpytM/I0SjwcZJf1ZNu89KeAZ55kdOTSqE=
 github.com/sapcc/go-bits v0.0.0-20230420083834-e3870701a14b h1:32tX1T7fnkfhcMy7EbVlyuhlRBF6NYCKlVBKBo3GAj4=
 github.com/sapcc/go-bits v0.0.0-20230420083834-e3870701a14b/go.mod h1:K+vV1SV0tgY+yJJUFntZEp3hlGhXZZwV9RlPKsvMKY4=
+github.com/sapcc/go-bits v0.0.0-20230427112005-83ae3f63bf8b h1:DFongxUdQDSawe3t0ySujf2JRGrFfS4ypPIyAtgIH6I=
+github.com/sapcc/go-bits v0.0.0-20230427112005-83ae3f63bf8b/go.mod h1:R1hZleU5SIB0+V+oZJUfx+BCDByN6hg8E5OC8hX2Xgs=
 github.com/satori/go.uuid v1.2.0/go.mod h1:dA0hQrYB0VpLJoorglMZABFdXlWrHn1NEOzdhQKdks0=
 github.com/scaleway/scaleway-sdk-go v1.0.0-beta.7.0.20210127161313-bd30bebeac4f/go.mod h1:CJJ5VAbozOl0yEw7nHB9+7BXTJbIn6h7W+f6Gau5IP8=
 github.com/scottdware/go-bigip v0.0.0-20220517145708-9fe3e2f9f005 h1:rWavEQRGLwPMp7fWiAMIO2tZivQDEVHLewYUuIVUv70=
