@@ -1,7 +1,7 @@
-import React from "react"
+import React, {useState} from "react"
 
 import {authStore, useStore} from "./store"
-import StyleProvider, {AppShell, PageHeader} from "juno-ui-components"
+import {AppShell, PageHeader, PortalProvider, StyleProvider} from "juno-ui-components"
 import {QueryCache, QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import styles from "./styles.scss"
 import AppContent from "./AppContent"
@@ -12,6 +12,7 @@ import {HeaderUser} from "./components/Components";
 const URL_STATE_KEY = "andromeda"
 
 const App = (props) => {
+    const [theme, setTheme] = useState(props.theme)
     const setUrlStateKey = useStore((state) => state.setUrlStateKey)
     const [auth, setAuth] = authStore((state) => [state.auth, state.setAuth])
 
@@ -26,15 +27,13 @@ const App = (props) => {
         queryClient.invalidateQueries().then()
     }
 
-    const pageHeader = React.useMemo(() => {
-        return (
-            <PageHeader heading="Converged Cloud | Andromeda">
-                {auth && (
-                    <HeaderUser auth={auth} logout={logout}/>
-                )}
-            </PageHeader>
-        )
-    }, [auth])
+    const pageHeader = (
+        <PageHeader heading="Converged Cloud | Andromeda" onClick={() => window.location.href='/'}>
+            {auth && (
+                <HeaderUser auth={auth} logout={logout} theme={theme} setTheme={setTheme}/>
+            )}
+        </PageHeader>
+    )
 
     // Create query client which it can be used from overall in the app
     const queryClient = new QueryClient({
@@ -49,33 +48,26 @@ const App = (props) => {
     })
 
     return (
-        <QueryClientProvider client={queryClient}>
-            <AppShell
-                pageHeader={pageHeader}
-                contentHeading="Global Load Balancing as a Service"
-                embedded={props.embedded === true}
-            >
-                {auth ? (
-                    <AppContent props={props}/>
-                ) : (
-                    <LogInModal keystoneEndpoint={props.endpoint} overrideEndpoint={props.overrideAndromedaEndpoint}/>
-                )}
-            </AppShell>
-            <ReactQueryDevtools initialIsOpen={false}/>
-        </QueryClientProvider>
-    )
-}
-
-const StyledApp = (props) => {
-    return (
-        <StyleProvider
-            stylesWrapper="shadowRoot"
-            theme={`${props.theme ? props.theme : "theme-dark"}`}
-        >
-            {/* load styles inside the shadow dom */}
+        <StyleProvider stylesWrapper="inline" theme={theme} key={theme}>
             <style>{styles.toString()}</style>
-            <App {...props} />
+            <PortalProvider>
+                <QueryClientProvider client={queryClient}>
+                    <AppShell
+                        pageHeader={pageHeader}
+                        contentHeading="Global Load Balancing as a Service"
+                        embedded={props.embedded === true}
+                    >
+                        {auth ? (
+                            <AppContent props={props}/>
+                        ) : (
+                            <LogInModal keystoneEndpoint={props.endpoint} overrideEndpoint={props.overrideAndromedaEndpoint}/>
+                        )}
+                    </AppShell>
+                    <ReactQueryDevtools initialIsOpen={false}/>
+                </QueryClientProvider>
+            </PortalProvider>
         </StyleProvider>
     )
 }
-export default StyledApp
+
+export default App

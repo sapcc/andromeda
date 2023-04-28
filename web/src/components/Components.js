@@ -1,12 +1,12 @@
 import React, {useMemo, useState} from "react";
 
 import {
-    Badge,
+    Badge, Box,
     Button,
     Icon,
     Message,
     Spinner,
-    Stack, Toast,
+    Stack, Switch, Toast,
     Tooltip,
     TooltipContent,
     TooltipTrigger
@@ -131,7 +131,7 @@ mr-2
 bg-cover 
 `
 
-export const HeaderUser = ({ auth, logout }) => {
+export const HeaderUser = ({ auth, logout, theme, setTheme }) => {
     const sapID = useMemo(() => auth?.user.name || "", [auth])
 
     return (
@@ -154,22 +154,33 @@ export const HeaderUser = ({ auth, logout }) => {
                 </TooltipContent>
             </Tooltip>
 
-            <Button
-                href={`${auth.endpoint}/docs`}
-                target="_blank"
-                icon="openInNew"
-                label="API"
-                variant="subdued"
-                size="small"
-            />
+            <Stack gap="2">
+                <Button
+                    onClick={() => {setTheme(theme === "theme-light" ? "theme-dark" : "theme-light")
+                        console.log(`${theme} => setTheme(${theme === "theme-light" ? "theme-dark" : "theme-light"})`)
+                    }}
+                    icon="danger"
+                    variant="subdued"
+                    size="small"
+                />
 
-            <Button
-                label="Logout"
-                variant="primary-danger"
-                icon="exitToApp"
-                size="small"
-                onClick={logout}
-            />
+                <Button
+                    href={`${auth.endpoint}/docs`}
+                    target="_blank"
+                    icon="openInNew"
+                    label="API"
+                    variant="subdued"
+                    size="small"
+                />
+
+                <Button
+                    label="Logout"
+                    variant="primary-danger"
+                    icon="exitToApp"
+                    size="small"
+                    onClick={logout}
+                />
+            </Stack>
         </Stack>
     )
 }

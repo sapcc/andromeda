@@ -33,7 +33,7 @@ func main() {
 			return server.ExecuteServer(API)
 		},
 		&cli.StringFlag{
-			Name:  "listen",
+			Name:  "host",
 			Usage: "The IP to listen on",
 			Value: "0.0.0.0",
 		},
