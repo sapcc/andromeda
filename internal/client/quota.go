@@ -17,9 +17,9 @@
 package client
 
 import (
-	"fmt"
 	"github.com/go-openapi/strfmt"
 	"github.com/jedib0t/go-pretty/table"
+
 	"github.com/sapcc/andromeda/client/administrative"
 	"github.com/sapcc/andromeda/models"
 )
@@ -63,13 +63,8 @@ func (*QuotaList) Execute(_ []string) error {
 
 	Table.AppendHeader(table.Row{"Project ID", "Domains", "Datacenters", "Pools", "Members", "Monitors"})
 	for _, quota := range resp.Payload.Quotas {
-		project := *quota.ProjectID
-		domains := fmt.Sprintf("%d/%d", quota.InUseDomain, *quota.Domain)
-		datacenters := fmt.Sprintf("%d/%d", quota.InUseDatacenter, *quota.Datacenter)
-		pools := fmt.Sprintf("%d/%d", quota.InUsePool, *quota.Pool)
-		members := fmt.Sprintf("%d/%d", quota.InUseMember, *quota.Member)
-		monitors := fmt.Sprintf("%d/%d", quota.InUseMonitor, *quota.Monitor)
-		Table.AppendRow(table.Row{project, domains, datacenters, pools, members, monitors})
+		Table.AppendRow(table.Row{*quota.ProjectID, *quota.Domain, *quota.Datacenter, *quota.Pool,
+			*quota.Member, *quota.Monitor})
 	}
 	Table.Render()
 	return nil
