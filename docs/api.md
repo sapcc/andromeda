@@ -1181,8 +1181,7 @@ Unexpected Error
 
 
 * composed type [Quota](#quota)
-* composed type [QuotaUsage](#quota-usage)
-* inlined member (*AO2*)
+* inlined member (*AO1*)
 
 
 
