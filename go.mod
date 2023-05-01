@@ -6,6 +6,7 @@ require (
 	github.com/Boostport/migration v1.1.2
 	github.com/Boostport/migration/driver/mysql v1.1.2
 	github.com/Boostport/migration/driver/postgres v1.1.3
+	github.com/Masterminds/squirrel v1.5.4
 	github.com/akamai/AkamaiOPEN-edgegrid-golang/v5 v5.0.0
 	github.com/cockroachdb/cockroach-go/v2 v2.3.3
 	github.com/didip/tollbooth v4.0.2+incompatible
@@ -97,6 +98,8 @@ require (
 	github.com/karrick/godirwalk v1.15.3 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.4 // indirect
+	github.com/lann/builder v0.0.0-20180802200727-47ae307949d0 // indirect
+	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect
 	github.com/logrusorgru/aurora v0.0.0-20181002194514-a7b3b318ed4e // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/markbates/errx v1.1.0 // indirect
