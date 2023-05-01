@@ -17,16 +17,17 @@
 package middlewares
 
 import (
-	"github.com/sapcc/andromeda/internal/utils"
-	"go-micro.dev/v4/logger"
 	"net/http"
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
+	"go-micro.dev/v4/logger"
+
 	"github.com/sapcc/andromeda/internal/auth"
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/policy"
+	"github.com/sapcc/andromeda/internal/utils"
 )
 
 type quotaController struct {
