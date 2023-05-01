@@ -936,7 +936,6 @@ paths:
                 items:
                   allOf:
                     - $ref: '#/definitions/quota'
-                    - $ref: '#/definitions/quota_usage'
                     - properties:
                         project_id:
                           type: string

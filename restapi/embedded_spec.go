@@ -1302,9 +1302,6 @@ func init() {
                         "$ref": "#/definitions/quota"
                       },
                       {
-                        "$ref": "#/definitions/quota_usage"
-                      },
-                      {
                         "properties": {
                           "project_id": {
                             "description": "The ID of the project owning this resource.",
@@ -4041,9 +4038,6 @@ func init() {
       "allOf": [
         {
           "$ref": "#/definitions/quota"
-        },
-        {
-          "$ref": "#/definitions/quota_usage"
         },
         {
           "properties": {

@@ -309,8 +309,6 @@ swagger:model GetQuotasOKBodyQuotasItems0
 type GetQuotasOKBodyQuotasItems0 struct {
 	models.Quota
 
-	models.QuotaUsage
-
 	// The ID of the project owning this resource.
 	// Example: fa84c217f361441986a220edf9b1e337
 	// Max Length: 32
@@ -328,51 +326,38 @@ func (o *GetQuotasOKBodyQuotasItems0) UnmarshalJSON(raw []byte) error {
 	o.Quota = aO0
 
 	// AO1
-	var aO1 models.QuotaUsage
-	if err := swag.ReadJSON(raw, &aO1); err != nil {
-		return err
-	}
-	o.QuotaUsage = aO1
-
-	// AO2
-	var dataAO2 struct {
+	var dataAO1 struct {
 		ProjectID *string `json:"project_id,omitempty"`
 	}
-	if err := swag.ReadJSON(raw, &dataAO2); err != nil {
+	if err := swag.ReadJSON(raw, &dataAO1); err != nil {
 		return err
 	}
 
-	o.ProjectID = dataAO2.ProjectID
+	o.ProjectID = dataAO1.ProjectID
 
 	return nil
 }
 
 // MarshalJSON marshals this object to a JSON structure
 func (o GetQuotasOKBodyQuotasItems0) MarshalJSON() ([]byte, error) {
-	_parts := make([][]byte, 0, 3)
+	_parts := make([][]byte, 0, 2)
 
 	aO0, err := swag.WriteJSON(o.Quota)
 	if err != nil {
 		return nil, err
 	}
 	_parts = append(_parts, aO0)
-
-	aO1, err := swag.WriteJSON(o.QuotaUsage)
-	if err != nil {
-		return nil, err
-	}
-	_parts = append(_parts, aO1)
-	var dataAO2 struct {
+	var dataAO1 struct {
 		ProjectID *string `json:"project_id,omitempty"`
 	}
 
-	dataAO2.ProjectID = o.ProjectID
+	dataAO1.ProjectID = o.ProjectID
 
-	jsonDataAO2, errAO2 := swag.WriteJSON(dataAO2)
-	if errAO2 != nil {
-		return nil, errAO2
+	jsonDataAO1, errAO1 := swag.WriteJSON(dataAO1)
+	if errAO1 != nil {
+		return nil, errAO1
 	}
-	_parts = append(_parts, jsonDataAO2)
+	_parts = append(_parts, jsonDataAO1)
 	return swag.ConcatJSON(_parts...), nil
 }
 
@@ -382,10 +367,6 @@ func (o *GetQuotasOKBodyQuotasItems0) Validate(formats strfmt.Registry) error {
 
 	// validation for a type composition with models.Quota
 	if err := o.Quota.Validate(formats); err != nil {
-		res = append(res, err)
-	}
-	// validation for a type composition with models.QuotaUsage
-	if err := o.QuotaUsage.Validate(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -422,10 +403,6 @@ func (o *GetQuotasOKBodyQuotasItems0) ContextValidate(ctx context.Context, forma
 
 	// validation for a type composition with models.Quota
 	if err := o.Quota.ContextValidate(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-	// validation for a type composition with models.QuotaUsage
-	if err := o.QuotaUsage.ContextValidate(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 

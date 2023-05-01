@@ -20,6 +20,7 @@ import (
 	dbsql "database/sql"
 	"errors"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
 
@@ -81,14 +82,33 @@ func (c QuotaController) GetQuotasProjectID(params administrative.GetQuotasProje
 	}
 
 	body := administrative.GetQuotasProjectIDOKBody{}
-	sql := c.db.Rebind(`
-		SELECT 
-    		domain, pool, member, monitor, datacenter, 
-    		in_use_domain, in_use_pool, in_use_member, in_use_monitor, in_use_datacenter 
-		FROM quota
-		WHERE project_id = ?
-	`)
-	if err := c.db.Get(&body.Quota, sql, &params.ProjectID); err != nil {
+
+	sql, args, err := sq.Select("domain, pool, member, monitor, datacenter").
+		Column(sq.Alias(
+			sq.Select("COUNT(id)").From("domain").Where(sq.Eq{"project_id": params.ProjectID}).
+				Where(sq.NotEq{"provisioning_status": "DELETED"}),
+			"in_use_domain")).
+		Column(sq.Alias(
+			sq.Select("COUNT(id)").From("pool").Where(sq.Eq{"project_id": params.ProjectID}),
+			"in_use_pool")).
+		Column(sq.Alias(
+			sq.Select("COUNT(id)").From("member").Where(sq.Eq{"project_id": params.ProjectID}),
+			"in_use_member")).
+		Column(sq.Alias(
+			sq.Select("COUNT(id)").From("monitor").Where(sq.Eq{"project_id": params.ProjectID}),
+			"in_use_monitor")).
+		Column(sq.Alias(
+			sq.Select("COUNT(id)").From("datacenter").Where(sq.Eq{"project_id": params.ProjectID}),
+			"in_use_datacenter")).
+		From("quota").
+		Where(sq.Eq{"project_id": params.ProjectID}).
+		ToSql()
+
+	if err != nil {
+		panic(err)
+	}
+
+	if err := c.db.Get(&body.Quota, c.db.Rebind(sql), args...); err != nil {
 		if errors.Is(err, dbsql.ErrNoRows) {
 			return administrative.NewGetQuotasProjectIDNotFound().WithPayload(utils.NotFound)
 		}
