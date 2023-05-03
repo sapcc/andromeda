@@ -18,6 +18,7 @@ package client
 
 import (
 	"github.com/go-openapi/strfmt"
+
 	"github.com/sapcc/andromeda/client/administrative"
 )
 

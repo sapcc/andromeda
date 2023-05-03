@@ -206,19 +206,6 @@ func (p *Pagination) Query(db *sqlx.DB, query string, filter map[string]any) (*s
 		whereClauses = append(whereClauses, sortWhereClauses.String())
 	}
 
-	/* TODO
-	//override project scope, ensures marker is not used for fetching others owner resources
-	if projectID != "" {
-		// hardcoded to datacenter, which allows a public scope for sharing datacenters
-		if p.table == "datacenter" {
-			whereClauses = append(whereClauses, "scope = 'public' OR project_id = :project_id")
-		} else {
-			whereClauses = append(whereClauses, "project_id = :project_id")
-		}
-		markerObj["project_id"] = projectID
-	}
-	*/
-
 	//add WHERE
 	if len(whereClauses) > 0 {
 		query += " WHERE ( " + strings.Join(whereClauses, " ) AND ( ") + " )"
