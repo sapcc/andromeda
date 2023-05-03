@@ -102,9 +102,8 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint}) => {
                     <SelectRow
                         className="flex-auto"
                         label="Domain"
-                        name="domain"
                         disabled={isLoading}
-                        onChange={handleChange}
+                        onChange={(target) => setCredentials({...credentials, domain: target})}
                         value={credentials.domain}
                     >
                         <SelectOption key="monsoon3" value="monsoon3" label="monsoon3" />
