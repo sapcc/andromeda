@@ -290,7 +290,7 @@ func (u *RPCHandler) GetDomains(ctx context.Context, request *SearchRequest, res
 			s := SearchRequest{
 				PageNumber:    0,
 				ResultPerPage: 100,
-				Pending:       true,
+				Pending:       false,
 				Ids:           datacenterIds,
 				Provider:      request.Provider,
 			}

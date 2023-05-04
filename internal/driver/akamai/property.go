@@ -125,12 +125,6 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 				}
 			}
 
-			// Sync datacenter first
-			aDatacenter, err = s.SyncDatacenter(aDatacenter, false)
-			if err != nil {
-				return
-			}
-
 			// DatacenterId is a unique number for an akamai datacenter
 			trafficTarget.DatacenterId = int(aDatacenter.GetMeta())
 		}
