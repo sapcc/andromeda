@@ -106,7 +106,7 @@ const NewMonitorModal = () => {
                 value={formState?.type}
                 onChange={(target) => setFormState({...formState, type: target})}
             >
-                <SelectOption key="icmp" value="ICMP" label="ICMP (Unsupported by Akamai)" />
+                <SelectOption key="icmp" value="ICMP" label="ICMP (Unsupported on Akamai)" />
                 <SelectOption key="http" value="HTTP" label="HTTP" />
                 <SelectOption key="https" value="HTTPS" label="HTTPS" />
                 <SelectOption key="tcp" value="TCP" label="TCP" />

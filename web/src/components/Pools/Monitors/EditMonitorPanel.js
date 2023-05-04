@@ -120,12 +120,11 @@ const EditMonitorPanel = ({closeCallback}) => {
                 />
                 <SelectRow
                     label="Type"
-                    name="type"
                     disabled={isLoading}
                     value={formState.type}
-                    onChange={handleChange}
+                    onChange={(target) => setFormState({...formState, type: target})}
                 >
-                    <SelectOption key="icmp" value="ICMP" label="ICMP"/>
+                    <SelectOption key="icmp" value="ICMP" label="ICMP (Unsupported on Akamai)"/>
                     <SelectOption key="http" value="HTTP" label="HTTP"/>
                     <SelectOption key="https" value="HTTPS" label="HTTPS"/>
                     <SelectOption key="tcp" value="TCP" label="TCP"/>
