@@ -19,6 +19,7 @@ package server
 import (
 	"context"
 	"fmt"
+	sq "github.com/Masterminds/squirrel"
 	"net"
 	"strings"
 
@@ -103,10 +104,21 @@ func (u *RPCHandler) GetPools(ctx context.Context, request *SearchRequest, respo
 }
 
 func (u *RPCHandler) GetDatacenters(ctx context.Context, request *SearchRequest, response *DatacentersResponse) error {
-	sql := u.DB.Rebind(`SELECT id, admin_state_up, city, state_or_province, continent, country, 
-            latitude, longitude, scope, provisioning_status, provider, meta
-			FROM datacenter`)
-	rows, err := u.QueryxWithIds(sql, request)
+	q := sq.
+		Select("id", "admin_state_up", "city", "state_or_province", "continent", "country", "latitude",
+			"longitude", "scope", "provisioning_status", "provider", "meta").
+		From("datacenter").
+		Where("provider = ?", request.Provider)
+
+	if request.Pending {
+		q = q.Where("provisioning_status LIKE 'PENDING%'")
+	}
+	if request.Ids != nil {
+		q = q.Where(sq.Eq{"id": request.Ids})
+	}
+
+	sql, args := q.MustSql()
+	rows, err := u.DB.Queryx(u.DB.Rebind(sql), args...)
 	if err != nil {
 		return err
 	}

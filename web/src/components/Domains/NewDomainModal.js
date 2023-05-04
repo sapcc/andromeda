@@ -3,7 +3,7 @@ import React, {useState} from "react"
 import {authStore, useStore} from "../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {createItem} from "../../actions"
-import {CheckboxRow, Message, Modal, SelectOption, SelectRow, TextInputRow} from "juno-ui-components"
+import {CheckboxRow, Modal, SelectOption, SelectRow, TextInputRow} from "juno-ui-components"
 import {currentState, push} from "url-state-provider"
 import {Error} from "../Components";
 
@@ -74,9 +74,8 @@ const NewDomainModal = () => {
             />
             <SelectRow
                 label="Provider"
-                name="provider"
                 value={formState.provider}
-                onChange={handleChange}
+                onChange={(target) => setFormState({...formState, provider: target})}
                 required
             >
                 <SelectOption
@@ -94,9 +93,8 @@ const NewDomainModal = () => {
             />
             <SelectRow
                 label="Record Type"
-                name="record_type"
                 value={formState.record_type}
-                onChange={handleChange}
+                onChange={(target) => setFormState({...formState, record_type: target})}
             >
                 <SelectOption
                     label="A"

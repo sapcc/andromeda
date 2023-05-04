@@ -172,7 +172,8 @@ func (c DatacenterController) DeleteDatacentersDatacenterID(params datacenters.D
 		return datacenters.NewDeleteDatacentersDatacenterIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
-	sql := c.db.Rebind(`DELETE FROM datacenter WHERE id = ?`)
+	// todo: check for related members
+	sql := c.db.Rebind(`UPDATE datacenter SET provisioning_status = 'PENDING_DELETE' WHERE id = ?`)
 	res, err := c.db.Exec(sql, params.DatacenterID)
 	if err != nil {
 		var pe *pq.Error

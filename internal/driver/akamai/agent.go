@@ -19,7 +19,6 @@ package akamai
 import (
 	"context"
 	"github.com/sapcc/andromeda/internal/driver"
-	"github.com/sapcc/andromeda/internal/rpcmodels"
 	"time"
 
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v5/pkg/gtm"
@@ -135,14 +134,23 @@ func (s *AkamaiAgent) WorkerThread() {
 	for {
 		select {
 		case domains := <-s.forceSync:
-			if err := s.pendingSync(domains); err != nil {
+			if err := s.datacenterSync(nil); err != nil {
+				logger.Error(err)
+			}
+
+			if err := s.domainSync(domains); err != nil {
 				logger.Error(err)
 			}
 		case <-s.workerTicker.C: // Activate periodically
 			if time.Since(s.lastSync) > syncInterval {
-				if err := s.pendingSync(nil); err != nil {
+				if err := s.datacenterSync(nil); err != nil {
 					logger.Error(err)
 				}
+
+				if err := s.domainSync(nil); err != nil {
+					logger.Error(err)
+				}
+
 				s.lastSync = time.Now()
 			}
 			if time.Since(s.lastMemberStatus) > memberStatusInterval {
@@ -156,7 +164,46 @@ func (s *AkamaiAgent) WorkerThread() {
 
 }
 
-func (s *AkamaiAgent) pendingSync(domains []string) error {
+func (s *AkamaiAgent) datacenterSync(datacenters []string) error {
+	logger.Debugf("Running pending datacenter sync()")
+	response, err := s.rpc.GetDatacenters(context.Background(), &server.SearchRequest{
+		Provider:       "akamai",
+		PageNumber:     0,
+		ResultPerPage:  1,
+		FullyPopulated: true,
+		Pending:        datacenters == nil,
+		Ids:            datacenters,
+	})
+	if err != nil {
+		return err
+	}
+
+	for _, datacenter := range response.GetResponse() {
+		if _, err = s.SyncDatacenter(datacenter, false); err != nil {
+			return err
+		}
+
+		// Wait for status propagation
+		var status string
+		for ok := true; ok; ok = status == "PENDING" {
+			time.Sleep(5 * time.Second)
+			status, err = s.syncProvisioningStatus(nil)
+			if err != nil {
+				return err
+			}
+		}
+
+		if status == "COMPLETE" {
+			driver.UpdateProvisioningStatus(s.rpc,
+				[]*server.ProvisioningStatusRequest_ProvisioningStatus{
+					driver.GetProvisioningStatusRequest(datacenter.Id, "DATACENTER", "ACTIVE"),
+				})
+		}
+	}
+	return nil
+}
+
+func (s *AkamaiAgent) domainSync(domains []string) error {
 	if s.executing {
 		return nil
 	}
@@ -164,7 +211,7 @@ func (s *AkamaiAgent) pendingSync(domains []string) error {
 	s.executing = true
 	defer func() { s.executing = false }()
 
-	logger.Debugf("Running pending sync(domains=%+v)", domains)
+	logger.Debugf("Running pending domain sync(domains=%+v)", domains)
 	response, err := s.rpc.GetDomains(context.Background(), &server.SearchRequest{
 		Provider:       "akamai",
 		PageNumber:     0,
@@ -186,29 +233,23 @@ func (s *AkamaiAgent) pendingSync(domains []string) error {
 	trafficManagementDomain := config.Global.AkamaiConfig.Domain
 
 	// Sync all required datacenters first
-	var datacenters []*rpcmodels.Datacenter
+	var datacenters []string
 	for _, domain := range res {
-		datacenters = append(datacenters, domain.Datacenters...)
-	}
-	for _, datacenter := range datacenters {
-		if _, err = s.SyncDatacenter(datacenter, false); err != nil {
-			return err
-		}
-
-		// Wait for status propagation
-		var status string
-		for ok := true; ok; ok = status == "PENDING" {
-			time.Sleep(5 * time.Second)
-			status, err = s.syncProvisioningStatus(nil)
-			if err != nil {
-				return err
+		for _, datacenter := range domain.Datacenters {
+			if datacenter.ProvisioningStatus != "ACTIVE" {
+				datacenters = append(datacenters, datacenter.Id)
 			}
+		}
+	}
+	if len(datacenters) > 0 {
+		if err := s.datacenterSync(datacenters); err != nil {
+			return err
 		}
 	}
 
 	for _, domain := range res {
 		var provRequests ProvRequests
-		logger.Infof("pendingSync(%s) running...", domain.Id)
+		logger.Infof("domainSync(%s) running...", domain.Id)
 		if err := s.gtmLock.Lock(trafficManagementDomain); err != nil {
 			return err
 		}
@@ -237,7 +278,7 @@ func (s *AkamaiAgent) pendingSync(domains []string) error {
 		}
 		driver.UpdateProvisioningStatus(s.rpc, provRequests)
 
-		logger.Infof("pendingSync(%s) finished with '%s'", domain.Id, status)
+		logger.Infof("domainSync(%s) finished with '%s'", domain.Id, status)
 		if err := s.gtmLock.Unlock(trafficManagementDomain); err != nil {
 			return err
 		}

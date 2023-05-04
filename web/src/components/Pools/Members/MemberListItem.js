@@ -13,9 +13,10 @@ const MemberListItem = ({member, setError}) => {
     const queryClient = useQueryClient()
 
     const queryDatacenter = useQuery(
-        [`datacenters`, member.datacenter_id],
+        ["datacenters", member.datacenter_id],
         fetchItem,
         {
+            enabled: 'datacenter_id' in member,
             meta: auth,
             onError: setError,
         }

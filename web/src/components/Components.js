@@ -17,7 +17,8 @@ export const Error = ({error}) => {
     if (error) {
         return (
             <Message variant="error" className="jn-mb-4">
-                {`${error.statusCode}, ${error.message}`}
+                {error.statusCode && `[${error.statusCode}] `}
+                {error.message}
             </Message>
         )
     }

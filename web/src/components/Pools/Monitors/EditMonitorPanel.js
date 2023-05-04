@@ -5,12 +5,10 @@ import {
     ButtonRow,
     CheckboxRow,
     Form,
-    Message,
     PanelBody,
     PanelFooter,
     SelectOption,
     SelectRow,
-    Spinner,
     Stack,
     TextareaRow,
     TextInputRow,
@@ -27,7 +25,6 @@ const EditMonitorPanel = ({closeCallback}) => {
     const urlState = currentState(urlStateKey)
     const queryClient = useQueryClient()
     const [error, setError] = useState()
-    const [advancedSettings, setAdvancedSettings] = useState(false)
     const [formState, setFormState] = useState({
         name: undefined,
         send: undefined,
@@ -134,30 +131,25 @@ const EditMonitorPanel = ({closeCallback}) => {
                     <SelectOption key="tcp" value="TCP" label="TCP"/>
                     <SelectOption key="udp" value="UDP" label="UDP"/>
                 </SelectRow>
-                <ButtonRow>
-                    <Button
-                        label="Show advanced settings"
-                        disabled={isLoading}
-                        variant="subdued"
-                        onClick={() => setAdvancedSettings(!advancedSettings)}
-                    />
-                </ButtonRow>
 
-                {advancedSettings && (
+                {formState.type !== "ICMP" && (
                     <Stack gap="2" distribution="between">
                         <TextareaRow
-                            label="Monitor send message"
+                            label="Monitor send string"
+                            className={"flex-auto"}
                             disabled={isLoading}
-                            value={formState.send || ""}
+                            value={formState?.send}
                             onChange={handleChange}
                         />
                         <TextareaRow
-                            label="Monitor expected receive message"
+                            label="Monitor expected receive string"
+                            className={"flex-auto"}
                             disabled={isLoading}
-                            value={formState.receive || ""}
+                            value={formState?.receive}
                             onChange={handleChange}
                         />
-                    </Stack>)}
+                    </Stack>
+                )}
             </PanelBody>
         </Form>
     )

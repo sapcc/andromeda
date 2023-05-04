@@ -3,7 +3,7 @@ import React, {useState} from "react"
 import {authStore, useStore} from "../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {createItem} from "../../actions"
-import {CheckboxRow, Message, Modal, SelectOption, SelectRow, Stack, TextInputRow} from "juno-ui-components"
+import {CheckboxRow, Modal, SelectOption, SelectRow, Stack, TextInputRow} from "juno-ui-components"
 import {currentState, push} from "url-state-provider"
 import {Error} from "../Components";
 
@@ -79,10 +79,9 @@ const NewDatacenterModal = () => {
             />
             <SelectRow
                 label="Continent"
-                name="continent"
                 helptext="A two-letter code that specifies the continent where the data center maps to."
                 value={formState.continent}
-                onChange={handleChange}
+                onChange={(target) => setFormState({...formState, continent: target})}
             >
                 <SelectOption label="Unknown"/>
                 <SelectOption key="AF" label="AF - Africa" value="AF"/>

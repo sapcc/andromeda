@@ -2,15 +2,12 @@ import React, {useState} from "react"
 
 import {
     Button,
-    Checkbox, CheckboxRow,
+    CheckboxRow,
     Form,
-    Message,
     PanelBody,
     PanelFooter,
     SelectOption,
     SelectRow,
-    Spinner,
-    Stack,
     TextInputRow,
 } from "juno-ui-components"
 import {authStore, useStore} from "../../store"
@@ -123,10 +120,9 @@ const EditDomainPanel = ({closeCallback}) => {
                 />
                 <SelectRow
                     label="Record Type"
-                    name="record_type"
                     value={formState?.record_type}
                     disabled={isLoading}
-                    onChange={handleChange}
+                    onChange={(target) => setFormState({...formState, record_type: target})}
                 >
                     <SelectOption
                         label="A"

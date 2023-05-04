@@ -99,11 +99,6 @@ func (c PoolController) PostPools(params pools.PostPoolsParams) middleware.Respo
 
 	// Wrap insert and relations into transaction
 	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
-		if len(params.Pool.Pool.Domains) == 0 {
-			// unused pool is auto-active (since not touched by agent)
-			pool.ProvisioningStatus = "ACTIVE"
-		}
-
 		sql := `
 			INSERT INTO pool
 				(name, admin_state_up, project_id)
@@ -183,15 +178,14 @@ func (c PoolController) PutPoolsPoolID(params pools.PutPoolsPoolIDParams) middle
 			UPDATE pool SET
 				name = COALESCE(:name, name),
 				admin_state_up = COALESCE(:admin_state_up, admin_state_up),
-				updated_at = NOW(),
-				provisioning_status = 'PENDING_UPDATE'
+				updated_at = NOW()
 			WHERE id = :id
 		`
 		if _, err := tx.NamedExec(sql, params.Pool.Pool); err != nil {
 			return err
 		}
 
-		return nil
+		return UpdateCascadePool(tx, params.PoolID, "PENDING_UPDATE")
 	}); err != nil {
 		panic(err)
 	}
@@ -208,7 +202,7 @@ func (c PoolController) PutPoolsPoolID(params pools.PutPoolsPoolIDParams) middle
 func (c PoolController) DeletePoolsPoolID(params pools.DeletePoolsPoolIDParams) middleware.Responder {
 	// zero-length slice used because we want [] via json encoder, nil encodes null
 	pool := models.Pool{ID: params.PoolID, Members: []strfmt.UUID{}, Domains: []strfmt.UUID{}}
-	if err := PopulatePool(c.db, &pool, []string{"id", "project_id"}, false); err != nil {
+	if err := PopulatePool(c.db, &pool, []string{"id", "project_id"}, true); err != nil {
 		return pools.NewDeletePoolsPoolIDNotFound().WithPayload(utils.NotFound)
 	}
 	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || projectID != *pool.ProjectID {
@@ -216,7 +210,12 @@ func (c PoolController) DeletePoolsPoolID(params pools.DeletePoolsPoolIDParams) 
 	}
 
 	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
-		return UpdateCascadePool(tx, params.PoolID, "PENDING_DELETE")
+		if len(pool.Domains) > 0 {
+			return UpdateCascadePool(tx, params.PoolID, "PENDING_DELETE")
+		}
+
+		_, err := tx.Exec(tx.Rebind(`DELETE FROM pool WHERE id = ?`), params.PoolID)
+		return err
 	}); err != nil {
 		panic(err)
 	}

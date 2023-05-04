@@ -22,14 +22,13 @@ const NewMonitorModal = () => {
     const auth = authStore((state) => state.auth)
     const urlState = currentState(urlStateKey)
     const queryClient = useQueryClient()
-    const [advancedSettings, setAdvancedSettings] = useState(false)
     const [formState, setFormState] = useState({
         name: "",
         pool_id: urlState?.pool,
         send: null,
         receive: null,
         timeout: 10,
-        type: "ICMP",
+        type: "HTTP",
         interval: 60,
         admin_state_up: true,
     })
@@ -104,38 +103,32 @@ const NewMonitorModal = () => {
             />
             <SelectRow
                 label="Type"
-                name="type"
                 value={formState?.type}
-                onChange={handleChange}
+                onChange={(target) => setFormState({...formState, type: target})}
             >
-                <SelectOption key="icmp" value="ICMP" label="ICMP" />
+                <SelectOption key="icmp" value="ICMP" label="ICMP (Unsupported by Akamai)" />
                 <SelectOption key="http" value="HTTP" label="HTTP" />
                 <SelectOption key="https" value="HTTPS" label="HTTPS" />
                 <SelectOption key="tcp" value="TCP" label="TCP" />
                 <SelectOption key="udp" value="UDP" label="UDP" />
             </SelectRow>
-            <ButtonRow>
-                <Button
-                    label="Show advanced settings"
-                    variant="subdued"
-                    onClick={() => setAdvancedSettings(!advancedSettings)}
-                />
-            </ButtonRow>
 
-            {advancedSettings && (
+            {formState.type !== "ICMP" && (
                 <Stack gap="2" distribution="between">
                     <TextareaRow
-                        label="Monitor send message"
+                        className={"flex-auto"}
+                        label="Monitor send string"
                         value={formState.send || ""}
                         onChange={handleChange}
                     />
                     <TextareaRow
-                        label="Monitor expected receive message"
+                        className={"flex-auto"}
+                        label="Monitor expected receive string"
                         value={formState.receive || ""}
                         onChange={handleChange}
                     />
-                </Stack>)}
-
+                </Stack>
+            )}
         </Modal>
     )
 }

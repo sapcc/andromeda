@@ -43,6 +43,8 @@ const EditPoolPanel = ({closeCallback}) => {
                     queryClient
                         .setQueryData(["pools", data.pool.id], data)
                     queryClient
+                        .setQueryDefaults([], {refetchInterval: 5000})
+                    queryClient
                         .invalidateQueries("pools")
                         .then(closeCallback)
                 },
