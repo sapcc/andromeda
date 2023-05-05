@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	sq "github.com/Masterminds/squirrel"
+	"github.com/go-openapi/strfmt"
 	"net"
 	"strings"
 
@@ -341,49 +342,57 @@ func (u *RPCHandler) UpdateProvisioningStatus(ctx context.Context, req *Provisio
 // UpdateMemberStatus Updates member status according to the requests, also updates dependend pool and domain status.
 func (u *RPCHandler) UpdateMemberStatus(ctx context.Context, req *MemberStatusRequest, res *MemberStatusResponse) error {
 	var statusResult []*StatusResult
+	tx, err := u.DB.Beginx()
+	if err != nil {
+		return err
+	}
+	defer func() { _ = tx.Rollback() }()
+
 	for _, memberStatusReq := range req.GetMemberStatus() {
 		status := memberStatusReq.GetStatus().String()
-		var err error
-		if status == "ONLINE" {
-			// Set all related objects to Online
-			sql := u.DB.Rebind(`UPDATE member m
-                    INNER JOIN pool p ON m.pool_id = p.id
-                    INNER JOIN domain_pool_relation dpr ON p.id = dpr.pool_id
-                    INNER JOIN domain d ON dpr.domain_id = d.id
-                    SET m.status = 'ONLINE', p.status = 'ONLINE', d.status = 'ONLINE' WHERE m.id = ?`)
-			if _, err = u.DB.Exec(sql, memberStatusReq.GetId()); err != nil {
-				logger.Error(err)
-			}
-		} else {
-			if err = db.TxExecute(u.DB, func(tx *sqlx.Tx) error {
-				// Select count all members from the same pool that are online
-				sql := tx.Rebind(`SELECT COUNT(m2.id)
-                        FROM member m
-                        INNER JOIN member m2 ON m2.pool_id = m.pool_id
-                        WHERE m.id = ? AND m2.id != m.id AND m2.status = 'ONLINE';`)
-				var members_online int
-				if err := tx.Get(&members_online, sql, memberStatusReq.GetId()); err != nil {
-					return err
-				}
+		// Set all related objects to Online
+		sql, args := sq.Update("member").
+			Set("status", status).
+			Where("id = ?", memberStatusReq.GetId()).
+			MustSql()
+		if _, err := tx.Exec(tx.Rebind(sql), args...); err != nil {
+			return err
+		}
 
-				if members_online > 0 {
-					sql := tx.Rebind(`UPDATE member SET status = 'OFFLINE' WHERE id = ?`)
-					if _, err := tx.Exec(sql, memberStatusReq.GetId()); err != nil {
-						return err
-					}
-				} else {
-					sql := tx.Rebind(`UPDATE member m
-                            INNER JOIN pool p ON m.pool_id = p.id
-                            INNER JOIN domain_pool_relation dpr ON p.id = dpr.pool_id
-                            INNER JOIN domain d ON dpr.domain_id = d.id
-                            SET m.status = 'OFFLINE', p.status = 'OFFLINE', d.status = 'OFFLINE' WHERE m.id = ?`)
-					if _, err := tx.Exec(sql, memberStatusReq.GetId()); err != nil {
-						return err
-					}
-				}
-				return nil
-			}); err != nil {
-				logger.Error(err)
+		sql, args = sq.Select("d.id", "p.id").
+			From("member m").
+			LeftJoin("pool p ON m.pool_id = p.id").
+			LeftJoin("domain_pool_relation dpr ON p.id = dpr.pool_id").
+			LeftJoin("domain d ON dpr.domain_id = d.id").
+			Where("m.id = ?", memberStatusReq.GetId()).
+			MustSql()
+		var domainID, poolID strfmt.UUID
+		if err := tx.QueryRowx(tx.Rebind(sql), args...).Scan(&domainID, &poolID); err != nil {
+			return err
+		}
+
+		sql, args = sq.Select("COUNT(m2.id)").
+			From("member m").
+			InnerJoin("member m2 ON m2.pool_id = m.pool_id").
+			Where(sq.And{
+				sq.Eq{"m.id": memberStatusReq.GetId()},
+				sq.Expr("m2.id != m.id"),
+				sq.Eq{"m2.status": "ONLINE"},
+			}).MustSql()
+		var membersOnline int
+		if err := tx.Get(&membersOnline, tx.Rebind(sql), args...); err != nil {
+			return err
+		}
+
+		if status == "ONLINE" || (membersOnline == 0 && status == "OFFLINE") {
+			sql, args = sq.Update("pool").Set("status", status).Where("id = ?", poolID).MustSql()
+			if _, err := tx.Exec(tx.Rebind(sql), args...); err != nil {
+				return err
+			}
+
+			sql, args = sq.Update("domain").Set("status", status).Where("id = ?", domainID).MustSql()
+			if _, err := tx.Exec(tx.Rebind(sql), args...); err != nil {
+				return err
 			}
 		}
 
@@ -393,5 +402,5 @@ func (u *RPCHandler) UpdateMemberStatus(ctx context.Context, req *MemberStatusRe
 		})
 	}
 	res.MemberStatusResult = statusResult
-	return nil
+	return tx.Commit()
 }

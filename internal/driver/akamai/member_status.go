@@ -18,6 +18,7 @@ package akamai
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -62,8 +63,11 @@ func (s *AkamaiAgent) syncMemberStatus(domain *rpcmodels.Domain) error {
 
 	stat := &IPAvailability{}
 	req, _ := http.NewRequest(http.MethodGet, hostURL, nil)
-	if _, err := (*s.session).Exec(req, &stat); err != nil {
+	if out, err := (*s.session).Exec(req, &stat); err != nil {
 		return err
+	} else {
+		bytes, _ := io.ReadAll(out.Body)
+		logger.Debugf("%s", bytes)
 	}
 
 	if len(stat.DataRows) == 0 {
@@ -83,7 +87,7 @@ func (s *AkamaiAgent) syncMemberStatus(domain *rpcmodels.Domain) error {
 			memberStatusRequests = append(memberStatusRequests,
 				driver.GetMemberStatusRequest(memberMap[ip.IP], status))
 
-			logger.Infof("status of %s: %+v/%+v, %f", domain.Id, ip.Alive, ip.HandedOut, ip.Score)
+			logger.Infof("status of %s: Alive: %+v ,HandedOut: %+v, %f", domain.Id, ip.Alive, ip.HandedOut, ip.Score)
 		}
 	}
 
