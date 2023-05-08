@@ -35,10 +35,10 @@ require (
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/lib/pq v1.10.9
 	github.com/mcuadros/go-defaults v1.2.0
-	github.com/prometheus/client_golang v1.15.0
+	github.com/prometheus/client_golang v1.15.1
 	github.com/rs/cors v1.9.0
 	github.com/sapcc/go-api-declarations v1.5.1
-	github.com/sapcc/go-bits v0.0.0-20230427112005-83ae3f63bf8b
+	github.com/sapcc/go-bits v0.0.0-20230504084121-e1394d9f1b00
 	github.com/scottdware/go-bigip v0.0.0-20220517145708-9fe3e2f9f005
 	github.com/stretchr/testify v1.8.2
 	github.com/urfave/cli/v2 v2.25.3
