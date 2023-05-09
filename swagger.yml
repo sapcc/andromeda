@@ -863,6 +863,166 @@ paths:
           schema:
             $ref: '#/definitions/error'
 
+  /geomaps:
+    get:
+      tags:
+        - Geographic maps
+      summary: List geographic maps
+      x-policy: andromeda:geomap:get_all
+      parameters:
+        - $ref: '#/parameters/marker'
+        - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/sort'
+        - $ref: '#/parameters/page_reverse'
+        - $ref: '#/parameters/tags'
+        - $ref: '#/parameters/tags-any'
+        - $ref: '#/parameters/not-tags'
+        - $ref: '#/parameters/not-tags-any'
+      responses:
+        200:
+          description: A JSON array of geographic maps
+          schema:
+            type: object
+            properties:
+              geomaps:
+                type: array
+                items:
+                  $ref: '#/definitions/geomap'
+              links:
+                x-omitempty: true
+                type: array
+                items:
+                  $ref: '#/definitions/link'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+
+    post:
+      tags:
+        - Geographic maps
+      summary: Create new geographic map
+      x-policy: andromeda:geomap:post
+      parameters:
+        - in: body
+          name: geomap
+          required: true
+          schema:
+            type: object
+            required:
+              - geomap
+            properties:
+              geomap:
+                $ref: '#/definitions/geomap'
+      responses:
+        201:
+          description: Created geomap.
+          schema:
+            type: object
+            properties:
+              geomap:
+                $ref: '#/definitions/geomap'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+
+  /geomaps/{geomap_id}:
+    parameters:
+      - in: path
+        name: geomap_id
+        required: true
+        type: string
+        format: uuid
+        description: The UUID of the geomap
+    get:
+      tags:
+        - Geographic maps
+      summary: Show geographic map detail
+      x-policy: andromeda:geomap:get_one
+      responses:
+        200:
+          description: Shows the details of a specific geomap.
+          schema:
+            type: object
+            properties:
+              geomap:
+                $ref: '#/definitions/geomap'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+
+    put:
+      tags:
+        - Geographic maps
+      summary: Update a geographic map
+      x-policy: andromeda:geomap:put
+      parameters:
+        - in: body
+          name: geomap
+          required: true
+          schema:
+            type: object
+            required:
+              - geomap
+            properties:
+              geomap:
+                $ref: '#/definitions/geomap'
+      responses:
+        202:
+          description: Updated geomap.
+          schema:
+            type: object
+            properties:
+              geomap:
+                $ref: '#/definitions/geomap'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+
+    delete:
+      tags:
+        - Geographic maps
+      summary: Delete a geographic map
+      x-policy: andromeda:geomap:delete
+      responses:
+        204:
+          description: Resource successfully deleted.
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+
   /services:
     get:
       tags:
@@ -1321,6 +1481,83 @@ definitions:
       meta:
         type: integer
         readOnly: true
+
+  geomap:
+    type: object
+    required:
+      - default_datacenter
+    properties:
+      id:
+        type: string
+        format: uuid
+        description: The id of the resource.
+        readOnly: true
+      name:
+        type: string
+        description: Human-readable name of the resource.
+        maxLength: 255
+        x-nullable: true
+      default_datacenter:
+        type: string
+        format: uuid
+        description: Datacenter ID
+      assignments:
+        type: array
+        description: Country to datacenter assignments.
+        items:
+          type: object
+          description: Assignment.
+          properties:
+            country:
+              type: string
+              description: ISO 3166 2-Letter Country code.
+              maxLength: 2
+              minLength: 2
+            datacenter:
+              type: string
+              format: uuid
+              description: Datacenter ID
+      created_at:
+        type: string
+        format: dateTime
+        description: The UTC date and timestamp when the resource was created.
+        readOnly: true
+        example: 2020-05-11T17:21:34
+      updated_at:
+        type: string
+        format: dateTime
+        description: The UTC date and timestamp when the resource was created.
+        readOnly: true
+        example: 2020-09-09T14:52:15
+      provisioning_status:
+        type: string
+        enum:
+          - PENDING
+          - ACTIVE
+          - ERROR
+        readOnly: true
+      project_id:
+        type: string
+        description: The ID of the project owning this resource.
+        example: fa84c217f361441986a220edf9b1e337
+        minLength: 32
+        maxLength: 32
+        x-nullable: true
+      scope:
+        type: string
+        description: Visibility of datacenter between different projects
+        enum:
+          - private
+          - shared
+        default: private
+        x-nullable: true
+      provider:
+        description: Provider driver for the backend solution
+        example: akamai
+        type: string
+        enum:
+          - akamai
+          - f5
 
   member:
     type: object
