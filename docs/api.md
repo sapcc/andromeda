@@ -88,6 +88,18 @@ Administrative API
   
 
 
+###  geographic_maps
+
+| Method  | URI     | Name   | Summary |
+|---------|---------|--------|---------|
+| DELETE | /v1/geomaps/{geomap_id} | [delete geomaps geomap ID](#delete-geomaps-geomap-id) | Delete a geographic map |
+| GET | /v1/geomaps | [get geomaps](#get-geomaps) | List geographic maps |
+| GET | /v1/geomaps/{geomap_id} | [get geomaps geomap ID](#get-geomaps-geomap-id) | Show geographic map detail |
+| POST | /v1/geomaps | [post geomaps](#post-geomaps) | Create new geographic map |
+| PUT | /v1/geomaps/{geomap_id} | [put geomaps geomap ID](#put-geomaps-geomap-id) | Update a geographic map |
+  
+
+
 ###  members
 
 | Method  | URI     | Name   | Summary |
@@ -211,6 +223,51 @@ Status: Not Found
 Unexpected Error
 
 ###### <span id="delete-domains-domain-id-default-schema"></span> Schema
+
+  
+
+[Error](#error)
+
+### <span id="delete-geomaps-geomap-id"></span> Delete a geographic map (*DeleteGeomapsGeomapID*)
+
+```
+DELETE /v1/geomaps/{geomap_id}
+```
+
+#### Parameters
+
+| Name | Source | Type | Go type | Separator | Required | Default | Description |
+|------|--------|------|---------|-----------| :------: |---------|-------------|
+| geomap_id | `path` | uuid (formatted string) | `strfmt.UUID` |  | ✓ |  | The UUID of the geomap |
+
+#### All responses
+| Code | Status | Description | Has headers | Schema |
+|------|--------|-------------|:-----------:|--------|
+| [204](#delete-geomaps-geomap-id-204) | No Content | Resource successfully deleted. |  | [schema](#delete-geomaps-geomap-id-204-schema) |
+| [404](#delete-geomaps-geomap-id-404) | Not Found | Not Found |  | [schema](#delete-geomaps-geomap-id-404-schema) |
+| [default](#delete-geomaps-geomap-id-default) | | Unexpected Error |  | [schema](#delete-geomaps-geomap-id-default-schema) |
+
+#### Responses
+
+
+##### <span id="delete-geomaps-geomap-id-204"></span> 204 - Resource successfully deleted.
+Status: No Content
+
+###### <span id="delete-geomaps-geomap-id-204-schema"></span> Schema
+
+##### <span id="delete-geomaps-geomap-id-404"></span> 404 - Not Found
+Status: Not Found
+
+###### <span id="delete-geomaps-geomap-id-404-schema"></span> Schema
+   
+  
+
+[Error](#error)
+
+##### <span id="delete-geomaps-geomap-id-default"></span> Default Response
+Unexpected Error
+
+###### <span id="delete-geomaps-geomap-id-default-schema"></span> Schema
 
   
 
@@ -681,6 +738,150 @@ Unexpected Error
 | Name | Type | Go type | Required | Default | Description | Example |
 |------|------|---------|:--------:| ------- |-------------|---------|
 | domain | [Domain](#domain)| `models.Domain` |  | |  |  |
+
+
+
+### <span id="get-geomaps"></span> List geographic maps (*GetGeomaps*)
+
+```
+GET /v1/geomaps
+```
+
+#### Parameters
+
+| Name | Source | Type | Go type | Separator | Required | Default | Description |
+|------|--------|------|---------|-----------| :------: |---------|-------------|
+| limit | `query` | integer | `int64` |  |  |  | Sets the page size. |
+| marker | `query` | uuid (formatted string) | `strfmt.UUID` |  |  |  | Pagination ID of the last item in the previous list. |
+| not-tags | `query` | []string | `[]string` |  |  |  | Filter for resources not having tags, multiple not-tags are considered as logical AND.
+Should be provided in a comma separated list. |
+| not-tags-any | `query` | []string | `[]string` |  |  |  | Filter for resources not having tags, multiple tags are considered as logical OR.
+Should be provided in a comma separated list. |
+| page_reverse | `query` | boolean | `bool` |  |  |  | Sets the page direction. |
+| sort | `query` | string | `string` |  |  |  | Comma-separated list of sort keys, optinally prefix with - to reverse sort order. |
+| tags | `query` | []string | `[]string` |  |  |  | Filter for tags, multiple tags are considered as logical AND. 
+Should be provided in a comma separated list. |
+| tags-any | `query` | []string | `[]string` |  |  |  | Filter for tags, multiple tags are considered as logical OR.
+Should be provided in a comma separated list. |
+
+#### All responses
+| Code | Status | Description | Has headers | Schema |
+|------|--------|-------------|:-----------:|--------|
+| [200](#get-geomaps-200) | OK | A JSON array of geographic maps |  | [schema](#get-geomaps-200-schema) |
+| [400](#get-geomaps-400) | Bad Request | Bad request |  | [schema](#get-geomaps-400-schema) |
+| [default](#get-geomaps-default) | | Unexpected Error |  | [schema](#get-geomaps-default-schema) |
+
+#### Responses
+
+
+##### <span id="get-geomaps-200"></span> 200 - A JSON array of geographic maps
+Status: OK
+
+###### <span id="get-geomaps-200-schema"></span> Schema
+   
+  
+
+[GetGeomapsOKBody](#get-geomaps-o-k-body)
+
+##### <span id="get-geomaps-400"></span> 400 - Bad request
+Status: Bad Request
+
+###### <span id="get-geomaps-400-schema"></span> Schema
+   
+  
+
+[Error](#error)
+
+##### <span id="get-geomaps-default"></span> Default Response
+Unexpected Error
+
+###### <span id="get-geomaps-default-schema"></span> Schema
+
+  
+
+[Error](#error)
+
+###### Inlined models
+
+**<span id="get-geomaps-o-k-body"></span> GetGeomapsOKBody**
+
+
+  
+
+
+
+**Properties**
+
+| Name | Type | Go type | Required | Default | Description | Example |
+|------|------|---------|:--------:| ------- |-------------|---------|
+| geomaps | [][Geomap](#geomap)| `[]*models.Geomap` |  | |  |  |
+| links | [][Link](#link)| `[]*models.Link` |  | |  |  |
+
+
+
+### <span id="get-geomaps-geomap-id"></span> Show geographic map detail (*GetGeomapsGeomapID*)
+
+```
+GET /v1/geomaps/{geomap_id}
+```
+
+#### Parameters
+
+| Name | Source | Type | Go type | Separator | Required | Default | Description |
+|------|--------|------|---------|-----------| :------: |---------|-------------|
+| geomap_id | `path` | uuid (formatted string) | `strfmt.UUID` |  | ✓ |  | The UUID of the geomap |
+
+#### All responses
+| Code | Status | Description | Has headers | Schema |
+|------|--------|-------------|:-----------:|--------|
+| [200](#get-geomaps-geomap-id-200) | OK | Shows the details of a specific geomap. |  | [schema](#get-geomaps-geomap-id-200-schema) |
+| [404](#get-geomaps-geomap-id-404) | Not Found | Not Found |  | [schema](#get-geomaps-geomap-id-404-schema) |
+| [default](#get-geomaps-geomap-id-default) | | Unexpected Error |  | [schema](#get-geomaps-geomap-id-default-schema) |
+
+#### Responses
+
+
+##### <span id="get-geomaps-geomap-id-200"></span> 200 - Shows the details of a specific geomap.
+Status: OK
+
+###### <span id="get-geomaps-geomap-id-200-schema"></span> Schema
+   
+  
+
+[GetGeomapsGeomapIDOKBody](#get-geomaps-geomap-id-o-k-body)
+
+##### <span id="get-geomaps-geomap-id-404"></span> 404 - Not Found
+Status: Not Found
+
+###### <span id="get-geomaps-geomap-id-404-schema"></span> Schema
+   
+  
+
+[Error](#error)
+
+##### <span id="get-geomaps-geomap-id-default"></span> Default Response
+Unexpected Error
+
+###### <span id="get-geomaps-geomap-id-default-schema"></span> Schema
+
+  
+
+[Error](#error)
+
+###### Inlined models
+
+**<span id="get-geomaps-geomap-id-o-k-body"></span> GetGeomapsGeomapIDOKBody**
+
+
+  
+
+
+
+**Properties**
+
+| Name | Type | Go type | Required | Default | Description | Example |
+|------|------|---------|:--------:| ------- |-------------|---------|
+| geomap | [Geomap](#geomap)| `models.Geomap` |  | |  |  |
 
 
 
@@ -1521,6 +1722,97 @@ Unexpected Error
 
 
 
+### <span id="post-geomaps"></span> Create new geographic map (*PostGeomaps*)
+
+```
+POST /v1/geomaps
+```
+
+#### Parameters
+
+| Name | Source | Type | Go type | Separator | Required | Default | Description |
+|------|--------|------|---------|-----------| :------: |---------|-------------|
+| geomap | `body` | [PostGeomapsBody](#post-geomaps-body) | `PostGeomapsBody` | | ✓ | |  |
+
+#### All responses
+| Code | Status | Description | Has headers | Schema |
+|------|--------|-------------|:-----------:|--------|
+| [201](#post-geomaps-201) | Created | Created geomap. |  | [schema](#post-geomaps-201-schema) |
+| [400](#post-geomaps-400) | Bad Request | Bad request |  | [schema](#post-geomaps-400-schema) |
+| [404](#post-geomaps-404) | Not Found | Not Found |  | [schema](#post-geomaps-404-schema) |
+| [default](#post-geomaps-default) | | Unexpected Error |  | [schema](#post-geomaps-default-schema) |
+
+#### Responses
+
+
+##### <span id="post-geomaps-201"></span> 201 - Created geomap.
+Status: Created
+
+###### <span id="post-geomaps-201-schema"></span> Schema
+   
+  
+
+[PostGeomapsCreatedBody](#post-geomaps-created-body)
+
+##### <span id="post-geomaps-400"></span> 400 - Bad request
+Status: Bad Request
+
+###### <span id="post-geomaps-400-schema"></span> Schema
+   
+  
+
+[Error](#error)
+
+##### <span id="post-geomaps-404"></span> 404 - Not Found
+Status: Not Found
+
+###### <span id="post-geomaps-404-schema"></span> Schema
+   
+  
+
+[Error](#error)
+
+##### <span id="post-geomaps-default"></span> Default Response
+Unexpected Error
+
+###### <span id="post-geomaps-default-schema"></span> Schema
+
+  
+
+[Error](#error)
+
+###### Inlined models
+
+**<span id="post-geomaps-body"></span> PostGeomapsBody**
+
+
+  
+
+
+
+**Properties**
+
+| Name | Type | Go type | Required | Default | Description | Example |
+|------|------|---------|:--------:| ------- |-------------|---------|
+| geomap | [Geomap](#geomap)| `models.Geomap` | ✓ | |  |  |
+
+
+
+**<span id="post-geomaps-created-body"></span> PostGeomapsCreatedBody**
+
+
+  
+
+
+
+**Properties**
+
+| Name | Type | Go type | Required | Default | Description | Example |
+|------|------|---------|:--------:| ------- |-------------|---------|
+| geomap | [Geomap](#geomap)| `models.Geomap` |  | |  |  |
+
+
+
 ### <span id="post-members"></span> Create new member (*PostMembers*)
 
 ```
@@ -2010,6 +2302,98 @@ Unexpected Error
 
 
 
+### <span id="put-geomaps-geomap-id"></span> Update a geographic map (*PutGeomapsGeomapID*)
+
+```
+PUT /v1/geomaps/{geomap_id}
+```
+
+#### Parameters
+
+| Name | Source | Type | Go type | Separator | Required | Default | Description |
+|------|--------|------|---------|-----------| :------: |---------|-------------|
+| geomap_id | `path` | uuid (formatted string) | `strfmt.UUID` |  | ✓ |  | The UUID of the geomap |
+| geomap | `body` | [PutGeomapsGeomapIDBody](#put-geomaps-geomap-id-body) | `PutGeomapsGeomapIDBody` | | ✓ | |  |
+
+#### All responses
+| Code | Status | Description | Has headers | Schema |
+|------|--------|-------------|:-----------:|--------|
+| [202](#put-geomaps-geomap-id-202) | Accepted | Updated geomap. |  | [schema](#put-geomaps-geomap-id-202-schema) |
+| [400](#put-geomaps-geomap-id-400) | Bad Request | Bad request |  | [schema](#put-geomaps-geomap-id-400-schema) |
+| [404](#put-geomaps-geomap-id-404) | Not Found | Not Found |  | [schema](#put-geomaps-geomap-id-404-schema) |
+| [default](#put-geomaps-geomap-id-default) | | Unexpected Error |  | [schema](#put-geomaps-geomap-id-default-schema) |
+
+#### Responses
+
+
+##### <span id="put-geomaps-geomap-id-202"></span> 202 - Updated geomap.
+Status: Accepted
+
+###### <span id="put-geomaps-geomap-id-202-schema"></span> Schema
+   
+  
+
+[PutGeomapsGeomapIDAcceptedBody](#put-geomaps-geomap-id-accepted-body)
+
+##### <span id="put-geomaps-geomap-id-400"></span> 400 - Bad request
+Status: Bad Request
+
+###### <span id="put-geomaps-geomap-id-400-schema"></span> Schema
+   
+  
+
+[Error](#error)
+
+##### <span id="put-geomaps-geomap-id-404"></span> 404 - Not Found
+Status: Not Found
+
+###### <span id="put-geomaps-geomap-id-404-schema"></span> Schema
+   
+  
+
+[Error](#error)
+
+##### <span id="put-geomaps-geomap-id-default"></span> Default Response
+Unexpected Error
+
+###### <span id="put-geomaps-geomap-id-default-schema"></span> Schema
+
+  
+
+[Error](#error)
+
+###### Inlined models
+
+**<span id="put-geomaps-geomap-id-accepted-body"></span> PutGeomapsGeomapIDAcceptedBody**
+
+
+  
+
+
+
+**Properties**
+
+| Name | Type | Go type | Required | Default | Description | Example |
+|------|------|---------|:--------:| ------- |-------------|---------|
+| geomap | [Geomap](#geomap)| `models.Geomap` |  | |  |  |
+
+
+
+**<span id="put-geomaps-geomap-id-body"></span> PutGeomapsGeomapIDBody**
+
+
+  
+
+
+
+**Properties**
+
+| Name | Type | Go type | Required | Default | Description | Example |
+|------|------|---------|:--------:| ------- |-------------|---------|
+| geomap | [Geomap](#geomap)| `models.Geomap` | ✓ | |  |  |
+
+
+
 ### <span id="put-members-member-id"></span> Update a member (*PutMembersMemberID*)
 
 ```
@@ -2425,6 +2809,51 @@ Unexpected Error
 |------|------|---------|:--------:| ------- |-------------|---------|
 | code | integer| `int64` |  | | HTTP Error code | `404` |
 | message | string| `string` |  | |  | `An example error message` |
+
+
+
+### <span id="geomap"></span> geomap
+
+
+  
+
+
+
+**Properties**
+
+| Name | Type | Go type | Required | Default | Description | Example |
+|------|------|---------|:--------:| ------- |-------------|---------|
+| assignments | [][GeomapAssignmentsItems0](#geomap-assignments-items0)| `[]*GeomapAssignmentsItems0` |  | | Country to datacenter assignments. |  |
+| created_at | dateTime (formatted string)| `string` |  | | The UTC date and timestamp when the resource was created. | `2020-05-11T17:21:34` |
+| default_datacenter | uuid (formatted string)| `strfmt.UUID` | ✓ | | Datacenter ID |  |
+| id | uuid (formatted string)| `strfmt.UUID` |  | | The id of the resource. |  |
+| name | string| `string` |  | | Human-readable name of the resource. |  |
+| project_id | string| `string` |  | | The ID of the project owning this resource. | `fa84c217f361441986a220edf9b1e337` |
+| provider | string| `string` |  | | Provider driver for the backend solution | `akamai` |
+| provisioning_status | string| `string` |  | |  |  |
+| scope | string| `string` |  | `"private"`| Visibility of datacenter between different projects |  |
+| updated_at | dateTime (formatted string)| `string` |  | | The UTC date and timestamp when the resource was created. | `2020-09-09T14:52:15` |
+
+
+
+#### Inlined models
+
+**<span id="geomap-assignments-items0"></span> GeomapAssignmentsItems0**
+
+
+> Assignment.
+  
+
+
+
+
+
+**Properties**
+
+| Name | Type | Go type | Required | Default | Description | Example |
+|------|------|---------|:--------:| ------- |-------------|---------|
+| country | string| `string` |  | | ISO 3166 2-Letter Country code. |  |
+| datacenter | uuid (formatted string)| `strfmt.UUID` |  | | Datacenter ID |  |
 
 
 
