@@ -73,5 +73,8 @@
       "value": "",
       "description": "Help slack link"
     }
+  },
+  "dependencies": {
+    "countries-list": "^2.6.1"
   }
 }

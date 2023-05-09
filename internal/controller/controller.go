@@ -37,6 +37,7 @@ type Controller struct {
 	Services    ServiceController
 	Quotas      QuotaController
 	Sync        SyncController
+	GeoMaps     GeoMapController
 }
 
 func New(db *sqlx.DB) *Controller {
@@ -66,6 +67,7 @@ func New(db *sqlx.DB) *Controller {
 		ServiceController{db, sv},
 		QuotaController{db},
 		SyncController{sv},
+		GeoMapController{db, sv},
 	}
 	return &c
 }

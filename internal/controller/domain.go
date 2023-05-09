@@ -20,6 +20,7 @@ import (
 	dbsql "database/sql"
 	"errors"
 	"fmt"
+	"github.com/jackc/pgx/v5/pgconn"
 	"strings"
 
 	"github.com/go-openapi/runtime/middleware"
@@ -27,7 +28,6 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
-	"github.com/lib/pq"
 	"go-micro.dev/v4"
 
 	"github.com/sapcc/andromeda/db"
@@ -133,7 +133,7 @@ func (c DomainController) PostDomains(params domains.PostDomainsParams) middlewa
 			return domains.NewPostDomainsDefault(400).WithPayload(
 				&models.Error{Code: 400, Message: errMsg})
 		}
-		var pe *pq.Error
+		var pe *pgconn.PgError
 		if errors.As(err, &pe) && pe.Code == pgerrcode.UniqueViolation {
 			return domains.NewPostDomainsDefault(409).WithPayload(utils.DuplicateDomain)
 		}

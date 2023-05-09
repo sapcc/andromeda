@@ -528,6 +528,256 @@ func init() {
         }
       ]
     },
+    "/geomaps": {
+      "get": {
+        "tags": [
+          "Geographic maps"
+        ],
+        "summary": "List geographic maps",
+        "parameters": [
+          {
+            "$ref": "#/parameters/marker"
+          },
+          {
+            "$ref": "#/parameters/limit"
+          },
+          {
+            "$ref": "#/parameters/sort"
+          },
+          {
+            "$ref": "#/parameters/page_reverse"
+          },
+          {
+            "$ref": "#/parameters/tags"
+          },
+          {
+            "$ref": "#/parameters/tags-any"
+          },
+          {
+            "$ref": "#/parameters/not-tags"
+          },
+          {
+            "$ref": "#/parameters/not-tags-any"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A JSON array of geographic maps",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "geomaps": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/geomap"
+                  }
+                },
+                "links": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/link"
+                  },
+                  "x-omitempty": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "default": {
+            "description": "Unexpected Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        },
+        "x-policy": "andromeda:geomap:get_all"
+      },
+      "post": {
+        "tags": [
+          "Geographic maps"
+        ],
+        "summary": "Create new geographic map",
+        "parameters": [
+          {
+            "name": "geomap",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "geomap"
+              ],
+              "properties": {
+                "geomap": {
+                  "$ref": "#/definitions/geomap"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created geomap.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "geomap": {
+                  "$ref": "#/definitions/geomap"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "default": {
+            "description": "Unexpected Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        },
+        "x-policy": "andromeda:geomap:post"
+      }
+    },
+    "/geomaps/{geomap_id}": {
+      "get": {
+        "tags": [
+          "Geographic maps"
+        ],
+        "summary": "Show geographic map detail",
+        "responses": {
+          "200": {
+            "description": "Shows the details of a specific geomap.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "geomap": {
+                  "$ref": "#/definitions/geomap"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "default": {
+            "description": "Unexpected Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        },
+        "x-policy": "andromeda:geomap:get_one"
+      },
+      "put": {
+        "tags": [
+          "Geographic maps"
+        ],
+        "summary": "Update a geographic map",
+        "parameters": [
+          {
+            "name": "geomap",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "geomap"
+              ],
+              "properties": {
+                "geomap": {
+                  "$ref": "#/definitions/geomap"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Updated geomap.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "geomap": {
+                  "$ref": "#/definitions/geomap"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "default": {
+            "description": "Unexpected Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        },
+        "x-policy": "andromeda:geomap:put"
+      },
+      "delete": {
+        "tags": [
+          "Geographic maps"
+        ],
+        "summary": "Delete a geographic map",
+        "responses": {
+          "204": {
+            "description": "Resource successfully deleted."
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "default": {
+            "description": "Unexpected Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        },
+        "x-policy": "andromeda:geomap:delete"
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "The UUID of the geomap",
+          "name": "geomap_id",
+          "in": "path",
+          "required": true
+        }
+      ]
+    },
     "/members": {
       "get": {
         "tags": [
@@ -1828,6 +2078,102 @@ func init() {
         }
       }
     },
+    "geomap": {
+      "type": "object",
+      "required": [
+        "default_datacenter"
+      ],
+      "properties": {
+        "assignments": {
+          "description": "Country to datacenter assignments.",
+          "type": "array",
+          "items": {
+            "description": "Assignment.",
+            "type": "object",
+            "properties": {
+              "country": {
+                "description": "ISO 3166 2-Letter Country code.",
+                "type": "string",
+                "maxLength": 2,
+                "minLength": 2
+              },
+              "datacenter": {
+                "description": "Datacenter ID",
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        },
+        "created_at": {
+          "description": "The UTC date and timestamp when the resource was created.",
+          "type": "string",
+          "format": "dateTime",
+          "readOnly": true,
+          "example": "2020-05-11T17:21:34"
+        },
+        "default_datacenter": {
+          "description": "Datacenter ID",
+          "type": "string",
+          "format": "uuid"
+        },
+        "id": {
+          "description": "The id of the resource.",
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true
+        },
+        "name": {
+          "description": "Human-readable name of the resource.",
+          "type": "string",
+          "maxLength": 255,
+          "x-nullable": true
+        },
+        "project_id": {
+          "description": "The ID of the project owning this resource.",
+          "type": "string",
+          "maxLength": 32,
+          "minLength": 32,
+          "x-nullable": true,
+          "example": "fa84c217f361441986a220edf9b1e337"
+        },
+        "provider": {
+          "description": "Provider driver for the backend solution",
+          "type": "string",
+          "enum": [
+            "akamai",
+            "f5"
+          ],
+          "example": "akamai"
+        },
+        "provisioning_status": {
+          "type": "string",
+          "enum": [
+            "PENDING",
+            "ACTIVE",
+            "ERROR"
+          ],
+          "readOnly": true
+        },
+        "scope": {
+          "description": "Visibility of datacenter between different projects",
+          "type": "string",
+          "default": "private",
+          "enum": [
+            "private",
+            "shared"
+          ],
+          "x-nullable": true
+        },
+        "updated_at": {
+          "description": "The UTC date and timestamp when the resource was created.",
+          "type": "string",
+          "format": "dateTime",
+          "readOnly": true,
+          "example": "2020-09-09T14:52:15"
+        }
+      }
+    },
     "link": {
       "type": "object",
       "properties": {
@@ -2901,6 +3247,293 @@ func init() {
           "format": "uuid",
           "description": "The UUID of the domain",
           "name": "domain_id",
+          "in": "path",
+          "required": true
+        }
+      ]
+    },
+    "/geomaps": {
+      "get": {
+        "tags": [
+          "Geographic maps"
+        ],
+        "summary": "List geographic maps",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "uuid",
+            "description": "Pagination ID of the last item in the previous list.",
+            "name": "marker",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "Sets the page size.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Comma-separated list of sort keys, optinally prefix with - to reverse sort order.",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Sets the page direction.",
+            "name": "page_reverse",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Filter for tags, multiple tags are considered as logical AND. \nShould be provided in a comma separated list.\n",
+            "name": "tags",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Filter for tags, multiple tags are considered as logical OR.\nShould be provided in a comma separated list.\n",
+            "name": "tags-any",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Filter for resources not having tags, multiple not-tags are considered as logical AND.\nShould be provided in a comma separated list.\n",
+            "name": "not-tags",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Filter for resources not having tags, multiple tags are considered as logical OR.\nShould be provided in a comma separated list.\n",
+            "name": "not-tags-any",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A JSON array of geographic maps",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "geomaps": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/geomap"
+                  }
+                },
+                "links": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/link"
+                  },
+                  "x-omitempty": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "default": {
+            "description": "Unexpected Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        },
+        "x-policy": "andromeda:geomap:get_all"
+      },
+      "post": {
+        "tags": [
+          "Geographic maps"
+        ],
+        "summary": "Create new geographic map",
+        "parameters": [
+          {
+            "name": "geomap",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "geomap"
+              ],
+              "properties": {
+                "geomap": {
+                  "$ref": "#/definitions/geomap"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created geomap.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "geomap": {
+                  "$ref": "#/definitions/geomap"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "default": {
+            "description": "Unexpected Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        },
+        "x-policy": "andromeda:geomap:post"
+      }
+    },
+    "/geomaps/{geomap_id}": {
+      "get": {
+        "tags": [
+          "Geographic maps"
+        ],
+        "summary": "Show geographic map detail",
+        "responses": {
+          "200": {
+            "description": "Shows the details of a specific geomap.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "geomap": {
+                  "$ref": "#/definitions/geomap"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "default": {
+            "description": "Unexpected Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        },
+        "x-policy": "andromeda:geomap:get_one"
+      },
+      "put": {
+        "tags": [
+          "Geographic maps"
+        ],
+        "summary": "Update a geographic map",
+        "parameters": [
+          {
+            "name": "geomap",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "geomap"
+              ],
+              "properties": {
+                "geomap": {
+                  "$ref": "#/definitions/geomap"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Updated geomap.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "geomap": {
+                  "$ref": "#/definitions/geomap"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "default": {
+            "description": "Unexpected Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        },
+        "x-policy": "andromeda:geomap:put"
+      },
+      "delete": {
+        "tags": [
+          "Geographic maps"
+        ],
+        "summary": "Delete a geographic map",
+        "responses": {
+          "204": {
+            "description": "Resource successfully deleted."
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "default": {
+            "description": "Unexpected Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        },
+        "x-policy": "andromeda:geomap:delete"
+      },
+      "parameters": [
+        {
+          "type": "string",
+          "format": "uuid",
+          "description": "The UUID of the geomap",
+          "name": "geomap_id",
           "in": "path",
           "required": true
         }
@@ -4034,6 +4667,23 @@ func init() {
     }
   },
   "definitions": {
+    "GeomapAssignmentsItems0": {
+      "description": "Assignment.",
+      "type": "object",
+      "properties": {
+        "country": {
+          "description": "ISO 3166 2-Letter Country code.",
+          "type": "string",
+          "maxLength": 2,
+          "minLength": 2
+        },
+        "datacenter": {
+          "description": "Datacenter ID",
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    },
     "QuotasItems0": {
       "allOf": [
         {
@@ -4317,6 +4967,88 @@ func init() {
         "message": {
           "type": "string",
           "example": "An example error message"
+        }
+      }
+    },
+    "geomap": {
+      "type": "object",
+      "required": [
+        "default_datacenter"
+      ],
+      "properties": {
+        "assignments": {
+          "description": "Country to datacenter assignments.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GeomapAssignmentsItems0"
+          }
+        },
+        "created_at": {
+          "description": "The UTC date and timestamp when the resource was created.",
+          "type": "string",
+          "format": "dateTime",
+          "readOnly": true,
+          "example": "2020-05-11T17:21:34"
+        },
+        "default_datacenter": {
+          "description": "Datacenter ID",
+          "type": "string",
+          "format": "uuid"
+        },
+        "id": {
+          "description": "The id of the resource.",
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true
+        },
+        "name": {
+          "description": "Human-readable name of the resource.",
+          "type": "string",
+          "maxLength": 255,
+          "x-nullable": true
+        },
+        "project_id": {
+          "description": "The ID of the project owning this resource.",
+          "type": "string",
+          "maxLength": 32,
+          "minLength": 32,
+          "x-nullable": true,
+          "example": "fa84c217f361441986a220edf9b1e337"
+        },
+        "provider": {
+          "description": "Provider driver for the backend solution",
+          "type": "string",
+          "enum": [
+            "akamai",
+            "f5"
+          ],
+          "example": "akamai"
+        },
+        "provisioning_status": {
+          "type": "string",
+          "enum": [
+            "PENDING",
+            "ACTIVE",
+            "ERROR"
+          ],
+          "readOnly": true
+        },
+        "scope": {
+          "description": "Visibility of datacenter between different projects",
+          "type": "string",
+          "default": "private",
+          "enum": [
+            "private",
+            "shared"
+          ],
+          "x-nullable": true
+        },
+        "updated_at": {
+          "description": "The UTC date and timestamp when the resource was created.",
+          "type": "string",
+          "format": "dateTime",
+          "readOnly": true,
+          "example": "2020-09-09T14:52:15"
         }
       }
     },

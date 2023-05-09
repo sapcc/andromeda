@@ -7,49 +7,58 @@ import {deleteItem} from "../../actions"
 import {DateTime} from "luxon";
 import {ListItemSpinner, ListItemStatus} from "../Components";
 
-const DatacenterListItem = ({datacenter, setError}) => {
+const GeographicMapListItem = ({geomap, setError}) => {
     const urlStateKey = useStore((state) => state.urlStateKey)
     const auth = authStore((state) => state.auth)
     const queryClient = useQueryClient()
     const createdAt = useMemo(() => {
-        if (datacenter.created_at) {
-            return DateTime.fromISO(datacenter.created_at).toLocaleString(
+        if (geomap.created_at) {
+            return DateTime.fromISO(geomap.created_at).toLocaleString(
                 DateTime.DATETIME_SHORT
             )
         }
-    }, [datacenter.created_at])
+    }, [geomap.created_at])
     const updatedAt = useMemo(() => {
-        if (datacenter.updated_at) {
-            return DateTime.fromISO(datacenter.updated_at).toLocaleString(
+        if (geomap.updated_at) {
+            return DateTime.fromISO(geomap.updated_at).toLocaleString(
                 DateTime.DATETIME_SHORT
             )
         }
-    }, [datacenter.updated_at])
+    }, [geomap.updated_at])
     const mutation = useMutation(deleteItem)
 
-    const handleEditDatacenterClick = () => {
+    const handleEditGeographicMapClick = () => {
         const urlState = currentState(urlStateKey)
         push(urlStateKey, {
             ...urlState,
-            currentPanel: "Datacenter",
-            id: datacenter.id,
+            currentPanel: "GeographicMap",
+            id: geomap.id,
         })
     }
 
-    const handleDeleteDatacenterClick = () => {
+    const handleShowGeographicMapClick = () => {
+        const urlState = currentState(urlStateKey)
+        push(urlStateKey, {
+            ...urlState,
+            currentModal: "ShowGeographicMap",
+            id: geomap.id,
+        })
+    }
+
+    const handleDeleteGeographicMapClick = () => {
         mutation.mutate(
             {
-                key: "datacenters",
+                key: "geomaps",
                 endpoint: auth?.endpoint,
-                id: datacenter.id,
+                id: geomap.id,
                 token: auth?.token,
             },
             {
                 onSuccess: () => {
-                    const queryKey = ["datacenters"]
+                    const queryKey = ["geomaps"]
                     queryClient
                         .setQueryDefaults(queryKey, {refetchInterval: 5000})
-                    // refetch datacenters
+                    // refetch geomaps
                     queryClient
                         .invalidateQueries(queryKey)
                         .then()
@@ -62,48 +71,43 @@ const DatacenterListItem = ({datacenter, setError}) => {
     return (
         <DataGridRow>
             <DataGridCell>
-                <ListItemSpinner data={datacenter} />
+                <ListItemSpinner data={geomap} />
             </DataGridCell>
-            <DataGridCell>{datacenter.continent}</DataGridCell>
-            <DataGridCell>{datacenter.country}</DataGridCell>
-            <DataGridCell>{datacenter.state_or_province}</DataGridCell>
-            <DataGridCell>{datacenter.city}</DataGridCell>
-            <DataGridCell>{datacenter.latitude}, {datacenter.longitude}</DataGridCell>
+            <DataGridCell>{geomap.scope}</DataGridCell>
+            <DataGridCell>{geomap.provider}</DataGridCell>
             <DataGridCell>{createdAt}</DataGridCell>
             <DataGridCell>{updatedAt}</DataGridCell>
             <DataGridCell>
-                <ListItemStatus data={datacenter} />
+                <ListItemStatus data={geomap} />
             </DataGridCell>
             <DataGridCell>
-                {/* Use <Stack> to align and space elements: */}
                 <Stack gap="1.5">
-                    {datacenter.project_id === auth?.project?.id && (
+                    {geomap.project_id === auth?.project?.id && (
                         <>
                             <Icon
+                                icon="openInNew"
+                                size="18"
+                                className="leading-none"
+                                onClick={handleShowGeographicMapClick}
+                            />
+                            {/*<Icon
                                 icon="edit"
                                 size="18"
                                 className="leading-none"
-                                onClick={handleEditDatacenterClick}
-                            />
+                                onClick={handleEditGeographicMapClick}
+                            />*/}
                             <Icon
                                 icon="deleteForever"
                                 size="18"
                                 className="leading-none"
-                                onClick={handleDeleteDatacenterClick}
+                                onClick={handleDeleteGeographicMapClick}
                             />
                         </>
                     )}
-                    <Icon
-                        icon="openInNew"
-                        size="18"
-                        href={`http://www.google.com/maps/place/${datacenter.latitude},${datacenter.longitude}`}
-                        target="_blank"
-                        className="leading-none"
-                    />
                 </Stack>
             </DataGridCell>
         </DataGridRow>
     )
 }
 
-export default DatacenterListItem
+export default GeographicMapListItem

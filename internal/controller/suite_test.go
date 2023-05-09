@@ -77,14 +77,14 @@ func (t *SuiteTest) SetupSuite() {
 
 	// initialize controller
 	t.c = &Controller{
-		DomainController{t.db, nil},
-		PoolController{t.db, nil},
-		DatacenterController{t.db, nil},
-		MemberController{t.db, nil},
-		MonitorController{t.db, nil},
-		ServiceController{t.db, nil},
-		QuotaController{t.db},
-		SyncController{nil},
+		Domains:     DomainController{t.db, nil},
+		Pools:       PoolController{t.db, nil},
+		Datacenters: DatacenterController{t.db, nil},
+		Members:     MemberController{t.db, nil},
+		Monitors:    MonitorController{t.db, nil},
+		Services:    ServiceController{t.db, nil},
+		Quotas:      QuotaController{t.db},
+		Sync:        SyncController{nil},
 	}
 
 	if err := migration.Migrate(t.dbUrl); err != nil {

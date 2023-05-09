@@ -8,6 +8,7 @@ import PanelManager from "./components/PanelManager"
 import DomainList from "./components/Domains/DomainList"
 import DatacenterList from "./components/Datacenters/DatacenterList";
 import PoolList from "./components/Pools/PoolList";
+import GeographicMapList from "./components/GeographicMaps/GeographicMapList";
 
 const AppContent = ({props}) => {
   const urlStateKey = useStore((state) => state.urlStateKey)
@@ -49,6 +50,7 @@ const AppContent = ({props}) => {
           <Tab>Domains</Tab>
           <Tab>Pools</Tab>
           <Tab>Datacenters</Tab>
+          <Tab>Geographic Maps</Tab>
         </TabList>
 
         <TabPanel>
@@ -74,6 +76,12 @@ const AppContent = ({props}) => {
         <TabPanel>
           <Container py>
             <DatacenterList />
+
+          </Container>
+        </TabPanel>
+        <TabPanel>
+          <Container py>
+            <GeographicMapList />
 
           </Container>
         </TabPanel>

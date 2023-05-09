@@ -36,6 +36,7 @@ import (
 	"github.com/sapcc/andromeda/restapi/operations/administrative"
 	"github.com/sapcc/andromeda/restapi/operations/datacenters"
 	"github.com/sapcc/andromeda/restapi/operations/domains"
+	"github.com/sapcc/andromeda/restapi/operations/geographic_maps"
 	"github.com/sapcc/andromeda/restapi/operations/members"
 	"github.com/sapcc/andromeda/restapi/operations/monitors"
 	"github.com/sapcc/andromeda/restapi/operations/pools"
@@ -69,6 +70,9 @@ func NewAndromedaAPI(spec *loads.Document) *AndromedaAPI {
 		DomainsDeleteDomainsDomainIDHandler: domains.DeleteDomainsDomainIDHandlerFunc(func(params domains.DeleteDomainsDomainIDParams) middleware.Responder {
 			return middleware.NotImplemented("operation domains.DeleteDomainsDomainID has not yet been implemented")
 		}),
+		GeographicMapsDeleteGeomapsGeomapIDHandler: geographic_maps.DeleteGeomapsGeomapIDHandlerFunc(func(params geographic_maps.DeleteGeomapsGeomapIDParams) middleware.Responder {
+			return middleware.NotImplemented("operation geographic_maps.DeleteGeomapsGeomapID has not yet been implemented")
+		}),
 		MembersDeleteMembersMemberIDHandler: members.DeleteMembersMemberIDHandlerFunc(func(params members.DeleteMembersMemberIDParams) middleware.Responder {
 			return middleware.NotImplemented("operation members.DeleteMembersMemberID has not yet been implemented")
 		}),
@@ -92,6 +96,12 @@ func NewAndromedaAPI(spec *loads.Document) *AndromedaAPI {
 		}),
 		DomainsGetDomainsDomainIDHandler: domains.GetDomainsDomainIDHandlerFunc(func(params domains.GetDomainsDomainIDParams) middleware.Responder {
 			return middleware.NotImplemented("operation domains.GetDomainsDomainID has not yet been implemented")
+		}),
+		GeographicMapsGetGeomapsHandler: geographic_maps.GetGeomapsHandlerFunc(func(params geographic_maps.GetGeomapsParams) middleware.Responder {
+			return middleware.NotImplemented("operation geographic_maps.GetGeomaps has not yet been implemented")
+		}),
+		GeographicMapsGetGeomapsGeomapIDHandler: geographic_maps.GetGeomapsGeomapIDHandlerFunc(func(params geographic_maps.GetGeomapsGeomapIDParams) middleware.Responder {
+			return middleware.NotImplemented("operation geographic_maps.GetGeomapsGeomapID has not yet been implemented")
 		}),
 		MembersGetMembersHandler: members.GetMembersHandlerFunc(func(params members.GetMembersParams) middleware.Responder {
 			return middleware.NotImplemented("operation members.GetMembers has not yet been implemented")
@@ -129,6 +139,9 @@ func NewAndromedaAPI(spec *loads.Document) *AndromedaAPI {
 		DomainsPostDomainsHandler: domains.PostDomainsHandlerFunc(func(params domains.PostDomainsParams) middleware.Responder {
 			return middleware.NotImplemented("operation domains.PostDomains has not yet been implemented")
 		}),
+		GeographicMapsPostGeomapsHandler: geographic_maps.PostGeomapsHandlerFunc(func(params geographic_maps.PostGeomapsParams) middleware.Responder {
+			return middleware.NotImplemented("operation geographic_maps.PostGeomaps has not yet been implemented")
+		}),
 		MembersPostMembersHandler: members.PostMembersHandlerFunc(func(params members.PostMembersParams) middleware.Responder {
 			return middleware.NotImplemented("operation members.PostMembers has not yet been implemented")
 		}),
@@ -146,6 +159,9 @@ func NewAndromedaAPI(spec *loads.Document) *AndromedaAPI {
 		}),
 		DomainsPutDomainsDomainIDHandler: domains.PutDomainsDomainIDHandlerFunc(func(params domains.PutDomainsDomainIDParams) middleware.Responder {
 			return middleware.NotImplemented("operation domains.PutDomainsDomainID has not yet been implemented")
+		}),
+		GeographicMapsPutGeomapsGeomapIDHandler: geographic_maps.PutGeomapsGeomapIDHandlerFunc(func(params geographic_maps.PutGeomapsGeomapIDParams) middleware.Responder {
+			return middleware.NotImplemented("operation geographic_maps.PutGeomapsGeomapID has not yet been implemented")
 		}),
 		MembersPutMembersMemberIDHandler: members.PutMembersMemberIDHandlerFunc(func(params members.PutMembersMemberIDParams) middleware.Responder {
 			return middleware.NotImplemented("operation members.PutMembersMemberID has not yet been implemented")
@@ -199,6 +215,8 @@ type AndromedaAPI struct {
 	DatacentersDeleteDatacentersDatacenterIDHandler datacenters.DeleteDatacentersDatacenterIDHandler
 	// DomainsDeleteDomainsDomainIDHandler sets the operation handler for the delete domains domain ID operation
 	DomainsDeleteDomainsDomainIDHandler domains.DeleteDomainsDomainIDHandler
+	// GeographicMapsDeleteGeomapsGeomapIDHandler sets the operation handler for the delete geomaps geomap ID operation
+	GeographicMapsDeleteGeomapsGeomapIDHandler geographic_maps.DeleteGeomapsGeomapIDHandler
 	// MembersDeleteMembersMemberIDHandler sets the operation handler for the delete members member ID operation
 	MembersDeleteMembersMemberIDHandler members.DeleteMembersMemberIDHandler
 	// MonitorsDeleteMonitorsMonitorIDHandler sets the operation handler for the delete monitors monitor ID operation
@@ -215,6 +233,10 @@ type AndromedaAPI struct {
 	DomainsGetDomainsHandler domains.GetDomainsHandler
 	// DomainsGetDomainsDomainIDHandler sets the operation handler for the get domains domain ID operation
 	DomainsGetDomainsDomainIDHandler domains.GetDomainsDomainIDHandler
+	// GeographicMapsGetGeomapsHandler sets the operation handler for the get geomaps operation
+	GeographicMapsGetGeomapsHandler geographic_maps.GetGeomapsHandler
+	// GeographicMapsGetGeomapsGeomapIDHandler sets the operation handler for the get geomaps geomap ID operation
+	GeographicMapsGetGeomapsGeomapIDHandler geographic_maps.GetGeomapsGeomapIDHandler
 	// MembersGetMembersHandler sets the operation handler for the get members operation
 	MembersGetMembersHandler members.GetMembersHandler
 	// MembersGetMembersMemberIDHandler sets the operation handler for the get members member ID operation
@@ -239,6 +261,8 @@ type AndromedaAPI struct {
 	DatacentersPostDatacentersHandler datacenters.PostDatacentersHandler
 	// DomainsPostDomainsHandler sets the operation handler for the post domains operation
 	DomainsPostDomainsHandler domains.PostDomainsHandler
+	// GeographicMapsPostGeomapsHandler sets the operation handler for the post geomaps operation
+	GeographicMapsPostGeomapsHandler geographic_maps.PostGeomapsHandler
 	// MembersPostMembersHandler sets the operation handler for the post members operation
 	MembersPostMembersHandler members.PostMembersHandler
 	// MonitorsPostMonitorsHandler sets the operation handler for the post monitors operation
@@ -251,6 +275,8 @@ type AndromedaAPI struct {
 	DatacentersPutDatacentersDatacenterIDHandler datacenters.PutDatacentersDatacenterIDHandler
 	// DomainsPutDomainsDomainIDHandler sets the operation handler for the put domains domain ID operation
 	DomainsPutDomainsDomainIDHandler domains.PutDomainsDomainIDHandler
+	// GeographicMapsPutGeomapsGeomapIDHandler sets the operation handler for the put geomaps geomap ID operation
+	GeographicMapsPutGeomapsGeomapIDHandler geographic_maps.PutGeomapsGeomapIDHandler
 	// MembersPutMembersMemberIDHandler sets the operation handler for the put members member ID operation
 	MembersPutMembersMemberIDHandler members.PutMembersMemberIDHandler
 	// MonitorsPutMonitorsMonitorIDHandler sets the operation handler for the put monitors monitor ID operation
@@ -342,6 +368,9 @@ func (o *AndromedaAPI) Validate() error {
 	if o.DomainsDeleteDomainsDomainIDHandler == nil {
 		unregistered = append(unregistered, "domains.DeleteDomainsDomainIDHandler")
 	}
+	if o.GeographicMapsDeleteGeomapsGeomapIDHandler == nil {
+		unregistered = append(unregistered, "geographic_maps.DeleteGeomapsGeomapIDHandler")
+	}
 	if o.MembersDeleteMembersMemberIDHandler == nil {
 		unregistered = append(unregistered, "members.DeleteMembersMemberIDHandler")
 	}
@@ -365,6 +394,12 @@ func (o *AndromedaAPI) Validate() error {
 	}
 	if o.DomainsGetDomainsDomainIDHandler == nil {
 		unregistered = append(unregistered, "domains.GetDomainsDomainIDHandler")
+	}
+	if o.GeographicMapsGetGeomapsHandler == nil {
+		unregistered = append(unregistered, "geographic_maps.GetGeomapsHandler")
+	}
+	if o.GeographicMapsGetGeomapsGeomapIDHandler == nil {
+		unregistered = append(unregistered, "geographic_maps.GetGeomapsGeomapIDHandler")
 	}
 	if o.MembersGetMembersHandler == nil {
 		unregistered = append(unregistered, "members.GetMembersHandler")
@@ -402,6 +437,9 @@ func (o *AndromedaAPI) Validate() error {
 	if o.DomainsPostDomainsHandler == nil {
 		unregistered = append(unregistered, "domains.PostDomainsHandler")
 	}
+	if o.GeographicMapsPostGeomapsHandler == nil {
+		unregistered = append(unregistered, "geographic_maps.PostGeomapsHandler")
+	}
 	if o.MembersPostMembersHandler == nil {
 		unregistered = append(unregistered, "members.PostMembersHandler")
 	}
@@ -419,6 +457,9 @@ func (o *AndromedaAPI) Validate() error {
 	}
 	if o.DomainsPutDomainsDomainIDHandler == nil {
 		unregistered = append(unregistered, "domains.PutDomainsDomainIDHandler")
+	}
+	if o.GeographicMapsPutGeomapsGeomapIDHandler == nil {
+		unregistered = append(unregistered, "geographic_maps.PutGeomapsGeomapIDHandler")
 	}
 	if o.MembersPutMembersMemberIDHandler == nil {
 		unregistered = append(unregistered, "members.PutMembersMemberIDHandler")
@@ -531,6 +572,10 @@ func (o *AndromedaAPI) initHandlerCache() {
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
+	o.handlers["DELETE"]["/geomaps/{geomap_id}"] = geographic_maps.NewDeleteGeomapsGeomapID(o.context, o.GeographicMapsDeleteGeomapsGeomapIDHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
 	o.handlers["DELETE"]["/members/{member_id}"] = members.NewDeleteMembersMemberID(o.context, o.MembersDeleteMembersMemberIDHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
@@ -560,6 +605,14 @@ func (o *AndromedaAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/domains/{domain_id}"] = domains.NewGetDomainsDomainID(o.context, o.DomainsGetDomainsDomainIDHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/geomaps"] = geographic_maps.NewGetGeomaps(o.context, o.GeographicMapsGetGeomapsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/geomaps/{geomap_id}"] = geographic_maps.NewGetGeomapsGeomapID(o.context, o.GeographicMapsGetGeomapsGeomapIDHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -611,6 +664,10 @@ func (o *AndromedaAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
+	o.handlers["POST"]["/geomaps"] = geographic_maps.NewPostGeomaps(o.context, o.GeographicMapsPostGeomapsHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
 	o.handlers["POST"]["/members"] = members.NewPostMembers(o.context, o.MembersPostMembersHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
@@ -632,6 +689,10 @@ func (o *AndromedaAPI) initHandlerCache() {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}
 	o.handlers["PUT"]["/domains/{domain_id}"] = domains.NewPutDomainsDomainID(o.context, o.DomainsPutDomainsDomainIDHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/geomaps/{geomap_id}"] = geographic_maps.NewPutGeomapsGeomapID(o.context, o.GeographicMapsPutGeomapsGeomapIDHandler)
 	if o.handlers["PUT"] == nil {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}

@@ -16,7 +16,7 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {fetchItem, updateAttributes, updateItem} from "../../actions"
 import {Error, Loading} from "../Components";
 
-const EditDatacenterPanel = ({closeCallback}) => {
+const EditGeographicMapPanel = ({closeCallback}) => {
     const urlStateKey = useStore((state) => state.urlStateKey)
     const auth = authStore((state) => state.auth)
     const urlState = currentState(urlStateKey)
@@ -24,14 +24,7 @@ const EditDatacenterPanel = ({closeCallback}) => {
     const [error, setError] = useState()
     const [formState, setFormState] = useState({
         name: undefined,
-        admin_state_up: true,
-        continent: undefined,
-        country: undefined,
-        state_or_province: undefined,
-        city: undefined,
-        longitude: undefined,
-        latitude: undefined,
-        provider: undefined,
+        default_datacenter: undefined,
     })
 
     const {isLoading} = useQuery(
@@ -164,4 +157,4 @@ const EditDatacenterPanel = ({closeCallback}) => {
     )
 }
 
-export default EditDatacenterPanel
+export default EditGeographicMapPanel

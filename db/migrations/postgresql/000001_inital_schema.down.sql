@@ -18,6 +18,10 @@ DROP TABLE IF EXISTS agent;
 
 DROP TABLE IF EXISTS quota;
 
+DROP TABLE IF EXISTS geographic_map_assignment;
+
+DROP TABLE IF EXISTS geographic_map;
+
 DROP TABLE IF EXISTS monitor;
 
 DROP TABLE IF EXISTS member;

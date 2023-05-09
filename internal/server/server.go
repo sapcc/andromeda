@@ -40,6 +40,7 @@ import (
 	"github.com/sapcc/andromeda/restapi/operations/administrative"
 	"github.com/sapcc/andromeda/restapi/operations/datacenters"
 	"github.com/sapcc/andromeda/restapi/operations/domains"
+	"github.com/sapcc/andromeda/restapi/operations/geographic_maps"
 	"github.com/sapcc/andromeda/restapi/operations/members"
 	"github.com/sapcc/andromeda/restapi/operations/monitors"
 	"github.com/sapcc/andromeda/restapi/operations/pools"
@@ -108,6 +109,13 @@ func ExecuteServer(server *restapi.Server) error {
 	api.DatacentersGetDatacentersDatacenterIDHandler = datacenters.GetDatacentersDatacenterIDHandlerFunc(c.Datacenters.GetDatacentersDatacenterID)
 	api.DatacentersPutDatacentersDatacenterIDHandler = datacenters.PutDatacentersDatacenterIDHandlerFunc(c.Datacenters.PutDatacentersDatacenterID)
 	api.DatacentersDeleteDatacentersDatacenterIDHandler = datacenters.DeleteDatacentersDatacenterIDHandlerFunc(c.Datacenters.DeleteDatacentersDatacenterID)
+
+	// Geographic Maps
+	api.GeographicMapsGetGeomapsHandler = geographic_maps.GetGeomapsHandlerFunc(c.GeoMaps.GetGeomaps)
+	api.GeographicMapsPostGeomapsHandler = geographic_maps.PostGeomapsHandlerFunc(c.GeoMaps.PostGeomaps)
+	api.GeographicMapsGetGeomapsGeomapIDHandler = geographic_maps.GetGeomapsGeomapIDHandlerFunc(c.GeoMaps.GetGeomapsGeoMapID)
+	api.GeographicMapsPutGeomapsGeomapIDHandler = geographic_maps.PutGeomapsGeomapIDHandlerFunc(c.GeoMaps.PutGeomapsGeoMapID)
+	api.GeographicMapsDeleteGeomapsGeomapIDHandler = geographic_maps.DeleteGeomapsGeomapIDHandlerFunc(c.GeoMaps.DeleteGeomapsGeoMapID)
 
 	// Monitors
 	api.MonitorsGetMonitorsHandler = monitors.GetMonitorsHandlerFunc(c.Monitors.GetMonitors)

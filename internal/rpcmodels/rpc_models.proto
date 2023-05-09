@@ -36,6 +36,17 @@ message Datacenter {
   int32 meta = 12;
 }
 
+message GeomapAssignment {
+  string country = 1;
+  Datacenter datacenter = 2;
+}
+
+message Geomap {
+  string id = 1;
+  Datacenter default_datacenter = 2;
+  repeated GeomapAssignment assignment = 3;
+}
+
 message Member {
   string id = 1;
   bool admin_state_up = 2;
@@ -59,6 +70,8 @@ message Monitor {
     ICMP = 2;
     TCP = 3;
     UDP = 4;
+    POP = 5;
+    SMTP = 7;
   }
   MonitorType type = 8;
   string provisioning_status = 9;

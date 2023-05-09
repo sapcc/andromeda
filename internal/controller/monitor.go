@@ -23,8 +23,8 @@ import (
 
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-sql-driver/mysql"
-	"github.com/jackc/pgconn"
 	"github.com/jackc/pgerrcode"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
 	"go-micro.dev/v4"
 

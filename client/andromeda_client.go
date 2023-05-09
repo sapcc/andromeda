@@ -27,6 +27,7 @@ import (
 	"github.com/sapcc/andromeda/client/administrative"
 	"github.com/sapcc/andromeda/client/datacenters"
 	"github.com/sapcc/andromeda/client/domains"
+	"github.com/sapcc/andromeda/client/geographic_maps"
 	"github.com/sapcc/andromeda/client/members"
 	"github.com/sapcc/andromeda/client/monitors"
 	"github.com/sapcc/andromeda/client/pools"
@@ -77,6 +78,7 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Andromeda 
 	cli.Administrative = administrative.New(transport, formats)
 	cli.Datacenters = datacenters.New(transport, formats)
 	cli.Domains = domains.New(transport, formats)
+	cli.GeographicMaps = geographic_maps.New(transport, formats)
 	cli.Members = members.New(transport, formats)
 	cli.Monitors = monitors.New(transport, formats)
 	cli.Pools = pools.New(transport, formats)
@@ -130,6 +132,8 @@ type Andromeda struct {
 
 	Domains domains.ClientService
 
+	GeographicMaps geographic_maps.ClientService
+
 	Members members.ClientService
 
 	Monitors monitors.ClientService
@@ -145,6 +149,7 @@ func (c *Andromeda) SetTransport(transport runtime.ClientTransport) {
 	c.Administrative.SetTransport(transport)
 	c.Datacenters.SetTransport(transport)
 	c.Domains.SetTransport(transport)
+	c.GeographicMaps.SetTransport(transport)
 	c.Members.SetTransport(transport)
 	c.Monitors.SetTransport(transport)
 	c.Pools.SetTransport(transport)
