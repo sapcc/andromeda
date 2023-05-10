@@ -3,8 +3,8 @@ import React, {useMemo, useState} from "react";
 import {
     Badge, Box,
     Button,
-    Icon,
-    Message,
+    Icon, JsonViewer,
+    Message, Modal,
     Spinner,
     Stack, Switch, Toast,
     Tooltip,
@@ -186,6 +186,10 @@ export const HeaderUser = ({ auth, logout, theme, setTheme }) => {
     )
 }
 
-/*
-
- */
+export const JsonModal = (data) => {
+    return (
+        <Modal size="large" open >
+            <JsonViewer data={data} toolbar />
+        </Modal>
+    )
+}

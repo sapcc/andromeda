@@ -1,16 +1,19 @@
-import React, {useMemo} from "react"
+import React, {useMemo, useState} from "react"
 import {DataGridCell, DataGridRow, Icon, Stack} from "juno-ui-components"
 import {authStore, useStore} from "../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {currentState, push} from "url-state-provider"
 import {deleteItem} from "../../actions"
 import {DateTime} from "luxon";
-import {ListItemSpinner, ListItemStatus} from "../Components";
+import {JsonModal, ListItemSpinner, ListItemStatus} from "../Components";
+import {ContextMenu} from "juno-ui-components/build/ContextMenu";
+import {MenuItem} from "juno-ui-components/build/MenuItem";
 
 const GeographicMapListItem = ({geomap, setError}) => {
     const urlStateKey = useStore((state) => state.urlStateKey)
     const auth = authStore((state) => state.auth)
     const queryClient = useQueryClient()
+    const [showJson, setShowJson] = useState(false)
     const createdAt = useMemo(() => {
         if (geomap.created_at) {
             return DateTime.fromISO(geomap.created_at).toLocaleString(
@@ -69,6 +72,7 @@ const GeographicMapListItem = ({geomap, setError}) => {
     }
 
     return (
+        <>
         <DataGridRow>
             <DataGridCell>
                 <ListItemSpinner data={geomap} />
@@ -80,7 +84,7 @@ const GeographicMapListItem = ({geomap, setError}) => {
             <DataGridCell>
                 <ListItemStatus data={geomap} />
             </DataGridCell>
-            <DataGridCell>
+            <DataGridCell className="jn-items-end">
                 <Stack gap="1.5">
                     {geomap.project_id === auth?.project?.id && (
                         <>
@@ -96,17 +100,25 @@ const GeographicMapListItem = ({geomap, setError}) => {
                                 className="leading-none"
                                 onClick={handleEditGeographicMapClick}
                             />*/}
-                            <Icon
-                                icon="deleteForever"
-                                size="18"
-                                className="leading-none"
-                                onClick={handleDeleteGeographicMapClick}
-                            />
+                            <ContextMenu>
+                                <MenuItem
+                                    icon="deleteForever"
+                                    label="Delete"
+                                    onClick={handleDeleteGeographicMapClick}
+                                />
+                                <MenuItem
+                                    icon="info"
+                                    label="JSON"
+                                    onClick={() => setShowJson(!showJson)}
+                                />
+                            </ContextMenu>
                         </>
                     )}
                 </Stack>
             </DataGridCell>
         </DataGridRow>
+        {showJson && JsonModal(geomap)}
+        </>
     )
 }
 

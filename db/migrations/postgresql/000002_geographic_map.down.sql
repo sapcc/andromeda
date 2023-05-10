@@ -1,5 +1,5 @@
 /*
- *   Copyright 2020 SAP SE
+ *   Copyright 2023 SAP SE
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -14,18 +14,6 @@
  *   limitations under the License.
  */
 
-DROP TABLE IF EXISTS agent;
+DROP TABLE IF EXISTS geographic_map_assignment;
 
-DROP TABLE IF EXISTS quota;
-
-DROP TABLE IF EXISTS monitor;
-
-DROP TABLE IF EXISTS member;
-
-DROP TABLE IF EXISTS datacenter;
-
-DROP TABLE IF EXISTS domain_pool_relation;
-
-DROP TABLE IF EXISTS pool;
-
-DROP TABLE IF EXISTS domain;
+DROP TABLE IF EXISTS geographic_map;
