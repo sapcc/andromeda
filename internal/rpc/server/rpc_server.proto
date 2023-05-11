@@ -10,6 +10,7 @@ service RPCServer {
   rpc GetMonitors(SearchRequest) returns (MonitorsResponse);
   rpc GetDatacenters(SearchRequest) returns (DatacentersResponse);
   rpc GetMembers(SearchRequest) returns (MembersResponse);
+  rpc GetGeomaps(SearchRequest) returns (GeomapsResponse);
   rpc UpdateDatacenterMeta(DatacenterMetaRequest) returns (Datacenter);
 }
 
@@ -42,6 +43,10 @@ message MembersResponse {
   repeated Member response = 1;
 }
 
+message GeomapsResponse {
+  repeated Geomap response = 1;
+}
+
 message ProvisioningStatusRequest {
   repeated ProvisioningStatus provisioning_status = 1;
   message ProvisioningStatus {
@@ -52,6 +57,7 @@ message ProvisioningStatusRequest {
       MEMBER = 2;
       MONITOR = 3;
       DATACENTER = 4;
+      GEOGRAPHIC_MAP = 5;
     }
     Model model = 2;
     enum StatusType {

@@ -37,13 +37,13 @@ message Datacenter {
 }
 
 message GeomapAssignment {
-  string country = 1;
-  Datacenter datacenter = 2;
+  string datacenter = 1;
+  repeated string countries = 2;
 }
 
 message Geomap {
   string id = 1;
-  Datacenter default_datacenter = 2;
+  string default_datacenter = 2;
   repeated GeomapAssignment assignment = 3;
 }
 

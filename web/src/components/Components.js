@@ -1,17 +1,19 @@
 import React, {useMemo, useState} from "react";
 
 import {
-    Badge, Box,
+    Badge,
     Button,
-    Icon, JsonViewer,
-    Message, Modal,
+    Icon,
+    JsonViewer,
+    Message,
+    Modal,
     Spinner,
-    Stack, Switch, Toast,
+    Stack,
+    Toast,
     Tooltip,
     TooltipContent,
     TooltipTrigger
 } from "juno-ui-components";
-import {useStore} from "../store";
 
 export const Error = ({error}) => {
     if (error) {
@@ -65,38 +67,36 @@ export async function copyTextToClipboard(text) {
     }
 }
 
-export const ListItemSpinner = ({data, onClick, className, maxLength=10}) => {
-    const id = data.name || data.id
+export const ListItemSpinner = ({data, onClick, className, maxLength=15}) => {
+    const name = data.name || data.id
     const [showToast, setToast] = useState(false)
 
     return (
         <Stack
             alignment="center"
             className={`${className} ${backgroundClass(data.provisioning_status)} jn-font-bold`}
-            onClick={onClick}>
+            onClick={onClick}
+            gap="1.5"
+        >
             {["ACTIVE", "DELETED", "ERROR"].includes(data.provisioning_status) || <Spinner
                 variant={variantClass(data.provisioning_status)} size="small"/>}
-            {id.length > maxLength ? (
                 <Tooltip triggerEvent="hover">
                     <TooltipTrigger asChild>
-                        {id.substring(0, maxLength)}...
+                        {name.substring(0, maxLength)}{name > maxLength && "..."}
                     </TooltipTrigger>
-                    <TooltipContent>{id}</TooltipContent>
+                    <TooltipContent>{data.id}</TooltipContent>
                 </Tooltip>
-                ) : id}
-            {(!data.name) && (
-                <div>
-                    {showToast && <Toast text="Copied!" className="absolute"/>}
-                    <Icon size="16" icon="contentCopy" onClick={() => {
-                        copyTextToClipboard(id).then(() => {
-                            setToast(true)
-                        setTimeout(function () { //Start the timer
-                            setToast(false)
-                        }.bind(this), 1000)
-                    })
-                    }} />
-                </div>
-            )}
+            <div>
+                {showToast && <Toast text="ID copied to clipboard" className="absolute"/>}
+                <Icon size="16" icon="contentCopy" onClick={() => {
+                    copyTextToClipboard(data.id).then(() => {
+                        setToast(true)
+                    setTimeout(function () { //Start the timer
+                        setToast(false)
+                    }.bind(this), 1000)
+                })
+                }} />
+            </div>
         </Stack>
     )
 }

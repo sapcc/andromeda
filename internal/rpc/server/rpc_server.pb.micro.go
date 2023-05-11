@@ -44,6 +44,7 @@ type RPCServerService interface {
 	GetMonitors(ctx context.Context, in *SearchRequest, opts ...client.CallOption) (*MonitorsResponse, error)
 	GetDatacenters(ctx context.Context, in *SearchRequest, opts ...client.CallOption) (*DatacentersResponse, error)
 	GetMembers(ctx context.Context, in *SearchRequest, opts ...client.CallOption) (*MembersResponse, error)
+	GetGeomaps(ctx context.Context, in *SearchRequest, opts ...client.CallOption) (*GeomapsResponse, error)
 	UpdateDatacenterMeta(ctx context.Context, in *DatacenterMetaRequest, opts ...client.CallOption) (*rpcmodels.Datacenter, error)
 }
 
@@ -129,6 +130,16 @@ func (c *rPCServerService) GetMembers(ctx context.Context, in *SearchRequest, op
 	return out, nil
 }
 
+func (c *rPCServerService) GetGeomaps(ctx context.Context, in *SearchRequest, opts ...client.CallOption) (*GeomapsResponse, error) {
+	req := c.c.NewRequest(c.name, "RPCServer.GetGeomaps", in)
+	out := new(GeomapsResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *rPCServerService) UpdateDatacenterMeta(ctx context.Context, in *DatacenterMetaRequest, opts ...client.CallOption) (*rpcmodels.Datacenter, error) {
 	req := c.c.NewRequest(c.name, "RPCServer.UpdateDatacenterMeta", in)
 	out := new(rpcmodels.Datacenter)
@@ -149,6 +160,7 @@ type RPCServerHandler interface {
 	GetMonitors(context.Context, *SearchRequest, *MonitorsResponse) error
 	GetDatacenters(context.Context, *SearchRequest, *DatacentersResponse) error
 	GetMembers(context.Context, *SearchRequest, *MembersResponse) error
+	GetGeomaps(context.Context, *SearchRequest, *GeomapsResponse) error
 	UpdateDatacenterMeta(context.Context, *DatacenterMetaRequest, *rpcmodels.Datacenter) error
 }
 
@@ -161,6 +173,7 @@ func RegisterRPCServerHandler(s server.Server, hdlr RPCServerHandler, opts ...se
 		GetMonitors(ctx context.Context, in *SearchRequest, out *MonitorsResponse) error
 		GetDatacenters(ctx context.Context, in *SearchRequest, out *DatacentersResponse) error
 		GetMembers(ctx context.Context, in *SearchRequest, out *MembersResponse) error
+		GetGeomaps(ctx context.Context, in *SearchRequest, out *GeomapsResponse) error
 		UpdateDatacenterMeta(ctx context.Context, in *DatacenterMetaRequest, out *rpcmodels.Datacenter) error
 	}
 	type RPCServer struct {
@@ -200,6 +213,10 @@ func (h *rPCServerHandler) GetDatacenters(ctx context.Context, in *SearchRequest
 
 func (h *rPCServerHandler) GetMembers(ctx context.Context, in *SearchRequest, out *MembersResponse) error {
 	return h.RPCServerHandler.GetMembers(ctx, in, out)
+}
+
+func (h *rPCServerHandler) GetGeomaps(ctx context.Context, in *SearchRequest, out *GeomapsResponse) error {
+	return h.RPCServerHandler.GetGeomaps(ctx, in, out)
 }
 
 func (h *rPCServerHandler) UpdateDatacenterMeta(ctx context.Context, in *DatacenterMetaRequest, out *rpcmodels.Datacenter) error {

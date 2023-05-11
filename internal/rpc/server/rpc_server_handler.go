@@ -134,6 +134,76 @@ func (u *RPCHandler) GetDatacenters(ctx context.Context, request *SearchRequest,
 	return nil
 }
 
+func (u *RPCHandler) GetGeomaps(ctx context.Context, request *SearchRequest, response *GeomapsResponse) error {
+	/*
+		SELECT
+		    id, scope, provider, default_datacenter, provisioning_status
+		FROM geographic_map
+		WHERE
+		    provider = 'akamai' AND provisioning_status LIKE 'PENDING%'
+	*/
+
+	q := sq.
+		Select("id", "default_datacenter").
+		From("geographic_map").
+		Where("provider = ?", request.Provider)
+
+	if request.Pending {
+		q = q.Where("provisioning_status LIKE 'PENDING%'")
+	}
+	if request.Ids != nil {
+		q = q.Where(sq.Eq{"id": request.Ids})
+	}
+
+	if err := db.TxExecute(u.DB, func(tx *sqlx.Tx) error {
+		sql, args := q.MustSql()
+		rows, err := tx.Queryx(tx.Rebind(sql), args...)
+		if err != nil {
+			return err
+		}
+		for rows.Next() {
+			var geomap rpcmodels.Geomap
+			if err := rows.StructScan(&geomap); err != nil {
+				return err
+			}
+			response.Response = append(response.Response, &geomap)
+		}
+
+		for _, geomap := range response.Response {
+			var aggregate = "string_agg(country, ',') AS countries"
+			if u.DB.DriverName() == "mysql" {
+				aggregate = "GROUP_CONCAT(country) AS countries"
+			}
+
+			// Populate assignments
+			sql, args := sq.Select("datacenter", aggregate).
+				From("geographic_map_assignment").
+				Where("geographic_map_id = ?", geomap.Id).
+				GroupBy("datacenter").
+				MustSql()
+			rows, err := tx.Queryx(tx.Rebind(sql), args...)
+			if err != nil {
+				return err
+			}
+			for rows.Next() {
+				var datacenter, countries string
+				if err := rows.Scan(&datacenter, &countries); err != nil {
+					return err
+				}
+				geomap.Assignment = append(geomap.Assignment, &rpcmodels.GeomapAssignment{
+					Datacenter: datacenter,
+					Countries:  strings.Split(countries, ","),
+				})
+			}
+		}
+		return nil
+	}); err != nil {
+		logger.Error(err)
+		return err
+	}
+	return nil
+}
+
 func (u *RPCHandler) GetMonitors(ctx context.Context, request *SearchRequest, response *MonitorsResponse) error {
 	panic("Todo")
 }

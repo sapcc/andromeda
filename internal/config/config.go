@@ -168,9 +168,12 @@ type Quota struct {
 }
 
 type Default struct {
-	Host         string `long:"hostname" ini-name:"host" description:"Hostname used by the server/agent. Defaults to auto-discovery."`
-	ApiBaseURL   string `json:"api_base_uri" description:"Base URI for the API for use in pagination links. This will be autodetected from the request if not overridden here."`
-	TransportURL string `json:"transport_url" description:"The network address and optional user credentials for connecting to the messaging backend."`
+	Host             string `long:"hostname" ini-name:"host" description:"Hostname used by the server/agent. Defaults to auto-discovery."`
+	ApiBaseURL       string `json:"api_base_uri" description:"Base URI for the API for use in pagination links. This will be autodetected from the request if not overridden here."`
+	TransportURL     string `json:"transport_url" description:"The network address and optional user credentials for connecting to the messaging backend."`
+	Prometheus       bool   `long:"prometheus" description:"Enable prometheus exporter."`
+	PrometheusListen string `long:"prometheus-listen" ini-name:"prometheus_listen" default:"127.0.0.1:9090" description:"Prometheus listen TCP network address."`
+	SentryDSN        string `long:"sentry-dsn" ini-name:"sentry_dsn" description:"Sentry Data Source Name."`
 }
 
 type Database struct {

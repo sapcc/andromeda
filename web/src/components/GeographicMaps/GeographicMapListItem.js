@@ -91,13 +91,13 @@ const GeographicMapListItem = ({geomap, setError}) => {
                             <Icon
                                 icon="openInNew"
                                 size="18"
-                                className="leading-none"
+                                className="leading-none self-center"
                                 onClick={handleShowGeographicMapClick}
                             />
                             {/*<Icon
                                 icon="edit"
                                 size="18"
-                                className="leading-none"
+                                className="leading-none self-center"
                                 onClick={handleEditGeographicMapClick}
                             />*/}
                             <ContextMenu>

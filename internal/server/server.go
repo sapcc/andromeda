@@ -17,18 +17,23 @@
 package server
 
 import (
+	"net/http"
 	"os"
 	"time"
 
+	"github.com/dlmiddlecote/sqlstats"
+	"github.com/getsentry/sentry-go"
 	"github.com/go-openapi/loads"
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/iancoleman/strcase"
-	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/sapcc/go-bits/logg"
 	"github.com/xo/dburl"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/logger"
 
+	_ "github.com/sapcc/andromeda/db/plugins"
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/controller"
 	"github.com/sapcc/andromeda/internal/policy"
@@ -67,6 +72,18 @@ func ExecuteServer(server *restapi.Server) error {
 	}
 	db := sqlx.MustConnect(u.Driver, u.DSN)
 
+	if config.Global.Default.SentryDSN != "" {
+		if err := sentry.Init(sentry.ClientOptions{
+			Dsn:              config.Global.Default.SentryDSN,
+			AttachStacktrace: true,
+			Release:          "TODO Version",
+		}); err != nil {
+			logg.Fatal("Sentry initialization failed: %v", err)
+		}
+
+		logg.Info("Sentry is enabled")
+	}
+
 	// Mapper function for SQL name mapping, snake_case table names
 	db.MapperFunc(strcase.ToSnake)
 
@@ -81,6 +98,18 @@ func ExecuteServer(server *restapi.Server) error {
 
 	// Logger
 	api.Logger = logger.Infof
+
+	// Prometheus Metrics
+	if config.Global.Default.Prometheus {
+		http.Handle("/metrics", promhttp.Handler())
+		go PrometheusServer()
+
+		// Create a new collector, the name will be used as a label on the metrics
+		collector := sqlstats.NewStatsCollector("db_name", db)
+
+		// Register it with Prometheus
+		prometheus.MustRegister(collector)
+	}
 
 	// Domains
 	api.DomainsGetDomainsHandler = domains.GetDomainsHandlerFunc(c.Domains.GetDomains)
@@ -193,5 +222,12 @@ func RPCServer(db *sqlx.DB) {
 
 	if err := service.Run(); err != nil {
 		logger.Fatal(err)
+	}
+}
+
+func PrometheusServer() {
+	logg.Info("Serving prometheus metrics at http://%s/metrics", config.Global.Default.PrometheusListen)
+	if err := http.ListenAndServe(config.Global.Default.PrometheusListen, nil); err != nil {
+		logg.Fatal(err.Error())
 	}
 }

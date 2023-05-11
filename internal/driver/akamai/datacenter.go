@@ -18,36 +18,59 @@ package akamai
 
 import (
 	"context"
-	"fmt"
+	"time"
 
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v5/pkg/gtm"
 	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/config"
+	"github.com/sapcc/andromeda/internal/driver"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
 )
 
-func (s *AkamaiAgent) GetDatacenter(datacenterID string) (*rpcmodels.Datacenter, error) {
+func (s *AkamaiAgent) GetDatacenterReference(datacenterUUID string, datacenters []*rpcmodels.Datacenter) (int, error) {
+	// Fetch from cache
+	if id, ok := s.datacenterIdCache.Get(datacenterUUID); ok {
+		return id, nil
+	}
+
+	if datacenters == nil {
+		var err error
+		if datacenters, err = s.GetDatacenters([]string{datacenterUUID}); err != nil {
+			return 0, err
+		}
+	}
+
+	var aDatacenter *rpcmodels.Datacenter
+	for _, datacenter := range datacenters {
+		if datacenter.GetId() == datacenterUUID {
+			aDatacenter = datacenter
+			break
+		}
+	}
+
+	// DatacenterId is a unique number for an akamai datacenter
+	s.datacenterIdCache.Add(datacenterUUID, int(aDatacenter.GetMeta()))
+	return int(aDatacenter.GetMeta()), nil
+}
+
+func (s *AkamaiAgent) GetDatacenters(datacenterIDs []string) ([]*rpcmodels.Datacenter, error) {
 	response, err := s.rpc.GetDatacenters(context.Background(), &server.SearchRequest{
-		Provider:      "akamai",
-		PageNumber:    0,
-		ResultPerPage: 1,
-		Ids:           []string{datacenterID},
+		Provider:       "akamai",
+		PageNumber:     0,
+		ResultPerPage:  1,
+		FullyPopulated: true,
+		Ids:            datacenterIDs,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	res := response.GetResponse()
-	if len(res) != 1 {
-		return nil, fmt.Errorf("Failed fetching datacenter '%s': len(res) = %d != 1", datacenterID,
-			len(res))
-	}
-	return res[0], nil
+	return response.GetResponse(), nil
 }
 
-func (s *AkamaiAgent) fetchOrCreateDatacenter(datacenter *rpcmodels.Datacenter) (*gtm.Datacenter, error) {
+func (s *AkamaiAgent) uploadDatacenter(datacenter *rpcmodels.Datacenter) (*gtm.Datacenter, error) {
 	datacenters, err := s.gtm.ListDatacenters(context.Background(), config.Global.AkamaiConfig.Domain)
 	if err != nil {
 		return nil, err
@@ -82,6 +105,38 @@ func (s *AkamaiAgent) fetchOrCreateDatacenter(datacenter *rpcmodels.Datacenter) 
 	return res.Resource, nil
 }
 
+func (s *AkamaiAgent) FetchAndSyncDatacenters(datacenters []string) error {
+	logger.Debugf("Running FetchAndSyncDatacenters()")
+
+	res, err := s.GetDatacenters(datacenters)
+	if err != nil {
+		return err
+	}
+	for _, datacenter := range res {
+		if _, err = s.SyncDatacenter(datacenter, false); err != nil {
+			return err
+		}
+
+		// Wait for status propagation
+		var status string
+		for ok := true; ok; ok = status == "PENDING" {
+			time.Sleep(5 * time.Second)
+			status, err = s.syncProvisioningStatus(nil)
+			if err != nil {
+				return err
+			}
+		}
+
+		if status == "COMPLETE" {
+			driver.UpdateProvisioningStatus(s.rpc,
+				[]*server.ProvisioningStatusRequest_ProvisioningStatus{
+					driver.GetProvisioningStatusRequest(datacenter.Id, "DATACENTER", "ACTIVE"),
+				})
+		}
+	}
+	return nil
+}
+
 func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force bool) (*rpcmodels.Datacenter, error) {
 	logger.Debugf("SyncDatacenter('%s')", datacenter.Id)
 
@@ -93,7 +148,7 @@ func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force boo
 		return datacenter, nil
 	}
 
-	backendDatacenter, err := s.fetchOrCreateDatacenter(datacenter)
+	backendDatacenter, err := s.uploadDatacenter(datacenter)
 	if err != nil {
 		return nil, err
 	}

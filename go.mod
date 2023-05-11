@@ -10,7 +10,9 @@ require (
 	github.com/akamai/AkamaiOPEN-edgegrid-golang/v5 v5.0.0
 	github.com/cockroachdb/cockroach-go/v2 v2.3.3
 	github.com/didip/tollbooth v4.0.2+incompatible
+	github.com/dlmiddlecote/sqlstats v1.0.2
 	github.com/dre1080/recovr v1.0.3
+	github.com/getsentry/sentry-go v0.21.0
 	github.com/go-micro/plugins/v4/broker/nats v1.2.0
 	github.com/go-micro/plugins/v4/config/encoder/yaml v1.2.0
 	github.com/go-micro/plugins/v4/registry/nats v1.2.1
@@ -26,6 +28,7 @@ require (
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/gophercloud/gophercloud v1.3.0
 	github.com/gophercloud/utils v0.0.0-20230418172808-6eab72e966e1
+	github.com/hashicorp/golang-lru/v2 v2.0.2
 	github.com/iancoleman/strcase v0.2.0
 	github.com/jackc/pgerrcode v0.0.0-20220416144525-469b46aa5efa
 	github.com/jackc/pgx/v5 v5.3.1
@@ -88,7 +91,6 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
-	github.com/hashicorp/golang-lru/v2 v2.0.2 // indirect
 	github.com/imdario/mergo v0.3.13 // indirect
 	github.com/jackc/pgconn v1.14.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
@@ -144,9 +146,9 @@ require (
 	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/term v0.8.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
-	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba // indirect
+	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/tools v0.7.0 // indirect
-	gopkg.in/ini.v1 v1.62.0 // indirect
+	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
