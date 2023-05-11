@@ -1,9 +1,9 @@
 import React, {useState} from "react"
 
+import "./styles.css"
 import {authStore, useStore} from "./store"
 import {AppShell, PageHeader, PortalProvider, StyleProvider} from "juno-ui-components"
 import {QueryCache, QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import styles from "./styles.scss"
 import AppContent from "./AppContent"
 import {ReactQueryDevtools} from "@tanstack/react-query-devtools";
 import LogInModal from "./components/LogInModal";
@@ -28,7 +28,7 @@ const App = (props) => {
     }
 
     const pageHeader = (
-        <PageHeader heading="Converged Cloud | Andromeda" onClick={() => window.location.href='/'}>
+        <PageHeader heading="Converged Cloud | Andromeda" onClick={() => window.location.href = '/'}>
             {auth && (
                 <HeaderUser auth={auth} logout={logout} theme={theme} setTheme={setTheme}/>
             )}
@@ -48,8 +48,7 @@ const App = (props) => {
     })
 
     return (
-        <StyleProvider stylesWrapper="inline" theme={theme} key={theme}>
-            <style>{styles.toString()}</style>
+        <StyleProvider stylesWrapper="head" theme={theme} key={theme}>
             <PortalProvider>
                 <QueryClientProvider client={queryClient}>
                     <AppShell
@@ -60,7 +59,8 @@ const App = (props) => {
                         {auth ? (
                             <AppContent props={props}/>
                         ) : (
-                            <LogInModal keystoneEndpoint={props.endpoint} overrideEndpoint={props.overrideAndromedaEndpoint}/>
+                            <LogInModal keystoneEndpoint={props.endpoint}
+                                        overrideEndpoint={props.overrideAndromedaEndpoint}/>
                         )}
                     </AppShell>
                     <ReactQueryDevtools initialIsOpen={false}/>
