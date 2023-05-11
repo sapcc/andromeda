@@ -29,7 +29,7 @@ const PoolList = () => {
         {
             getNextPageParam: nextPageParam,
             meta: auth,
-            onError: setError,
+            onError: (err) => setError(err),
             onSuccess: () => setError(undefined),
         }
     )

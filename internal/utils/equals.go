@@ -67,7 +67,13 @@ func deepValueEqualField(v1, v2 reflect.Value, fieldsToCompare []string) bool {
 			return true
 		}
 		for i := 0; i < v1.Len(); i++ {
-			if !deepValueEqualField(v1.Index(i), v2.Index(i), fieldsToCompare) {
+			found := false
+			for j := 0; j < v2.Len(); j++ {
+				if deepValueEqualField(v1.Index(i), v2.Index(j), fieldsToCompare) {
+					found = true
+				}
+			}
+			if !found {
 				return false
 			}
 		}
@@ -122,7 +128,7 @@ func deepValueEqualField(v1, v2 reflect.Value, fieldsToCompare []string) bool {
 	}
 }
 
-//DeepEqualFields like reflect.DeepEqual, but with field array to compare
+// DeepEqualFields like reflect.DeepEqual, but with field array to compare
 func DeepEqualFields(x, y interface{}, fieldsToCompare []string) bool {
 	if x == nil || y == nil {
 		return x == y

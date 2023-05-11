@@ -18,11 +18,14 @@ package restapi
 
 import (
 	"crypto/tls"
+	"github.com/getsentry/sentry-go"
 	"github.com/rs/cors"
 	"net/http"
+	"time"
 
 	"github.com/didip/tollbooth"
 	"github.com/dre1080/recovr"
+	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"go-micro.dev/v4/logger"
@@ -56,7 +59,9 @@ func configureAPI(api *operations.AndromedaAPI) http.Handler {
 	api.JSONConsumer = runtime.JSONConsumer()
 	api.JSONProducer = runtime.JSONProducer()
 	api.PreServerShutdown = func() {}
-	api.ServerShutdown = func() {}
+	api.ServerShutdown = func() {
+		sentry.Flush(5 * time.Second)
+	}
 
 	return setupGlobalMiddleware(api.Serve(setupMiddlewares))
 }
@@ -114,6 +119,10 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
 			AllowedHeaders: []string{"Content-Type", "User-Agent", "X-Auth-Token"},
 		}).Handler(handler)
 	}
+
+	handler = sentryhttp.New(sentryhttp.Options{
+		Repanic: true,
+	}).Handle(handler)
 
 	return recovr.New()(handler)
 }

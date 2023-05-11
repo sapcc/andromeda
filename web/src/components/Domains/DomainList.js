@@ -73,7 +73,7 @@ const DomainList = ({domains}) => {
                         <DataGridHeadCell>Created</DataGridHeadCell>
                         <DataGridHeadCell>Updated</DataGridHeadCell>
                         <DataGridHeadCell>Status</DataGridHeadCell>
-                        <DataGridHeadCell>Options</DataGridHeadCell>
+                        <DataGridHeadCell className="jn-items-end">Options</DataGridHeadCell>
                     </DataGridRow>
 
                     {/* Render items: */}

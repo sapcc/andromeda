@@ -23,9 +23,13 @@ const checkStatus = (response) => {
         return response
     } else {
         return response.json().then((message) => {
-            const msg = message.error || message
-            const error = new HTTPError(msg.code, msg.message)
-            return Promise.reject(error)
+            if (message.Message) {
+                return Promise.reject(new HTTPError(response.status, message.Message))
+            }
+            if (message.error) {
+                return Promise.reject(new HTTPError(message.error.code, message.error.message))
+            }
+            return Promise.reject(new HTTPError(message.code, message.message))
         }, () => {
             const error = new HTTPError(response.status, response.statusText)
             error.statusCode = response.status

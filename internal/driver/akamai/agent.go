@@ -18,17 +18,17 @@ package akamai
 
 import (
 	"context"
-	"github.com/sapcc/andromeda/internal/driver"
 	"time"
 
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v5/pkg/gtm"
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v5/pkg/session"
+	"github.com/go-micro/plugins/v4/sync/memory"
+	lru "github.com/hashicorp/golang-lru/v2"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/logger"
 	"go-micro.dev/v4/metadata"
 	"go-micro.dev/v4/sync"
 
-	"github.com/go-micro/plugins/v4/sync/memory"
 	"github.com/sapcc/andromeda/internal/config"
 	_ "github.com/sapcc/andromeda/internal/plugins"
 	"github.com/sapcc/andromeda/internal/rpc/server"
@@ -45,16 +45,17 @@ var PROPERTY_TYPE_MAP = map[string]string{
 }
 
 type AkamaiAgent struct {
-	session          *session.Session
-	gtm              gtm.GTM
-	gtmLock          sync.Sync
-	domainType       string
-	rpc              server.RPCServerService
-	workerTicker     *time.Ticker
-	lastSync         time.Time
-	lastMemberStatus time.Time
-	forceSync        chan []string
-	executing        bool
+	session           *session.Session
+	gtm               gtm.GTM
+	gtmLock           sync.Sync
+	domainType        string
+	rpc               server.RPCServerService
+	workerTicker      *time.Ticker
+	lastSync          time.Time
+	lastMemberStatus  time.Time
+	forceSync         chan []string
+	executing         bool
+	datacenterIdCache *lru.Cache[string, int]
 }
 
 type Sync struct {
@@ -93,6 +94,8 @@ func ExecuteAkamaiAgent() error {
 				interval = time.Duration(config.Global.AkamaiConfig.MemberStatusInterval) + 1
 			}
 
+			cache, _ := lru.New[string, int](64)
+
 			akamai := AkamaiAgent{
 				s,
 				gtm.Client(*s),
@@ -104,6 +107,7 @@ func ExecuteAkamaiAgent() error {
 				time.Unix(0, 0),
 				make(chan []string),
 				false,
+				cache,
 			}
 			syncer.akamai = &akamai
 
@@ -134,20 +138,28 @@ func (s *AkamaiAgent) WorkerThread() {
 	for {
 		select {
 		case domains := <-s.forceSync:
-			if err := s.datacenterSync(nil); err != nil {
+			if err := s.FetchAndSyncDatacenters(nil); err != nil {
 				logger.Error(err)
 			}
 
-			if err := s.domainSync(domains); err != nil {
+			if err := s.FetchAndSyncGeomaps(nil); err != nil {
+				logger.Error(err)
+			}
+
+			if err := s.FetchAndSyncDomains(domains); err != nil {
 				logger.Error(err)
 			}
 		case <-s.workerTicker.C: // Activate periodically
 			if time.Since(s.lastSync) > syncInterval {
-				if err := s.datacenterSync(nil); err != nil {
+				if err := s.FetchAndSyncDatacenters(nil); err != nil {
 					logger.Error(err)
 				}
 
-				if err := s.domainSync(nil); err != nil {
+				if err := s.FetchAndSyncGeomaps(nil); err != nil {
+					logger.Error(err)
+				}
+
+				if err := s.FetchAndSyncDomains(nil); err != nil {
 					logger.Error(err)
 				}
 
@@ -162,128 +174,6 @@ func (s *AkamaiAgent) WorkerThread() {
 		}
 	}
 
-}
-
-func (s *AkamaiAgent) datacenterSync(datacenters []string) error {
-	logger.Debugf("Running pending datacenter sync()")
-	response, err := s.rpc.GetDatacenters(context.Background(), &server.SearchRequest{
-		Provider:       "akamai",
-		PageNumber:     0,
-		ResultPerPage:  1,
-		FullyPopulated: true,
-		Pending:        datacenters == nil,
-		Ids:            datacenters,
-	})
-	if err != nil {
-		return err
-	}
-
-	for _, datacenter := range response.GetResponse() {
-		if _, err = s.SyncDatacenter(datacenter, false); err != nil {
-			return err
-		}
-
-		// Wait for status propagation
-		var status string
-		for ok := true; ok; ok = status == "PENDING" {
-			time.Sleep(5 * time.Second)
-			status, err = s.syncProvisioningStatus(nil)
-			if err != nil {
-				return err
-			}
-		}
-
-		if status == "COMPLETE" {
-			driver.UpdateProvisioningStatus(s.rpc,
-				[]*server.ProvisioningStatusRequest_ProvisioningStatus{
-					driver.GetProvisioningStatusRequest(datacenter.Id, "DATACENTER", "ACTIVE"),
-				})
-		}
-	}
-	return nil
-}
-
-func (s *AkamaiAgent) domainSync(domains []string) error {
-	if s.executing {
-		return nil
-	}
-
-	s.executing = true
-	defer func() { s.executing = false }()
-
-	logger.Debugf("Running pending domain sync(domains=%+v)", domains)
-	response, err := s.rpc.GetDomains(context.Background(), &server.SearchRequest{
-		Provider:       "akamai",
-		PageNumber:     0,
-		ResultPerPage:  1,
-		FullyPopulated: true,
-		Pending:        domains == nil,
-		Ids:            domains,
-	})
-	if err != nil {
-		return err
-	}
-
-	res := response.GetResponse()
-	if len(res) == 0 {
-		return nil
-	}
-
-	// TODO: support multiple trafficManagementDomains due to limit of 100 properties
-	trafficManagementDomain := config.Global.AkamaiConfig.Domain
-
-	// Sync all required datacenters first
-	var datacenters []string
-	for _, domain := range res {
-		for _, datacenter := range domain.Datacenters {
-			if datacenter.ProvisioningStatus != "ACTIVE" {
-				datacenters = append(datacenters, datacenter.Id)
-			}
-		}
-	}
-	if len(datacenters) > 0 {
-		if err := s.datacenterSync(datacenters); err != nil {
-			return err
-		}
-	}
-
-	for _, domain := range res {
-		var provRequests ProvRequests
-		logger.Infof("domainSync(%s) running...", domain.Id)
-		if err := s.gtmLock.Lock(trafficManagementDomain); err != nil {
-			return err
-		}
-
-		if domain.ProvisioningStatus == "PENDING_DELETE" {
-			// Run Delete
-			if err := s.DeleteProperty(domain, trafficManagementDomain); err != nil {
-				return err
-			}
-			provRequests = s.CascadeUpdateDomainProvisioningStatus(domain, "DELETED")
-		} else {
-			// Run Sync
-			if provRequests, err = s.SyncProperty(domain, trafficManagementDomain); err != nil {
-				return err
-			}
-		}
-
-		// Wait for status propagation
-		var status string
-		for ok := true; ok; ok = status == "PENDING" {
-			time.Sleep(5 * time.Second)
-			status, err = s.syncProvisioningStatus(domain)
-			if err != nil {
-				logger.Error(err)
-			}
-		}
-		driver.UpdateProvisioningStatus(s.rpc, provRequests)
-
-		logger.Infof("domainSync(%s) finished with '%s'", domain.Id, status)
-		if err := s.gtmLock.Unlock(trafficManagementDomain); err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func (s *AkamaiAgent) ForceSync(ctx context.Context, request *worker.SyncRequest) error {
