@@ -8,6 +8,7 @@ require (
 	github.com/Boostport/migration/driver/postgres v1.1.3
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/akamai/AkamaiOPEN-edgegrid-golang/v5 v5.0.0
+	github.com/akamai/AkamaiOPEN-edgegrid-golang/v7 v7.1.0
 	github.com/cockroachdb/cockroach-go/v2 v2.3.3
 	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/dlmiddlecote/sqlstats v1.0.2
