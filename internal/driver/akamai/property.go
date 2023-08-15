@@ -19,11 +19,12 @@ package akamai
 import (
 	"context"
 	"fmt"
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v5/pkg/gtm"
-	"github.com/sapcc/andromeda/internal/driver"
+
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v7/pkg/gtm"
 	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/config"
+	"github.com/sapcc/andromeda/internal/driver"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
 	"github.com/sapcc/andromeda/internal/utils"
 )

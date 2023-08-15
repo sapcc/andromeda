@@ -18,13 +18,13 @@ package akamai
 
 import (
 	"context"
-	"github.com/sapcc/andromeda/internal/driver"
-	"github.com/sapcc/andromeda/internal/rpc/server"
 	"time"
 
 	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/config"
+	"github.com/sapcc/andromeda/internal/driver"
+	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
 )
 
