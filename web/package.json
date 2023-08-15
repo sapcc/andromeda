@@ -9,7 +9,7 @@
     "@tanstack/react-query-devtools": "^4.29.3",
     "autoprefixer": "^10.4.2",
     "chalk": "^5.2.0",
-    "esbuild": "^0.17.17",
+    "esbuild": "^0.19.0",
     "esbuild-plugin-inline-image": "^0.0.9",
     "esbuild-plugin-svgr": "^1.1.0",
     "esbuild-style-plugin": "^1.6.2",
