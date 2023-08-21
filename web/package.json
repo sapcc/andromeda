@@ -11,7 +11,7 @@
     "chalk": "^5.2.0",
     "esbuild": "^0.19.0",
     "esbuild-plugin-inline-image": "^0.0.9",
-    "esbuild-plugin-svgr": "^1.1.0",
+    "esbuild-plugin-svgr": "^2.0.0",
     "esbuild-style-plugin": "^1.6.2",
     "juno-ui-components": "https://assets.juno.global.cloud.sap/libs/juno-ui-components@1.5.9/package.tgz",
     "luxon": "^3.0.0",
