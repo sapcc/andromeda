@@ -42,7 +42,7 @@ type Executor struct {
 	DB *sqlx.DB
 }
 
-func (e *Executor) findNextPoolToActivate(tx *sqlx.Tx, _ prometheus.Labels) (*strfmt.UUID, error) {
+func (e *Executor) findNextPoolToActivate(_ context.Context, tx *sqlx.Tx, _ prometheus.Labels) (*strfmt.UUID, error) {
 	var poolID strfmt.UUID
 	sql := `
 		SELECT id 
@@ -59,7 +59,7 @@ func (e *Executor) findNextPoolToActivate(tx *sqlx.Tx, _ prometheus.Labels) (*st
 	return &poolID, nil
 }
 
-func (e *Executor) poolCascadeActive(tx *sqlx.Tx, poolID *strfmt.UUID, _ prometheus.Labels) error {
+func (e *Executor) poolCascadeActive(_ context.Context, tx *sqlx.Tx, poolID *strfmt.UUID, _ prometheus.Labels) error {
 	if _, err := tx.Exec(tx.Rebind(`UPDATE member SET provisioning_status = 'ACTIVE' WHERE pool_id = ?`),
 		poolID); err != nil {
 		return err
@@ -77,7 +77,7 @@ func (e *Executor) poolCascadeActive(tx *sqlx.Tx, poolID *strfmt.UUID, _ prometh
 	return tx.Commit()
 }
 
-func (e *Executor) CleanupDeletedDomains(labels prometheus.Labels) error {
+func (e *Executor) CleanupDeletedDomains(_ context.Context, labels prometheus.Labels) error {
 	// Delete deleted domains
 	sql := `DELETE FROM
            		domain 
