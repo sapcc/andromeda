@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react"
 
-import {Button, Container, IntroBox, Label, MainTabs, Pill, Stack, Tab, TabList, TabPanel,} from "juno-ui-components"
+import {Container, IntroBox, MainTabs, Tab, TabList, TabPanel,} from "juno-ui-components"
 import {useStore} from "./store"
 import {addOnChangeListener, currentState, push} from "url-state-provider"
 import ModalManager from "./components/ModalManager"

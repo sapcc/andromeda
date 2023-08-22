@@ -1,16 +1,6 @@
 import React, {useState} from "react"
 
-import {
-    Box,
-    Button,
-    ContentAreaToolbar,
-    DataGrid,
-    DataGridHeadCell,
-    DataGridRow,
-    Message,
-    Spinner,
-    Stack,
-} from "juno-ui-components"
+import {Box, Button, ContentAreaToolbar, DataGrid, DataGridHeadCell, DataGridRow, Spinner,} from "juno-ui-components"
 import DomainListItem from "./DomainListItem"
 import {authStore, useStore} from "../../store"
 import {currentState, push} from "url-state-provider"
@@ -18,7 +8,7 @@ import {fetchAll, nextPageParam} from "../../actions";
 import {useInfiniteQuery} from '@tanstack/react-query';
 import {Error, Loading} from "../Components";
 
-const DomainList = ({domains}) => {
+const DomainList = () => {
     const urlStateKey = useStore((state) => state.urlStateKey)
     const auth = authStore((state) => state.auth)
     const [error, setError] = useState()

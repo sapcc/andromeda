@@ -4,12 +4,13 @@ import {
     Button,
     ButtonRow,
     Form,
+    FormRow,
     IntroBox,
     Modal,
+    Select,
     SelectOption,
-    SelectRow,
     Stack,
-    TextInputRow
+    TextInput
 } from "juno-ui-components"
 import {authStore, useStore} from "../store"
 import {currentState, push} from "url-state-provider";
@@ -99,8 +100,7 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint}) => {
 
             <Form onSubmit={onSubmit}>
                 <Stack distribution="between" gap="2" className="pt-2">
-                    <SelectRow
-                        className="flex-auto"
+                    <Select
                         label="Domain"
                         disabled={isLoading}
                         onChange={(target) => setCredentials({...credentials, domain: target})}
@@ -108,9 +108,8 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint}) => {
                     >
                         <SelectOption key="monsoon3" value="monsoon3" label="monsoon3" />
                         <SelectOption key="ccadmin" value="ccadmin" label="ccadmin" />
-                    </SelectRow>
-                    <TextInputRow
-                        className="flex-auto"
+                    </Select>
+                    <TextInput
                         label="Project"
                         name="project"
                         value={credentials.project}
@@ -125,23 +124,27 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint}) => {
                 </Stack>
                 {showCredentials && (
                     <div>
-                        <TextInputRow
-                            label="User Name"
-                            name="username"
-                            value={credentials.username}
-                            disabled={isLoading}
-                            onChange={handleChange}
-                            required
-                        />
-                        <TextInputRow
-                            label="Password"
-                            name="password"
-                            type="password"
-                            value={credentials.password}
-                            disabled={isLoading}
-                            onChange={handleChange}
-                            required
-                        />
+                        <FormRow>
+                            <TextInput
+                                label="User Name"
+                                name="username"
+                                value={credentials.username}
+                                disabled={isLoading}
+                                onChange={handleChange}
+                                required
+                            />
+                        </FormRow>
+                        <FormRow>
+                            <TextInput
+                                label="Password"
+                                name="password"
+                                type="password"
+                                value={credentials.password}
+                                disabled={isLoading}
+                                onChange={handleChange}
+                                required
+                            />
+                        </FormRow>
                     </div>
             )}
                 <ButtonRow name="Default ButtonRow" className="jn-justify-end pt-2">

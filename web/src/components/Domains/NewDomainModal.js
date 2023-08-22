@@ -3,7 +3,7 @@ import React, {useState} from "react"
 import {authStore, useStore} from "../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {createItem} from "../../actions"
-import {CheckboxRow, Modal, SelectOption, SelectRow, TextInputRow} from "juno-ui-components"
+import {Checkbox, Modal, Select, SelectOption, Stack, TextInput} from "juno-ui-components"
 import {currentState, push} from "url-state-provider"
 import {Error} from "../Components";
 
@@ -57,62 +57,64 @@ const NewDomainModal = () => {
             confirmButtonLabel="Save new Domain"
             onConfirm={onSubmit}
         >
-            {/* Error Bar */}
-            <Error error={error} />
+            <Stack direction="vertical" gap="2">
+                {/* Error Bar */}
+                <Error error={error}/>
 
-            <CheckboxRow
-                id="selectable"
-                label="Enabled"
-                checked={formState.admin_state_up}
-                onChange={(event) => setFormState({...formState, admin_state_up: event.target.checked})}
-            />
-            <TextInputRow
-                label="Name"
-                name="name"
-                value={formState.name}
-                onChange={handleChange}
-            />
-            <SelectRow
-                label="Provider"
-                value={formState.provider}
-                onChange={(target) => setFormState({...formState, provider: target})}
-                required
-            >
-                <SelectOption
-                    key="akamai"
-                    label="Akamai"
-                    value="akamai"
+                <Checkbox
+                    id="selectable"
+                    label="Enabled"
+                    checked={formState.admin_state_up}
+                    onChange={(event) => setFormState({...formState, admin_state_up: event.target.checked})}
                 />
-            </SelectRow>
-            <TextInputRow
-                label="Fully Qualified Domain Name"
-                name="fqdn"
-                value={formState.fqdn}
-                onChange={handleChange}
-                required
-            />
-            <SelectRow
-                label="Record Type"
-                value={formState.record_type}
-                onChange={(target) => setFormState({...formState, record_type: target})}
-            >
-                <SelectOption
-                    label="A"
-                    value="A"
+                <TextInput
+                    label="Name"
+                    name="name"
+                    value={formState.name}
+                    onChange={handleChange}
                 />
-                <SelectOption
-                    label="AAAA"
-                    value="AAAA"
+                <Select
+                    label="Provider"
+                    value={formState.provider}
+                    onChange={(target) => setFormState({...formState, provider: target})}
+                    required
+                >
+                    <SelectOption
+                        key="akamai"
+                        label="Akamai"
+                        value="akamai"
+                    />
+                </Select>
+                <TextInput
+                    label="Fully Qualified Domain Name"
+                    name="fqdn"
+                    value={formState.fqdn}
+                    onChange={handleChange}
+                    required
                 />
-                <SelectOption
-                    label="CNAME"
-                    value="CNAME"
-                />
-                <SelectOption
-                    label="MX"
-                    value="MX"
-                />
-            </SelectRow>
+                <Select
+                    label="Record Type"
+                    value={formState.record_type}
+                    onChange={(target) => setFormState({...formState, record_type: target})}
+                >
+                    <SelectOption
+                        label="A"
+                        value="A"
+                    />
+                    <SelectOption
+                        label="AAAA"
+                        value="AAAA"
+                    />
+                    <SelectOption
+                        label="CNAME"
+                        value="CNAME"
+                    />
+                    <SelectOption
+                        label="MX"
+                        value="MX"
+                    />
+                </Select>
+            </Stack>
         </Modal>
     )
 }

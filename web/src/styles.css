@@ -3,6 +3,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.juno-stack > div {
+  flex: auto;
+}
+
 .galaxy {
   position: absolute;
   top: 0;
