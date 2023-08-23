@@ -12,15 +12,14 @@ import {
     Stack,
     TextInput
 } from "juno-ui-components"
-import {authStore, useStore} from "../store"
-import {currentState, push} from "url-state-provider";
+import {authStore, urlStore} from "../store"
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {login} from "../actions";
 import {Error} from "./Components";
 
 const LogInModal = ({keystoneEndpoint, overrideEndpoint}) => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
     const setAuth = authStore((state) => state.setAuth)
+    const setModal = urlStore((state) => state.openModal)
     const queryClient = useQueryClient()
     const {mutate, isLoading, error} = useMutation(login)
     const [showCredentials, setShowCredentials] = useState(false)
@@ -61,8 +60,7 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint}) => {
                         setAuth(auth)
                         queryClient.invalidateQueries().then()
                     }.bind(this), 700)
-                    const urlState = currentState(urlStateKey)
-                    push(urlStateKey, {...urlState, currentModal: ""})
+                    setModal(null)
                 }
             }
         )

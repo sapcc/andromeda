@@ -1,16 +1,16 @@
 import React, {useState} from "react"
 
-import {Box, Button, DataGrid, DataGridHeadCell, DataGridRow, Message, Spinner, Stack,} from "juno-ui-components"
+import {Box, Button, DataGrid, DataGridHeadCell, DataGridRow, Spinner, Stack,} from "juno-ui-components"
 import GeographicMapListItem from "./GeographicMapListItem"
-import {authStore, useStore} from "../../store"
-import {currentState, push} from "url-state-provider"
+import {authStore, urlStore} from "../../store"
 import {fetchAll, nextPageParam} from "../../actions";
 import {useInfiniteQuery} from '@tanstack/react-query';
 import {Error, Loading} from "../Components";
 
 const GeographicMapList = () => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
     const auth = authStore((state) => state.auth)
+    const setModal = urlStore((state) => state.openModal)
+
     const [error, setError] = useState()
     const {
         data,
@@ -31,11 +31,6 @@ const GeographicMapList = () => {
         }
     )
 
-    const handleNewGeographicMapClick = () => {
-        const urlState = currentState(urlStateKey)
-        push(urlStateKey, {...urlState, currentModal: "NewGeographicMapsItem"})
-    }
-
     return (
         <>
             {/* Error Bar */}
@@ -55,7 +50,7 @@ const GeographicMapList = () => {
                 <Button
                     variant="primary"
                     icon="addCircle"
-                    onClick={handleNewGeographicMapClick}
+                    onClick={() => setModal("NewGeographicMapsItem")}
                     label="Add a Geographic Map"
                 />
             </Stack>

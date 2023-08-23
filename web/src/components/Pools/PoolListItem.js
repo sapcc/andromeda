@@ -1,17 +1,15 @@
 import React, {useMemo} from "react"
 
-import {Badge, DataGridCell, DataGridRow, Icon, Spinner, Stack} from "juno-ui-components"
+import {DataGridCell, DataGridRow, Icon, Stack} from "juno-ui-components"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
-import {currentState, push} from "url-state-provider"
 import {deleteItem} from "../../actions"
 import {DateTime} from "luxon";
-import {authStore, useStore} from "../../store"
+import {authStore, urlStore} from "../../store"
 import {ListItemSpinner, ListItemStatus} from "../Components";
 
-const PoolListItem = ({pool, setSelectedPool, isActive, setError}) => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
+const PoolListItem = ({pool, isActive, setError}) => {
     const auth = authStore((state) => state.auth)
-    const urlState = currentState(urlStateKey)
+    const [openPanel, setSelectedPool] = urlStore((state) => [state.openPanel, state.setPool])
     const queryClient = useQueryClient()
     const createdAt = useMemo(() => {
         if (pool.created_at) {
@@ -30,14 +28,8 @@ const PoolListItem = ({pool, setSelectedPool, isActive, setError}) => {
 
     const {mutate} = useMutation(deleteItem)
 
-    const handleEditPoolClick = () => {
-        push(urlStateKey, {
-            ...urlState,
-            currentPanel: "Pool",
-            id: pool.id,
-        })
-    }
-
+    const handlePoolClick = () => setSelectedPool(pool.id)
+    const handleEditPoolClick = () => openPanel("Pool", pool.id)
     const handleDeletePoolClick = () => {
         mutate(
             {
@@ -60,18 +52,13 @@ const PoolListItem = ({pool, setSelectedPool, isActive, setError}) => {
         )
     }
 
-    const handlePoolClick = () => {
-        push(urlStateKey, {
-            ...urlState,
-            pool: pool.id,
-        })
-        setSelectedPool(pool.id)
-    }
-
     return (
         <DataGridRow>
             <DataGridCell>
-                <ListItemSpinner data={pool} onClick={handlePoolClick} className={`cursor-pointer ${isActive ? "jn-text-theme-accent" : "hover:text-theme-accent"}`}/>
+                <ListItemSpinner
+                    data={pool} onClick={handlePoolClick}
+                    className={`cursor-pointer ${isActive ? "jn-text-theme-accent" : "hover:text-theme-accent"}`}
+                />
             </DataGridCell>
             <DataGridCell>{pool.domains?.length || 0}/{pool.members?.length || 0}/{pool.monitors?.length || 0}</DataGridCell>
             <DataGridCell>{createdAt}</DataGridCell>

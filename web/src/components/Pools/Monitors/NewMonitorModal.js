@@ -1,30 +1,18 @@
-import React, {useState} from "react"
+import React, {useMemo, useState} from "react"
 
-import {authStore, useStore} from "../../../store"
+import {authStore, urlStore} from "../../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {createItem} from "../../../actions"
-import {
-    Button,
-    ButtonRow,
-    CheckboxRow,
-    Modal,
-    SelectOption,
-    SelectRow,
-    Stack,
-    TextareaRow,
-    TextInputRow
-} from "juno-ui-components"
-import {currentState, push} from "url-state-provider"
+import {Badge, Checkbox, Modal, Select, SelectOption, Stack, Textarea, TextInput} from "juno-ui-components"
 import {Error} from "../../Components";
 
 const NewMonitorModal = () => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
     const auth = authStore((state) => state.auth)
-    const urlState = currentState(urlStateKey)
+    const [closeModal, pool] = urlStore((state) => [state.closeModal, state.pool])
     const queryClient = useQueryClient()
     const [formState, setFormState] = useState({
         name: "",
-        pool_id: urlState?.pool,
+        pool_id: pool,
         send: null,
         receive: null,
         timeout: 10,
@@ -34,12 +22,6 @@ const NewMonitorModal = () => {
     })
 
     const {error, mutate} = useMutation(createItem)
-
-    const closeNewMonitorModal = () => {
-        const urlState = currentState(urlStateKey)
-        push(urlStateKey, {...urlState, currentModal: ""})
-    }
-
     const onSubmit = () => {
         mutate(
             {
@@ -54,7 +36,7 @@ const NewMonitorModal = () => {
                         .setQueryData(["monitors", data.monitor.id], data)
                     queryClient
                         .invalidateQueries(`monitors`)
-                        .then(closeNewMonitorModal)
+                        .then(closeModal)
                 }
             }
         )
@@ -63,72 +45,82 @@ const NewMonitorModal = () => {
     const handleChange = (event) => {
         setFormState({...formState, [event.target.name]: event.target.value});
     };
+    const heading = useMemo(() => {
+        return (
+            <>
+                Add new Monitor
+                <p><small>Pool <Badge>{pool}</Badge></small></p>
+            </>
+        )
+    }, [pool])
 
     return (
         <Modal
-            title="Add new Monitor"
+            heading={heading}
             open
-            onCancel={closeNewMonitorModal}
+            onCancel={closeModal}
             confirmButtonLabel="Save new Monitor"
             onConfirm={onSubmit}
         >
-            {/* Error Bar */}
-            <Error error={error} />
+            <Stack direction="vertical" gap="2">
+                {/* Error Bar */}
+                <Error error={error}/>
 
-            <CheckboxRow
-                id="selectable"
-                label="Enabled"
-                checked={formState.admin_state_up}
-                onChange={(event) => setFormState({...formState, admin_state_up: event.target.checked})}
-            />
-            <TextInputRow
-                label="Name"
-                name="name"
-                value={formState.name}
-                onChange={handleChange}
-            />
-            <TextInputRow
-                label="Interval"
-                name="interval"
-                type="number"
-                value={formState.interval.toString()}
-                onChange={(event) => setFormState({...formState, interval: parseInt(event.target.value)})}
-            />
-            <TextInputRow
-                label="Timeout"
-                name="timeout"
-                type="number"
-                value={formState.timeout.toString()}
-                onChange={(event) => setFormState({...formState, timeout: parseInt(event.target.value)})}
-            />
-            <SelectRow
-                label="Type"
-                value={formState?.type}
-                onChange={(target) => setFormState({...formState, type: target})}
-            >
-                <SelectOption key="icmp" value="ICMP" label="ICMP (Unsupported on Akamai)" />
-                <SelectOption key="http" value="HTTP" label="HTTP" />
-                <SelectOption key="https" value="HTTPS" label="HTTPS" />
-                <SelectOption key="tcp" value="TCP" label="TCP" />
-                <SelectOption key="udp" value="UDP" label="UDP" />
-            </SelectRow>
+                <Checkbox
+                    id="selectable"
+                    label="Enabled"
+                    checked={formState.admin_state_up}
+                    onChange={(event) => setFormState({...formState, admin_state_up: event.target.checked})}
+                />
+                <TextInput
+                    label="Name"
+                    name="name"
+                    value={formState.name}
+                    onChange={handleChange}
+                />
+                <TextInput
+                    label="Interval"
+                    name="interval"
+                    type="number"
+                    value={formState.interval.toString()}
+                    onChange={(event) => setFormState({...formState, interval: parseInt(event.target.value)})}
+                />
+                <TextInput
+                    label="Timeout"
+                    name="timeout"
+                    type="number"
+                    value={formState.timeout.toString()}
+                    onChange={(event) => setFormState({...formState, timeout: parseInt(event.target.value)})}
+                />
+                <Select
+                    label="Type"
+                    value={formState?.type}
+                    onChange={(target) => setFormState({...formState, type: target})}
+                >
+                    <SelectOption key="icmp" value="ICMP" label="ICMP (Unsupported on Akamai)"/>
+                    <SelectOption key="http" value="HTTP" label="HTTP"/>
+                    <SelectOption key="https" value="HTTPS" label="HTTPS"/>
+                    <SelectOption key="tcp" value="TCP" label="TCP"/>
+                    <SelectOption key="udp" value="UDP" label="UDP"/>
+                </Select>
 
-            {formState.type !== "ICMP" && (
-                <Stack gap="2" distribution="between">
-                    <TextareaRow
-                        className={"flex-auto"}
-                        label="Monitor send string"
-                        value={formState.send || ""}
-                        onChange={handleChange}
-                    />
-                    <TextareaRow
-                        className={"flex-auto"}
-                        label="Monitor expected receive string"
-                        value={formState.receive || ""}
-                        onChange={handleChange}
-                    />
-                </Stack>
-            )}
+                {formState.type !== "ICMP" && (
+                    <Stack gap="2" distribution="between">
+                        <Textarea
+                            className={"flex-auto"}
+                            label="Monitor send string"
+                            value={formState.send || ""}
+                            onChange={handleChange}
+                        />
+                        <Textarea
+                            className={"flex-auto"}
+                            label="Monitor expected receive string"
+                            value={formState.receive || ""}
+                            onChange={handleChange}
+                        />
+                    </Stack>
+                )}
+            </Stack>
         </Modal>
     )
 }

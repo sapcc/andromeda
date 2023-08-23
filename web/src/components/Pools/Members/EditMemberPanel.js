@@ -1,28 +1,15 @@
 import React, {useState} from "react"
 
-import {
-    Button,
-    CheckboxRow,
-    Form,
-    Message,
-    PanelBody,
-    PanelFooter,
-    Spinner,
-    Stack,
-    TextInputRow,
-} from "juno-ui-components"
-import {authStore, useStore} from "../../../store"
-import {currentState} from "url-state-provider"
+import {Button, CheckboxRow, Form, PanelBody, PanelFooter, TextInputRow,} from "juno-ui-components"
+import {authStore, urlStore} from "../../../store"
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {fetchItem, updateAttributes, updateItem} from "../../../actions"
 import DatacenterMenu from "./DatacenterMenu";
 import {Error, Loading} from "../../Components";
 
 const EditMemberPanel = ({closeCallback}) => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
     const auth = authStore((state) => state.auth)
-    const urlState = currentState(urlStateKey)
-    const queryClient = useQueryClient()
+    const id = urlStore((state) => state.id)
     const [error, setError] = useState()
     const [formState, setFormState] = useState({
         name: undefined,
@@ -32,8 +19,9 @@ const EditMemberPanel = ({closeCallback}) => {
         admin_state_up: undefined,
     })
 
+    const queryClient = useQueryClient()
     const {isLoading} = useQuery(
-        ["members", urlState.id],
+        ["members", id],
         fetchItem, {
             meta: auth,
             onError: setError,
@@ -46,7 +34,7 @@ const EditMemberPanel = ({closeCallback}) => {
         mutation.mutate(
             {
                 key: "members",
-                id: urlState.id,
+                id: id,
                 endpoint: auth?.endpoint,
                 token: auth?.token,
                 formState: {"member": formState},

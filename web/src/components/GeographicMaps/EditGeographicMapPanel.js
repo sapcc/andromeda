@@ -10,16 +10,14 @@ import {
     Stack,
     TextInputRow,
 } from "juno-ui-components"
-import {authStore, useStore} from "../../store"
-import {currentState} from "url-state-provider"
+import {authStore, urlStore} from "../../store"
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {fetchItem, updateAttributes, updateItem} from "../../actions"
 import {Error, Loading} from "../Components";
 
 const EditGeographicMapPanel = ({closeCallback}) => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
     const auth = authStore((state) => state.auth)
-    const urlState = currentState(urlStateKey)
+    const id = urlStore((state) => state.id)
     const queryClient = useQueryClient()
     const [error, setError] = useState()
     const [formState, setFormState] = useState({
@@ -28,7 +26,7 @@ const EditGeographicMapPanel = ({closeCallback}) => {
     })
 
     const {isLoading} = useQuery(
-        ["datacenters", urlState.id],
+        ["geomap", id],
         fetchItem,
         {
             meta: auth,
@@ -41,18 +39,18 @@ const EditGeographicMapPanel = ({closeCallback}) => {
     const onSubmit = () => {
         mutation.mutate(
             {
-                key: "datacenters",
-                id: urlState.id,
-                formState: {"datacenter": formState},
+                key: "geomap",
+                id: id,
+                formState: {"geomap": formState},
                 endpoint: auth?.endpoint,
                 token: auth?.token,
             },
             {
                 onSuccess: (data) => {
                     queryClient
-                        .setQueryData(["datacenters", data.datacenter.id], data)
+                        .setQueryData(["geomap", data.datacenter.id], data)
                     queryClient
-                        .invalidateQueries("datacenters")
+                        .invalidateQueries("geomap")
                         .then(closeCallback)
                 },
                 onError: setError,

@@ -1,18 +1,16 @@
 import React, {useState} from "react"
 
-import {authStore, useStore} from "../../store"
+import {authStore, urlStore} from "../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {createItem} from "../../actions"
 import {Box, Button, Icon, JsonViewer, Label, Modal, Stack, TextInputRow} from "juno-ui-components"
-import {currentState, push} from "url-state-provider"
 import {Error} from "../Components";
 import {continents, countries} from "countries-list";
 import DatacenterSelect from "./DatacenterSelect";
-import {data} from "autoprefixer";
 
 const NewGeographicMapModal = () => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
     const auth = authStore((state) => state.auth)
+    const closeModal = urlStore((state) => state.closeModal)
     const queryClient = useQueryClient()
     const [formState, setFormState] = useState({
         name: undefined,
@@ -24,13 +22,7 @@ const NewGeographicMapModal = () => {
     const [error, setError] = useState()
     const [assignments, setAssignments] = useState({})
     const [expandContinent, setExpandContinent] = useState(Object.fromEntries(Object.keys(continents).map(c => [c, false])))
-
-
     const mutation = useMutation(createItem)
-    const closeNewGeographicMapModal = () => {
-        const urlState = currentState(urlStateKey)
-        push(urlStateKey, {...urlState, currentModal: ""})
-    }
 
     const onSubmit = () => {
         mutation.mutate(
@@ -51,7 +43,7 @@ const NewGeographicMapModal = () => {
                         .setQueryData(["geomaps", data.geomap.id], data)
                     queryClient
                         .invalidateQueries("geomaps")
-                        .then(closeNewGeographicMapModal)
+                        .then(closeModal)
                 },
                 onError: setError
             }
@@ -96,7 +88,7 @@ const NewGeographicMapModal = () => {
             title="Add new Geographical Map"
             size="large"
             open
-            onCancel={closeNewGeographicMapModal}
+            onCancel={closeModal}
             confirmButtonLabel="Save new Geographical Map"
             onConfirm={onSubmit}
         >

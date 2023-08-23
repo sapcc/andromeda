@@ -1,16 +1,15 @@
 import React, {useState} from "react"
 
-import {authStore, useStore} from "../../store"
+import {authStore, urlStore} from "../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {createItem} from "../../actions"
-import {CheckboxRow, Message, Modal, TextInputRow} from "juno-ui-components"
+import {Checkbox, Modal, TextInput} from "juno-ui-components"
 import DomainMenu from "./DomainMenu";
-import {currentState, push} from "url-state-provider";
-import {Error, Loading} from "../Components";
+import {Error} from "../Components";
 
 const NewPoolModal = () => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
     const auth = authStore((state) => state.auth)
+    const setModal = urlStore((state) => state.openModal)
     const queryClient = useQueryClient()
     const [error, setError] = useState()
     const [formState, setFormState] = useState({
@@ -20,11 +19,7 @@ const NewPoolModal = () => {
     })
 
     const {mutate} = useMutation(createItem)
-
-    const closeModal = () => {
-        const urlState = currentState(urlStateKey)
-        push(urlStateKey, {...urlState, currentModal: ""})
-    }
+    const closeModal = () => setModal(null)
 
     const onSubmit = () => {
         mutate({
@@ -59,13 +54,13 @@ const NewPoolModal = () => {
             {/* Error Bar */}
             <Error error={error} />
 
-            <CheckboxRow
+            <Checkbox
                 id="selectable"
                 label="Enabled"
                 checked={formState.admin_state_up}
                 onChange={(event) => setFormState({...formState, admin_state_up: event.target.checked})}
             />
-            <TextInputRow
+            <TextInput
                 label="Name"
                 name="name"
                 value={formState.name}

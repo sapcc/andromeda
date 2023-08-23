@@ -1,15 +1,14 @@
 import React, {useState} from "react"
 
-import {Box, Button, DataGrid, DataGridHeadCell, DataGridRow, Message, Spinner, Stack,} from "juno-ui-components"
+import {Box, Button, DataGrid, DataGridHeadCell, DataGridRow, Spinner, Stack,} from "juno-ui-components"
 import DatacenterListItem from "./DatacenterListItem"
-import {authStore, useStore} from "../../store"
-import {currentState, push} from "url-state-provider"
+import {authStore, urlStore} from "../../store"
 import {fetchAll, nextPageParam} from "../../actions";
 import {useInfiniteQuery} from '@tanstack/react-query';
 import {Error, Loading} from "../Components";
 
 const DatacenterList = () => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
+    const setModal = urlStore((state) => state.openModal)
     const auth = authStore((state) => state.auth)
     const [error, setError] = useState()
     const {
@@ -31,11 +30,6 @@ const DatacenterList = () => {
         }
     )
 
-    const handleNewDatacenterClick = () => {
-        const urlState = currentState(urlStateKey)
-        push(urlStateKey, {...urlState, currentModal: "NewDatacentersItem"})
-    }
-
     return (
         <>
             {/* Error Bar */}
@@ -55,7 +49,7 @@ const DatacenterList = () => {
                 <Button
                     variant="primary"
                     icon="addCircle"
-                    onClick={handleNewDatacenterClick}
+                    onClick={() => setModal("NewDatacentersItem")}
                     label="Add a Datacenter"
                 />
             </Stack>

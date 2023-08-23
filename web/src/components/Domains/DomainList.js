@@ -2,15 +2,14 @@ import React, {useState} from "react"
 
 import {Box, Button, ContentAreaToolbar, DataGrid, DataGridHeadCell, DataGridRow, Spinner,} from "juno-ui-components"
 import DomainListItem from "./DomainListItem"
-import {authStore, useStore} from "../../store"
-import {currentState, push} from "url-state-provider"
+import {authStore, urlStore} from "../../store"
 import {fetchAll, nextPageParam} from "../../actions";
 import {useInfiniteQuery} from '@tanstack/react-query';
 import {Error, Loading} from "../Components";
 
 const DomainList = () => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
     const auth = authStore((state) => state.auth)
+    const setModal = urlStore((state) => state.openModal)
     const [error, setError] = useState()
 
     const {
@@ -32,11 +31,6 @@ const DomainList = () => {
         },
     )
 
-    const handleNewDomainClick = () => {
-        const urlState = currentState(urlStateKey)
-        push(urlStateKey, {...urlState, currentModal: "NewDomainsItem"})
-    }
-
     return (
         <>
             {/* Error Bar */}
@@ -49,7 +43,7 @@ const DomainList = () => {
                 <Button
                     variant="primary"
                     icon="addCircle"
-                    onClick={handleNewDomainClick}
+                    onClick={() => setModal("NewDomainsItem")}
                     label="Add a Domain"
                 />
             </ContentAreaToolbar>

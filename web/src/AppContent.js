@@ -1,8 +1,7 @@
-import React, {useEffect, useState} from "react"
+import React from "react"
 
 import {Container, IntroBox, MainTabs, Tab, TabList, TabPanel,} from "juno-ui-components"
-import {useStore} from "./store"
-import {addOnChangeListener, currentState, push} from "url-state-provider"
+import {urlStore} from "./store"
 import ModalManager from "./components/ModalManager"
 import PanelManager from "./components/PanelManager"
 import DomainList from "./components/Domains/DomainList"
@@ -11,40 +10,13 @@ import PoolList from "./components/Pools/PoolList";
 import GeographicMapList from "./components/GeographicMaps/GeographicMapList";
 
 const AppContent = ({props}) => {
-  const urlStateKey = useStore((state) => state.urlStateKey)
-  const [currentPanel, setCurrentPanel] = useState(null)
-  const [currentModal, setCurrentModal] = useState(null)
-  const [tabIndex, setTabIndex] = useState(0)
-
-  // wait until the global state is set to fetch the url state
-  useEffect(() => {
-    const urlState = currentState(urlStateKey)
-    setCurrentPanel(urlState?.currentPanel)
-    setCurrentModal(urlState?.currentModal)
-    if (urlState?.tabIndex) setTabIndex(urlState?.tabIndex)
-  }, [urlStateKey])
-
-  // this listener reacts on any change on the url state
-  addOnChangeListener(urlStateKey, (newState) => {
-    setCurrentPanel(newState?.currentPanel)
-    setCurrentModal(newState?.currentModal)
-  })
-
-  const onTabSelected = (index) => {
-    setTabIndex(index)
-    const urlState = currentState(urlStateKey)
-    push(urlStateKey, { ...urlState, tabIndex: index })
-  }
-
-  const closePanel = () => {
-    const urlState = currentState(urlStateKey)
-    push(urlStateKey, { ...urlState, currentPanel: "" })
-  }
+  const [panel, setPanel] = urlStore((state) => [state.p, state.openPanel])
+  const [tab, setTab] = urlStore((state) => [state.t, state.setTab])
 
   return (
     <>
-      <MainTabs selectedIndex={tabIndex} onSelect={onTabSelected}>
-        <PanelManager currentPanel={currentPanel} closePanel={closePanel} />
+      <MainTabs selectedIndex={tab} onSelect={setTab}>
+        <PanelManager currentPanel={panel} closePanel={() => setPanel(null)} />
 
         <TabList>
           <Tab>Domains</Tab>
@@ -86,7 +58,7 @@ const AppContent = ({props}) => {
           </Container>
         </TabPanel>
       </MainTabs>
-      <ModalManager currentModal={currentModal} />
+      <ModalManager />
     </>
   )
 }

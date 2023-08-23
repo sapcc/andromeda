@@ -2,15 +2,15 @@ import React, {useState} from "react"
 
 import {Box, Button, DataGrid, DataGridHeadCell, DataGridRow, Stack,} from "juno-ui-components"
 import MemberListItem from "./MemberListItem"
-import {authStore, useStore} from "../../../store"
-import {currentState, push} from "url-state-provider"
+import {authStore, urlStore} from "../../../store"
 import {fetchAll, nextPageParam} from "../../../actions";
 import {useInfiniteQuery} from '@tanstack/react-query';
 import {Error, Loading} from "../../Components";
 
-const MemberList = ({poolID, setSelectedPool}) => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
+const MemberList = () => {
     const auth = authStore((state) => state.auth)
+    const openModal = urlStore((state) => state.openModal)
+    const [poolId, clearSelectedPool] = urlStore((state) => [state.pool, state.clearPool])
     const [error, setError] = useState()
 
     const {
@@ -22,7 +22,7 @@ const MemberList = ({poolID, setSelectedPool}) => {
         isFetching,
         isFetchingNextPage,
     } = useInfiniteQuery(
-        ["members", {pool_id: poolID}],
+        ["members", {pool_id: poolId}],
         fetchAll,
         {
             getNextPageParam: nextPageParam,
@@ -31,19 +31,6 @@ const MemberList = ({poolID, setSelectedPool}) => {
             onSuccess: () => setError(undefined),
         }
     )
-    const handleNewMemberClick = () => {
-        const urlState = currentState(urlStateKey)
-        push(urlStateKey, {
-            ...urlState,
-            currentModal: "NewMembersItem",
-        })
-    }
-
-    const handleCloseClick = () => {
-        const urlState = currentState(urlStateKey)
-        push(urlStateKey, {...urlState, pool: ""})
-        setSelectedPool("")
-    }
 
     return (
         <Stack direction="vertical" className="basis-1 md:basis-1/2">
@@ -59,12 +46,12 @@ const MemberList = ({poolID, setSelectedPool}) => {
                     <Button
                         variant="primary"
                         icon="addCircle"
-                        onClick={handleNewMemberClick}
+                        onClick={() => openModal("NewMembersItem")}
                         label="Add a Member"
                     />
                     <Button
                         icon="close"
-                        onClick={handleCloseClick}
+                        onClick={clearSelectedPool}
                     />
                 </Stack>
             </Stack>

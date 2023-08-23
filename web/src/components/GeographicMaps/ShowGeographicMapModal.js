@@ -1,17 +1,16 @@
 import React, {useMemo, useState} from "react"
 
-import {authStore, useStore} from "../../store"
+import {authStore, urlStore} from "../../store"
 import {useQuery} from '@tanstack/react-query'
 import {fetchItem} from "../../actions"
 import {Badge, DataGrid, DataGridCell, DataGridHeadCell, DataGridRow, Modal, Spinner, Stack} from "juno-ui-components"
-import {currentState, push} from "url-state-provider"
 import {Error} from "../Components";
 import {continents, countries} from "countries-list";
 import {DateTime} from "luxon";
 
-const ShowGeographicMapModal = ({id}) => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
+const ShowGeographicMapModal = () => {
     const auth = authStore((state) => state.auth)
+    const [id, closeModal] = urlStore((state) => [state.id, state.closeModal])
     const [error, setError] = useState()
     const [geomap, setGeomap] = useState({})
     const {isSuccess, isLoading} = useQuery(
@@ -30,26 +29,13 @@ const ShowGeographicMapModal = ({id}) => {
             )
         }
     }, [geomap.created_at])
-    const updatedAt = useMemo(() => {
-        if (geomap.updated_at) {
-            return DateTime.fromISO(geomap.updated_at).toLocaleString(
-                DateTime.DATETIME_SHORT
-            )
-        }
-    }, [geomap.updated_at])
-
-
-    const closeShowGeographicMapModal = () => {
-        const urlState = currentState(urlStateKey)
-        push(urlStateKey, {...urlState, currentModal: ""})
-    }
 
     return (
         <Modal
             title={`Geographical map`}
             size="large"
             open
-            onCancel={closeShowGeographicMapModal}
+            onCancel={closeModal}
         >
             {/* Error Bar */}
             <Error error={error} />

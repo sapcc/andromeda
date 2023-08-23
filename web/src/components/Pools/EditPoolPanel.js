@@ -1,17 +1,15 @@
 import React, {useState} from "react"
 
 import {Button, CheckboxRow, Form, PanelBody, PanelFooter, Spinner, TextInputRow,} from "juno-ui-components"
-import {authStore, useStore} from "../../store"
-import {currentState} from "url-state-provider"
+import {authStore, urlStore} from "../../store"
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {fetchItem, updateAttributes, updateItem} from "../../actions"
 import DomainMenu from "./DomainMenu";
 import {Error, Loading} from "../Components";
 
 const EditPoolPanel = ({closeCallback}) => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
     const auth = authStore((state) => state.auth)
-    const urlState = currentState(urlStateKey)
+    const id = urlStore((state) => state.id)
     const queryClient = useQueryClient()
     const [error, setError] = useState()
     const [formState, setFormState] = useState({
@@ -19,7 +17,7 @@ const EditPoolPanel = ({closeCallback}) => {
     })
 
     const {isLoading} = useQuery(
-        ["pools", urlState.id],
+        ["pools", id],
         fetchItem,
         {
             meta: auth,
@@ -33,7 +31,7 @@ const EditPoolPanel = ({closeCallback}) => {
         mutation.mutate(
             {
                 key: "pools",
-                id: urlState.id,
+                id: id,
                 endpoint: auth?.endpoint,
                 token: auth?.token,
                 formState: {pool: formState},

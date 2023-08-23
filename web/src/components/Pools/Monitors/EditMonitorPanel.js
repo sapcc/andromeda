@@ -2,7 +2,6 @@ import React, {useState} from "react"
 
 import {
     Button,
-    ButtonRow,
     CheckboxRow,
     Form,
     PanelBody,
@@ -13,16 +12,14 @@ import {
     TextareaRow,
     TextInputRow,
 } from "juno-ui-components"
-import {authStore, useStore} from "../../../store"
-import {currentState} from "url-state-provider"
+import {authStore, urlStore} from "../../../store"
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {fetchItem, updateAttributes, updateItem} from "../../../actions"
 import {Error, Loading} from "../../Components";
 
 const EditMonitorPanel = ({closeCallback}) => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
     const auth = authStore((state) => state.auth)
-    const urlState = currentState(urlStateKey)
+    const id = urlStore((state) => state.id)
     const queryClient = useQueryClient()
     const [error, setError] = useState()
     const [formState, setFormState] = useState({
@@ -36,7 +33,7 @@ const EditMonitorPanel = ({closeCallback}) => {
     })
 
     const {isLoading} = useQuery(
-        ["monitors", urlState.id],
+        ["monitors", id],
         fetchItem, {
             meta: auth,
             onError: setError,
@@ -50,7 +47,7 @@ const EditMonitorPanel = ({closeCallback}) => {
         mutation.mutate(
             {
                 key: "monitors",
-                id: urlState.id,
+                id: id,
                 endpoint: auth?.endpoint,
                 token: auth?.token,
                 formState: {"monitor": formState},

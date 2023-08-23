@@ -1,29 +1,18 @@
 import React, {useMemo, useState} from "react"
 
-import {
-    DataGridCell,
-    DataGridRow,
-    Icon,
-    Spinner,
-    Stack, Toast,
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger
-} from "juno-ui-components"
-import {authStore, useStore} from "../../store"
+import {DataGridCell, DataGridRow, Icon, Stack, Tooltip, TooltipContent, TooltipTrigger} from "juno-ui-components"
+import {authStore, urlStore} from "../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
-import {currentState, push} from "url-state-provider"
 import {deleteItem} from "../../actions"
 import {DateTime} from "luxon";
-import {copyTextToClipboard, JsonModal, ListItemSpinner, ListItemStatus} from "../Components";
+import {JsonModal, ListItemSpinner, ListItemStatus} from "../Components";
 import {ContextMenu} from "juno-ui-components/build/ContextMenu";
 import {MenuItem} from "juno-ui-components/build/MenuItem";
 
 const DomainListItem = ({domain, setError}) => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
+    const setPanel = urlStore((state) => state.openPanel)
     const auth = authStore((state) => state.auth)
     const [showJson, setShowJson] = useState(false)
-    const [showCNAME, setShowCNAME] = useState(false)
     const queryClient = useQueryClient()
     const createdAt = useMemo(() => {
         if (domain.created_at) {
@@ -42,15 +31,7 @@ const DomainListItem = ({domain, setError}) => {
 
     const {mutate} = useMutation(deleteItem)
 
-    const handleEditDomainClick = () => {
-        const urlState = currentState(urlStateKey)
-        push(urlStateKey, {
-            ...urlState,
-            currentPanel: "Domain",
-            id: domain.id,
-        })
-    }
-
+    const handleEditDomainClick = () => setPanel("Domain", domain.id)
     const handleDeleteDomainClick = () => {
         mutate(
             {

@@ -1,16 +1,14 @@
 import React, {useState} from "react"
 
-import {authStore, useStore} from "../../store"
+import {authStore, urlStore} from "../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {createItem} from "../../actions"
 import {Checkbox, Modal, Select, SelectOption, Stack, TextInput} from "juno-ui-components"
-import {currentState, push} from "url-state-provider"
 import {Error} from "../Components";
 
 const NewDomainModal = () => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
     const auth = authStore((state) => state.auth)
-    const urlState = currentState(urlStateKey)
+    const closeModal = urlStore((state) => state.closeModal)
     const [formState, setFormState] = useState({
         name: "",
         provider: "akamai",
@@ -20,10 +18,6 @@ const NewDomainModal = () => {
     })
     const queryClient = useQueryClient()
     const {error, mutate} = useMutation(createItem)
-
-    const closeNewDomainModal = () => {
-        push(urlStateKey, {...urlState, currentModal: ""})
-    }
 
     const onSubmit = () => {
         mutate(
@@ -39,7 +33,7 @@ const NewDomainModal = () => {
                         .setQueryData(["domains", data.domain.id], data)
                     queryClient
                         .invalidateQueries(["domains"])
-                        .then(closeNewDomainModal)
+                        .then(closeModal)
                 }
             }
         )
@@ -53,7 +47,7 @@ const NewDomainModal = () => {
         <Modal
             title="Add new Domain"
             open
-            onCancel={closeNewDomainModal}
+            onCancel={closeModal}
             confirmButtonLabel="Save new Domain"
             onConfirm={onSubmit}
         >

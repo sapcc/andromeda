@@ -1,16 +1,15 @@
 import React, {useMemo} from "react"
 
-import {DataGridCell, DataGridRow, Icon, Spinner, Stack} from "juno-ui-components"
-import {authStore, useStore} from "../../../store"
+import {DataGridCell, DataGridRow, Icon, Stack} from "juno-ui-components"
+import {authStore, urlStore} from "../../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
-import {currentState, push} from "url-state-provider"
 import {deleteItem} from "../../../actions"
 import {DateTime} from "luxon";
 import {ListItemSpinner, ListItemStatus} from "../../Components";
 
 const MonitorListItem = ({monitor, setError}) => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
     const auth = authStore((state) => state.auth)
+    const openPanel = urlStore((state) => state.openPanel)
     const queryClient = useQueryClient()
     const createdAt = useMemo(() => {
         if (monitor.created_at) {
@@ -30,12 +29,7 @@ const MonitorListItem = ({monitor, setError}) => {
     const {mutate} = useMutation(deleteItem)
 
     const handleEditMonitorClick = () => {
-        const urlState = currentState(urlStateKey)
-        push(urlStateKey, {
-            ...urlState,
-            currentPanel: "Monitor",
-            id: monitor.id,
-        })
+        openPanel("Monitor", monitor.id)
         queryClient
             .setQueryDefaults(["monitors", {pool_id: monitor.pool_id}], {refetchInterval: 5000})
         queryClient

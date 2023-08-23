@@ -1,8 +1,7 @@
 import React, {useMemo, useState} from "react"
 import {DataGridCell, DataGridRow, Icon, Stack} from "juno-ui-components"
-import {authStore, useStore} from "../../store"
+import {authStore, urlStore} from "../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
-import {currentState, push} from "url-state-provider"
 import {deleteItem} from "../../actions"
 import {DateTime} from "luxon";
 import {JsonModal, ListItemSpinner, ListItemStatus} from "../Components";
@@ -10,10 +9,10 @@ import {ContextMenu} from "juno-ui-components/build/ContextMenu";
 import {MenuItem} from "juno-ui-components/build/MenuItem";
 
 const GeographicMapListItem = ({geomap, setError}) => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
     const auth = authStore((state) => state.auth)
-    const queryClient = useQueryClient()
+    const [setPanel, setModalId] = urlStore((state) => [state.openPanel, state.openModalWithId])
     const [showJson, setShowJson] = useState(false)
+    const queryClient = useQueryClient()
     const createdAt = useMemo(() => {
         if (geomap.created_at) {
             return DateTime.fromISO(geomap.created_at).toLocaleString(
@@ -30,24 +29,8 @@ const GeographicMapListItem = ({geomap, setError}) => {
     }, [geomap.updated_at])
     const mutation = useMutation(deleteItem)
 
-    const handleEditGeographicMapClick = () => {
-        const urlState = currentState(urlStateKey)
-        push(urlStateKey, {
-            ...urlState,
-            currentPanel: "GeographicMap",
-            id: geomap.id,
-        })
-    }
-
-    const handleShowGeographicMapClick = () => {
-        const urlState = currentState(urlStateKey)
-        push(urlStateKey, {
-            ...urlState,
-            currentModal: "ShowGeographicMap",
-            id: geomap.id,
-        })
-    }
-
+    const handleEditGeographicMapClick = () => setPanel("GeographicMap", geomap.id)
+    const handleShowGeographicMapClick = () => setModalId("ShowGeographicMap", geomap.id)
     const handleDeleteGeographicMapClick = () => {
         mutation.mutate(
             {

@@ -9,18 +9,21 @@
     "@tanstack/react-query-devtools": "^4.33.0",
     "autoprefixer": "^10.4.15",
     "chalk": "^5.3.0",
+    "countries-list": "^2.6.1",
     "esbuild": "^0.19.2",
     "esbuild-plugin-inline-image": "^0.0.9",
     "esbuild-plugin-svgr": "^2.1.0",
     "esbuild-style-plugin": "^1.6.2",
+    "immer": "^10.0.2",
     "juno-ui-components": "https://assets.juno.global.cloud.sap/libs/juno-ui-components@2.1.3/package.tgz",
-    "prop-types": "^15.8.1",
     "luxon": "^3.4.0",
+    "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "simple-zustand-devtools": "^1.1.0",
     "tailwindcss": "^3.3.3",
-    "url-state-provider": "https://assets.juno.global.cloud.sap/libs/url-state-provider@1.2.5/package.tgz",
-    "zustand": "^4.4.1"
+    "zustand": "^4.4.1",
+    "zustand-querystring": "^0.0.14"
   },
   "scripts": {
     "start": "PORT=$APP_PORT NODE_ENV=development node esbuild.config.mjs --serve --watch",
@@ -54,8 +57,5 @@
       "value": "",
       "description": "Help slack link"
     }
-  },
-  "dependencies": {
-    "countries-list": "^2.6.1"
   }
 }

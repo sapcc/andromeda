@@ -1,15 +1,14 @@
 import React from "react"
 
 import {DataGridCell, DataGridRow, Icon, Stack} from "juno-ui-components"
-import {authStore, useStore} from "../../../store"
+import {authStore, urlStore} from "../../../store"
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
-import {currentState, push} from "url-state-provider"
 import {deleteItem, fetchItem} from "../../../actions"
 import {ListItemSpinner, ListItemStatus} from "../../Components";
 
 const MemberListItem = ({member, setError}) => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
     const auth = authStore((state) => state.auth)
+    const openPanel = urlStore((state) => state.openPanel)
     const queryClient = useQueryClient()
 
     const queryDatacenter = useQuery(
@@ -23,15 +22,7 @@ const MemberListItem = ({member, setError}) => {
     )
     const mutation = useMutation(deleteItem)
 
-    const handleEditMemberClick = () => {
-        const urlState = currentState(urlStateKey)
-        push(urlStateKey, {
-            ...urlState,
-            currentPanel: "Member",
-            id: member.id,
-        })
-    }
-
+    const handleEditMemberClick = () => openPanel("Member", member.id)
     const handleDeleteMemberClick = () => {
         mutation.mutate(
             {

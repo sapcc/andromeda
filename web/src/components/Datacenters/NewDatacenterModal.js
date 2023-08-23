@@ -4,12 +4,11 @@ import {authStore, useStore} from "../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {createItem} from "../../actions"
 import {CheckboxRow, Modal, SelectOption, SelectRow, Stack, TextInputRow} from "juno-ui-components"
-import {currentState, push} from "url-state-provider"
 import {Error} from "../Components";
 
 const NewDatacenterModal = () => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
     const auth = authStore((state) => state.auth)
+    const closeModal = useStore((state) => state.closeModal)
     const queryClient = useQueryClient()
     const [formState, setFormState] = useState({
         name: undefined,
@@ -24,12 +23,6 @@ const NewDatacenterModal = () => {
     })
 
     const {error, mutate} = useMutation(createItem)
-
-    const closeNewDatacenterModal = () => {
-        const urlState = currentState(urlStateKey)
-        push(urlStateKey, {...urlState, currentModal: ""})
-    }
-
     const onSubmit = () => {
         mutate(
             {
@@ -44,7 +37,7 @@ const NewDatacenterModal = () => {
                         .setQueryData(["datacenters", data.datacenter.id], data)
                     queryClient
                         .invalidateQueries("datacenters")
-                        .then(closeNewDatacenterModal)
+                        .then(closeModal)
                 }
             }
         )
@@ -58,7 +51,7 @@ const NewDatacenterModal = () => {
         <Modal
             title="Add new Datacenter"
             open
-            onCancel={closeNewDatacenterModal}
+            onCancel={closeModal}
             confirmButtonLabel="Save new Datacenter"
             onConfirm={onSubmit}
         >

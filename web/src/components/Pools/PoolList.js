@@ -1,9 +1,8 @@
-import React, {useEffect, useState} from "react"
+import React, {useState} from "react"
 
-import {Box, Button, DataGrid, DataGridHeadCell, DataGridRow, Message, Spinner, Stack,} from "juno-ui-components"
+import {Box, Button, DataGrid, DataGridHeadCell, DataGridRow, Stack,} from "juno-ui-components"
 import PoolListItem from "./PoolListItem"
-import {authStore, useStore} from "../../store"
-import {currentState, push} from "url-state-provider"
+import {authStore, urlStore} from "../../store"
 import {fetchAll, nextPageParam} from "../../actions";
 import {useInfiniteQuery} from '@tanstack/react-query';
 import MemberList from "./Members/MemberList";
@@ -11,8 +10,9 @@ import MonitorList from "./Monitors/MonitorList";
 import {Error, Loading} from "../Components";
 
 const PoolList = () => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
     const auth = authStore((state) => state.auth)
+    const setModal = urlStore((state) => state.openModal)
+    const selectedPool = urlStore((state) => state.pool)
     const [error, setError] = useState()
 
     const {
@@ -33,16 +33,6 @@ const PoolList = () => {
             onSuccess: () => setError(undefined),
         }
     )
-    const handleNewPoolClick = () => {
-        const urlState = currentState(urlStateKey)
-        push(urlStateKey, {...urlState, currentModal: "NewPoolsItem"})
-    }
-
-    const [selectedPool, setSelectedPool] = useState("");
-    useEffect(() => {
-        const urlState = currentState(urlStateKey)
-        if (urlState?.pool) setSelectedPool(urlState.pool)
-    }, [urlStateKey])
 
     return (
         <>
@@ -63,7 +53,7 @@ const PoolList = () => {
                 <Button
                     variant="primary"
                     icon="addCircle"
-                    onClick={handleNewPoolClick}
+                    onClick={() => setModal("NewPoolsItem")}
                     label="Add a Pool"
                 />
             </Stack>
@@ -84,7 +74,6 @@ const PoolList = () => {
                             <PoolListItem
                                 key={index}
                                 pool={pool}
-                                setSelectedPool={setSelectedPool}
                                 isActive={selectedPool === pool.id}
                                 setError={setError}
                             />)
@@ -114,8 +103,8 @@ const PoolList = () => {
 
             {selectedPool && (
                 <Stack direction="horizontal" gap="2">
-                    <MemberList poolID={selectedPool} setSelectedPool={setSelectedPool} />
-                    <MonitorList poolID={selectedPool} setSelectedPool={setSelectedPool} />
+                    <MemberList />
+                    <MonitorList />
                 </Stack>
             )}
         </>

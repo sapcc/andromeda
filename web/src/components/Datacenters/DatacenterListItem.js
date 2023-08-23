@@ -1,15 +1,14 @@
 import React, {useMemo} from "react"
 import {DataGridCell, DataGridRow, Icon, Stack} from "juno-ui-components"
-import {authStore, useStore} from "../../store"
+import {authStore, urlStore} from "../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
-import {currentState, push} from "url-state-provider"
 import {deleteItem} from "../../actions"
 import {DateTime} from "luxon";
 import {ListItemSpinner, ListItemStatus} from "../Components";
 
 const DatacenterListItem = ({datacenter, setError}) => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
     const auth = authStore((state) => state.auth)
+    const setPanel = urlStore((state) => state.openPanel)
     const queryClient = useQueryClient()
     const createdAt = useMemo(() => {
         if (datacenter.created_at) {
@@ -27,15 +26,7 @@ const DatacenterListItem = ({datacenter, setError}) => {
     }, [datacenter.updated_at])
     const mutation = useMutation(deleteItem)
 
-    const handleEditDatacenterClick = () => {
-        const urlState = currentState(urlStateKey)
-        push(urlStateKey, {
-            ...urlState,
-            currentPanel: "Datacenter",
-            id: datacenter.id,
-        })
-    }
-
+    const handleEditDatacenterClick = () => setPanel("Datacenter", datacenter.id)
     const handleDeleteDatacenterClick = () => {
         mutation.mutate(
             {

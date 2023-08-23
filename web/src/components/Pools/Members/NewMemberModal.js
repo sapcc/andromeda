@@ -1,17 +1,15 @@
-import React, {useState} from "react"
+import React, {useMemo, useState} from "react"
 
-import {authStore, useStore} from "../../../store"
+import {authStore, urlStore} from "../../../store"
 import {createItem} from "../../../actions"
-import {CheckboxRow, Message, Modal, TextInputRow} from "juno-ui-components"
+import {Badge, Checkbox, Modal, Stack, TextInput} from "juno-ui-components"
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import DatacenterMenu from "./DatacenterMenu";
-import {currentState, push} from "url-state-provider";
-import {Error, Loading} from "../../Components";
+import {Error} from "../../Components";
 
 const NewMemberModal = () => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
     const auth = authStore((state) => state.auth)
-    const urlState = currentState(urlStateKey)
+    const [closeModal, pool] = urlStore((state) => [state.closeModal, state.pool])
     const queryClient = useQueryClient()
     const [error, setError] = useState()
     const [formState, setFormState] = useState({
@@ -20,15 +18,10 @@ const NewMemberModal = () => {
         datacenter_id: undefined,
         port: undefined,
         admin_state_up: true,
-        pool_id: urlState?.pool,
+        pool_id: pool,
     })
 
     const {mutate} = useMutation(createItem)
-
-    const closeModal = () => {
-        push(urlStateKey, {...urlState, currentModal: ""})
-    }
-
     const onSubmit = () => {
         mutate(
             {
@@ -53,46 +46,56 @@ const NewMemberModal = () => {
     const handleChange = (event) => {
         setFormState({...formState, [event.target.name]: event.target.value});
     };
+    const heading = useMemo(() => {
+        return (
+            <>
+                Add new Member
+                <p><small>Pool <Badge>{pool}</Badge></small></p>
+            </>
+        )
+    }, [pool])
 
     return (
         <Modal
-            title="Add new Member"
+            heading={heading}
             open
             onCancel={closeModal}
             confirmButtonLabel="Save new Member"
             onConfirm={onSubmit}
         >
-            {/* Error Bar */}
-            <Error error={error} />
+            <Stack direction="vertical" gap="2">
+                {/* Error Bar */}
+                <Error error={error}/>
 
-            <CheckboxRow
-                id="selectable"
-                label="Enabled"
-                checked={formState.admin_state_up}
-                onChange={(event) => setFormState({...formState, admin_state_up: event.target.checked})}
-            />
-            <TextInputRow
-                label="Name"
-                name="name"
-                value={formState.name}
-                onChange={handleChange}
-            />
-            <TextInputRow
-                label="IP address"
-                name="address"
-                value={formState.address}
-                onChange={handleChange}
-                required
-            />
-            <TextInputRow
-                label="Port"
-                type="number"
-                value={formState.port?.toString()}
-                onChange={(event) => setFormState({...formState, port: parseInt(event.target.value)})}
-                required
-            />
-            Select a Datacenter
-            <DatacenterMenu formState={formState} setFormState={setFormState} setError={setError}/>
+                <Checkbox
+                    id="selectable"
+                    label="Enabled"
+                    checked={formState.admin_state_up}
+                    onChange={(event) => setFormState({...formState, admin_state_up: event.target.checked})}
+                />
+                <TextInput
+                    label="Name"
+                    name="name"
+                    value={formState.name}
+                    onChange={handleChange}
+                />
+                <TextInput
+                    label="IP address"
+                    name="address"
+                    value={formState.address}
+                    onChange={handleChange}
+                    required
+                />
+                <TextInput
+                    label="Port"
+                    type="number"
+                    value={formState.port?.toString()}
+                    onChange={(event) => setFormState({...formState, port: parseInt(event.target.value)})}
+                    required
+                />
+                Select a Datacenter
+                <DatacenterMenu formState={formState} setFormState={setFormState} setError={setError}/>
+            </Stack>
         </Modal>
     )
 }

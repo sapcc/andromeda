@@ -10,16 +10,14 @@ import {
     SelectRow,
     TextInputRow,
 } from "juno-ui-components"
-import {authStore, useStore} from "../../store"
-import {currentState} from "url-state-provider"
+import {authStore, urlStore} from "../../store"
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {fetchItem, updateAttributes, updateItem} from "../../actions"
 import {Error, Loading} from "../Components";
 
 const EditDomainPanel = ({closeCallback}) => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
+    const id = urlStore((state) => state.id)
     const auth = authStore((state) => state.auth)
-    const urlState = currentState(urlStateKey)
     const queryClient = useQueryClient()
     const [error, setError] = useState()
     const [formState, setFormState] = useState({
@@ -30,7 +28,7 @@ const EditDomainPanel = ({closeCallback}) => {
         admin_state_up: undefined,
     })
 
-    const {isLoading} = useQuery(["domains", urlState.id],
+    const {isLoading} = useQuery(["domains", id],
         fetchItem,
         {
             meta: auth,
@@ -44,7 +42,7 @@ const EditDomainPanel = ({closeCallback}) => {
         mutation.mutate(
             {
                 key: "domains",
-                id: urlState.id,
+                id: id,
                 formState: {"domain": formState},
                 endpoint: auth?.endpoint,
                 token: auth?.token,

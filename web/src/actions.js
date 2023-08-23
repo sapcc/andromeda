@@ -1,5 +1,3 @@
-const ENDPOINT = "https://endpoint-url-here.com"
-
 class HTTPError extends Error {
     constructor(code, message) {
         super(message || code)

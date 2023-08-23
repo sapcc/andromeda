@@ -10,16 +10,15 @@ import {
     Stack,
     TextInputRow,
 } from "juno-ui-components"
-import {authStore, useStore} from "../../store"
-import {currentState} from "url-state-provider"
+import {authStore, urlStore} from "../../store"
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {fetchItem, updateAttributes, updateItem} from "../../actions"
 import {Error, Loading} from "../Components";
+import {produce} from "immer";
 
 const EditDatacenterPanel = ({closeCallback}) => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
     const auth = authStore((state) => state.auth)
-    const urlState = currentState(urlStateKey)
+    const id = urlStore((state) => state.id)
     const queryClient = useQueryClient()
     const [error, setError] = useState()
     const [formState, setFormState] = useState({
@@ -35,7 +34,7 @@ const EditDatacenterPanel = ({closeCallback}) => {
     })
 
     const {isLoading} = useQuery(
-        ["datacenters", urlState.id],
+        ["datacenters", id],
         fetchItem,
         {
             meta: auth,
@@ -49,7 +48,7 @@ const EditDatacenterPanel = ({closeCallback}) => {
         mutation.mutate(
             {
                 key: "datacenters",
-                id: urlState.id,
+                id: id,
                 formState: {"datacenter": formState},
                 endpoint: auth?.endpoint,
                 token: auth?.token,
@@ -68,7 +67,12 @@ const EditDatacenterPanel = ({closeCallback}) => {
     }
 
     const handleChange = (event) => {
-        setFormState({...formState, [event.target.name]: event.target.value});
+        setFormState(
+            produce((draft) => {
+                draft[event.target.name] = event.target.value
+            })
+        );
+        //setFormState({...formState, [event.target.name]: event.target.value});
     };
 
     return (

@@ -1,6 +1,6 @@
 import React from "react";
 
-import {authStore, useStore} from "../../store";
+import {authStore} from "../../store";
 import {useInfiniteQuery} from "@tanstack/react-query";
 import {fetchAll, nextPageParam} from "../../actions";
 import {Menu} from "juno-ui-components/build/Menu";

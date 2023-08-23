@@ -4,7 +4,7 @@ import {Menu} from "juno-ui-components/build/Menu";
 import {MenuItem} from "juno-ui-components/build/MenuItem";
 import {useInfiniteQuery} from "@tanstack/react-query";
 import {fetchAll, nextPageParam} from "../../../actions";
-import {authStore, useStore} from "../../../store";
+import {authStore} from "../../../store";
 
 
 const DatacenterMenu = ({formState, setFormState, setError}) => {
@@ -22,6 +22,7 @@ const DatacenterMenu = ({formState, setFormState, setError}) => {
     })
 
     const onDatacenterClick = (id) => {
+
         setFormState({
             ...formState,
             datacenter_id: id === formState.datacenter_id ? undefined : id,

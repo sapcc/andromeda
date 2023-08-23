@@ -1,22 +1,20 @@
 import React, {useMemo} from "react"
 
 import {Badge, Panel} from "juno-ui-components"
-import {useStore} from "../store"
-import {currentState} from "url-state-provider"
 import EditDomainPanel from "./Domains/EditDomainPanel"
 import EditDatacenterPanel from "./Datacenters/EditDatacenterPanel";
 import EditPoolPanel from "./Pools/EditPoolPanel";
 import EditMemberPanel from "./Pools/Members/EditMemberPanel";
 import EditMonitorPanel from "./Pools/Monitors/EditMonitorPanel";
+import {urlStore} from "../store";
 
 const PanelManager = ({ currentPanel, closePanel }) => {
-  const urlStateKey = useStore((state) => state.urlStateKey)
+  const id = urlStore((state) => state.id)
 
   const heading = useMemo(() => {
-    const urlState = currentState(urlStateKey)
     return (
         <span>
-          Edit {currentPanel}: <Badge>{urlState?.id}</Badge>
+          Edit {currentPanel}: <Badge>{id}</Badge>
         </span>
     )
   }, [currentPanel])

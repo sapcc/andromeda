@@ -7,13 +7,10 @@ import NewPoolModal from "./Pools/NewPoolModal";
 import NewDatacenterModal from "./Datacenters/NewDatacenterModal";
 import NewGeographicMapModal from "./GeographicMaps/NewGeographicMapModal";
 import ShowGeographicMapModal from "./GeographicMaps/ShowGeographicMapModal";
-import {useStore} from "../store";
-import {currentState} from "url-state-provider";
+import {urlStore} from "../store";
 
-const ModalManager = ({currentModal}) => {
-    const urlStateKey = useStore((state) => state.urlStateKey)
-    const urlState = currentState(urlStateKey)
-
+const ModalManager = () => {
+    const currentModal = urlStore((state) => state.m)
     switch (currentModal) {
         case "LogIn":
             return <LogInModal />
@@ -26,7 +23,7 @@ const ModalManager = ({currentModal}) => {
         case "NewGeographicMapsItem":
             return <NewGeographicMapModal />
         case "ShowGeographicMap":
-            return <ShowGeographicMapModal id={urlState?.id} />
+            return <ShowGeographicMapModal />
         case "NewMembersItem":
             return <NewMemberModal/>
         case "NewMonitorsItem":
