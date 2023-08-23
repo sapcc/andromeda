@@ -1,6 +1,6 @@
 import React, {useState} from "react"
 
-import {Button, CheckboxRow, Form, PanelBody, PanelFooter, TextInputRow,} from "juno-ui-components"
+import {Button, Checkbox, Form, PanelBody, PanelFooter, Stack, TextInput,} from "juno-ui-components"
 import {authStore, urlStore} from "../../../store"
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {fetchItem, updateAttributes, updateItem} from "../../../actions"
@@ -66,44 +66,47 @@ const EditMemberPanel = ({closeCallback}) => {
                     </PanelFooter>
                 }
             >
-                {/* Error Bar */}
-                <Error error={error} />
+                <Stack direction="vertical" gap="2">
 
-                {/* Loading indicator for page content */}
-                <Loading isLoading={isLoading || mutation.isLoading} />
+                    {/* Error Bar */}
+                    <Error error={error}/>
 
-                <CheckboxRow
-                    id="selectable"
-                    label="Enabled"
-                    checked={formState.admin_state_up}
-                    disabled={isLoading}
-                    onChange={(event) => setFormState({...formState, admin_state_up: event.target.checked})}
-                />
-                <TextInputRow
-                    label="Name"
-                    name="name"
-                    value={formState.name}
-                    disabled={isLoading}
-                    onChange={handleChange}
-                />
-                <TextInputRow
-                    label="IP address"
-                    name="address"
-                    value={formState.address}
-                    disabled={isLoading}
-                    onChange={handleChange}
-                    required
-                />
-                <TextInputRow
-                    label="Port"
-                    type="number"
-                    disabled={isLoading}
-                    value={formState.port?.toString()}
-                    onChange={(event) => setFormState({...formState, port: parseInt(event.target.value)})}
-                    required
-                />
-                Select a Datacenter
-                <DatacenterMenu formState={formState} setFormState={setFormState} setError={setError}/>
+                    {/* Loading indicator for page content */}
+                    <Loading isLoading={isLoading || mutation.isLoading}/>
+
+                    <Checkbox
+                        id="selectable"
+                        label="Enabled"
+                        checked={formState.admin_state_up}
+                        disabled={isLoading}
+                        onChange={(event) => setFormState({...formState, admin_state_up: event.target.checked})}
+                    />
+                    <TextInput
+                        label="Name"
+                        name="name"
+                        value={formState.name}
+                        disabled={isLoading}
+                        onChange={handleChange}
+                    />
+                    <TextInput
+                        label="IP address"
+                        name="address"
+                        value={formState.address}
+                        disabled={isLoading}
+                        onChange={handleChange}
+                        required
+                    />
+                    <TextInput
+                        label="Port"
+                        type="number"
+                        disabled={isLoading}
+                        value={formState.port?.toString()}
+                        onChange={(event) => setFormState({...formState, port: parseInt(event.target.value)})}
+                        required
+                    />
+                    Select a Datacenter
+                    <DatacenterMenu formState={formState} setFormState={setFormState} setError={setError}/>
+                </Stack>
             </PanelBody>
         </Form>
     )

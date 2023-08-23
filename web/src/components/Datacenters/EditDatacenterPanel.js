@@ -1,14 +1,14 @@
 import React, {useState} from "react"
 import {
     Button,
-    CheckboxRow,
+    Checkbox,
     Form,
     PanelBody,
     PanelFooter,
     SelectOption,
-    SelectRow,
+    Select,
     Stack,
-    TextInputRow,
+    TextInput,
 } from "juno-ui-components"
 import {authStore, urlStore} from "../../store"
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
@@ -91,21 +91,21 @@ const EditDatacenterPanel = ({closeCallback}) => {
                 {/* Loading indicator for page content */}
                 <Loading isLoading={isLoading || mutation.isLoading} />
 
-                <CheckboxRow
+                <Checkbox
                     id="selectable"
                     label="Enabled"
                     disabled={isLoading}
                     checked={formState?.admin_state_up}
                     onChange={(event) => setFormState({...formState, admin_state_up: event.target.checked})}
                 />
-                <TextInputRow
+                <TextInput
                     label="Name"
                     disabled={isLoading}
                     name="name"
                     value={formState?.name}
                     onChange={handleChange}
                 />
-                <SelectRow
+                <Select
                     label="Continent"
                     disabled={isLoading}
                     helptext="A two-letter code that specifies the continent where the data center maps to."
@@ -120,8 +120,8 @@ const EditDatacenterPanel = ({closeCallback}) => {
                     <SelectOption key="NA" label="NA - North america" value="NA"/>
                     <SelectOption key="OC" label="OC - Oceania" value="OC"/>
                     <SelectOption key="SA" label="SA - South america" value="SA"/>
-                </SelectRow>
-                <TextInputRow
+                </Select>
+                <TextInput
                     label="Country"
                     disabled={isLoading}
                     name="country"
@@ -129,7 +129,7 @@ const EditDatacenterPanel = ({closeCallback}) => {
                     value={formState?.country}
                     onChange={handleChange}
                 />
-                <TextInputRow
+                <TextInput
                     label="State or Province"
                     disabled={isLoading}
                     name="state_or_province"
@@ -137,7 +137,7 @@ const EditDatacenterPanel = ({closeCallback}) => {
                     value={formState.state_or_province}
                     onChange={handleChange}
                 />
-                <TextInputRow
+                <TextInput
                     label="City"
                     disabled={isLoading}
                     name="city"
@@ -146,7 +146,7 @@ const EditDatacenterPanel = ({closeCallback}) => {
                     onChange={handleChange}
                 />
                 <Stack gap="2">
-                    <TextInputRow
+                    <TextInput
                         label="Longitude"
                         disabled={isLoading}
                         type="number"
@@ -154,7 +154,7 @@ const EditDatacenterPanel = ({closeCallback}) => {
                         value={formState.longitude?.toString()}
                         onChange={(event) => setFormState({...formState, longitude: parseFloat(event.target.value)})}
                     />
-                    <TextInputRow
+                    <TextInput
                         label="Latitude"
                         disabled={isLoading}
                         type="number"

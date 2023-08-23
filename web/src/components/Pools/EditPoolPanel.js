@@ -1,6 +1,6 @@
 import React, {useState} from "react"
 
-import {Button, CheckboxRow, Form, PanelBody, PanelFooter, Spinner, TextInputRow,} from "juno-ui-components"
+import {Button, Checkbox, Form, PanelBody, PanelFooter, Spinner, TextInput,} from "juno-ui-components"
 import {authStore, urlStore} from "../../store"
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {fetchItem, updateAttributes, updateItem} from "../../actions"
@@ -71,14 +71,14 @@ const EditPoolPanel = ({closeCallback}) => {
                 {/* Loading indicator for page content */}
                 <Loading isLoading={isLoading || mutation.isLoading} />
 
-                <CheckboxRow
+                <Checkbox
                     id="selectable"
                     label="Enabled"
                     disabled={isLoading}
                     checked={formState.admin_state_up}
                     onChange={(event) => setFormState({...formState, admin_state_up: event.target.checked})}
                 />
-                <TextInputRow
+                <TextInput
                     label="Name"
                     disabled={isLoading}
                     name="name"

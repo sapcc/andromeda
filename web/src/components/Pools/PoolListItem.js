@@ -66,7 +66,7 @@ const PoolListItem = ({pool, isActive, setError}) => {
             <DataGridCell>
                 <ListItemStatus data={pool} />
             </DataGridCell>
-            <DataGridCell>
+            <DataGridCell className="jn-items-end">
                 {/* Use <Stack> to align and space elements: */}
                 <Stack gap="1.5">
                     <Icon

@@ -3,7 +3,7 @@ import React, {useState} from "react"
 import {authStore, useStore} from "../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {createItem} from "../../actions"
-import {CheckboxRow, Modal, SelectOption, SelectRow, Stack, TextInputRow} from "juno-ui-components"
+import {Checkbox, Modal, SelectOption, Select, Stack, TextInput} from "juno-ui-components"
 import {Error} from "../Components";
 
 const NewDatacenterModal = () => {
@@ -58,19 +58,19 @@ const NewDatacenterModal = () => {
             {/* Error Bar */}
             <Error error={error} />
 
-            <CheckboxRow
+            <Checkbox
                 id="selectable"
                 label="Enabled"
                 checked={formState.admin_state_up}
                 onChange={(event) => setFormState({...formState, admin_state_up: event.target.checked})}
             />
-            <TextInputRow
+            <TextInput
                 label="Name"
                 name="name"
                 value={formState.name}
                 onChange={handleChange}
             />
-            <SelectRow
+            <Select
                 label="Continent"
                 helptext="A two-letter code that specifies the continent where the data center maps to."
                 value={formState.continent}
@@ -84,22 +84,22 @@ const NewDatacenterModal = () => {
                 <SelectOption key="NA" label="NA - North america" value="NA"/>
                 <SelectOption key="OC" label="OC - Oceania" value="OC"/>
                 <SelectOption key="SA" label="SA - South america" value="SA"/>
-            </SelectRow>
-            <TextInputRow
+            </Select>
+            <TextInput
                 label="Country"
                 name="country"
                 helptext="A two-letter ISO 3166 country code that specifies the country where the data center maps to."
                 value={formState.country}
                 onChange={handleChange}
             />
-            <TextInputRow
+            <TextInput
                 label="State or Province"
                 name="state_or_province"
                 helptext="The name of the state or province where the data center is located."
                 value={formState.state_or_province}
                 onChange={handleChange}
             />
-            <TextInputRow
+            <TextInput
                 label="City"
                 name="city"
                 helptext="The name of the city where the data center is located."
@@ -107,14 +107,14 @@ const NewDatacenterModal = () => {
                 onChange={handleChange}
             />
             <Stack gap="2">
-                <TextInputRow
+                <TextInput
                     label="Longitude"
                     type="number"
                     helptext="Specifies the geographical longitude of the data center's position."
                     value={formState.longitude?.toString()}
                     onChange={(event) => setFormState({...formState, longitude: parseFloat(event.target.value)})}
                 />
-                <TextInputRow
+                <TextInput
                     label="Latitude"
                     type="number"
                     helptext="Specifies the geographic latitude of the data center's position."

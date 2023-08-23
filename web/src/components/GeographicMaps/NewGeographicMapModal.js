@@ -3,7 +3,7 @@ import React, {useState} from "react"
 import {authStore, urlStore} from "../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {createItem} from "../../actions"
-import {Box, Button, Icon, JsonViewer, Label, Modal, Stack, TextInputRow} from "juno-ui-components"
+import {Box, Button, Icon, JsonViewer, Label, Modal, Stack, TextInput} from "juno-ui-components"
 import {Error} from "../Components";
 import {continents, countries} from "countries-list";
 import DatacenterSelect from "./DatacenterSelect";
@@ -97,7 +97,7 @@ const NewGeographicMapModal = () => {
 
             <Stack direction="vertical" gap="1.5">
 
-                <TextInputRow
+                <TextInput
                     label="Name"
                     name="name"
                     value={formState.name}

@@ -2,13 +2,13 @@ import React, {useState} from "react"
 
 import {
     Button,
-    CheckboxRow,
+    Checkbox,
     Form,
     PanelBody,
     PanelFooter,
     SelectOption,
-    SelectRow,
-    TextInputRow,
+    Select,
+    TextInput,
 } from "juno-ui-components"
 import {authStore, urlStore} from "../../store"
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
@@ -80,21 +80,21 @@ const EditDomainPanel = ({closeCallback}) => {
             <Loading isLoading={isLoading || mutation.isLoading} />
 
             <Form>
-                <CheckboxRow
+                <Checkbox
                     id="selectable"
                     label="Enabled"
                     checked={formState.admin_state_up}
                     disabled={isLoading}
                     onChange={(event) => setFormState({...formState, admin_state_up: event.target.checked})}
                 />
-                <TextInputRow
+                <TextInput
                     label="Name"
                     name="name"
                     value={formState?.name}
                     disabled={isLoading}
                     onChange={handleChange}
                 />
-                <SelectRow
+                <Select
                     label="Provider"
                     name="provider"
                     value={formState?.provider}
@@ -107,8 +107,8 @@ const EditDomainPanel = ({closeCallback}) => {
                         label="Akamai"
                         value="akamai"
                     />
-                </SelectRow>
-                <TextInputRow
+                </Select>
+                <TextInput
                     label="Fully Qualified Domain Name"
                     name="fqdn"
                     value={formState?.fqdn}
@@ -116,7 +116,7 @@ const EditDomainPanel = ({closeCallback}) => {
                     onChange={handleChange}
                     required
                 />
-                <SelectRow
+                <Select
                     label="Record Type"
                     value={formState?.record_type}
                     disabled={isLoading}
@@ -138,7 +138,7 @@ const EditDomainPanel = ({closeCallback}) => {
                         label="MX"
                         value="MX"
                     />
-                </SelectRow>
+                </Select>
             </Form>
         </PanelBody>
     )

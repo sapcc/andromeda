@@ -2,15 +2,15 @@ import React, {useState} from "react"
 
 import {
     Button,
-    CheckboxRow,
+    Checkbox,
     Form,
     PanelBody,
     PanelFooter,
+    Select,
     SelectOption,
-    SelectRow,
     Stack,
-    TextareaRow,
-    TextInputRow,
+    Textarea,
+    TextInput,
 } from "juno-ui-components"
 import {authStore, urlStore} from "../../../store"
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
@@ -79,73 +79,75 @@ const EditMonitorPanel = ({closeCallback}) => {
                     </PanelFooter>
                 }
             >
-                {/* Error Bar */}
-                <Error error={error} />
+                <Stack direction="vertical" gap="2">
+                    {/* Error Bar */}
+                    <Error error={error}/>
 
-                {/* Loading indicator for page content */}
-                <Loading isLoading={isLoading || mutation.isLoading} />
+                    {/* Loading indicator for page content */}
+                    <Loading isLoading={isLoading || mutation.isLoading}/>
 
-                <CheckboxRow
-                    id="selectable"
-                    label="Enabled"
-                    disabled={isLoading}
-                    checked={formState.admin_state_up}
-                    onChange={(event) => setFormState({...formState, admin_state_up: event.target.checked})}
-                />
-                <TextInputRow
-                    label="Name"
-                    name="name"
-                    disabled={isLoading}
-                    value={formState.name}
-                    onChange={handleChange}
-                />
-                <TextInputRow
-                    label="Interval"
-                    name="interval"
-                    disabled={isLoading}
-                    type="number"
-                    value={formState.interval?.toString()}
-                    onChange={(event) => setFormState({...formState, interval: parseInt(event.target.value)})}
-                />
-                <TextInputRow
-                    label="Timeout"
-                    name="timeout"
-                    disabled={isLoading}
-                    type="number"
-                    value={formState.timeout?.toString()}
-                    onChange={(event) => setFormState({...formState, timeout: parseInt(event.target.value)})}
-                />
-                <SelectRow
-                    label="Type"
-                    disabled={isLoading}
-                    value={formState.type}
-                    onChange={(target) => setFormState({...formState, type: target})}
-                >
-                    <SelectOption key="icmp" value="ICMP" label="ICMP (Unsupported on Akamai)"/>
-                    <SelectOption key="http" value="HTTP" label="HTTP"/>
-                    <SelectOption key="https" value="HTTPS" label="HTTPS"/>
-                    <SelectOption key="tcp" value="TCP" label="TCP"/>
-                    <SelectOption key="udp" value="UDP" label="UDP"/>
-                </SelectRow>
+                    <Checkbox
+                        id="selectable"
+                        label="Enabled"
+                        disabled={isLoading}
+                        checked={formState.admin_state_up}
+                        onChange={(event) => setFormState({...formState, admin_state_up: event.target.checked})}
+                    />
+                    <TextInput
+                        label="Name"
+                        name="name"
+                        disabled={isLoading}
+                        value={formState.name}
+                        onChange={handleChange}
+                    />
+                    <TextInput
+                        label="Interval"
+                        name="interval"
+                        disabled={isLoading}
+                        type="number"
+                        value={formState.interval?.toString()}
+                        onChange={(event) => setFormState({...formState, interval: parseInt(event.target.value)})}
+                    />
+                    <TextInput
+                        label="Timeout"
+                        name="timeout"
+                        disabled={isLoading}
+                        type="number"
+                        value={formState.timeout?.toString()}
+                        onChange={(event) => setFormState({...formState, timeout: parseInt(event.target.value)})}
+                    />
+                    <Select
+                        label="Type"
+                        disabled={isLoading}
+                        value={formState.type}
+                        onChange={(target) => setFormState({...formState, type: target})}
+                    >
+                        <SelectOption key="icmp" value="ICMP" label="ICMP (Unsupported on Akamai)"/>
+                        <SelectOption key="http" value="HTTP" label="HTTP"/>
+                        <SelectOption key="https" value="HTTPS" label="HTTPS"/>
+                        <SelectOption key="tcp" value="TCP" label="TCP"/>
+                        <SelectOption key="udp" value="UDP" label="UDP"/>
+                    </Select>
 
-                {formState.type !== "ICMP" && (
-                    <Stack gap="2" distribution="between">
-                        <TextareaRow
-                            label="Monitor send string"
-                            className={"flex-auto"}
-                            disabled={isLoading}
-                            value={formState?.send}
-                            onChange={handleChange}
-                        />
-                        <TextareaRow
-                            label="Monitor expected receive string"
-                            className={"flex-auto"}
-                            disabled={isLoading}
-                            value={formState?.receive}
-                            onChange={handleChange}
-                        />
-                    </Stack>
-                )}
+                    {formState.type !== "ICMP" && (
+                        <Stack gap="2" distribution="between">
+                            <Textarea
+                                label="Monitor send string"
+                                className={"flex-auto"}
+                                disabled={isLoading}
+                                value={formState?.send}
+                                onChange={handleChange}
+                            />
+                            <Textarea
+                                label="Monitor expected receive string"
+                                className={"flex-auto"}
+                                disabled={isLoading}
+                                value={formState?.receive}
+                                onChange={handleChange}
+                            />
+                        </Stack>
+                    )}
+                </Stack>
             </PanelBody>
         </Form>
     )

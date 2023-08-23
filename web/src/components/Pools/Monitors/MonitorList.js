@@ -1,6 +1,6 @@
 import React, {useState} from "react"
 
-import {Box, Button, DataGrid, DataGridHeadCell, DataGridRow, Stack,} from "juno-ui-components"
+import {Badge, Box, Button, DataGrid, DataGridHeadCell, DataGridRow, Stack,} from "juno-ui-components"
 import MonitorListItem from "./MonitorListItem"
 import {authStore, urlStore} from "../../../store"
 import {fetchAll, nextPageParam} from "../../../actions";
@@ -33,24 +33,21 @@ const MonitorList = () => {
     )
 
     return (
-        <Stack direction="vertical" className="basis-1 md:basis-1/2">
-            <Stack
-                className="jn-px-6 jn-py-3 mt-6 jn-bg-theme-background-lvl-1">
+        <Stack direction="vertical" className="basis-1 md:basis-1/2 mt-6">
+            <Stack gap="2" className="jn-px-2 jn-py-2 jn-bg-theme-background-lvl-1">
                 <div className="jn-text-lg jn-text-theme-high">
-                    <strong>Associated Monitors</strong>
+                    <strong>Associated Monitors<Badge>Pool {poolId}</Badge></strong>
                 </div>
-                <Stack direction="horizontal" alignment="end" gap="2">
-                    <Button
-                        variant="primary"
-                        icon="addCircle"
-                        onClick={() => openModal("NewMonitorsItem")}
-                        label="Add a Monitor"
-                    />
-                    <Button
-                        icon="close"
-                        onClick={clearSelectedPool}
-                    />
-                </Stack>
+                <Button
+                    variant="primary"
+                    icon="addCircle"
+                    onClick={() => openModal("NewMonitorsItem")}
+                    label="Add a Monitor"
+                />
+                <Button
+                    icon="close"
+                    onClick={clearSelectedPool}
+                />
             </Stack>
 
             {/* Error Bar */}
@@ -66,7 +63,7 @@ const MonitorList = () => {
                         <DataGridHeadCell>Created</DataGridHeadCell>
                         <DataGridHeadCell>Updated</DataGridHeadCell>
                         <DataGridHeadCell>Status</DataGridHeadCell>
-                        <DataGridHeadCell>Options</DataGridHeadCell>
+                        <DataGridHeadCell className="jn-items-end">Options</DataGridHeadCell>
                     </DataGridRow>
 
                     {/* Render items: */}

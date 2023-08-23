@@ -65,7 +65,7 @@ const PoolList = () => {
                         <DataGridHeadCell>Created</DataGridHeadCell>
                         <DataGridHeadCell>Updated</DataGridHeadCell>
                         <DataGridHeadCell>Status</DataGridHeadCell>
-                        <DataGridHeadCell>Options</DataGridHeadCell>
+                        <DataGridHeadCell className="jn-items-end">Options</DataGridHeadCell>
                     </DataGridRow>
 
                     {/* Render items: */}
@@ -102,7 +102,7 @@ const PoolList = () => {
             </Box>
 
             {selectedPool && (
-                <Stack direction="horizontal" gap="2">
+                <Stack direction="vertical" gap="2">
                     <MemberList />
                     <MonitorList />
                 </Stack>

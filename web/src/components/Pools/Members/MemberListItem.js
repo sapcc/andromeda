@@ -56,7 +56,7 @@ const MemberListItem = ({member, setError}) => {
             <DataGridCell>
                 <ListItemStatus data={member} />
             </DataGridCell>
-            <DataGridCell>
+            <DataGridCell className="jn-items-end">
                 {/* Use <Stack> to align and space elements: */}
                 <Stack gap="1.5">
                     <Icon

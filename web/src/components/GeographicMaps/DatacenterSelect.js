@@ -2,7 +2,7 @@ import React from "react";
 import {useInfiniteQuery} from "@tanstack/react-query";
 import {fetchAll, nextPageParam} from "../../actions";
 import {authStore} from "../../store";
-import {Button, SelectOption, SelectRow} from "juno-ui-components";
+import {Button, SelectOption, Select} from "juno-ui-components";
 
 
 const DatacenterSelect = ({setDatacenter, setError, label = "Select Datacenter", className}) => {
@@ -20,7 +20,7 @@ const DatacenterSelect = ({setDatacenter, setError, label = "Select Datacenter",
     })
 
     return (
-        <SelectRow
+        <Select
             onValueChange={(value) => setDatacenter(value)}
             label={label}
             required="true"
@@ -45,7 +45,7 @@ const DatacenterSelect = ({setDatacenter, setError, label = "Select Datacenter",
                     icon={hasNextPage ? "expandMore" : "info"}
                 />
             )}
-        </SelectRow>
+        </Select>
     )
 }
 
