@@ -66,14 +66,14 @@ const EditMemberPanel = ({closeCallback}) => {
                     </PanelFooter>
                 }
             >
+
+                {/* Error Bar */}
+                <Error error={error}/>
+
+                {/* Loading indicator for page content */}
+                <Loading isLoading={isLoading || mutation.isLoading}/>
+
                 <Stack direction="vertical" gap="2">
-
-                    {/* Error Bar */}
-                    <Error error={error}/>
-
-                    {/* Loading indicator for page content */}
-                    <Loading isLoading={isLoading || mutation.isLoading}/>
-
                     <Checkbox
                         id="selectable"
                         label="Enabled"

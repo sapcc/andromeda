@@ -6,8 +6,9 @@ import {
     Form,
     PanelBody,
     PanelFooter,
-    SelectOption,
     Select,
+    SelectOption,
+    Stack,
     TextInput,
 } from "juno-ui-components"
 import {authStore, urlStore} from "../../store"
@@ -74,71 +75,73 @@ const EditDomainPanel = ({closeCallback}) => {
             }
         >
             {/* Error Bar */}
-            <Error error={error} />
+            <Error error={error}/>
 
             {/* Loading indicator for page content */}
-            <Loading isLoading={isLoading || mutation.isLoading} />
+            <Loading isLoading={isLoading || mutation.isLoading}/>
 
             <Form>
-                <Checkbox
-                    id="selectable"
-                    label="Enabled"
-                    checked={formState.admin_state_up}
-                    disabled={isLoading}
-                    onChange={(event) => setFormState({...formState, admin_state_up: event.target.checked})}
-                />
-                <TextInput
-                    label="Name"
-                    name="name"
-                    value={formState?.name}
-                    disabled={isLoading}
-                    onChange={handleChange}
-                />
-                <Select
-                    label="Provider"
-                    name="provider"
-                    value={formState?.provider}
-                    disabled={isLoading}
-                    onChange={handleChange}
-                    required
-                >
-                    <SelectOption
-                        key="akamai"
-                        label="Akamai"
-                        value="akamai"
+                <Stack direction="vertical" gap="2">
+                    <Checkbox
+                        id="selectable"
+                        label="Enabled"
+                        checked={formState.admin_state_up}
+                        disabled={isLoading}
+                        onChange={(event) => setFormState({...formState, admin_state_up: event.target.checked})}
                     />
-                </Select>
-                <TextInput
-                    label="Fully Qualified Domain Name"
-                    name="fqdn"
-                    value={formState?.fqdn}
-                    disabled={isLoading}
-                    onChange={handleChange}
-                    required
-                />
-                <Select
-                    label="Record Type"
-                    value={formState?.record_type}
-                    disabled={isLoading}
-                    onChange={(target) => setFormState({...formState, record_type: target})}
-                >
-                    <SelectOption
-                        label="A"
-                        value="A"
+                    <TextInput
+                        label="Name"
+                        name="name"
+                        value={formState?.name}
+                        disabled={isLoading}
+                        onChange={handleChange}
                     />
-                    <SelectOption
-                        label="AAAA"
-                        value="AAAA"
+                    <Select
+                        label="Provider"
+                        name="provider"
+                        value={formState?.provider}
+                        disabled={isLoading}
+                        onChange={handleChange}
+                        required
+                    >
+                        <SelectOption
+                            key="akamai"
+                            label="Akamai"
+                            value="akamai"
+                        />
+                    </Select>
+                    <TextInput
+                        label="Fully Qualified Domain Name"
+                        name="fqdn"
+                        value={formState?.fqdn}
+                        disabled={isLoading}
+                        onChange={handleChange}
+                        required
                     />
-                    <SelectOption
-                        label="CNAME"
-                        value="CNAME"
-                    />
-                    <SelectOption
-                        label="MX"
-                        value="MX"
-                    />
-                </Select>
+                    <Select
+                        label="Record Type"
+                        value={formState?.record_type}
+                        disabled={isLoading}
+                        onChange={(target) => setFormState({...formState, record_type: target})}
+                    >
+                        <SelectOption
+                            label="A"
+                            value="A"
+                        />
+                        <SelectOption
+                            label="AAAA"
+                            value="AAAA"
+                        />
+                        <SelectOption
+                            label="CNAME"
+                            value="CNAME"
+                        />
+                        <SelectOption
+                            label="MX"
+                            value="MX"
+                        />
+                    </Select>
+                </Stack>
             </Form>
         </PanelBody>
     )

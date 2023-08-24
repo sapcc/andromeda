@@ -1,6 +1,6 @@
 import React, {useState} from "react"
 
-import {Button, Checkbox, Form, PanelBody, PanelFooter, Spinner, TextInput,} from "juno-ui-components"
+import {Button, Checkbox, Form, PanelBody, PanelFooter, Spinner, Stack, TextInput,} from "juno-ui-components"
 import {authStore, urlStore} from "../../store"
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {fetchItem, updateAttributes, updateItem} from "../../actions"
@@ -71,23 +71,25 @@ const EditPoolPanel = ({closeCallback}) => {
                 {/* Loading indicator for page content */}
                 <Loading isLoading={isLoading || mutation.isLoading} />
 
-                <Checkbox
-                    id="selectable"
-                    label="Enabled"
-                    disabled={isLoading}
-                    checked={formState.admin_state_up}
-                    onChange={(event) => setFormState({...formState, admin_state_up: event.target.checked})}
-                />
-                <TextInput
-                    label="Name"
-                    disabled={isLoading}
-                    name="name"
-                    value={formState.name}
-                    onChange={handleChange}
-                />
-                Associated Domain(s):
-                {isLoading && <Spinner/>}
-                <DomainMenu formState={formState} setFormState={setFormState} setError={setError}/>
+                <Stack direction="vertical" gap="2">
+                    <Checkbox
+                        id="selectable"
+                        label="Enabled"
+                        disabled={isLoading}
+                        checked={formState.admin_state_up}
+                        onChange={(event) => setFormState({...formState, admin_state_up: event.target.checked})}
+                    />
+                    <TextInput
+                        label="Name"
+                        disabled={isLoading}
+                        name="name"
+                        value={formState.name}
+                        onChange={handleChange}
+                    />
+                    Associated Domain(s):
+                    {isLoading && <Spinner/>}
+                    <DomainMenu formState={formState} setFormState={setFormState} setError={setError}/>
+                </Stack>
             </PanelBody>
         </Form>
     )
