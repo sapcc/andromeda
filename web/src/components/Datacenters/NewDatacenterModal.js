@@ -1,14 +1,14 @@
 import React, {useState} from "react"
 
-import {authStore, useStore} from "../../store"
+import {authStore, urlStore} from "../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {createItem} from "../../actions"
-import {Checkbox, Modal, SelectOption, Select, Stack, TextInput} from "juno-ui-components"
+import {Checkbox, Modal, Select, SelectOption, Stack, TextInput} from "juno-ui-components"
 import {Error} from "../Components";
 
 const NewDatacenterModal = () => {
     const auth = authStore((state) => state.auth)
-    const closeModal = useStore((state) => state.closeModal)
+    const closeModal = urlStore((state) => state.closeModal)
     const queryClient = useQueryClient()
     const [formState, setFormState] = useState({
         name: undefined,

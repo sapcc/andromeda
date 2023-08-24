@@ -14,7 +14,6 @@ import {authStore, urlStore} from "../../store"
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {fetchItem, updateAttributes, updateItem} from "../../actions"
 import {Error, Loading} from "../Components";
-import {produce} from "immer";
 
 const EditDatacenterPanel = ({closeCallback}) => {
     const auth = authStore((state) => state.auth)
@@ -67,12 +66,7 @@ const EditDatacenterPanel = ({closeCallback}) => {
     }
 
     const handleChange = (event) => {
-        setFormState(
-            produce((draft) => {
-                draft[event.target.name] = event.target.value
-            })
-        );
-        //setFormState({...formState, [event.target.name]: event.target.value});
+        setFormState({...formState, [event.target.name]: event.target.value});
     };
 
     return (

@@ -3,15 +3,6 @@ import { createJSONStorage, persist } from "zustand/middleware"
 import { querystring } from "zustand-querystring";
 import { mountStoreDevtool } from 'simple-zustand-devtools';
 
-// global zustand store. See how this works here: https://github.com/pmndrs/zustand
-export const useStore = create(
-    (set) => ({
-        // basics
-        urlStateKey: undefined,
-        setUrlStateKey: (newUrlStateKey) => set((state) => ({urlStateKey: newUrlStateKey})),
-    })
-)
-
 export const authStore = create(
     persist((set, get) => ({
             auth: undefined,
