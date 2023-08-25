@@ -7,7 +7,7 @@ require (
 	github.com/Boostport/migration/driver/mysql v1.1.2
 	github.com/Boostport/migration/driver/postgres v1.1.3
 	github.com/Masterminds/squirrel v1.5.4
-	github.com/akamai/AkamaiOPEN-edgegrid-golang/v7 v7.2.0
+	github.com/akamai/AkamaiOPEN-edgegrid-golang/v7 v7.2.1
 	github.com/cockroachdb/cockroach-go/v2 v2.3.5
 	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/dlmiddlecote/sqlstats v1.0.2
