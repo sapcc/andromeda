@@ -145,7 +145,7 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint}) => {
                         </FormRow>
                     </div>
             )}
-                <ButtonRow name="Default ButtonRow" className="jn-justify-end pt-2">
+                <ButtonRow name="Default ButtonRow" className="jn-justify-end">
                     <Button
                         icon="openInBrowser"
                         label={`Enter ${credentials.domain}`}
