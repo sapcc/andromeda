@@ -39,7 +39,7 @@ require (
 	github.com/mcuadros/go-defaults v1.2.0
 	github.com/prometheus/client_golang v1.16.0
 	github.com/rs/cors v1.9.0
-	github.com/sapcc/go-api-declarations v1.8.0
+	github.com/sapcc/go-api-declarations v1.10.3
 	github.com/sapcc/go-bits v0.0.0-20230817142210-d6d2e72f3d0a
 	github.com/scottdware/go-bigip v0.0.0-20220517145708-9fe3e2f9f005
 	github.com/stretchr/testify v1.8.4

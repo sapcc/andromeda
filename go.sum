@@ -726,6 +726,8 @@ github.com/ryanuber/columnize v0.0.0-20160712163229-9b3edd62028f/go.mod h1:sm1tb
 github.com/sacloud/libsacloud v1.36.2/go.mod h1:P7YAOVmnIn3DKHqCZcUKYUXmSwGBm3yS7IBEjKVSrjg=
 github.com/sapcc/go-api-declarations v1.8.0 h1:jlomBUa0IMgcibtUT1GQ6VOT9RYa8LCk6LuP0DxURWo=
 github.com/sapcc/go-api-declarations v1.8.0/go.mod h1:83R3hTANhuRXt/pXDby37IJetw8l7DG41s33Tp9NXxI=
+github.com/sapcc/go-api-declarations v1.10.3 h1:wFnq1Qx1Uv0G4F0AWT+9E4N/8n77Lm3buUpT9rFm/QY=
+github.com/sapcc/go-api-declarations v1.10.3/go.mod h1:83R3hTANhuRXt/pXDby37IJetw8l7DG41s33Tp9NXxI=
 github.com/sapcc/go-bits v0.0.0-20230817142210-d6d2e72f3d0a h1:yBFT9UW5WROF37kgkt0KaLGeDewdZItMpFe9XaQqNB4=
 github.com/sapcc/go-bits v0.0.0-20230817142210-d6d2e72f3d0a/go.mod h1:k6CTEhqxP0n0Btmn8e64rVkZVBCe1smX+LmaYd1Lt4I=
 github.com/satori/go.uuid v1.2.0/go.mod h1:dA0hQrYB0VpLJoorglMZABFdXlWrHn1NEOzdhQKdks0=
