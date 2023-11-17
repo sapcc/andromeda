@@ -41,7 +41,7 @@ require (
 	github.com/rs/cors v1.10.1
 	github.com/sapcc/go-api-declarations v1.10.3
 	github.com/sapcc/go-bits v0.0.0-20231114102838-b69ff7fedd7f
-	github.com/scottdware/go-bigip v0.0.0-20220517145708-9fe3e2f9f005
+	github.com/scottdware/go-bigip v0.0.0-20230907015320-92d03ba95eca
 	github.com/stretchr/testify v1.8.4
 	github.com/urfave/cli/v2 v2.25.7
 	github.com/xo/dburl v0.16.0
