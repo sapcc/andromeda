@@ -32,7 +32,7 @@ const NewPoolModal = () => {
                 queryClient
                     .setQueryData(["pools", data.pool.id], data)
                 queryClient
-                    .invalidateQueries("pools")
+                    .invalidateQueries({queryKey: ["pools"]})
                     .then(closeModal)
             },
             onError: setError,

@@ -32,15 +32,15 @@ const EditMonitorPanel = ({closeCallback}) => {
         admin_state_up: undefined,
     })
 
-    const {isLoading} = useQuery(
-        ["monitors", id],
-        fetchItem, {
+    const {isLoading} = useQuery({
+        queryKey: ["monitors", id],
+        ...fetchItem
+    }, {
             meta: auth,
             onError: setError,
             onSuccess: (data) => setFormState(updateAttributes(formState, data.monitor)),
             refetchOnWindowFocus: false,
-        }
-    )
+        })
     const mutation = useMutation(updateItem)
 
     const onSubmit = () => {
@@ -57,7 +57,7 @@ const EditMonitorPanel = ({closeCallback}) => {
                     queryClient
                         .setQueryData(["monitors", data.monitor.id], data)
                     queryClient
-                        .invalidateQueries("monitors")
+                        .invalidateQueries({queryKey: ["monitors"]})
                         .then(closeCallback)
                 },
                 onError: setError

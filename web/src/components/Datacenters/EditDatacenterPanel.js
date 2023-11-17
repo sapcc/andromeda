@@ -32,15 +32,15 @@ const EditDatacenterPanel = ({closeCallback}) => {
         provider: undefined,
     })
 
-    const {isLoading} = useQuery(
-        ["datacenters", id],
-        fetchItem,
-        {
-            meta: auth,
-            onError: setError,
-            onSuccess: (data) => setFormState(updateAttributes(formState, data.datacenter)),
-            refetchOnWindowFocus: false,
-        })
+    const {isLoading} = useQuery({
+        queryKey: ["datacenters", id],
+        ...fetchItem
+    }, {
+        meta: auth,
+        onError: setError,
+        onSuccess: (data) => setFormState(updateAttributes(formState, data.datacenter)),
+        refetchOnWindowFocus: false,
+    })
     const mutation = useMutation(updateItem)
 
     const onSubmit = () => {
@@ -57,7 +57,7 @@ const EditDatacenterPanel = ({closeCallback}) => {
                     queryClient
                         .setQueryData(["datacenters", data.datacenter.id], data)
                     queryClient
-                        .invalidateQueries("datacenters")
+                        .invalidateQueries({queryKey: ["datacenters"]})
                         .then(closeCallback)
                 },
                 onError: setError,

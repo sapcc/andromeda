@@ -42,7 +42,7 @@ const NewGeographicMapModal = () => {
                     queryClient
                         .setQueryData(["geomaps", data.geomap.id], data)
                     queryClient
-                        .invalidateQueries("geomaps")
+                        .invalidateQueries({queryKey: ["geomaps"]})
                         .then(closeModal)
                 },
                 onError: setError

@@ -29,14 +29,15 @@ const EditDomainPanel = ({closeCallback}) => {
         admin_state_up: undefined,
     })
 
-    const {isLoading} = useQuery(["domains", id],
-        fetchItem,
-        {
-            meta: auth,
-            onError: setError,
-            onSuccess: (data) => setFormState(updateAttributes(formState, data.domain)),
-            refetchOnWindowFocus: false,
-        })
+    const {isLoading} = useQuery({
+        queryKey: ["domains", id],
+        ...fetchItem
+    }, {
+        meta: auth,
+        onError: setError,
+        onSuccess: (data) => setFormState(updateAttributes(formState, data.domain)),
+        refetchOnWindowFocus: false,
+    })
     const mutation = useMutation(updateItem)
 
     const onSubmit = () => {
@@ -53,7 +54,7 @@ const EditDomainPanel = ({closeCallback}) => {
                     queryClient
                         .setQueryData(["domains", data.domain.id], data)
                     queryClient
-                        .invalidateQueries("domains")
+                        .invalidateQueries({queryKey: ["domains"]})
                         .then(closeCallback)
                 },
                 onError: setError

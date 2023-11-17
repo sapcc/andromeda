@@ -41,8 +41,9 @@ const DatacenterListItem = ({datacenter, setError}) => {
                     queryClient
                         .setQueryDefaults(queryKey, {refetchInterval: 5000})
                     // refetch datacenters
-                    queryClient
-                        .invalidateQueries(queryKey)
+                    queryClient.invalidateQueries({
+                        queryKey: queryKey
+                    })
                         .then()
                 },
                 onError: setError

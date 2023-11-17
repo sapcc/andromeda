@@ -13,14 +13,14 @@ const ShowGeographicMapModal = () => {
     const [id, closeModal] = urlStore((state) => [state.id, state.closeModal])
     const [error, setError] = useState()
     const [geomap, setGeomap] = useState({})
-    const {isSuccess, isLoading} = useQuery(
-        ["geomaps", id],
-        fetchItem,
-        {
-            meta: auth,
-            onSuccess: (data) => setGeomap(data.geomap),
-            onError: setError
-        })
+    const {isSuccess, isLoading} = useQuery({
+        queryKey: ["geomaps", id],
+        ...fetchItem
+    }, {
+        meta: auth,
+        onSuccess: (data) => setGeomap(data.geomap),
+        onError: setError
+    })
 
     const createdAt = useMemo(() => {
         if (geomap.created_at) {

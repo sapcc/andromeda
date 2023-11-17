@@ -31,8 +31,9 @@ const NewDomainModal = () => {
                 onSuccess: (data) => {
                     queryClient
                         .setQueryData(["domains", data.domain.id], data)
-                    queryClient
-                        .invalidateQueries(["domains"])
+                    queryClient.invalidateQueries({
+                        queryKey: ["domains"]
+                    })
                         .then(closeModal)
                 }
             }

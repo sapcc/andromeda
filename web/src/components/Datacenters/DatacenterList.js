@@ -19,16 +19,14 @@ const DatacenterList = () => {
         isLoading,
         isFetching,
         isFetchingNextPage,
-    } = useInfiniteQuery(
-        ["datacenters"],
-        fetchAll,
-        {
-            getNextPageParam: nextPageParam,
-            meta: auth,
-            onError: setError,
-            onSuccess: () => setError(undefined),
-        }
-    )
+    } = useInfiniteQuery({
+        queryKey: ["datacenters"],
+        queryFn: fetchAll,
+        getNextPageParam: nextPageParam,
+        meta: auth,
+        onError: setError,
+        onSuccess: () => setError(undefined),
+    })
 
     return (
         <>

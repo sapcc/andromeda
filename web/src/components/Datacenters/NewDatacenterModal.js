@@ -36,7 +36,7 @@ const NewDatacenterModal = () => {
                     queryClient
                         .setQueryData(["datacenters", data.datacenter.id], data)
                     queryClient
-                        .invalidateQueries("datacenters")
+                        .invalidateQueries( {queryKey: ["datacenters"]})
                         .then(closeModal)
                 }
             }

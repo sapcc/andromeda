@@ -20,16 +20,14 @@ const DomainList = () => {
         hasNextPage,
         isFetching,
         isFetchingNextPage,
-    } = useInfiniteQuery(
-        ["domains"],
-        fetchAll,
-        {
-            getNextPageParam: nextPageParam,
-            meta: auth,
-            onError: setError,
-            onSuccess: () => setError(undefined),
-        },
-    )
+    } = useInfiniteQuery({
+        queryKey: ["domains"],
+        queryFn: fetchAll,
+        getNextPageParam: nextPageParam,
+        meta: auth,
+        onError: setError,
+        onSuccess: () => setError(undefined),
+    })
 
     return (
         <>

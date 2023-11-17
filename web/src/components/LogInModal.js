@@ -21,7 +21,7 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint}) => {
     const setAuth = authStore((state) => state.setAuth)
     const setModal = urlStore((state) => state.openModal)
     const queryClient = useQueryClient()
-    const {mutate, isLoading, error} = useMutation(login)
+    const {mutate, isLoading, error} = useMutation({mutationFn: login})
     const [showCredentials, setShowCredentials] = useState(false)
     const [mounted, setMounted] = useState(false)
     const [credentials, setCredentials] = useState({

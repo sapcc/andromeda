@@ -11,15 +11,14 @@ const MemberListItem = ({member, setError}) => {
     const openPanel = urlStore((state) => state.openPanel)
     const queryClient = useQueryClient()
 
-    const queryDatacenter = useQuery(
-        ["datacenters", member.datacenter_id],
-        fetchItem,
-        {
-            enabled: 'datacenter_id' in member,
-            meta: auth,
-            onError: setError,
-        }
-    )
+    const queryDatacenter = useQuery({
+        queryKey: ["datacenters", member.datacenter_id],
+        ...fetchItem
+    }, {
+        enabled: 'datacenter_id' in member,
+        meta: auth,
+        onError: setError,
+    })
     const mutation = useMutation(deleteItem)
 
     const handleEditMemberClick = () => openPanel("Member", member.id)
@@ -36,8 +35,9 @@ const MemberListItem = ({member, setError}) => {
                     const queryKey= ["members", {pool_id: member.pool_id}]
                     queryClient
                         .setQueryDefaults(queryKey, {refetchInterval: 5000})
-                    queryClient
-                        .invalidateQueries(queryKey)
+                    queryClient.invalidateQueries({
+                        queryKey: queryKey
+                    })
                         .then()
                 },
                 onError: setError,

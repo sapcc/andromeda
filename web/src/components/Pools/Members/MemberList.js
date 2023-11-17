@@ -21,16 +21,14 @@ const MemberList = () => {
         hasNextPage,
         isFetching,
         isFetchingNextPage,
-    } = useInfiniteQuery(
-        ["members", {pool_id: poolId}],
-        fetchAll,
-        {
-            getNextPageParam: nextPageParam,
-            meta: auth,
-            onError: setError,
-            onSuccess: () => setError(undefined),
-        }
-    )
+    } = useInfiniteQuery({
+        queryKey: ["members", {pool_id: poolId}],
+        queryFn: fetchAll,
+        getNextPageParam: nextPageParam,
+        meta: auth,
+        onError: setError,
+        onSuccess: () => setError(undefined),
+    })
 
     return (
         <Stack direction="vertical" className="basis-1 md:basis-1/2 mt-6">

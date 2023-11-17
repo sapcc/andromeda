@@ -45,8 +45,9 @@ const GeographicMapListItem = ({geomap, setError}) => {
                     queryClient
                         .setQueryDefaults(queryKey, {refetchInterval: 5000})
                     // refetch geomaps
-                    queryClient
-                        .invalidateQueries(queryKey)
+                    queryClient.invalidateQueries({
+                        queryKey: queryKey
+                    })
                         .then()
                 },
                 onError: setError

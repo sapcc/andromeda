@@ -51,8 +51,9 @@ const MonitorListItem = ({monitor, setError}) => {
                     const queryKey = ["monitors", {pool_id: monitor.pool_id}]
                     queryClient
                         .setQueryDefaults(queryKey, {refetchInterval: 5000})
-                    queryClient
-                        .invalidateQueries(queryKey)
+                    queryClient.invalidateQueries({
+                        queryKey: queryKey
+                    })
                         .then()
                 },
                 onError: (err) => {

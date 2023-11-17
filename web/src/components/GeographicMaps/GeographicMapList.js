@@ -20,16 +20,14 @@ const GeographicMapList = () => {
         isLoading,
         isFetching,
         isFetchingNextPage,
-    } = useInfiniteQuery(
-        ["geomaps"],
-        fetchAll,
-        {
-            getNextPageParam: nextPageParam,
-            meta: auth,
-            onError: setError,
-            onSuccess: () => setError(undefined),
-        }
-    )
+    } = useInfiniteQuery({
+        queryKey: ["geomaps"],
+        queryFn: fetchAll,
+        getNextPageParam: nextPageParam,
+        meta: auth,
+        onError: setError,
+        onSuccess: () => setError(undefined),
+    })
 
     return (
         <>

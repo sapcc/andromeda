@@ -16,15 +16,15 @@ const EditPoolPanel = ({closeCallback}) => {
         name: undefined, admin_state_up: true, domains: [],
     })
 
-    const {isLoading} = useQuery(
-        ["pools", id],
-        fetchItem,
-        {
-            meta: auth,
-            onError: setError,
-            onSuccess: (data) => setFormState(updateAttributes(formState, data.pool)),
-            refetchOnWindowFocus: false,
-        })
+    const {isLoading} = useQuery({
+        queryKey: ["pools", id],
+        ...fetchItem
+    }, {
+        meta: auth,
+        onError: setError,
+        onSuccess: (data) => setFormState(updateAttributes(formState, data.pool)),
+        refetchOnWindowFocus: false,
+    })
     const mutation = useMutation(updateItem)
 
     const onSubmit = () => {
@@ -43,7 +43,7 @@ const EditPoolPanel = ({closeCallback}) => {
                     queryClient
                         .setQueryDefaults([], {refetchInterval: 5000})
                     queryClient
-                        .invalidateQueries("pools")
+                        .invalidateQueries({queryKey: ["pools"]})
                         .then(closeCallback)
                 },
                 onError: setError

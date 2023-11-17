@@ -20,9 +20,10 @@ const EditMemberPanel = ({closeCallback}) => {
     })
 
     const queryClient = useQueryClient()
-    const {isLoading} = useQuery(
-        ["members", id],
-        fetchItem, {
+    const {isLoading} = useQuery({
+        queryKey: ["members", id],
+        ...fetchItem
+    }, {
             meta: auth,
             onError: setError,
             onSuccess: (data) => setFormState(updateAttributes(formState, data.member)),
@@ -44,7 +45,7 @@ const EditMemberPanel = ({closeCallback}) => {
                     queryClient
                         .setQueryData(["members", data.member.id], data)
                     queryClient
-                        .invalidateQueries("members")
+                        .invalidateQueries({queryKey: ["members"]})
                         .then(closeCallback)
                 },
                 onError: setError

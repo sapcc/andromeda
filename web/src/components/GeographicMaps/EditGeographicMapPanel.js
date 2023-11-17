@@ -25,15 +25,15 @@ const EditGeographicMapPanel = ({closeCallback}) => {
         default_datacenter: undefined,
     })
 
-    const {isLoading} = useQuery(
-        ["geomap", id],
-        fetchItem,
-        {
-            meta: auth,
-            onError: setError,
-            onSuccess: (data) => setFormState(updateAttributes(formState, data.datacenter)),
-            refetchOnWindowFocus: false,
-        })
+    const {isLoading} = useQuery({
+        queryKey: ["geomap", id],
+        ...fetchItem
+    }, {
+        meta: auth,
+        onError: setError,
+        onSuccess: (data) => setFormState(updateAttributes(formState, data.datacenter)),
+        refetchOnWindowFocus: false,
+    })
     const mutation = useMutation(updateItem)
 
     const onSubmit = () => {
@@ -50,7 +50,7 @@ const EditGeographicMapPanel = ({closeCallback}) => {
                     queryClient
                         .setQueryData(["geomap", data.datacenter.id], data)
                     queryClient
-                        .invalidateQueries("geomap")
+                        .invalidateQueries({queryKey: ["geomap"]})
                         .then(closeCallback)
                 },
                 onError: setError,

@@ -45,8 +45,9 @@ const DomainListItem = ({domain, setError}) => {
                     const queryKey = ["domains"]
                     queryClient
                         .setQueryDefaults(queryKey, {refetchInterval: 5000})
-                    queryClient
-                        .invalidateQueries(queryKey)
+                    queryClient.invalidateQueries({
+                        queryKey: queryKey
+                    })
                         .then()
                 },
                 onError: setError

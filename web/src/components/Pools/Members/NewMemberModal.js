@@ -35,7 +35,7 @@ const NewMemberModal = () => {
                     queryClient
                         .setQueryData(["members", data.member.id], data)
                     queryClient
-                        .invalidateQueries("members")
+                        .invalidateQueries({queryKey: ["members"]})
                         .then(closeModal)
                 },
                 onError: setError

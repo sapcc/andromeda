@@ -16,7 +16,9 @@ const DomainMenu = ({formState, setFormState, setError}) => {
         hasNextPage,
         fetchNextPage,
         isFetching
-    } = useInfiniteQuery(["domains"], fetchAll, {
+    } = useInfiniteQuery({
+        queryKey: ["domains"],
+        queryFn: fetchAll,
         getNextPageParam: nextPageParam,
         meta: auth,
         onError: setError

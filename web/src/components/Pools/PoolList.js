@@ -23,16 +23,14 @@ const PoolList = () => {
         hasNextPage,
         isFetching,
         isFetchingNextPage,
-    } = useInfiniteQuery(
-        ["pools"],
-        fetchAll,
-        {
-            getNextPageParam: nextPageParam,
-            meta: auth,
-            onError: (err) => setError(err),
-            onSuccess: () => setError(undefined),
-        }
-    )
+    } = useInfiniteQuery({
+        queryKey: ["pools"],
+        queryFn: fetchAll,
+        getNextPageParam: nextPageParam,
+        meta: auth,
+        onError: (err) => setError(err),
+        onSuccess: () => setError(undefined),
+    })
 
     return (
         <>

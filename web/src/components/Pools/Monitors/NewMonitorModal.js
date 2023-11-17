@@ -35,7 +35,7 @@ const NewMonitorModal = () => {
                     queryClient
                         .setQueryData(["monitors", data.monitor.id], data)
                     queryClient
-                        .invalidateQueries(`monitors`)
+                        .invalidateQueries({queryKey: ["monitors"]})
                         .then(closeModal)
                 }
             }
