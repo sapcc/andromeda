@@ -98,9 +98,9 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint, loginDomains, loginProj
             {isLoading ? <Spinner variant="primary"/> : null}
 
             <Form onSubmit={onSubmit}>
-                <Stack distribution="between" gap="2" className="pt-2">
+                <Stack distribution="between" gap="2">
                     <Select
-                        label="Domain"
+                        helptext="Domain"
                         disabled={isLoading}
                         onChange={(target) => setCredentials({...credentials, domain: target})}
                         value={credentials.domain}
@@ -110,14 +110,14 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint, loginDomains, loginProj
                         )}
                     </Select>
                     <TextInput
-                        label="Project"
+                        helptext="Project"
                         name="project"
                         value={credentials.project}
                         disabled={isLoading}
                         onChange={handleChange}
                     />
                     <Button
-                        className="flex-none jn-relative jn-mb-2"
+                        className="jn-h-textinput"
                         icon="manageAccounts"
                         onClick={() => setShowCredentials(!showCredentials)}
                     />
@@ -147,7 +147,7 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint, loginDomains, loginProj
                         </FormRow>
                     </div>
             )}
-                <ButtonRow name="Default ButtonRow" className="jn-justify-end">
+                <ButtonRow name="Default ButtonRow" className="jn-mt-2 jn-justify-end">
                     <Button
                         icon="openInBrowser"
                         label={`Enter ${credentials.domain}`}
