@@ -2,7 +2,7 @@ import React, {useState} from "react"
 
 import "./styles.css"
 import {authStore} from "./store"
-import {AppShell, PageHeader, PortalProvider, StyleProvider} from "juno-ui-components"
+import {AppShell, ContentHeading, PageHeader, PortalProvider, StyleProvider} from "juno-ui-components"
 import {QueryCache, QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import AppContent from "./AppContent"
 import {ReactQueryDevtools} from "@tanstack/react-query-devtools";
@@ -44,14 +44,17 @@ const App = (props) => {
                 <QueryClientProvider client={queryClient}>
                     <AppShell
                         pageHeader={pageHeader}
-                        contentHeading="Global Load Balancing as a Service"
                         embedded={props.embedded === true}
                     >
+                        <ContentHeading>Global Load Balancing as a Service</ContentHeading>
                         {auth ? (
                             <AppContent props={props}/>
                         ) : (
                             <LogInModal keystoneEndpoint={props.endpoint}
-                                        overrideEndpoint={props.overrideAndromedaEndpoint}/>
+                                        overrideEndpoint={props.overrideAndromedaEndpoint}
+                                        loginDomains={props?.loginDomains || []}
+                                        loginProject={props?.loginProject}
+                            />
                         )}
                     </AppShell>
                     <ReactQueryDevtools initialIsOpen={false}/>

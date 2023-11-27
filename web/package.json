@@ -55,6 +55,14 @@
     "slackURL": {
       "value": "",
       "description": "Help slack link"
+    },
+    "loginDomains": {
+      "value": [],
+      "description": "List of domains for login"
+    },
+    "loginProject": {
+        "value": "",
+        "description": "Default project for login"
     }
   }
 }

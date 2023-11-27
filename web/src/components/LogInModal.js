@@ -8,7 +8,7 @@ import {
     IntroBox,
     Modal,
     Select,
-    SelectOption,
+    SelectOption, Spinner,
     Stack,
     TextInput
 } from "juno-ui-components"
@@ -17,7 +17,7 @@ import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {login} from "../actions";
 import {Error} from "./Components";
 
-const LogInModal = ({keystoneEndpoint, overrideEndpoint}) => {
+const LogInModal = ({keystoneEndpoint, overrideEndpoint, loginDomains, loginProject}) => {
     const setAuth = authStore((state) => state.setAuth)
     const setModal = urlStore((state) => state.openModal)
     const queryClient = useQueryClient()
@@ -27,8 +27,8 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint}) => {
     const [credentials, setCredentials] = useState({
         username: undefined,
         password: undefined,
-        domain: "monsoon3",
-        project: "cc-demo",
+        domain: loginDomains[0] || undefined,
+        project: loginProject,
     })
 
     const onSubmit = (event) => {
@@ -95,6 +95,7 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint}) => {
 
             {/* Error Bar */}
             <Error error={error}/>
+            {isLoading ? <Spinner variant="primary"/> : null}
 
             <Form onSubmit={onSubmit}>
                 <Stack distribution="between" gap="2" className="pt-2">
@@ -104,8 +105,9 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint}) => {
                         onChange={(target) => setCredentials({...credentials, domain: target})}
                         value={credentials.domain}
                     >
-                        <SelectOption key="monsoon3" value="monsoon3" label="monsoon3" />
-                        <SelectOption key="ccadmin" value="ccadmin" label="ccadmin" />
+                        {loginDomains.map(domain =>
+                            <SelectOption key={domain} value={domain} label={domain} />
+                        )}
                     </Select>
                     <TextInput
                         label="Project"
