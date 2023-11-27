@@ -25,12 +25,6 @@
         display: inline;
       }
     </style>
-    <script>
-      // automatically reload on build changes
-      new EventSource("/esbuild").addEventListener("change", () =>
-        location.reload()
-      )
-    </script>
   </head>
   <body>
     <script type="module">
