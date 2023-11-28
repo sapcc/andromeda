@@ -18,7 +18,7 @@ const NewPoolModal = () => {
         domains: [],
     })
 
-    const {mutate} = useMutation(createItem)
+    const {mutate} = useMutation({mutationFn: createItem})
     const closeModal = () => setModal(null)
 
     const onSubmit = () => {

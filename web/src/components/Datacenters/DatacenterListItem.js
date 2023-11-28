@@ -24,7 +24,7 @@ const DatacenterListItem = ({datacenter, setError}) => {
             )
         }
     }, [datacenter.updated_at])
-    const mutation = useMutation(deleteItem)
+    const mutation = useMutation({mutationFn: deleteItem})
 
     const handleEditDatacenterClick = () => setPanel("Datacenter", datacenter.id)
     const handleDeleteDatacenterClick = () => {

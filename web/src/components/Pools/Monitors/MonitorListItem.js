@@ -26,7 +26,7 @@ const MonitorListItem = ({monitor, setError}) => {
         }
     }, [monitor.updated_at])
 
-    const {mutate} = useMutation(deleteItem)
+    const {mutate} = useMutation({mutationFn: deleteItem})
 
     const handleEditMonitorClick = () => {
         openPanel("Monitor", monitor.id)

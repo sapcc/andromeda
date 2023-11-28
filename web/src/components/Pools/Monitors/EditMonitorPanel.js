@@ -1,4 +1,4 @@
-import React, {useState} from "react"
+import React, {useEffect, useState} from "react"
 
 import {
     Button,
@@ -32,16 +32,20 @@ const EditMonitorPanel = ({closeCallback}) => {
         admin_state_up: undefined,
     })
 
-    const {isLoading} = useQuery({
+    const {data, isLoading} = useQuery({
         queryKey: ["monitors", id],
-        ...fetchItem
-    }, {
-            meta: auth,
-            onError: setError,
-            onSuccess: (data) => setFormState(updateAttributes(formState, data.monitor)),
-            refetchOnWindowFocus: false,
-        })
-    const mutation = useMutation(updateItem)
+        queryFn: fetchItem,
+        meta: auth,
+        refetchOnWindowFocus: false,
+    })
+    const mutation = useMutation({mutationFn: updateItem})
+
+    useEffect(() => {
+        if (data) {
+            setFormState(updateAttributes(formState, data.monitor))
+        }
+    }, [data]);
+
 
     const onSubmit = () => {
         mutation.mutate(

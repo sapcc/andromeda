@@ -46,7 +46,7 @@ const App = (props) => {
                         pageHeader={pageHeader}
                         embedded={props.embedded === true}
                     >
-                        <ContentHeading>Global Load Balancing as a Service</ContentHeading>
+                        <ContentHeading heading="Global Load Balancing as a Service" className="jn-p-2"/>
                         {auth ? (
                             <AppContent props={props}/>
                         ) : (

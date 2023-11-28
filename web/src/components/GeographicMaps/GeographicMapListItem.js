@@ -27,7 +27,7 @@ const GeographicMapListItem = ({geomap, setError}) => {
             )
         }
     }, [geomap.updated_at])
-    const mutation = useMutation(deleteItem)
+    const mutation = useMutation({mutationFn: deleteItem})
 
     const handleEditGeographicMapClick = () => setPanel("GeographicMap", geomap.id)
     const handleShowGeographicMapClick = () => setModalId("ShowGeographicMap", geomap.id)

@@ -1,4 +1,4 @@
-import React, {useState} from "react"
+import React, {useEffect, useState} from "react"
 import {
     Button,
     Checkbox,
@@ -32,16 +32,21 @@ const EditDatacenterPanel = ({closeCallback}) => {
         provider: undefined,
     })
 
-    const {isLoading} = useQuery({
+    const {data, isLoading} = useQuery({
         queryKey: ["datacenters", id],
-        ...fetchItem
-    }, {
+        queryFn: fetchItem,
         meta: auth,
         onError: setError,
-        onSuccess: (data) => setFormState(updateAttributes(formState, data.datacenter)),
         refetchOnWindowFocus: false,
     })
-    const mutation = useMutation(updateItem)
+    const mutation = useMutation({mutationFn: updateItem})
+
+    // update formState when data is fetched
+    useEffect(() => {
+        if (data) {
+            setFormState(updateAttributes(formState, data.datacenter))
+        }
+    }, [data]);
 
     const onSubmit = () => {
         mutation.mutate(

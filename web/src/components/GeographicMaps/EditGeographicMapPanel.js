@@ -1,4 +1,4 @@
-import React, {useState} from "react"
+import React, {useEffect, useState} from "react"
 import {
     Button,
     Checkbox,
@@ -25,16 +25,20 @@ const EditGeographicMapPanel = ({closeCallback}) => {
         default_datacenter: undefined,
     })
 
-    const {isLoading} = useQuery({
+    const {data, isLoading} = useQuery({
         queryKey: ["geomap", id],
-        ...fetchItem
-    }, {
+        queryFn: fetchItem,
         meta: auth,
-        onError: setError,
-        onSuccess: (data) => setFormState(updateAttributes(formState, data.datacenter)),
         refetchOnWindowFocus: false,
     })
-    const mutation = useMutation(updateItem)
+    const mutation = useMutation({mutationFn: updateItem})
+
+    // update formState when data is fetched
+    useEffect(() => {
+        if (data) {
+            setFormState(updateAttributes(formState, data.geomap))
+        }
+    }, [data]);
 
     const onSubmit = () => {
         mutation.mutate(
@@ -48,7 +52,7 @@ const EditGeographicMapPanel = ({closeCallback}) => {
             {
                 onSuccess: (data) => {
                     queryClient
-                        .setQueryData(["geomap", data.datacenter.id], data)
+                        .setQueryData(["geomap", data.geomap.id], data)
                     queryClient
                         .invalidateQueries({queryKey: ["geomap"]})
                         .then(closeCallback)

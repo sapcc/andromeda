@@ -1,8 +1,8 @@
-import React, {useMemo, useState} from "react"
+import React, {useEffect, useMemo, useState} from "react"
 
 import {authStore, urlStore} from "../../store"
 import {useQuery} from '@tanstack/react-query'
-import {fetchItem} from "../../actions"
+import {fetchItem, updateAttributes} from "../../actions"
 import {Badge, DataGrid, DataGridCell, DataGridHeadCell, DataGridRow, Modal, Spinner, Stack} from "juno-ui-components"
 import {Error} from "../Components";
 import {continents, countries} from "countries-list";
@@ -11,16 +11,19 @@ import {DateTime} from "luxon";
 const ShowGeographicMapModal = () => {
     const auth = authStore((state) => state.auth)
     const [id, closeModal] = urlStore((state) => [state.id, state.closeModal])
-    const [error, setError] = useState()
     const [geomap, setGeomap] = useState({})
-    const {isSuccess, isLoading} = useQuery({
+    const {data, error, isSuccess, isLoading} = useQuery({
         queryKey: ["geomaps", id],
-        ...fetchItem
-    }, {
+        queryFn: fetchItem,
         meta: auth,
-        onSuccess: (data) => setGeomap(data.geomap),
-        onError: setError
     })
+
+    // update formState when data is fetched
+    useEffect(() => {
+        if (data) {
+            setGeomap(data.geomap)
+        }
+    }, [data]);
 
     const createdAt = useMemo(() => {
         if (geomap.created_at) {

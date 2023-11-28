@@ -29,7 +29,7 @@ const DomainListItem = ({domain, setError}) => {
         }
     }, [domain.updated_at])
 
-    const {mutate} = useMutation(deleteItem)
+    const {mutate} = useMutation({mutationFn: deleteItem})
 
     const handleEditDomainClick = () => setPanel("Domain", domain.id)
     const handleDeleteDomainClick = () => {

@@ -1,4 +1,4 @@
-import React, {useState} from "react"
+import React, {useEffect, useState} from "react"
 
 import {Button, Checkbox, Form, PanelBody, PanelFooter, Stack, TextInput,} from "juno-ui-components"
 import {authStore, urlStore} from "../../../store"
@@ -20,16 +20,20 @@ const EditMemberPanel = ({closeCallback}) => {
     })
 
     const queryClient = useQueryClient()
-    const {isLoading} = useQuery({
+    const {data, isLoading} = useQuery({
         queryKey: ["members", id],
-        ...fetchItem
-    }, {
-            meta: auth,
-            onError: setError,
-            onSuccess: (data) => setFormState(updateAttributes(formState, data.member)),
-            refetchOnWindowFocus: false,
-        })
-    const mutation = useMutation(updateItem)
+        queryFn: fetchItem,
+        meta: auth,
+        refetchOnWindowFocus: false,
+    })
+    const mutation = useMutation({mutationFn: updateItem})
+
+    // update formState when data is fetched
+    useEffect(() => {
+        if (data) {
+            setFormState(updateAttributes(formState, data.member))
+        }
+    }, [data]);
 
     const onSubmit = () => {
         mutation.mutate(

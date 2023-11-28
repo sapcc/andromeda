@@ -17,7 +17,7 @@ const NewDomainModal = () => {
         admin_state_up: true,
     })
     const queryClient = useQueryClient()
-    const {error, mutate} = useMutation(createItem)
+    const {error, mutate} = useMutation({mutationFn: createItem})
 
     const onSubmit = () => {
         mutate(
@@ -64,6 +64,7 @@ const NewDomainModal = () => {
                 />
                 <TextInput
                     label="Name"
+                    helptext="The name of the domain, e.g. example-com"
                     name="name"
                     value={formState.name}
                     onChange={handleChange}
@@ -71,17 +72,18 @@ const NewDomainModal = () => {
                 <Select
                     label="Provider"
                     value={formState.provider}
+                    helptext="Currently, only Akamai is supported."
                     onChange={(target) => setFormState({...formState, provider: target})}
                     required
                 >
                     <SelectOption
-                        key="akamai"
                         label="Akamai"
                         value="akamai"
                     />
                 </Select>
                 <TextInput
                     label="Fully Qualified Domain Name"
+                    helptext="The fully qualified domain name of the domain, e.g. example.com"
                     name="fqdn"
                     value={formState.fqdn}
                     onChange={handleChange}
@@ -89,6 +91,7 @@ const NewDomainModal = () => {
                 />
                 <Select
                     label="Record Type"
+                    helptext="The type of DNS record to create."
                     value={formState.record_type}
                     onChange={(target) => setFormState({...formState, record_type: target})}
                 >

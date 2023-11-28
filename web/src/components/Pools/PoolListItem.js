@@ -26,7 +26,7 @@ const PoolListItem = ({pool, isActive, setError}) => {
         }
     }, [pool.updated_at])
 
-    const {mutate} = useMutation(deleteItem)
+    const {mutate} = useMutation({mutationFn: deleteItem})
 
     const handlePoolClick = () => setSelectedPool(pool.id)
     const handleEditPoolClick = () => openPanel("Pool", pool.id)

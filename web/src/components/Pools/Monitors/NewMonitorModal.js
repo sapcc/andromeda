@@ -21,7 +21,7 @@ const NewMonitorModal = () => {
         admin_state_up: true,
     })
 
-    const {error, mutate} = useMutation(createItem)
+    const {error, mutate} = useMutation({mutationFn: createItem})
     const onSubmit = () => {
         mutate(
             {

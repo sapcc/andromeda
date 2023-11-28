@@ -22,7 +22,7 @@ const NewGeographicMapModal = () => {
     const [error, setError] = useState()
     const [assignments, setAssignments] = useState({})
     const [expandContinent, setExpandContinent] = useState(Object.fromEntries(Object.keys(continents).map(c => [c, false])))
-    const mutation = useMutation(createItem)
+    const mutation = useMutation({mutationFn: createItem})
 
     const onSubmit = () => {
         mutation.mutate(

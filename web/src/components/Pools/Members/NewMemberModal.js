@@ -21,7 +21,7 @@ const NewMemberModal = () => {
         pool_id: pool,
     })
 
-    const {mutate} = useMutation(createItem)
+    const {mutate} = useMutation({mutationFn: createItem})
     const onSubmit = () => {
         mutate(
             {

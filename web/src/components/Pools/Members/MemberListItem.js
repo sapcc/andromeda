@@ -1,9 +1,9 @@
-import React from "react"
+import React, {useEffect} from "react"
 
 import {DataGridCell, DataGridRow, Icon, Stack} from "juno-ui-components"
 import {authStore, urlStore} from "../../../store"
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
-import {deleteItem, fetchItem} from "../../../actions"
+import {deleteItem, fetchItem, updateAttributes} from "../../../actions"
 import {ListItemSpinner, ListItemStatus} from "../../Components";
 
 const MemberListItem = ({member, setError}) => {
@@ -13,13 +13,18 @@ const MemberListItem = ({member, setError}) => {
 
     const queryDatacenter = useQuery({
         queryKey: ["datacenters", member.datacenter_id],
-        ...fetchItem
-    }, {
+        queryFn: fetchItem,
         enabled: 'datacenter_id' in member,
         meta: auth,
-        onError: setError,
     })
-    const mutation = useMutation(deleteItem)
+    const mutation = useMutation({mutationFn: deleteItem})
+
+    // update formState when data is fetched
+    useEffect(() => {
+        if (queryDatacenter.error) {
+            setError(queryDatacenter.error)
+        }
+    }, [queryDatacenter.error]);
 
     const handleEditMemberClick = () => openPanel("Member", member.id)
     const handleDeleteMemberClick = () => {
