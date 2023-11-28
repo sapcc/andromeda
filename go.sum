@@ -67,6 +67,8 @@ github.com/acomagu/bufpipe v1.0.3/go.mod h1:mxdxdup/WdsKVreO5GpW4+M/1CE2sMG4jeGJ
 github.com/akamai/AkamaiOPEN-edgegrid-golang v1.1.0/go.mod h1:kX6YddBkXqqywAe8c9LyvgTCyFuZCTMF4cRPQhc3Fy8=
 github.com/akamai/AkamaiOPEN-edgegrid-golang/v7 v7.4.0 h1:ElaZi3EnSfC4gTpdAYTmJCCGVGzkcmUW6IJls1NOkGU=
 github.com/akamai/AkamaiOPEN-edgegrid-golang/v7 v7.4.0/go.mod h1:+8Nc6CkB/hiTEvoxxZwvY3whU5QsXxW4RhSARTMnAfI=
+github.com/akamai/AkamaiOPEN-edgegrid-golang/v7 v7.5.0 h1:rxtfltEe15EyTrAdkKpd7/R8GDmMQXbMmh4OX7acO5o=
+github.com/akamai/AkamaiOPEN-edgegrid-golang/v7 v7.5.0/go.mod h1:+8Nc6CkB/hiTEvoxxZwvY3whU5QsXxW4RhSARTMnAfI=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
