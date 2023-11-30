@@ -105,7 +105,7 @@ func (s *AkamaiAgent) uploadDatacenter(datacenter *rpcmodels.Datacenter) (*gtm.D
 	return res.Resource, nil
 }
 
-func (s *AkamaiAgent) FetchAndSyncDatacenters(datacenters []string) error {
+func (s *AkamaiAgent) FetchAndSyncDatacenters(datacenters []string, force bool) error {
 	logger.Debugf("Running FetchAndSyncDatacenters()")
 
 	res, err := s.GetDatacenters(datacenters)
@@ -113,7 +113,7 @@ func (s *AkamaiAgent) FetchAndSyncDatacenters(datacenters []string) error {
 		return err
 	}
 	for _, datacenter := range res {
-		if _, err = s.SyncDatacenter(datacenter, false); err != nil {
+		if _, err = s.SyncDatacenter(datacenter, force); err != nil {
 			return err
 		}
 

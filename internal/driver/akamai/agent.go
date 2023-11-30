@@ -116,7 +116,7 @@ func ExecuteAkamaiAgent() error {
 			}
 
 			go akamai.WorkerThread()
-			// sync immediately
+			// full sync immediately
 			akamai.forceSync <- nil
 			return nil
 		}),
@@ -138,11 +138,11 @@ func (s *AkamaiAgent) WorkerThread() {
 	for {
 		select {
 		case domains := <-s.forceSync:
-			if err := s.FetchAndSyncDatacenters(nil); err != nil {
+			if err := s.FetchAndSyncDatacenters(nil, true); err != nil {
 				logger.Error(err)
 			}
 
-			if err := s.FetchAndSyncGeomaps(nil); err != nil {
+			if err := s.FetchAndSyncGeomaps(nil, true); err != nil {
 				logger.Error(err)
 			}
 
@@ -151,11 +151,11 @@ func (s *AkamaiAgent) WorkerThread() {
 			}
 		case <-s.workerTicker.C: // Activate periodically
 			if time.Since(s.lastSync) > syncInterval {
-				if err := s.FetchAndSyncDatacenters(nil); err != nil {
+				if err := s.FetchAndSyncDatacenters(nil, false); err != nil {
 					logger.Error(err)
 				}
 
-				if err := s.FetchAndSyncGeomaps(nil); err != nil {
+				if err := s.FetchAndSyncGeomaps(nil, false); err != nil {
 					logger.Error(err)
 				}
 

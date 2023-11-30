@@ -89,7 +89,7 @@ func (s *AkamaiAgent) constructAkamaiGeoMap(geomap *rpcmodels.Geomap) (*gtm.GeoM
 	return &akamaiGeoMap, nil
 }
 
-func (s *AkamaiAgent) FetchAndSyncGeomaps(geomaps []string) error {
+func (s *AkamaiAgent) FetchAndSyncGeomaps(geomaps []string, force bool) error {
 	logger.Debugf("Running FetchAndSyncGeomaps()")
 	response, err := s.rpc.GetGeomaps(context.Background(), &server.SearchRequest{
 		Provider:       "akamai",
@@ -104,7 +104,7 @@ func (s *AkamaiAgent) FetchAndSyncGeomaps(geomaps []string) error {
 	}
 
 	for _, geomap := range response.GetResponse() {
-		if _, err = s.SyncGeomap(geomap, false); err != nil {
+		if _, err = s.SyncGeomap(geomap, force); err != nil {
 			return err
 		}
 
