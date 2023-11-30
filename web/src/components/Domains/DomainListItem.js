@@ -92,7 +92,7 @@ const DomainListItem = ({domain, setError}) => {
                         <Icon
                             icon="openInNew"
                             size="18"
-                            href={domain.fqdn}
+                            href="http://{domain.cname_target}"
                             target="_blank"
                             className="leading-none self-center"
                         />
