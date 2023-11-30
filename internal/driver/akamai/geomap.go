@@ -90,7 +90,7 @@ func (s *AkamaiAgent) constructAkamaiGeoMap(geomap *rpcmodels.Geomap) (*gtm.GeoM
 }
 
 func (s *AkamaiAgent) FetchAndSyncGeomaps(geomaps []string, force bool) error {
-	logger.Debugf("Running FetchAndSyncGeomaps()")
+	logger.Debugf("Running FetchAndSyncGeomaps(%+v, force=%t)", geomaps, force)
 	response, err := s.rpc.GetGeomaps(context.Background(), &server.SearchRequest{
 		Provider:       "akamai",
 		PageNumber:     0,
@@ -129,7 +129,7 @@ func (s *AkamaiAgent) FetchAndSyncGeomaps(geomaps []string, force bool) error {
 }
 
 func (s *AkamaiAgent) SyncGeomap(geomap *rpcmodels.Geomap, force bool) (*gtm.GeoMap, error) {
-	logger.Debugf("SyncGeomap('%s')", geomap.Id)
+	logger.Debugf("SyncGeomap(%s, force=%t)", geomap.Id, force)
 
 	newAkamaiGeoMap, err := s.constructAkamaiGeoMap(geomap)
 	if err != nil {

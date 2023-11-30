@@ -106,7 +106,7 @@ func (s *AkamaiAgent) uploadDatacenter(datacenter *rpcmodels.Datacenter) (*gtm.D
 }
 
 func (s *AkamaiAgent) FetchAndSyncDatacenters(datacenters []string, force bool) error {
-	logger.Debugf("Running FetchAndSyncDatacenters()")
+	logger.Debugf("Running FetchAndSyncDatacenters(%+v, force=%t)", datacenters, force)
 
 	res, err := s.GetDatacenters(datacenters)
 	if err != nil {
@@ -138,7 +138,7 @@ func (s *AkamaiAgent) FetchAndSyncDatacenters(datacenters []string, force bool) 
 }
 
 func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force bool) (*rpcmodels.Datacenter, error) {
-	logger.Debugf("SyncDatacenter('%s')", datacenter.Id)
+	logger.Debugf("SyncDatacenter(%s, force=%t)", datacenter.Id, force)
 
 	// akamai datacenterId is a unique numeric reference to a domain specific datacenter
 	meta := int(datacenter.GetMeta())
