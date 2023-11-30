@@ -64,6 +64,9 @@ func (c GeoMapController) GetGeomaps(params geographic_maps.GetGeomapsParams) mi
 		if err := rows.StructScan(&geoMap); err != nil {
 			panic(err)
 		}
+		if err := PopulateGeoMapAssignments(c.db, &geoMap); err != nil {
+			panic(err)
+		}
 		_geoMaps = append(_geoMaps, &geoMap)
 	}
 
@@ -184,4 +187,14 @@ func (c GeoMapController) DeleteGeomapsGeoMapID(params geographic_maps.DeleteGeo
 		return geographic_maps.NewDeleteGeomapsGeomapIDNotFound().WithPayload(utils.NotFound)
 	}
 	return geographic_maps.NewDeleteGeomapsGeomapIDNoContent()
+}
+
+// PopulateDomainPools populates a domain instance with associated pools
+func PopulateGeoMapAssignments(db *sqlx.DB, geomap *models.Geomap) error {
+	// Get pool_ids associated
+	sql := db.Rebind(`SELECT datacenter, country FROM geographic_map_assignment WHERE geographic_map_id = ?`)
+	if err := db.Select(&geomap.Assignments, sql, geomap.ID); err != nil {
+		return err
+	}
+	return nil
 }

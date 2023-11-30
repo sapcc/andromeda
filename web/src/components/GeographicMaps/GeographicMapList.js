@@ -53,9 +53,10 @@ const GeographicMapList = () => {
                 />
             </Stack>
             {isSuccess ? (
-                <DataGrid columns={7}>
+                <DataGrid columns={8}>
                     <DataGridRow>
                         <DataGridHeadCell>ID/Name</DataGridHeadCell>
+                        <DataGridHeadCell>#Assignments</DataGridHeadCell>
                         <DataGridHeadCell>Scope</DataGridHeadCell>
                         <DataGridHeadCell>Provider</DataGridHeadCell>
                         <DataGridHeadCell>Created</DataGridHeadCell>

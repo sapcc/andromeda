@@ -96,7 +96,7 @@ func (s *AkamaiAgent) FetchAndSyncGeomaps(geomaps []string, force bool) error {
 		PageNumber:     0,
 		ResultPerPage:  1,
 		FullyPopulated: true,
-		Pending:        geomaps == nil,
+		Pending:        geomaps == nil && !force,
 		Ids:            geomaps,
 	})
 	if err != nil {
