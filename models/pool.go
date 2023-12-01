@@ -41,7 +41,8 @@ type Pool struct {
 	// The UTC date and timestamp when the resource was created.
 	// Example: 2020-05-11 17:21:34
 	// Read Only: true
-	CreatedAt string `json:"created_at,omitempty"`
+	// Format: date-time
+	CreatedAt strfmt.DateTime `json:"created_at,omitempty"`
 
 	// Array of domains assigned to this pool
 	Domains []strfmt.UUID `json:"domains"`
@@ -82,12 +83,17 @@ type Pool struct {
 	// The UTC date and timestamp when the resource was created.
 	// Example: 2020-09-09 14:52:15
 	// Read Only: true
-	UpdatedAt string `json:"updated_at,omitempty"`
+	// Format: date-time
+	UpdatedAt strfmt.DateTime `json:"updated_at,omitempty"`
 }
 
 // Validate validates this pool
 func (m *Pool) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := m.validateCreatedAt(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := m.validateDomains(formats); err != nil {
 		res = append(res, err)
@@ -121,9 +127,25 @@ func (m *Pool) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateUpdatedAt(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *Pool) validateCreatedAt(formats strfmt.Registry) error {
+	if swag.IsZero(m.CreatedAt) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("created_at", "body", "date-time", m.CreatedAt.String(), formats); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -302,6 +324,18 @@ func (m *Pool) validateStatus(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *Pool) validateUpdatedAt(formats strfmt.Registry) error {
+	if swag.IsZero(m.UpdatedAt) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("updated_at", "body", "date-time", m.UpdatedAt.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // ContextValidate validate this pool based on the context it is used
 func (m *Pool) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
@@ -342,7 +376,7 @@ func (m *Pool) ContextValidate(ctx context.Context, formats strfmt.Registry) err
 
 func (m *Pool) contextValidateCreatedAt(ctx context.Context, formats strfmt.Registry) error {
 
-	if err := validate.ReadOnly(ctx, "created_at", "body", string(m.CreatedAt)); err != nil {
+	if err := validate.ReadOnly(ctx, "created_at", "body", strfmt.DateTime(m.CreatedAt)); err != nil {
 		return err
 	}
 
@@ -396,7 +430,7 @@ func (m *Pool) contextValidateStatus(ctx context.Context, formats strfmt.Registr
 
 func (m *Pool) contextValidateUpdatedAt(ctx context.Context, formats strfmt.Registry) error {
 
-	if err := validate.ReadOnly(ctx, "updated_at", "body", string(m.UpdatedAt)); err != nil {
+	if err := validate.ReadOnly(ctx, "updated_at", "body", strfmt.DateTime(m.UpdatedAt)); err != nil {
 		return err
 	}
 

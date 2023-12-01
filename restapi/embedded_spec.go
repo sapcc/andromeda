@@ -1847,7 +1847,7 @@ func init() {
         "created_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "readOnly": true,
           "example": "2020-05-11T17:21:34"
         },
@@ -1930,7 +1930,7 @@ func init() {
         "updated_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "readOnly": true,
           "example": "2020-09-09T14:52:15"
         }
@@ -1968,7 +1968,7 @@ func init() {
         "created_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "readOnly": true,
           "example": "2020-05-11T17:21:34"
         },
@@ -2058,7 +2058,7 @@ func init() {
         "updated_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "readOnly": true,
           "example": "2020-09-09T14:52:15"
         }
@@ -2108,7 +2108,7 @@ func init() {
         "created_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "readOnly": true,
           "example": "2020-05-11T17:21:34"
         },
@@ -2168,7 +2168,7 @@ func init() {
         "updated_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "readOnly": true,
           "example": "2020-09-09T14:52:15"
         }
@@ -2213,7 +2213,7 @@ func init() {
         "created_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "readOnly": true,
           "example": "2020-05-11T17:21:34"
         },
@@ -2276,7 +2276,7 @@ func init() {
         "updated_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "readOnly": true,
           "example": "2020-09-09T14:52:15"
         }
@@ -2294,7 +2294,7 @@ func init() {
         "created_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "readOnly": true,
           "example": "2020-05-11T17:21:34"
         },
@@ -2381,7 +2381,7 @@ func init() {
         "updated_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "readOnly": true,
           "example": "2020-09-09T14:52:15"
         }
@@ -2398,7 +2398,7 @@ func init() {
         "created_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "readOnly": true,
           "example": "2020-05-11 17:21:34"
         },
@@ -2469,7 +2469,7 @@ func init() {
         "updated_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "readOnly": true,
           "example": "2020-09-09 14:52:15"
         }
@@ -2551,7 +2551,7 @@ func init() {
         "heartbeat": {
           "description": "The UTC date and timestamp when had the last heartbeat.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "example": "2020-05-11 17:21:34"
         },
         "host": {
@@ -4739,7 +4739,7 @@ func init() {
         "created_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "readOnly": true,
           "example": "2020-05-11T17:21:34"
         },
@@ -4822,7 +4822,7 @@ func init() {
         "updated_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "readOnly": true,
           "example": "2020-09-09T14:52:15"
         }
@@ -4860,7 +4860,7 @@ func init() {
         "created_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "readOnly": true,
           "example": "2020-05-11T17:21:34"
         },
@@ -4950,7 +4950,7 @@ func init() {
         "updated_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "readOnly": true,
           "example": "2020-09-09T14:52:15"
         }
@@ -4986,7 +4986,7 @@ func init() {
         "created_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "readOnly": true,
           "example": "2020-05-11T17:21:34"
         },
@@ -5046,7 +5046,7 @@ func init() {
         "updated_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "readOnly": true,
           "example": "2020-09-09T14:52:15"
         }
@@ -5091,7 +5091,7 @@ func init() {
         "created_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "readOnly": true,
           "example": "2020-05-11T17:21:34"
         },
@@ -5155,7 +5155,7 @@ func init() {
         "updated_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "readOnly": true,
           "example": "2020-09-09T14:52:15"
         }
@@ -5173,7 +5173,7 @@ func init() {
         "created_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "readOnly": true,
           "example": "2020-05-11T17:21:34"
         },
@@ -5261,7 +5261,7 @@ func init() {
         "updated_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "readOnly": true,
           "example": "2020-09-09T14:52:15"
         }
@@ -5278,7 +5278,7 @@ func init() {
         "created_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "readOnly": true,
           "example": "2020-05-11 17:21:34"
         },
@@ -5349,7 +5349,7 @@ func init() {
         "updated_at": {
           "description": "The UTC date and timestamp when the resource was created.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "readOnly": true,
           "example": "2020-09-09 14:52:15"
         }
@@ -5431,7 +5431,7 @@ func init() {
         "heartbeat": {
           "description": "The UTC date and timestamp when had the last heartbeat.",
           "type": "string",
-          "format": "dateTime",
+          "format": "date-time",
           "example": "2020-05-11 17:21:34"
         },
         "host": {

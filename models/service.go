@@ -35,7 +35,8 @@ type Service struct {
 
 	// The UTC date and timestamp when had the last heartbeat.
 	// Example: 2020-05-11 17:21:34
-	Heartbeat string `json:"heartbeat,omitempty"`
+	// Format: date-time
+	Heartbeat strfmt.DateTime `json:"heartbeat,omitempty"`
 
 	// Hostname of the computer the service is running.
 	// Example: example.host
@@ -70,6 +71,10 @@ type Service struct {
 func (m *Service) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateHeartbeat(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateHost(formats); err != nil {
 		res = append(res, err)
 	}
@@ -77,6 +82,18 @@ func (m *Service) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *Service) validateHeartbeat(formats strfmt.Registry) error {
+	if swag.IsZero(m.Heartbeat) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("heartbeat", "body", "date-time", m.Heartbeat.String(), formats); err != nil {
+		return err
+	}
+
 	return nil
 }
 

@@ -50,7 +50,8 @@ type Domain struct {
 	// The UTC date and timestamp when the resource was created.
 	// Example: 2020-05-11T17:21:34
 	// Read Only: true
-	CreatedAt string `json:"created_at,omitempty"`
+	// Format: date-time
+	CreatedAt strfmt.DateTime `json:"created_at,omitempty"`
 
 	// Desired Fully-Qualified Host Name.
 	// Example: example.org
@@ -103,7 +104,8 @@ type Domain struct {
 	// The UTC date and timestamp when the resource was created.
 	// Example: 2020-09-09T14:52:15
 	// Read Only: true
-	UpdatedAt string `json:"updated_at,omitempty"`
+	// Format: date-time
+	UpdatedAt strfmt.DateTime `json:"updated_at,omitempty"`
 }
 
 // Validate validates this domain
@@ -111,6 +113,10 @@ func (m *Domain) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateCnameTarget(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateCreatedAt(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -150,6 +156,10 @@ func (m *Domain) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateUpdatedAt(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -162,6 +172,18 @@ func (m *Domain) validateCnameTarget(formats strfmt.Registry) error {
 	}
 
 	if err := validate.FormatOf("cname_target", "body", "hostname", m.CnameTarget.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Domain) validateCreatedAt(formats strfmt.Registry) error {
+	if swag.IsZero(m.CreatedAt) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("created_at", "body", "date-time", m.CreatedAt.String(), formats); err != nil {
 		return err
 	}
 
@@ -455,6 +477,18 @@ func (m *Domain) validateStatus(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *Domain) validateUpdatedAt(formats strfmt.Registry) error {
+	if swag.IsZero(m.UpdatedAt) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("updated_at", "body", "date-time", m.UpdatedAt.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // ContextValidate validate this domain based on the context it is used
 func (m *Domain) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
@@ -500,7 +534,7 @@ func (m *Domain) contextValidateCnameTarget(ctx context.Context, formats strfmt.
 
 func (m *Domain) contextValidateCreatedAt(ctx context.Context, formats strfmt.Registry) error {
 
-	if err := validate.ReadOnly(ctx, "created_at", "body", string(m.CreatedAt)); err != nil {
+	if err := validate.ReadOnly(ctx, "created_at", "body", strfmt.DateTime(m.CreatedAt)); err != nil {
 		return err
 	}
 
@@ -536,7 +570,7 @@ func (m *Domain) contextValidateStatus(ctx context.Context, formats strfmt.Regis
 
 func (m *Domain) contextValidateUpdatedAt(ctx context.Context, formats strfmt.Registry) error {
 
-	if err := validate.ReadOnly(ctx, "updated_at", "body", string(m.UpdatedAt)); err != nil {
+	if err := validate.ReadOnly(ctx, "updated_at", "body", strfmt.DateTime(m.UpdatedAt)); err != nil {
 		return err
 	}
 

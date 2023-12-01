@@ -1230,13 +1230,13 @@ definitions:
         readOnly: true
       created_at:
         type: string
-        format: dateTime
+        format: "date-time"
         description: The UTC date and timestamp when the resource was created.
         readOnly: true
         example: 2020-05-11T17:21:34
       updated_at:
         type: string
-        format: dateTime
+        format: "date-time"
         description: The UTC date and timestamp when the resource was created.
         readOnly: true
         example: 2020-09-09T14:52:15
@@ -1331,13 +1331,13 @@ definitions:
         readOnly: true
       created_at:
         type: string
-        format: dateTime
+        format: "date-time"
         description: The UTC date and timestamp when the resource was created.
         readOnly: true
         example: 2020-05-11 17:21:34
       updated_at:
         type: string
-        format: dateTime
+        format: "date-time"
         description: The UTC date and timestamp when the resource was created.
         readOnly: true
         example: 2020-09-09 14:52:15
@@ -1397,13 +1397,13 @@ definitions:
         x-nullable: true
       created_at:
         type: string
-        format: dateTime
+        format: "date-time"
         description: The UTC date and timestamp when the resource was created.
         readOnly: true
         example: 2020-05-11T17:21:34
       updated_at:
         type: string
-        format: dateTime
+        format: "date-time"
         description: The UTC date and timestamp when the resource was created.
         readOnly: true
         example: 2020-09-09T14:52:15
@@ -1519,13 +1519,13 @@ definitions:
               description: Datacenter ID
       created_at:
         type: string
-        format: dateTime
+        format: "date-time"
         description: The UTC date and timestamp when the resource was created.
         readOnly: true
         example: 2020-05-11T17:21:34
       updated_at:
         type: string
-        format: dateTime
+        format: "date-time"
         description: The UTC date and timestamp when the resource was created.
         readOnly: true
         example: 2020-09-09T14:52:15
@@ -1582,13 +1582,13 @@ definitions:
         x-nullable: true
       created_at:
         type: string
-        format: dateTime
+        format: "date-time"
         description: The UTC date and timestamp when the resource was created.
         readOnly: true
         example: 2020-05-11T17:21:34
       updated_at:
         type: string
-        format: dateTime
+        format: "date-time"
         description: The UTC date and timestamp when the resource was created.
         readOnly: true
         example: 2020-09-09T14:52:15
@@ -1655,13 +1655,13 @@ definitions:
         x-nullable: true
       created_at:
         type: string
-        format: dateTime
+        format: "date-time"
         description: The UTC date and timestamp when the resource was created.
         readOnly: true
         example: 2020-05-11T17:21:34
       updated_at:
         type: string
-        format: dateTime
+        format: "date-time"
         description: The UTC date and timestamp when the resource was created.
         readOnly: true
         example: 2020-09-09T14:52:15
@@ -1747,7 +1747,7 @@ definitions:
         description: Provider this service supports.
       heartbeat:
         type: string
-        format: dateTime
+        format: "date-time"f
         description: The UTC date and timestamp when had the last heartbeat.
         example: 2020-05-11 17:21:34
       rpc_address:
