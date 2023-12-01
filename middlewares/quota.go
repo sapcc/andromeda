@@ -101,7 +101,7 @@ func (qc *quotaController) QuotaHandler(next http.Handler) http.Handler {
 			Where(sq.NotEq{"provisioning_status": "DELETED"})
 
 		query := sq.Select(resource).
-			Column(sq.Alias(subquery, "use")).
+			Column(sq.Alias(subquery, "quota_usage")).
 			From("quota").
 			Where(sq.Eq{"project_id": project})
 
