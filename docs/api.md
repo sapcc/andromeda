@@ -2749,7 +2749,7 @@ Unexpected Error
 | city | string| `string` |  | |  | `Berlin` |
 | continent | string| `string` |  | |  | `EU` |
 | country | string| `string` |  | |  | `DE` |
-| created_at | dateTime (formatted string)| `string` |  | | The UTC date and timestamp when the resource was created. | `2020-05-11T17:21:34` |
+| created_at | date-time (formatted string)| `strfmt.DateTime` |  | | The UTC date and timestamp when the resource was created. | `2020-05-11T17:21:34` |
 | id | uuid (formatted string)| `strfmt.UUID` |  | | The id of the resource. |  |
 | latitude | float (formatted number)| `float32` |  | `52.52`|  | `52.526055` |
 | longitude | float (formatted number)| `float32` |  | `13.4`|  | `13.403454` |
@@ -2760,7 +2760,7 @@ Unexpected Error
 | provisioning_status | string| `string` |  | |  |  |
 | scope | string| `string` |  | `"private"`| Visibility of datacenter between different projects |  |
 | state_or_province | string| `string` |  | |  | `Berlin` |
-| updated_at | dateTime (formatted string)| `string` |  | | The UTC date and timestamp when the resource was created. | `2020-09-09T14:52:15` |
+| updated_at | date-time (formatted string)| `strfmt.DateTime` |  | | The UTC date and timestamp when the resource was created. | `2020-09-09T14:52:15` |
 
 
 
@@ -2781,7 +2781,7 @@ Unexpected Error
 | admin_state_up | boolean| `bool` |  | `true`| The administrative state of the resource, which is up (true) or down (false). Default is true. |  |
 | aliases | []string (formatted string)| `[]string` |  | |  |  |
 | cname_target | hostname (formatted string)| `strfmt.Hostname` |  | | If not empty, the backend created a CNAME target to be used for the FQDN. | `example.org.production.gtm.com` |
-| created_at | dateTime (formatted string)| `string` |  | | The UTC date and timestamp when the resource was created. | `2020-05-11T17:21:34` |
+| created_at | date-time (formatted string)| `strfmt.DateTime` |  | | The UTC date and timestamp when the resource was created. | `2020-05-11T17:21:34` |
 | fqdn | hostname (formatted string)| `strfmt.Hostname` | ✓ | | Desired Fully-Qualified Host Name. | `example.org` |
 | id | uuid (formatted string)| `strfmt.UUID` |  | | The id of the resource. |  |
 | mode | string| `string` |  | `"ROUND_ROBIN"`| Load balancing method to use for the references pools. |  |
@@ -2792,7 +2792,7 @@ Unexpected Error
 | provisioning_status | string| `string` |  | |  |  |
 | record_type | string| `string` |  | `"A"`| DNS Record type to use. |  |
 | status | string| `string` |  | |  |  |
-| updated_at | dateTime (formatted string)| `string` |  | | The UTC date and timestamp when the resource was created. | `2020-09-09T14:52:15` |
+| updated_at | date-time (formatted string)| `strfmt.DateTime` |  | | The UTC date and timestamp when the resource was created. | `2020-09-09T14:52:15` |
 
 
 
@@ -2824,7 +2824,7 @@ Unexpected Error
 | Name | Type | Go type | Required | Default | Description | Example |
 |------|------|---------|:--------:| ------- |-------------|---------|
 | assignments | [][GeomapAssignmentsItems0](#geomap-assignments-items0)| `[]*GeomapAssignmentsItems0` |  | | Country to datacenter assignments. |  |
-| created_at | dateTime (formatted string)| `string` |  | | The UTC date and timestamp when the resource was created. | `2020-05-11T17:21:34` |
+| created_at | date-time (formatted string)| `strfmt.DateTime` |  | | The UTC date and timestamp when the resource was created. | `2020-05-11T17:21:34` |
 | default_datacenter | uuid (formatted string)| `strfmt.UUID` | ✓ | | Datacenter ID |  |
 | id | uuid (formatted string)| `strfmt.UUID` |  | | The id of the resource. |  |
 | name | string| `string` |  | | Human-readable name of the resource. |  |
@@ -2832,7 +2832,7 @@ Unexpected Error
 | provider | string| `string` |  | | Provider driver for the backend solution | `akamai` |
 | provisioning_status | string| `string` |  | |  |  |
 | scope | string| `string` |  | `"private"`| Visibility of datacenter between different projects |  |
-| updated_at | dateTime (formatted string)| `string` |  | | The UTC date and timestamp when the resource was created. | `2020-09-09T14:52:15` |
+| updated_at | date-time (formatted string)| `strfmt.DateTime` |  | | The UTC date and timestamp when the resource was created. | `2020-09-09T14:52:15` |
 
 
 
@@ -2886,7 +2886,7 @@ Unexpected Error
 |------|------|---------|:--------:| ------- |-------------|---------|
 | address | ipv4 (formatted string)| `strfmt.IPv4` | ✓ | | Address to use. | `1.2.3.4` |
 | admin_state_up | boolean| `bool` |  | `true`| The administrative state of the resource, which is up (true) or down (false). Default is true. |  |
-| created_at | dateTime (formatted string)| `string` |  | | The UTC date and timestamp when the resource was created. | `2020-05-11T17:21:34` |
+| created_at | date-time (formatted string)| `strfmt.DateTime` |  | | The UTC date and timestamp when the resource was created. | `2020-05-11T17:21:34` |
 | datacenter_id | uuid (formatted string)| `strfmt.UUID` |  | | Datacenter assigned for this member. |  |
 | id | uuid (formatted string)| `strfmt.UUID` |  | | The id of the resource. |  |
 | name | string| `string` |  | | Human-readable name of the resource. |  |
@@ -2895,7 +2895,7 @@ Unexpected Error
 | project_id | string| `string` |  | | The ID of the project owning this resource. | `fa84c217f361441986a220edf9b1e337` |
 | provisioning_status | string| `string` |  | |  |  |
 | status | string| `string` |  | |  |  |
-| updated_at | dateTime (formatted string)| `string` |  | | The UTC date and timestamp when the resource was created. | `2020-09-09T14:52:15` |
+| updated_at | date-time (formatted string)| `strfmt.DateTime` |  | | The UTC date and timestamp when the resource was created. | `2020-09-09T14:52:15` |
 
 
 
@@ -2911,7 +2911,7 @@ Unexpected Error
 | Name | Type | Go type | Required | Default | Description | Example |
 |------|------|---------|:--------:| ------- |-------------|---------|
 | admin_state_up | boolean| `bool` |  | `true`| The administrative state of the resource, which is up (true) or down (false). Default is true. |  |
-| created_at | dateTime (formatted string)| `string` |  | | The UTC date and timestamp when the resource was created. | `2020-05-11T17:21:34` |
+| created_at | date-time (formatted string)| `strfmt.DateTime` |  | | The UTC date and timestamp when the resource was created. | `2020-05-11T17:21:34` |
 | id | uuid (formatted string)| `strfmt.UUID` |  | | The id of the resource. |  |
 | interval | integer| `int64` |  | `60`| The interval, in seconds, between health checks. | `10` |
 | name | string| `string` |  | | Human-readable name of the resource. |  |
@@ -2922,7 +2922,7 @@ Unexpected Error
 | send | string| `string` |  | | Specifies the text string that the monitor sends to the target member. | `HEAD / HTTP/1.0\\r\\n\\r\\n` |
 | timeout | integer| `int64` |  | `10`| The time in total, in seconds, after which a health check times out. | `30` |
 | type | string| `string` |  | `"ICMP"`| Type of the health check monitor. | `HTTP` |
-| updated_at | dateTime (formatted string)| `string` |  | | The UTC date and timestamp when the resource was created. | `2020-09-09T14:52:15` |
+| updated_at | date-time (formatted string)| `strfmt.DateTime` |  | | The UTC date and timestamp when the resource was created. | `2020-09-09T14:52:15` |
 
 
 
@@ -2938,7 +2938,7 @@ Unexpected Error
 | Name | Type | Go type | Required | Default | Description | Example |
 |------|------|---------|:--------:| ------- |-------------|---------|
 | admin_state_up | boolean| `bool` |  | `true`| The administrative state of the resource, which is up (true) or down (false). Default is true. |  |
-| created_at | dateTime (formatted string)| `string` |  | | The UTC date and timestamp when the resource was created. | `2020-05-11 17:21:34` |
+| created_at | date-time (formatted string)| `strfmt.DateTime` |  | | The UTC date and timestamp when the resource was created. | `2020-05-11 17:21:34` |
 | domains | []uuid (formatted string)| `[]strfmt.UUID` |  | | Array of domains assigned to this pool |  |
 | id | uuid (formatted string)| `strfmt.UUID` |  | | The id of the resource. |  |
 | members | []uuid (formatted string)| `[]strfmt.UUID` |  | | Array of member ids that this pool uses for load balancing. |  |
@@ -2947,7 +2947,7 @@ Unexpected Error
 | project_id | string| `string` |  | | The ID of the project owning this resource. | `fa84c217f361441986a220edf9b1e337` |
 | provisioning_status | string| `string` |  | |  |  |
 | status | string| `string` |  | |  |  |
-| updated_at | dateTime (formatted string)| `string` |  | | The UTC date and timestamp when the resource was created. | `2020-09-09 14:52:15` |
+| updated_at | date-time (formatted string)| `strfmt.DateTime` |  | | The UTC date and timestamp when the resource was created. | `2020-09-09 14:52:15` |
 
 
 
@@ -3000,7 +3000,7 @@ Unexpected Error
 
 | Name | Type | Go type | Required | Default | Description | Example |
 |------|------|---------|:--------:| ------- |-------------|---------|
-| heartbeat | dateTime (formatted string)| `string` |  | | The UTC date and timestamp when had the last heartbeat. | `2020-05-11 17:21:34` |
+| heartbeat | date-time (formatted string)| `strfmt.DateTime` |  | | The UTC date and timestamp when had the last heartbeat. | `2020-05-11 17:21:34` |
 | host | hostname (formatted string)| `strfmt.Hostname` |  | | Hostname of the computer the service is running. | `example.host` |
 | id | string| `string` |  | | ID of the RPC service. | `andromeda-agent-fbb49979-03f5-4a97-a334-1fd2c9f61e7e` |
 | metadata | [interface{}](#interface)| `interface{}` |  | |  |  |
