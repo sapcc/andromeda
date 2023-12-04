@@ -1747,7 +1747,7 @@ definitions:
         description: Provider this service supports.
       heartbeat:
         type: string
-        format: "date-time"f
+        format: "date-time"
         description: The UTC date and timestamp when had the last heartbeat.
         example: 2020-05-11 17:21:34
       rpc_address:
