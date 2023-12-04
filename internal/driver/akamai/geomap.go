@@ -131,6 +131,22 @@ func (s *AkamaiAgent) FetchAndSyncGeomaps(geomaps []string, force bool) error {
 func (s *AkamaiAgent) SyncGeomap(geomap *rpcmodels.Geomap, force bool) (*gtm.GeoMap, error) {
 	logger.Debugf("SyncGeomap(%s, force=%t)", geomap.Id, force)
 
+	if geomap.ProvisioningStatus == "PENDING_DELETE" {
+		// Run Delete
+		toDelete, err := s.gtm.GetGeoMap(context.Background(), geomap.Id, config.Global.AkamaiConfig.Domain)
+		if err != nil {
+			return nil, err
+		}
+
+		if toDelete == nil {
+			// geomap already deleted
+			return nil, nil
+		}
+
+		_, err = s.gtm.DeleteGeoMap(context.Background(), toDelete, config.Global.AkamaiConfig.Domain)
+		return nil, err
+	}
+
 	newAkamaiGeoMap, err := s.constructAkamaiGeoMap(geomap)
 	if err != nil {
 		return nil, err
@@ -153,6 +169,9 @@ func (s *AkamaiAgent) SyncGeomap(geomap *rpcmodels.Geomap, force bool) (*gtm.Geo
 			return gm, nil
 		}
 	}
+
+	logger.Debugf("SyncGeomap(%s) for domain %s, changes identified",
+		geomap.Id, config.Global.AkamaiConfig.Domain)
 
 	// create or update
 	res, err := s.gtm.CreateGeoMap(context.Background(), newAkamaiGeoMap, config.Global.AkamaiConfig.Domain)
