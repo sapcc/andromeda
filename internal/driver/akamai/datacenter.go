@@ -27,6 +27,7 @@ import (
 	"github.com/sapcc/andromeda/internal/driver"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
+	"github.com/sapcc/andromeda/internal/utils"
 )
 
 func (s *AkamaiAgent) GetDatacenterReference(datacenterUUID string, datacenters []*rpcmodels.Datacenter) (int, error) {
@@ -68,41 +69,6 @@ func (s *AkamaiAgent) GetDatacenters(datacenterIDs []string) ([]*rpcmodels.Datac
 	}
 
 	return response.GetResponse(), nil
-}
-
-func (s *AkamaiAgent) uploadDatacenter(datacenter *rpcmodels.Datacenter) (*gtm.Datacenter, error) {
-	datacenters, err := s.gtm.ListDatacenters(context.Background(), config.Global.AkamaiConfig.Domain)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, d := range datacenters {
-		if d.Nickname == datacenter.Id {
-			return d, nil
-		}
-	}
-
-	// Create datacenter
-	akamaiDatacenter := gtm.Datacenter{
-		City:            datacenter.GetCity(),
-		Continent:       datacenter.GetContinent(),
-		Country:         datacenter.GetCountry(),
-		StateOrProvince: datacenter.GetStateOrProvince(),
-		Latitude:        float64(datacenter.GetLatitude()),
-		Longitude:       float64(datacenter.GetLongitude()),
-		Nickname:        datacenter.Id,
-	}
-
-	res, err := s.gtm.CreateDatacenter(context.Background(), &akamaiDatacenter, config.Global.AkamaiConfig.Domain)
-	if err != nil {
-		logger.Errorf("CreateDatacenter(%s) for domain %s failed", akamaiDatacenter.Nickname,
-			config.Global.AkamaiConfig.Domain)
-		return nil, err
-	} else {
-		logger.Infof("CreateDatacenter(%s) for domain %s", akamaiDatacenter.Nickname,
-			config.Global.AkamaiConfig.Domain)
-	}
-	return res.Resource, nil
 }
 
 func (s *AkamaiAgent) FetchAndSyncDatacenters(datacenters []string, force bool) error {
@@ -148,10 +114,64 @@ func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force boo
 		return datacenter, nil
 	}
 
-	backendDatacenter, err := s.uploadDatacenter(datacenter)
-	if err != nil {
-		return nil, err
+	var backendDatacenter *gtm.Datacenter
+	if meta != 0 {
+		var err error
+
+		backendDatacenter, err = s.gtm.GetDatacenter(context.Background(), meta, config.Global.AkamaiConfig.Domain)
+		if err != nil {
+			// try to find datacenter by nickname
+			datacenters, err := s.gtm.ListDatacenters(context.Background(), config.Global.AkamaiConfig.Domain)
+			if err != nil {
+				return nil, err
+			}
+
+			for _, d := range datacenters {
+				if d.Nickname == datacenter.Id {
+					backendDatacenter = d
+					break
+				}
+			}
+		}
 	}
+
+	// reference datacenter
+	referenceDatacenter := gtm.Datacenter{
+		City:            datacenter.GetCity(),
+		Continent:       datacenter.GetContinent(),
+		Country:         datacenter.GetCountry(),
+		StateOrProvince: datacenter.GetStateOrProvince(),
+		Latitude:        float64(datacenter.GetLatitude()),
+		Longitude:       float64(datacenter.GetLongitude()),
+		Nickname:        datacenter.Id,
+	}
+
+	// compare to reference datacenter
+	fieldsToCompare := []string{
+		"City",
+		"Continent",
+		"Country",
+		"StateOrProvince",
+		"Longitude",
+		"Nickname",
+	}
+	if utils.DeepEqualFields(&referenceDatacenter, backendDatacenter, fieldsToCompare) {
+		// no change
+		return datacenter, nil
+	}
+
+	res, err := s.gtm.CreateDatacenter(context.Background(), &referenceDatacenter, config.Global.AkamaiConfig.Domain)
+	if err != nil {
+		logger.Errorf("CreateDatacenter(%s) for domain %s failed", referenceDatacenter.Nickname,
+			config.Global.AkamaiConfig.Domain)
+		return nil, err
+	} else {
+		logger.Infof("CreateDatacenter(%s) for domain %s", referenceDatacenter.Nickname,
+			config.Global.AkamaiConfig.Domain)
+	}
+
+	// update backend datacenter
+	backendDatacenter = res.Resource
 
 	if backendDatacenter.DatacenterId != meta {
 		req := &server.DatacenterMetaRequest{Id: datacenter.Id, Meta: int32(backendDatacenter.DatacenterId)}

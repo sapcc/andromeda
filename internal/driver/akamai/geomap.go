@@ -56,7 +56,7 @@ func (s *AkamaiAgent) constructAkamaiGeoMap(geomap *rpcmodels.Geomap) (*gtm.GeoM
 		return nil, err
 	}
 
-	var assignments []*gtm.GeoAssignment
+	var assignments = make([]*gtm.GeoAssignment, 0)
 	for _, dc := range geomap.Assignment {
 		if dc.Datacenter == geomap.DefaultDatacenter {
 			// skip assignments to default datacenter
@@ -147,40 +147,42 @@ func (s *AkamaiAgent) SyncGeomap(geomap *rpcmodels.Geomap, force bool) (*gtm.Geo
 		return nil, err
 	}
 
-	newAkamaiGeoMap, err := s.constructAkamaiGeoMap(geomap)
+	referenceGeoMap, err := s.constructAkamaiGeoMap(geomap)
 	if err != nil {
 		return nil, err
 	}
 
-	akamaiGeoMaps, err := s.gtm.ListGeoMaps(context.Background(), config.Global.AkamaiConfig.Domain)
+	var backendGeoMap *gtm.GeoMap
+	backendGeoMap, err = s.gtm.GetGeoMap(context.Background(), geomap.Id, config.Global.AkamaiConfig.Domain)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, gm := range akamaiGeoMaps {
-		if !force && utils.DeepEqualFields(gm, newAkamaiGeoMap, []string{
-			"Name",
-			"DefaultDatacenter",
-			"Assignments",
-			"Assignments.DatacenterBase",
-			"Assignments.Countries",
-		}) {
-			// everything's equal, nothing to do
-			return gm, nil
-		}
+	fieldsToCompare := []string{
+		"Name",
+		"DefaultDatacenter",
+		"DefaultDatacenter.Nickname",
+		"DefaultDatacenter.DatacenterId",
+		"Assignments",
+		"Assignments.DatacenterBase",
+		"Assignments.Countries",
+	}
+	if utils.DeepEqualFields(backendGeoMap, referenceGeoMap, fieldsToCompare) {
+		// everything's equal, nothing to do
+		return backendGeoMap, nil
 	}
 
 	logger.Debugf("SyncGeomap(%s) for domain %s, changes identified",
 		geomap.Id, config.Global.AkamaiConfig.Domain)
 
 	// create or update
-	res, err := s.gtm.CreateGeoMap(context.Background(), newAkamaiGeoMap, config.Global.AkamaiConfig.Domain)
+	res, err := s.gtm.CreateGeoMap(context.Background(), referenceGeoMap, config.Global.AkamaiConfig.Domain)
 	if err != nil {
-		logger.Errorf("CreateGeomap(%s) for domain %s failed", newAkamaiGeoMap.Name,
+		logger.Errorf("CreateGeomap(%s) for domain %s failed", referenceGeoMap.Name,
 			config.Global.AkamaiConfig.Domain)
 		return nil, err
 	}
 
-	logger.Infof("CreateGeomap(%s) for domain %s", newAkamaiGeoMap.Name, config.Global.AkamaiConfig.Domain)
+	logger.Infof("CreateGeomap(%s) for domain %s", referenceGeoMap.Name, config.Global.AkamaiConfig.Domain)
 	return res.Resource, nil
 }

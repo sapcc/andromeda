@@ -17,6 +17,7 @@
 package utils
 
 import (
+	"math"
 	"reflect"
 	"strings"
 )
@@ -123,6 +124,9 @@ func deepValueEqualField(v1, v2 reflect.Value, fieldsToCompare []string) bool {
 		}
 		// Can't do better than this:
 		return false
+	case reflect.Float64:
+		// This is likely a longitude/latitude field, so we need to compare them with a delta
+		return math.Abs(v1.Float()-v2.Float()) < 0.0001
 	default:
 		return v1.Interface() == v2.Interface()
 	}
