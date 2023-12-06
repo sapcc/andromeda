@@ -1,48 +1,23 @@
 {
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base",
-    "default:pinDigestsDisabled",
-    "github>whitesource/merge-confidence:beta",
-    "docker:disable"
+    "config:base"
   ],
   "assignees": [
     "notandy"
   ],
-  "commitMessageAction": "Renovate: Update",
-  "constraints": {
-    "go": "1.21.4"
-  },
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true
+    },
+    {
+      "matchPackageNames": ["github.com/getsentry/sentry-go"],
+      "enabled": false
+    }
+  ],
   "postUpdateOptions": [
     "gomodTidy",
     "gomodUpdateImportPaths"
-  ],
-  "packageRules": [
-    {
-      "matchPackageNames": [
-        "golang"
-      ],
-      "allowedVersions": "1.21.4.x"
-    },
-    {
-      "matchPackagePatterns": [
-        "^github\\.com\\/sapcc\\/.*"
-      ],
-      "automerge": true,
-      "groupName": "github.com/sapcc"
-    },
-    {
-      "excludePackagePatterns": [
-        "^github\\.com\\/sapcc\\/.*"
-      ],
-      "matchPackagePatterns": [
-        ".*"
-      ],
-      "groupName": "External dependencies"
-    }
-  ],
-  "prHourlyLimit": 0,
-  "schedule": [
-    "before 8am on Friday"
-  ],
-  "semanticCommits": "disabled"
+  ]
 }
