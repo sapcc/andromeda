@@ -669,8 +669,8 @@ github.com/ryanuber/columnize v0.0.0-20160712163229-9b3edd62028f/go.mod h1:sm1tb
 github.com/sacloud/libsacloud v1.36.2/go.mod h1:P7YAOVmnIn3DKHqCZcUKYUXmSwGBm3yS7IBEjKVSrjg=
 github.com/sapcc/go-api-declarations v1.10.5 h1:1jGXudH2kcS0JCfGqooHszhSIe7BCvqu7QYJdqfas0A=
 github.com/sapcc/go-api-declarations v1.10.5/go.mod h1:83R3hTANhuRXt/pXDby37IJetw8l7DG41s33Tp9NXxI=
-github.com/sapcc/go-bits v0.0.0-20240102174110-7cfd07964158 h1:lhR9xlT4FWmo8Nu1E1jq0j+SazY41Lfwv8L162paBUI=
-github.com/sapcc/go-bits v0.0.0-20240102174110-7cfd07964158/go.mod h1:wEFayuwafHrMvuG4rT7d4AV5BQiopTA4UndFP3CuwMI=
+github.com/sapcc/go-bits v0.0.0-20240103142137-2e41a6bbfd5b h1:BJxcfPGSv9jVoRdJpZKd4+YTxua1mKrdgXlpPZUV1gQ=
+github.com/sapcc/go-bits v0.0.0-20240103142137-2e41a6bbfd5b/go.mod h1:IA/0LxaN828U61lmkdSDqskWqqBK+iF7DXsZfkuOY+A=
 github.com/satori/go.uuid v1.2.0/go.mod h1:dA0hQrYB0VpLJoorglMZABFdXlWrHn1NEOzdhQKdks0=
 github.com/scaleway/scaleway-sdk-go v1.0.0-beta.7.0.20210127161313-bd30bebeac4f/go.mod h1:CJJ5VAbozOl0yEw7nHB9+7BXTJbIn6h7W+f6Gau5IP8=
 github.com/scottdware/go-bigip v0.0.0-20230907015320-92d03ba95eca h1:OQdd+IKW9v0aQAPQ+tfLAn3H8SrbCqOKttGCPwlrQjk=
