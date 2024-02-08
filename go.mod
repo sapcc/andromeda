@@ -7,7 +7,7 @@ require (
 	github.com/Boostport/migration/driver/mysql v1.1.2
 	github.com/Boostport/migration/driver/postgres v1.1.3
 	github.com/Masterminds/squirrel v1.5.4
-	github.com/akamai/AkamaiOPEN-edgegrid-golang/v7 v7.5.0
+	github.com/akamai/AkamaiOPEN-edgegrid-golang/v7 v7.6.0
 	github.com/cockroachdb/cockroach-go/v2 v2.3.6
 	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/dlmiddlecote/sqlstats v1.0.2
@@ -140,13 +140,13 @@ require (
 	go.opentelemetry.io/otel/trace v1.17.0 // indirect
 	go.uber.org/ratelimit v0.2.0 // indirect
 	golang.org/x/crypto v0.19.0 // indirect
-	golang.org/x/mod v0.9.0 // indirect
-	golang.org/x/sync v0.5.0 // indirect
+	golang.org/x/mod v0.14.0 // indirect
+	golang.org/x/sync v0.6.0 // indirect
 	golang.org/x/sys v0.17.0 // indirect
 	golang.org/x/term v0.17.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
-	golang.org/x/tools v0.7.0 // indirect
+	golang.org/x/tools v0.17.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
