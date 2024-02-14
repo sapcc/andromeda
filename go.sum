@@ -65,8 +65,8 @@ github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMx
 github.com/acomagu/bufpipe v1.0.3 h1:fxAGrHZTgQ9w5QqVItgzwj235/uYZYgbXitB+dLupOk=
 github.com/acomagu/bufpipe v1.0.3/go.mod h1:mxdxdup/WdsKVreO5GpW4+M/1CE2sMG4jeGJ2sYmHc4=
 github.com/akamai/AkamaiOPEN-edgegrid-golang v1.1.0/go.mod h1:kX6YddBkXqqywAe8c9LyvgTCyFuZCTMF4cRPQhc3Fy8=
-github.com/akamai/AkamaiOPEN-edgegrid-golang/v7 v7.6.0 h1:Y6DiIpp6fWR01YaK65PqTV8wiatLOaN8rBPzqfmjb7Y=
-github.com/akamai/AkamaiOPEN-edgegrid-golang/v7 v7.6.0/go.mod h1:gajRk0oNRQj4bHUc2SGAvAp/gPestSpuvK4QXU1QtPA=
+github.com/akamai/AkamaiOPEN-edgegrid-golang/v7 v7.6.1 h1:KrYkNvCKBGPs/upjgJCojZnnmt5XdEPWS4L2zRQm7+o=
+github.com/akamai/AkamaiOPEN-edgegrid-golang/v7 v7.6.1/go.mod h1:gajRk0oNRQj4bHUc2SGAvAp/gPestSpuvK4QXU1QtPA=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
