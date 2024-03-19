@@ -7,7 +7,7 @@ require (
 	github.com/Boostport/migration/driver/mysql v1.1.2
 	github.com/Boostport/migration/driver/postgres v1.1.3
 	github.com/Masterminds/squirrel v1.5.4
-	github.com/akamai/AkamaiOPEN-edgegrid-golang/v7 v7.6.1
+	github.com/akamai/AkamaiOPEN-edgegrid-golang/v8 v8.0.0
 	github.com/cockroachdb/cockroach-go/v2 v2.3.7
 	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/dlmiddlecote/sqlstats v1.0.2
@@ -81,6 +81,7 @@ require (
 	github.com/go-openapi/analysis v0.23.0 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
 	github.com/go-openapi/jsonreference v0.21.0 // indirect
+	github.com/go-ozzo/ozzo-validation/v4 v4.3.0 // indirect
 	github.com/gobuffalo/logger v1.0.3 // indirect
 	github.com/gobuffalo/packd v1.0.0 // indirect
 	github.com/gobuffalo/packr/v2 v2.8.0 // indirect

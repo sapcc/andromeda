@@ -20,7 +20,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v7/pkg/gtm"
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v8/pkg/gtm"
 	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/config"
