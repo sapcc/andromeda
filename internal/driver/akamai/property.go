@@ -20,7 +20,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v7/pkg/gtm"
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v8/pkg/gtm"
 	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/config"
@@ -127,7 +127,7 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 			}
 
 			// DatacenterId is a unique number for an akamai datacenter
-			trafficTarget.DatacenterId = int(aDatacenter.GetMeta())
+			trafficTarget.DatacenterID = int(aDatacenter.GetMeta())
 		}
 		property.TrafficTargets = append(property.TrafficTargets, &trafficTarget)
 		provRequests = append(provRequests,
@@ -158,7 +158,7 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 				livenessTest.TestObject = monitor.GetSend()
 			}
 			livenessTest.TestObjectPort = 80
-			livenessTest.HttpHeaders = []*gtm.HttpHeader{}
+			livenessTest.HTTPHeaders = []*gtm.HTTPHeader{}
 		case rpcmodels.Monitor_TCP:
 			livenessTest.RequestString = monitor.GetSend()
 			livenessTest.ResponseString = monitor.GetReceive()

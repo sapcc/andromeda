@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v7/pkg/gtm"
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v8/pkg/gtm"
 	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/config"
@@ -71,7 +71,7 @@ func (s *AkamaiAgent) constructAkamaiGeoMap(geomap *rpcmodels.Geomap) (*gtm.GeoM
 		assignments = append(assignments, &gtm.GeoAssignment{
 			DatacenterBase: gtm.DatacenterBase{
 				Nickname:     dc.Datacenter,
-				DatacenterId: datacenterReference,
+				DatacenterID: datacenterReference,
 			},
 			Countries: dc.Countries,
 		})
@@ -81,7 +81,7 @@ func (s *AkamaiAgent) constructAkamaiGeoMap(geomap *rpcmodels.Geomap) (*gtm.GeoM
 	akamaiGeoMap := gtm.GeoMap{
 		DefaultDatacenter: &gtm.DatacenterBase{
 			Nickname:     geomap.DefaultDatacenter,
-			DatacenterId: defaultDatacenterReference},
+			DatacenterID: defaultDatacenterReference},
 		Assignments: assignments,
 		Name:        geomap.Id,
 	}

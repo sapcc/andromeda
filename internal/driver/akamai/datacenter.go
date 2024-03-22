@@ -20,7 +20,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v7/pkg/gtm"
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v8/pkg/gtm"
 	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/config"
@@ -173,8 +173,8 @@ func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force boo
 	// update backend datacenter
 	backendDatacenter = res.Resource
 
-	if backendDatacenter.DatacenterId != meta {
-		req := &server.DatacenterMetaRequest{Id: datacenter.Id, Meta: int32(backendDatacenter.DatacenterId)}
+	if backendDatacenter.DatacenterID != meta {
+		req := &server.DatacenterMetaRequest{Id: datacenter.Id, Meta: int32(backendDatacenter.DatacenterID)}
 		return s.rpc.UpdateDatacenterMeta(context.Background(), req)
 	}
 	return datacenter, nil

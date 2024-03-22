@@ -20,6 +20,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v8/pkg/gtm"
 	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/config"
@@ -37,8 +38,11 @@ var MONITOR_LIVENESS_TYPE_MAP = map[rpcmodels.Monitor_MonitorType]string{
 func (s *AkamaiAgent) EnsureDomain(domainType string) error {
 	if _, err := s.gtm.GetDomain(context.Background(), config.Global.AkamaiConfig.Domain); err != nil {
 		logger.Warnf("Akamai Domain %s doesn't exist, creating...", config.Global.AkamaiConfig.Domain)
-		domain := s.gtm.NewDomain(context.Background(), config.Global.AkamaiConfig.Domain, domainType)
-		if _, err := s.gtm.CreateDomain(context.Background(), domain, nil); err != nil {
+		domain := gtm.Domain{
+			Name: config.Global.AkamaiConfig.Domain,
+			Type: domainType,
+		}
+		if _, err := s.gtm.CreateDomain(context.Background(), &domain, nil); err != nil {
 			return err
 		}
 	}
