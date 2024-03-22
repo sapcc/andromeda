@@ -4,7 +4,6 @@ import stylePlugin from 'esbuild-style-plugin'
 import tailwindcss from "tailwindcss"
 import autoprefixer from "autoprefixer";
 import chalk from "chalk";
-import svgr from 'esbuild-plugin-svgr'
 import imageInline from "esbuild-plugin-inline-image";
 import { writeFile } from "fs";
 
@@ -43,7 +42,6 @@ let ctx = await esbuild.context({
     outdir: "public/build",
     plugins: [
         stylePlugin({postcss: {plugins: [tailwindcss, autoprefixer]}}),
-        svgr(),
         imageInline({limit: 10240, extensions: ["png", "jpg", "jpeg", "gif"]}), // 10Kb
     ],
 })
