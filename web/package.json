@@ -10,7 +10,7 @@
     "autoprefixer": "^10.4.16",
     "chalk": "^5.3.0",
     "countries-list": "^3.0.6",
-    "esbuild": "^0.19.5",
+    "esbuild": "^0.20.0",
     "esbuild-plugin-inline-image": "^0.0.9",
     "esbuild-plugin-svgr": "^2.1.0",
     "esbuild-style-plugin": "^1.6.3",
