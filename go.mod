@@ -40,7 +40,7 @@ require (
 	github.com/prometheus/client_golang v1.19.0
 	github.com/rs/cors v1.10.1
 	github.com/sapcc/go-api-declarations v1.10.10
-	github.com/sapcc/go-bits v0.0.0-20240327231412-977c12306b61
+	github.com/sapcc/go-bits v0.0.0-20240328092936-0e0b562825d4
 	github.com/scottdware/go-bigip v0.0.0-20230907015320-92d03ba95eca
 	github.com/stretchr/testify v1.9.0
 	github.com/urfave/cli/v2 v2.27.1
@@ -126,7 +126,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_model v0.6.0 // indirect
-	github.com/prometheus/common v0.50.0 // indirect
+	github.com/prometheus/common v0.51.1 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/rabbitmq/amqp091-go v1.9.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
