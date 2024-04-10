@@ -25,9 +25,9 @@ const DatacenterSelect = ({setDatacenter, setError, label = "Select Datacenter",
         <Select
             onValueChange={(value) => setDatacenter(value)}
             label={label}
-            required="true"
             position="align-items"
             className={className}
+            required
         >
             {/* Render items: */}
             {data?.pages.map((group, i) => group.datacenters.map((datacenter, index) => (

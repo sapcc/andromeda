@@ -11,12 +11,12 @@ const NewDatacenterModal = () => {
     const closeModal = urlStore((state) => state.closeModal)
     const queryClient = useQueryClient()
     const [formState, setFormState] = useState({
-        name: undefined,
+        name: "",
         admin_state_up: true,
-        continent: undefined,
-        country: undefined,
-        state_or_province: undefined,
-        city: undefined,
+        continent: "",
+        country: "",
+        state_or_province: "",
+        city: "",
         longitude: 13.4,
         latitude: 52.52,
         provider: "akamai",

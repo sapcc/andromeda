@@ -21,15 +21,15 @@ const EditDatacenterPanel = ({closeCallback}) => {
     const queryClient = useQueryClient()
     const [error, setError] = useState()
     const [formState, setFormState] = useState({
-        name: undefined,
+        name: "",
         admin_state_up: true,
-        continent: undefined,
-        country: undefined,
-        state_or_province: undefined,
-        city: undefined,
-        longitude: undefined,
-        latitude: undefined,
-        provider: undefined,
+        continent: "",
+        country: "",
+        state_or_province: "",
+        city: "",
+        longitude: 0.0,
+        latitude: 0.0,
+        provider: "",
     })
 
     const {data, isLoading} = useQuery({

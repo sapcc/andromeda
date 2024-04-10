@@ -12,11 +12,11 @@ const EditMemberPanel = ({closeCallback}) => {
     const id = urlStore((state) => state.id)
     const [error, setError] = useState()
     const [formState, setFormState] = useState({
-        name: undefined,
-        address: undefined,
-        datacenter_id: undefined,
-        port: undefined,
-        admin_state_up: undefined,
+        name: "",
+        address: "",
+        datacenter_id: "",
+        port: 0,
+        admin_state_up: "",
     })
 
     const queryClient = useQueryClient()

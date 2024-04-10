@@ -1,6 +1,16 @@
 import React, {useMemo, useState} from "react"
 
-import {DataGridCell, DataGridRow, Icon, Stack, Tooltip, TooltipContent, TooltipTrigger, ContextMenu, MenuItem} from "juno-ui-components"
+import {
+    DataGridCell,
+    DataGridRow,
+    Icon,
+    Stack,
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+    ContextMenu,
+    MenuItem
+} from "juno-ui-components"
 import {authStore, urlStore} from "../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {deleteItem} from "../../actions"

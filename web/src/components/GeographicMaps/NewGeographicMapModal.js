@@ -13,8 +13,8 @@ const NewGeographicMapModal = () => {
     const closeModal = urlStore((state) => state.closeModal)
     const queryClient = useQueryClient()
     const [formState, setFormState] = useState({
-        name: undefined,
-        default_datacenter: undefined,
+        name: "",
+        default_datacenter: "",
         scope: "private",
         provider: "akamai",
     })

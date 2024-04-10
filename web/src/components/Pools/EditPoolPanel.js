@@ -13,7 +13,9 @@ const EditPoolPanel = ({closeCallback}) => {
     const queryClient = useQueryClient()
     const [error, setError] = useState()
     const [formState, setFormState] = useState({
-        name: undefined, admin_state_up: true, domains: [],
+        name: "",
+        admin_state_up: true,
+        domains: [],
     })
 
     const {data, isLoading} = useQuery({

@@ -25,9 +25,9 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint, loginDomains, loginProj
     const [showCredentials, setShowCredentials] = useState(false)
     const [mounted, setMounted] = useState(false)
     const [credentials, setCredentials] = useState({
-        username: undefined,
-        password: undefined,
-        domain: loginDomains[0] || undefined,
+        username: "",
+        password: "",
+        domain: loginDomains[0] || "",
         project: loginProject,
     })
 

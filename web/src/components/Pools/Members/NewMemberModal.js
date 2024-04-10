@@ -13,10 +13,10 @@ const NewMemberModal = () => {
     const queryClient = useQueryClient()
     const [error, setError] = useState()
     const [formState, setFormState] = useState({
-        name: undefined,
-        address: undefined,
-        datacenter_id: undefined,
-        port: undefined,
+        name: "",
+        address: "",
+        datacenter_id: "",
+        port: 0,
         admin_state_up: true,
         pool_id: pool,
     })

@@ -21,8 +21,8 @@ const EditGeographicMapPanel = ({closeCallback}) => {
     const queryClient = useQueryClient()
     const [error, setError] = useState()
     const [formState, setFormState] = useState({
-        name: undefined,
-        default_datacenter: undefined,
+        name: "",
+        default_datacenter: "",
     })
 
     const {data, isLoading} = useQuery({

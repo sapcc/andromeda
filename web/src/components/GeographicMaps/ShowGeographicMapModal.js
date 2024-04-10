@@ -2,10 +2,10 @@ import React, {useEffect, useMemo, useState} from "react"
 
 import {authStore, urlStore} from "../../store"
 import {useQuery} from '@tanstack/react-query'
-import {fetchItem, updateAttributes} from "../../actions"
+import {fetchItem} from "../../actions"
 import {Badge, DataGrid, DataGridCell, DataGridHeadCell, DataGridRow, Modal, Spinner, Stack} from "juno-ui-components"
 import {Error} from "../Components";
-import {continents, countries} from "countries-list";
+import {continents, countries, getEmojiFlag} from "countries-list";
 import {DateTime} from "luxon";
 
 const ShowGeographicMapModal = () => {
@@ -65,12 +65,12 @@ const ShowGeographicMapModal = () => {
                             </DataGridHeadCell>
                         </DataGridRow>
                         {geomap.assignments?.map(o => (
-                            <DataGridRow>
+                            <DataGridRow key={o.country}>
                                 <DataGridCell>
-                                    {o.datacenter}
+                                    {o.datacenter.substring(0, 10)}...
                                 </DataGridCell>
                                 <DataGridCell>
-                                    {countries[o.country].name} {countries[o.country].emoji}
+                                    {getEmojiFlag(o.country)} {countries[o.country].name}
                                 </DataGridCell>
                                 <DataGridCell>
                                     {continents[countries[o.country].continent]}

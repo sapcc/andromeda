@@ -13,7 +13,7 @@ const NewPoolModal = () => {
     const queryClient = useQueryClient()
     const [error, setError] = useState()
     const [formState, setFormState] = useState({
-        name: undefined,
+        name: "",
         admin_state_up: true,
         domains: [],
     })

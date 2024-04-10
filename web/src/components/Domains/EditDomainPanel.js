@@ -22,11 +22,11 @@ const EditDomainPanel = ({closeCallback}) => {
     const queryClient = useQueryClient()
     const [error, setError] = useState()
     const [formState, setFormState] = useState({
-        name: undefined,
-        provider: undefined,
-        fqdn: undefined,
-        record_type: undefined,
-        admin_state_up: undefined,
+        name: '',
+        provider: '',
+        fqdn: '',
+        record_type: "A",
+        admin_state_up: true,
     })
 
     const {data, isLoading} = useQuery({

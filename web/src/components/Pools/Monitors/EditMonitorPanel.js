@@ -23,13 +23,13 @@ const EditMonitorPanel = ({closeCallback}) => {
     const queryClient = useQueryClient()
     const [error, setError] = useState()
     const [formState, setFormState] = useState({
-        name: undefined,
-        send: undefined,
-        receive: undefined,
-        timeout: undefined,
-        type: undefined,
-        interval: undefined,
-        admin_state_up: undefined,
+        name: "",
+        send: "",
+        receive: "",
+        timeout: "",
+        type: "",
+        interval: 0,
+        admin_state_up: true,
     })
 
     const {data, isLoading} = useQuery({
