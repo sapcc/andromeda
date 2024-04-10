@@ -1,13 +1,11 @@
 import React, {useMemo, useState} from "react"
 
-import {DataGridCell, DataGridRow, Icon, Stack, Tooltip, TooltipContent, TooltipTrigger} from "juno-ui-components"
+import {DataGridCell, DataGridRow, Icon, Stack, Tooltip, TooltipContent, TooltipTrigger, ContextMenu, MenuItem} from "juno-ui-components"
 import {authStore, urlStore} from "../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {deleteItem} from "../../actions"
 import {DateTime} from "luxon";
 import {JsonModal, ListItemSpinner, ListItemStatus} from "../Components";
-import {ContextMenu} from "juno-ui-components/build/ContextMenu";
-import {MenuItem} from "juno-ui-components/build/MenuItem";
 
 const DomainListItem = ({domain, setError}) => {
     const setPanel = urlStore((state) => state.openPanel)

@@ -1,12 +1,10 @@
 import React, {useMemo, useState} from "react"
-import {DataGridCell, DataGridRow, Icon, Stack} from "juno-ui-components"
+import {DataGridCell, DataGridRow, Icon, Stack, ContextMenu, MenuItem} from "juno-ui-components"
 import {authStore, urlStore} from "../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {deleteItem} from "../../actions"
 import {DateTime} from "luxon";
 import {JsonModal, ListItemSpinner, ListItemStatus} from "../Components";
-import {ContextMenu} from "juno-ui-components/build/ContextMenu";
-import {MenuItem} from "juno-ui-components/build/MenuItem";
 
 const GeographicMapListItem = ({geomap, setError}) => {
     const auth = authStore((state) => state.auth)
