@@ -36,7 +36,7 @@ require (
 	github.com/jackc/pgx/v5 v5.5.5
 	github.com/jedib0t/go-pretty v4.3.0+incompatible
 	github.com/jessevdk/go-flags v1.5.0
-	github.com/jmoiron/sqlx v1.3.5
+	github.com/jmoiron/sqlx v1.4.0
 	github.com/lib/pq v1.10.9
 	github.com/mcuadros/go-defaults v1.2.0
 	github.com/prometheus/client_golang v1.19.0
