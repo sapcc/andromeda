@@ -40,7 +40,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/mcuadros/go-defaults v1.2.0
 	github.com/prometheus/client_golang v1.19.0
-	github.com/rs/cors v1.10.1
+	github.com/rs/cors v1.11.0
 	github.com/sapcc/go-api-declarations v1.11.0
 	github.com/sapcc/go-bits v0.0.0-20240418035538-c509bd89fb1a
 	github.com/scottdware/go-bigip v0.0.0-20230907015320-92d03ba95eca
