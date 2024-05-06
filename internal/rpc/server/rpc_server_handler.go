@@ -19,10 +19,11 @@ package server
 import (
 	"context"
 	"fmt"
-	sq "github.com/Masterminds/squirrel"
-	"github.com/go-openapi/strfmt"
 	"net"
 	"strings"
+
+	sq "github.com/Masterminds/squirrel"
+	"github.com/go-openapi/strfmt"
 
 	"github.com/jmoiron/sqlx"
 	"go-micro.dev/v4/logger"
@@ -291,8 +292,8 @@ func populateMonitors(u *RPCHandler, poolID string) ([]*rpcmodels.Monitor, error
 }
 
 func populateMembers(u *RPCHandler, poolID string) ([]*rpcmodels.Member, error) {
-	sql := u.DB.Rebind(`SELECT id, admin_state_up, address, port, datacenter_id, provisioning_status 
-		FROM member WHERE pool_id = ?`)
+	sql := u.DB.Rebind(`SELECT id, admin_state_up, address, port, COALESCE(datacenter_id, ''),
+       provisioning_status FROM member WHERE pool_id = ?`)
 	rows, err := u.DB.Queryx(sql, poolID)
 	if err != nil {
 		return nil, err
