@@ -1,5 +1,5 @@
 import * as esbuild from 'esbuild'
-import { default as pkg } from './package.json' assert {type: 'json'}
+import { default as pkg } from './package.json' with {type: 'json'}
 import stylePlugin from 'esbuild-style-plugin'
 import tailwindcss from "tailwindcss"
 import autoprefixer from "autoprefixer";
