@@ -73,7 +73,7 @@ const DomainListItem = ({domain, setError}) => {
                 <DataGridCell>
                     <Stack direction="vertical">
                         <p>{domain.fqdn}</p>
-                        {domain.cname_target && <small><a target="_blank" href={domain.cname_target}>{domain.cname_target}</a></small>}
+                        {domain.cname_target && <small><a target="_blank" href={"https://"+domain.cname_target}>{domain.cname_target}</a></small>}
                     </Stack>
                 </DataGridCell>
                 <DataGridCell>{domain.record_type}</DataGridCell>
