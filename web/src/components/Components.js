@@ -78,26 +78,24 @@ export const ListItemSpinner = ({data, onClick, className, maxLength=15}) => {
             onClick={onClick}
             gap="1.5"
         >
+            {["ACTIVE", "DELETED", "ERROR"].includes(data.provisioning_status) || <Spinner
+                variant={variantClass(data.provisioning_status)} size="small"/>}
+                <Tooltip triggerEvent="hover">
+                    <TooltipTrigger asChild>
+                        {name.substring(0, maxLength)}{name > maxLength && "..."}
+                    </TooltipTrigger>
+                    <TooltipContent>{data.id}</TooltipContent>
+                </Tooltip>
             <div>
-                {["ACTIVE", "DELETED", "ERROR"].includes(data.provisioning_status) || <Spinner
-                    variant={variantClass(data.provisioning_status)} size="small"/>}
-                    <Tooltip triggerEvent="hover">
-                        <TooltipTrigger asChild>
-                            {name.substring(0, maxLength)}{name > maxLength && "..."}
-                        </TooltipTrigger>
-                        <TooltipContent>{data.id}</TooltipContent>
-                    </Tooltip>
-                <div>
-                    {showToast && <Toast text="ID copied to clipboard" className="absolute"/>}
-                    <Icon size="16" icon="contentCopy" onClick={() => {
-                        copyTextToClipboard(data.id).then(() => {
-                            setToast(true)
-                        setTimeout(function () { //Start the timer
-                            setToast(false)
-                        }.bind(this), 1000)
-                    })
-                    }} />
-                </div>
+                {showToast && <Toast text="ID copied to clipboard" className="absolute"/>}
+                <Icon size="16" icon="contentCopy" onClick={() => {
+                    copyTextToClipboard(data.id).then(() => {
+                        setToast(true)
+                    setTimeout(function () { //Start the timer
+                        setToast(false)
+                    }.bind(this), 1000)
+                })
+                }} />
             </div>
         </Stack>
     )

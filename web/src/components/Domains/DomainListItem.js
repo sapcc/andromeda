@@ -8,6 +8,7 @@ import {
     Tooltip,
     TooltipContent,
     TooltipTrigger,
+    Label,
     ContextMenu,
     MenuItem
 } from "juno-ui-components"
@@ -70,17 +71,9 @@ const DomainListItem = ({domain, setError}) => {
                     <ListItemSpinner data={domain} />
                 </DataGridCell>
                 <DataGridCell>
-                    <Stack gap="1.5" alignment="center">
-                        {domain.fqdn}
-                        {domain.cname_target && (
-                            <Tooltip triggerEvent="hover" variant="info"
-                            >
-                                <TooltipTrigger asChild>
-                                    <Icon icon="help" size="18" />
-                                </TooltipTrigger>
-                                <TooltipContent>Use CNAME record: {domain.cname_target}</TooltipContent>
-                            </Tooltip>
-                        )}
+                    <Stack direction="vertical">
+                        <p>{domain.fqdn}</p>
+                        {domain.cname_target && <small><a target="_blank" href={domain.cname_target}>{domain.cname_target}</a></small>}
                     </Stack>
                 </DataGridCell>
                 <DataGridCell>{domain.record_type}</DataGridCell>
@@ -96,13 +89,6 @@ const DomainListItem = ({domain, setError}) => {
                             size="18"
                             className="leading-none self-center"
                             onClick={handleEditDomainClick}
-                        />
-                        <Icon
-                            icon="openInNew"
-                            size="18"
-                            href="http://{domain.cname_target}"
-                            target="_blank"
-                            className="leading-none self-center"
                         />
                         <ContextMenu>
                             <MenuItem
