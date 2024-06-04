@@ -47,7 +47,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/urfave/cli/v2 v2.27.2
 	github.com/xo/dburl v0.23.1
-	go-micro.dev/v4 v4.10.2
+	go-micro.dev/v4 v4.11.0
 	golang.org/x/net v0.25.0
 	google.golang.org/protobuf v1.34.1
 )
