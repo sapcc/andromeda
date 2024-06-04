@@ -720,8 +720,8 @@ github.com/yuin/goldmark v1.3.5/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 github.com/ztrue/tracerr v0.3.0 h1:lDi6EgEYhPYPnKcjsYzmWw4EkFEoA/gfe+I9Y5f+h6Y=
 github.com/ztrue/tracerr v0.3.0/go.mod h1:qEalzze4VN9O8tnhBXScfCrmoJo10o8TN5ciKjm6Mww=
-go-micro.dev/v4 v4.10.2 h1:GWQf1+FcAiMf1yca3P09RNjB31Xtk0C5HiKHSpq/2qA=
-go-micro.dev/v4 v4.10.2/go.mod h1:RV2AolXjTAil9Xm82QCMo1gknuZwD61oMUH14wJpECk=
+go-micro.dev/v4 v4.11.0 h1:DZ2xcr0pnZJDlp6MJiCLhw4tXRxLw9xrJlPT91kubr0=
+go-micro.dev/v4 v4.11.0/go.mod h1:eE/tD53n3KbVrzrWxKLxdkGw45Fg1qaNLWjpJMvIUF4=
 go.etcd.io/bbolt v1.3.2/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.mongodb.org/mongo-driver v1.14.0 h1:P98w8egYRjYe3XDjxhYJagTokP/H6HzlsnojRgZRd80=
 go.mongodb.org/mongo-driver v1.14.0/go.mod h1:Vzb0Mk/pa7e6cWw85R4F/endUC3u0U9jGcNU603k65c=
