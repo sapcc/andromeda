@@ -18,7 +18,7 @@ require (
 	github.com/go-micro/plugins/v4/broker/nats v1.2.0
 	github.com/go-micro/plugins/v4/config/encoder/yaml v1.2.0
 	github.com/go-micro/plugins/v4/registry/nats v1.2.2
-	github.com/go-micro/plugins/v4/sync/memory v1.2.0
+	github.com/go-micro/plugins/v4/sync/memory v1.2.1
 	github.com/go-micro/plugins/v4/transport/nats v1.2.0
 	github.com/go-openapi/errors v0.22.0
 	github.com/go-openapi/loads v0.22.0
