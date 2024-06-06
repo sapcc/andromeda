@@ -221,8 +221,8 @@ github.com/go-micro/plugins/v4/broker/nats v1.2.0 h1:uI9ksw/YrG1dJWMHnG/1bqodqUr
 github.com/go-micro/plugins/v4/broker/nats v1.2.0/go.mod h1:HKZKcWPJQPCA2CA/WvDtko0aXz2U5xywZYzCgGn8hiY=
 github.com/go-micro/plugins/v4/config/encoder/yaml v1.2.0 h1:mijLWwVEvkpMKCGo3KzR1MDyS55zPEzY/srERqof/zA=
 github.com/go-micro/plugins/v4/config/encoder/yaml v1.2.0/go.mod h1:ef/zSqzvYPp3m0lKCY16mI/KMMaf8t5tUfLVUcWEgfk=
-github.com/go-micro/plugins/v4/registry/nats v1.2.1 h1:YsGmSYxhdu9NK7d8NYMY/xhaYMB4AhcCWoSrk7YGdEY=
-github.com/go-micro/plugins/v4/registry/nats v1.2.1/go.mod h1:RDsrDhcjJggCzAvvUzo/Bzy68d9s9+tu0KOfofXVCog=
+github.com/go-micro/plugins/v4/registry/nats v1.2.2 h1:+M1ZzEA77CXJBvhPb71Q8+dZ5vZPkpDTvqWzzwpWSS0=
+github.com/go-micro/plugins/v4/registry/nats v1.2.2/go.mod h1:RDsrDhcjJggCzAvvUzo/Bzy68d9s9+tu0KOfofXVCog=
 github.com/go-micro/plugins/v4/sync/memory v1.2.0 h1:ZuytNL1Roz+a07jLMiEvcZIL+pYa2shNX1lF9pa4A44=
 github.com/go-micro/plugins/v4/sync/memory v1.2.0/go.mod h1:zWwIaChf/ehPEBaXzQNLqE4H5N06Q79maoKNaSVOEN4=
 github.com/go-micro/plugins/v4/transport/nats v1.2.0 h1:PrAEAlgnveN9B5liONUg7U9xoRTS7zdIXLpCYSGfjMI=
