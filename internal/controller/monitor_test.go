@@ -68,4 +68,9 @@ func (t *SuiteTest) TestMonitors() {
 	monitorsResponse = monitors.GetMonitorsOKBody{}
 	_ = monitorsResponse.UnmarshalBinary(rr.Body.Bytes())
 	assert.Equal(t.T(), 1, len(monitorsResponse.Monitors), rr.Body)
+
+	// cleanup pool
+	if _, err := t.db.Exec("DELETE FROM pool"); err != nil {
+		t.FailNow(err.Error())
+	}
 }
