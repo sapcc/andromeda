@@ -2866,7 +2866,7 @@ Unexpected Error
 | datacenter_id | uuid (formatted string)| `strfmt.UUID` |  | | Datacenter assigned for this member. |  |
 | id | uuid (formatted string)| `strfmt.UUID` |  | | The id of the resource. |  |
 | name | string| `string` |  | | Human-readable name of the resource. |  |
-| pool_id | uuid (formatted string)| `strfmt.UUID` |  | | pool id. |  |
+| pool_id | uuid (formatted string)| `strfmt.UUID` | ✓ | | pool id. |  |
 | port | integer| `int64` | ✓ | | Port to use for monitor checks. | `80` |
 | project_id | string| `string` |  | | The ID of the project owning this resource. | `fa84c217f361441986a220edf9b1e337` |
 | provisioning_status | string| `string` |  | |  |  |
