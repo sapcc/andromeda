@@ -12,7 +12,7 @@
       "automerge": true
     },
     {
-      "matchPackageNames": ["github.com/getsentry/sentry-go"],
+      "matchPackageNames": ["github.com/getsentry/sentry-go", "go-micro.dev/v4"],
       "enabled": false
     }
   ],
