@@ -19,8 +19,9 @@ package controller
 import (
 	"errors"
 	"fmt"
-	"go-micro.dev/v4/logger"
 	"strings"
+
+	"go-micro.dev/v4/logger"
 
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-sql-driver/mysql"
@@ -61,7 +62,9 @@ func (c MemberController) GetMembers(params members.GetMembersParams) middleware
 		Tags:        params.Tags,
 		TagsAny:     params.TagsAny,
 	}
-	filter["pool_id"] = params.PoolID
+	if params.PoolID != nil {
+		filter["pool_id"] = params.PoolID
+	}
 	rows, err := pagination.Query(c.db, "SELECT * FROM member", filter)
 	if err != nil {
 		if errors.Is(err, db.ErrInvalidMarker) {

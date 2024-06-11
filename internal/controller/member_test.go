@@ -35,7 +35,7 @@ func (t *SuiteTest) TestMembers() {
 		MemberID: "test123",
 	})
 	res.WriteResponse(rr, runtime.JSONProducer())
-	assert.Equal(t.T(), rr.Code, http.StatusNotFound, rr.Body)
+	assert.Equal(t.T(), http.StatusNotFound, rr.Code, rr.Body)
 
 	member := members.PostMembersBody{}
 	_ = member.UnmarshalBinary([]byte(`{ "member": { "name": "test", "address": "1.2.3.4", "port": 1234 } }`))
@@ -45,19 +45,29 @@ func (t *SuiteTest) TestMembers() {
 	res = mc.PostMembers(members.PostMembersParams{Member: member})
 	rr = httptest.NewRecorder()
 	res.WriteResponse(rr, runtime.JSONProducer())
-	assert.Equal(t.T(), rr.Code, http.StatusCreated, rr.Body)
+	assert.Equal(t.T(), http.StatusCreated, rr.Code, rr.Body)
 
 	// Get all members
 	res = mc.GetMembers(members.GetMembersParams{PoolID: &poolID})
 	rr = httptest.NewRecorder()
 	res.WriteResponse(rr, runtime.JSONProducer())
-	assert.Equal(t.T(), rr.Code, http.StatusOK, rr.Body)
+	assert.Equal(t.T(), http.StatusOK, rr.Code, rr.Body)
 
 	membersResponse := members.GetMembersOKBody{}
 	_ = membersResponse.UnmarshalBinary(rr.Body.Bytes())
 	assert.Equal(t.T(), len(membersResponse.Members), 1, rr.Body)
 	assert.Equal(t.T(), membersResponse.Members[0].ID, member.Member.ID, rr.Body)
 	assert.Equal(t.T(), *membersResponse.Members[0].Name, "test", rr.Body)
+
+	// Fetch all members without pool filter
+	res = mc.GetMembers(members.GetMembersParams{})
+	rr = httptest.NewRecorder()
+	res.WriteResponse(rr, runtime.JSONProducer())
+	assert.Equal(t.T(), http.StatusOK, rr.Code, rr.Body)
+
+	membersResponse = members.GetMembersOKBody{}
+	_ = membersResponse.UnmarshalBinary(rr.Body.Bytes())
+	assert.Equal(t.T(), len(membersResponse.Members), 1, rr.Body)
 
 	// Get specific member
 	res = mc.GetMembersMemberID(members.GetMembersMemberIDParams{
