@@ -31,6 +31,9 @@ var MonitorOptions struct {
 }
 
 type MonitorList struct {
+	PositionalMonitorList struct {
+		PoolID strfmt.UUID `description:"UUID of the pool"`
+	} `positional-args:"yes"`
 }
 
 type MonitorShow struct {
@@ -57,7 +60,8 @@ type MonitorDelete struct {
 }
 
 func (*MonitorList) Execute(_ []string) error {
-	resp, err := AndromedaClient.Monitors.GetMonitors(nil)
+	resp, err := AndromedaClient.Monitors.GetMonitors(monitors.
+		NewGetMonitorsParams().WithPoolID(&MonitorOptions.PositionalMonitorList.PoolID))
 	if err != nil {
 		return err
 	}

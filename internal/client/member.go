@@ -33,7 +33,7 @@ var MemberOptions struct {
 type MemberList struct {
 	PositionalMemberList struct {
 		PoolID strfmt.UUID `description:"UUID of the pool"`
-	} `positional-args:"yes" required:"no"`
+	} `positional-args:"yes"`
 }
 
 type MemberShow struct {
