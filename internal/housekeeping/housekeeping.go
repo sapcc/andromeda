@@ -49,10 +49,13 @@ func (e *Executor) findNextPoolToActivate(_ context.Context, tx *sqlx.Tx, _ prom
 		FROM pool
 		LEFT JOIN domain_pool_relation dpr ON id = dpr.pool_id
 		WHERE pool.provisioning_status LIKE 'PENDING_%' AND dpr.domain_id IS NULL
-		LIMIT 1
-		FOR UPDATE OF pool`
+		LIMIT 1 FOR UPDATE`
 
-	if err := tx.Get(&poolID, sql); err != nil {
+	if tx.DriverName() != "mysql" {
+		sql += " OF pool"
+	}
+
+	if err := tx.Get(&poolID, tx.Rebind(sql)); err != nil {
 		return nil, err
 	}
 
