@@ -104,9 +104,9 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 		}
 
 		// Add member to existing traffic target within the same Datacenter
-		if addTrafficTarget(&property, member) {
+		/*if addTrafficTarget(&property, member) {
 			continue
-		}
+		}*/
 
 		// Add new traffic target
 		trafficTarget := gtm.TrafficTarget{
