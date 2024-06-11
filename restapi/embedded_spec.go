@@ -2195,7 +2195,8 @@ func init() {
       "type": "object",
       "required": [
         "address",
-        "port"
+        "port",
+        "pool_id"
       ],
       "properties": {
         "address": {
@@ -5073,7 +5074,8 @@ func init() {
       "type": "object",
       "required": [
         "address",
-        "port"
+        "port",
+        "pool_id"
       ],
       "properties": {
         "address": {
