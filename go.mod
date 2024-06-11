@@ -49,7 +49,7 @@ require (
 	github.com/xo/dburl v0.23.2
 	go-micro.dev/v4 v4.11.0
 	golang.org/x/net v0.26.0
-	google.golang.org/protobuf v1.34.1
+	google.golang.org/protobuf v1.34.2
 )
 
 require (
