@@ -60,7 +60,9 @@ func (c MonitorController) GetMonitors(params monitors.GetMonitorsParams) middle
 		Tags:        params.Tags,
 		TagsAny:     params.TagsAny,
 	}
-	filter["pool_id"] = params.PoolID
+	if params.PoolID != nil {
+		filter["pool_id"] = params.PoolID
+	}
 	rows, err := pagination.Query(c.db, "SELECT * from monitor", filter)
 	if err != nil {
 		if errors.Is(err, db.ErrInvalidMarker) {
