@@ -29,16 +29,6 @@ import (
 	"github.com/sapcc/andromeda/internal/utils"
 )
 
-func addTrafficTarget(property *gtm.Property, member *rpcmodels.Member) bool {
-	for _, trafficTarget := range property.TrafficTargets {
-		if trafficTarget.Name == member.GetDatacenter() {
-			trafficTarget.Servers = append(trafficTarget.Servers, utils.InetNtoa(member.Address).String())
-			return true
-		}
-	}
-	return false
-}
-
 func (s *AkamaiAgent) DeleteProperty(domain *rpcmodels.Domain, trafficManagementDomain string) error {
 	// Delete
 	logger.Infof("DeleteProperty(domain=%s, property=%s)", trafficManagementDomain, domain.GetFqdn())
@@ -102,11 +92,6 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 				driver.GetProvisioningStatusRequest(member.Id, "MEMBER", "DELETE"))
 			continue
 		}
-
-		// Add member to existing traffic target within the same Datacenter
-		/*if addTrafficTarget(&property, member) {
-			continue
-		}*/
 
 		// Add new traffic target
 		trafficTarget := gtm.TrafficTarget{
