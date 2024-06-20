@@ -43,12 +43,6 @@ type MonitorController struct {
 // GetMonitors GET /monitors
 func (c MonitorController) GetMonitors(params monitors.GetMonitorsParams) middleware.Responder {
 	filter := make(map[string]any, 0)
-	if projectId, err := auth.Authenticate(params.HTTPRequest); err != nil {
-		return monitors.NewGetMonitorsDefault(403).WithPayload(utils.PolicyForbidden)
-	} else if projectId != "" {
-		filter["project_id"] = projectId
-	}
-
 	pagination := db.Pagination{
 		HTTPRequest: params.HTTPRequest,
 		Limit:       params.Limit,
@@ -78,7 +72,11 @@ func (c MonitorController) GetMonitors(params monitors.GetMonitorsParams) middle
 		if err := rows.StructScan(&monitor); err != nil {
 			panic(err)
 		}
-		_monitors = append(_monitors, &monitor)
+		// Filter result based on policy
+		requestVars := map[string]string{"project_id": *monitor.ProjectID}
+		if err = auth.AuthenticateWithVars(params.HTTPRequest, requestVars); err == nil {
+			_monitors = append(_monitors, &monitor)
+		}
 	}
 	_links := pagination.GetLinks(_monitors)
 	payload := monitors.GetMonitorsOKBody{Monitors: _monitors, Links: _links}

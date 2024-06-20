@@ -45,12 +45,6 @@ type MemberController struct {
 // GetMembers GET /members
 func (c MemberController) GetMembers(params members.GetMembersParams) middleware.Responder {
 	filter := make(map[string]any, 0)
-	if projectId, err := auth.Authenticate(params.HTTPRequest); err != nil {
-		return members.NewGetMembersDefault(403).WithPayload(utils.PolicyForbidden)
-	} else if projectId != "" {
-		filter["project_id"] = projectId
-	}
-
 	pagination := db.Pagination{
 		HTTPRequest: params.HTTPRequest,
 		Limit:       params.Limit,
@@ -80,7 +74,12 @@ func (c MemberController) GetMembers(params members.GetMembersParams) middleware
 		if err := rows.StructScan(&member); err != nil {
 			panic(err)
 		}
-		_members = append(_members, &member)
+
+		// Filter result based on policy
+		requestVars := map[string]string{"project_id": *member.ProjectID}
+		if err = auth.AuthenticateWithVars(params.HTTPRequest, requestVars); err == nil {
+			_members = append(_members, &member)
+		}
 	}
 	_links := pagination.GetLinks(_members)
 	payload := members.GetMembersOKBody{Members: _members, Links: _links}

@@ -41,15 +41,8 @@ type GeoMapController struct {
 
 // GetGeomaps GET /geoMaps
 func (c GeoMapController) GetGeomaps(params geographic_maps.GetGeomapsParams) middleware.Responder {
-	filter := make(map[string]any, 0)
-	if projectId, err := auth.Authenticate(params.HTTPRequest); err != nil {
-		return geographic_maps.NewGetGeomapsDefault(403).WithPayload(utils.PolicyForbidden)
-	} else if projectId != "" {
-		filter["project_id"] = projectId
-	}
-
 	pagination := db.Pagination(params)
-	rows, err := pagination.Query(c.db, "SELECT * FROM geographic_map", filter)
+	rows, err := pagination.Query(c.db, "SELECT * FROM geographic_map", nil)
 	if err != nil {
 		if errors.Is(err, db.ErrInvalidMarker) {
 			return geographic_maps.NewGetGeomapsBadRequest().WithPayload(utils.InvalidMarker)
@@ -64,10 +57,15 @@ func (c GeoMapController) GetGeomaps(params geographic_maps.GetGeomapsParams) mi
 		if err := rows.StructScan(&geoMap); err != nil {
 			panic(err)
 		}
-		if err := PopulateGeoMapAssignments(c.db, &geoMap); err != nil {
-			panic(err)
+
+		// Filter result based on policy
+		requestVars := map[string]string{"project_id": *geoMap.ProjectID, "scope": *geoMap.Scope}
+		if err = auth.AuthenticateWithVars(params.HTTPRequest, requestVars); err == nil {
+			if err := PopulateGeoMapAssignments(c.db, &geoMap); err != nil {
+				panic(err)
+			}
+			_geoMaps = append(_geoMaps, &geoMap)
 		}
-		_geoMaps = append(_geoMaps, &geoMap)
 	}
 
 	_links := pagination.GetLinks(_geoMaps)
@@ -116,6 +114,9 @@ func (c GeoMapController) PostGeomaps(params geographic_maps.PostGeomapsParams) 
 			RETURNING *
 		`
 		for _, assignment := range geomap.Assignments {
+			if assignment == nil {
+				continue
+			}
 			if _, err := tx.Exec(tx.Rebind(sql), geomap.ID, assignment.Datacenter, assignment.Country); err != nil {
 				return err
 			}

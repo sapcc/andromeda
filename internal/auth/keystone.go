@@ -24,10 +24,11 @@ import (
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/utils/openstack/clientconfig"
-	"github.com/sapcc/andromeda/internal/config"
-	"github.com/sapcc/andromeda/internal/policy"
 	"github.com/sapcc/go-bits/audittools"
 	"github.com/sapcc/go-bits/gopherpolicy"
+
+	"github.com/sapcc/andromeda/internal/config"
+	"github.com/sapcc/andromeda/internal/policy"
 )
 
 var (
@@ -109,6 +110,22 @@ func UserForRequest(r *http.Request) (audittools.UserInfo, error) {
 	return nil, errors.New("failure accessing keystone token")
 }
 
+func AuthenticateWithVars(r *http.Request, requestVars map[string]string) error {
+	if config.Global.ApiSettings.AuthStrategy != "keystone" {
+		return nil
+	}
+
+	if t := TokenFrom(r); t != nil {
+		t.Context.Request = requestVars
+		if t.Check(policy.RuleFromHTTPRequest(r)) {
+			return nil
+		}
+		return ErrForbidden
+	}
+
+	return nil
+}
+
 func Authenticate(r *http.Request) (string, error) {
 	if config.Global.ApiSettings.AuthStrategy != "keystone" {
 		return "", nil
@@ -116,9 +133,7 @@ func Authenticate(r *http.Request) (string, error) {
 
 	if t := TokenFrom(r); t != nil {
 		rule := policy.RuleFromHTTPRequest(r)
-		if t.Check(rule + "-global") {
-			return "", nil
-		} else if t.Check(rule) {
+		if t.Check(rule) {
 			return t.ProjectScopeUUID(), nil
 		} else {
 			return "", ErrForbidden

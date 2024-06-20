@@ -40,15 +40,8 @@ type PoolController struct {
 
 // GetPools GET /pools
 func (c PoolController) GetPools(params pools.GetPoolsParams) middleware.Responder {
-	filter := make(map[string]any, 0)
-	if projectId, err := auth.Authenticate(params.HTTPRequest); err != nil {
-		return pools.NewGetPoolsDefault(403).WithPayload(utils.PolicyForbidden)
-	} else if projectId != "" {
-		filter["project_id"] = projectId
-	}
-
 	pagination := db.Pagination(params)
-	rows, err := pagination.Query(c.db, "SELECT * FROM pool", filter)
+	rows, err := pagination.Query(c.db, "SELECT * FROM pool", nil)
 	if err != nil {
 		if errors.Is(err, db.ErrInvalidMarker) {
 			return pools.NewGetPoolsBadRequest().WithPayload(utils.InvalidMarker)
@@ -64,16 +57,21 @@ func (c PoolController) GetPools(params pools.GetPoolsParams) middleware.Respond
 		if err := rows.StructScan(&pool); err != nil {
 			panic(err)
 		}
-		if err := PopulatePoolDomains(c.db, &pool); err != nil {
-			panic(err)
+
+		// Filter result based on policy
+		requestVars := map[string]string{"project_id": *pool.ProjectID}
+		if err = auth.AuthenticateWithVars(params.HTTPRequest, requestVars); err == nil {
+			if err := PopulatePoolDomains(c.db, &pool); err != nil {
+				panic(err)
+			}
+			if err := PopulatePoolMembers(c.db, &pool); err != nil {
+				panic(err)
+			}
+			if err := PopulatePoolMonitors(c.db, &pool); err != nil {
+				panic(err)
+			}
+			_pools = append(_pools, &pool)
 		}
-		if err := PopulatePoolMembers(c.db, &pool); err != nil {
-			panic(err)
-		}
-		if err := PopulatePoolMonitors(c.db, &pool); err != nil {
-			panic(err)
-		}
-		_pools = append(_pools, &pool)
 	}
 	_links := pagination.GetLinks(_pools)
 	payload := pools.GetPoolsOKBody{Pools: _pools, Links: _links}

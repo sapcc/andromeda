@@ -41,15 +41,8 @@ type DatacenterController struct {
 
 // GetDatacenters GET /datacenters
 func (c DatacenterController) GetDatacenters(params datacenters.GetDatacentersParams) middleware.Responder {
-	filter := make(map[string]any, 0)
-	if projectId, err := auth.Authenticate(params.HTTPRequest); err != nil {
-		return datacenters.NewGetDatacentersDefault(403).WithPayload(utils.PolicyForbidden)
-	} else if projectId != "" {
-		filter["project_id"] = projectId
-	}
-
 	pagination := db.Pagination(params)
-	rows, err := pagination.Query(c.db, "SELECT * FROM datacenter", filter)
+	rows, err := pagination.Query(c.db, "SELECT * FROM datacenter", nil)
 	if err != nil {
 		if errors.Is(err, db.ErrInvalidMarker) {
 			return datacenters.NewGetDatacentersBadRequest().WithPayload(utils.InvalidMarker)
@@ -64,7 +57,12 @@ func (c DatacenterController) GetDatacenters(params datacenters.GetDatacentersPa
 		if err := rows.StructScan(&datacenter); err != nil {
 			panic(err)
 		}
-		_datacenters = append(_datacenters, &datacenter)
+
+		// Filter result based on policy
+		requestVars := map[string]string{"project_id": *datacenter.ProjectID, "scope": *datacenter.Scope}
+		if err = auth.AuthenticateWithVars(params.HTTPRequest, requestVars); err == nil {
+			_datacenters = append(_datacenters, &datacenter)
+		}
 	}
 
 	_links := pagination.GetLinks(_datacenters)
@@ -112,14 +110,11 @@ func (c DatacenterController) GetDatacentersDatacenterID(params datacenters.GetD
 		return datacenters.NewGetDatacentersDatacenterIDNotFound().WithPayload(utils.NotFound)
 	}
 
-	if "public" != *datacenter.Scope {
-		// Allow public scope datacenters to be fetched
-		if projectId, err := auth.Authenticate(params.HTTPRequest); err != nil {
-			return datacenters.NewGetDatacentersDatacenterIDDefault(403).WithPayload(utils.PolicyForbidden)
-		} else if projectId != "" && projectId != *datacenter.ProjectID {
-			return datacenters.NewGetDatacentersDatacenterIDDefault(403).WithPayload(utils.PolicyForbidden)
-		}
+	requestVars := map[string]string{"project_id": *datacenter.ProjectID, "scope": *datacenter.Scope}
+	if err = auth.AuthenticateWithVars(params.HTTPRequest, requestVars); err != nil {
+		return datacenters.NewGetDatacentersDatacenterIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
+
 	return datacenters.NewGetDatacentersDatacenterIDOK().WithPayload(&datacenters.GetDatacentersDatacenterIDOKBody{Datacenter: &datacenter})
 }
 

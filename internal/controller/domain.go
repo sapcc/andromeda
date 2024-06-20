@@ -20,8 +20,9 @@ import (
 	dbsql "database/sql"
 	"errors"
 	"fmt"
-	"github.com/jackc/pgx/v5/pgconn"
 	"strings"
+
+	"github.com/jackc/pgx/v5/pgconn"
 
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
@@ -45,15 +46,8 @@ type DomainController struct {
 
 // GetDomains GET /domains
 func (c DomainController) GetDomains(params domains.GetDomainsParams) middleware.Responder {
-	filter := make(map[string]any, 0)
-	if projectId, err := auth.Authenticate(params.HTTPRequest); err != nil {
-		return domains.NewGetDomainsDefault(403).WithPayload(utils.PolicyForbidden)
-	} else if projectId != "" {
-		filter["project_id"] = projectId
-	}
-
 	pagination := db.Pagination(params)
-	rows, err := pagination.Query(c.db, "SELECT * FROM domain", filter)
+	rows, err := pagination.Query(c.db, "SELECT * FROM domain", nil)
 	if err != nil {
 		if errors.Is(err, db.ErrInvalidMarker) {
 			return domains.NewGetDomainsDefault(400).WithPayload(utils.InvalidMarker)
@@ -68,6 +62,11 @@ func (c DomainController) GetDomains(params domains.GetDomainsParams) middleware
 		if err := rows.StructScan(&domain); err != nil {
 			panic(err)
 		}
+		requestVars := map[string]string{"project_id": *domain.ProjectID}
+		if err = auth.AuthenticateWithVars(params.HTTPRequest, requestVars); err != nil {
+			continue
+		}
+
 		if *domain.Provider == "akamai" {
 			cname := strfmt.Hostname(fmt.Sprintf("%s.%s", domain.Fqdn.String(), config.Global.AkamaiConfig.Domain))
 			domain.CnameTarget = &cname
