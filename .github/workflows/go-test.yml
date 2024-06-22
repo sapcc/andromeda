@@ -29,7 +29,7 @@ jobs:
 
       - if: ${{ matrix.database == 'mariadb' }}
         name: Run MariaDB
-        uses: getong/mariadb-action@v1.1
+        uses: getong/mariadb-action@v1.10
         with:
           mysql database: 'test_suite_controller'
           mysql root password: root
