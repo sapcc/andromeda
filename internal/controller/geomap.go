@@ -60,7 +60,7 @@ func (c GeoMapController) GetGeomaps(params geographic_maps.GetGeomapsParams) mi
 
 		// Filter result based on policy
 		requestVars := map[string]string{"project_id": *geoMap.ProjectID, "scope": *geoMap.Scope}
-		if err = auth.AuthenticateWithVars(params.HTTPRequest, requestVars); err == nil {
+		if _, err = auth.Authenticate(params.HTTPRequest, requestVars); err == nil {
 			if err := PopulateGeoMapAssignments(c.db, &geoMap); err != nil {
 				panic(err)
 			}
@@ -77,7 +77,7 @@ func (c GeoMapController) GetGeomaps(params geographic_maps.GetGeomapsParams) mi
 func (c GeoMapController) PostGeomaps(params geographic_maps.PostGeomapsParams) middleware.Responder {
 	geomap := params.Geomap.Geomap
 
-	projectID, err := auth.Authenticate(params.HTTPRequest)
+	projectID, err := auth.Authenticate(params.HTTPRequest, nil)
 	if err != nil {
 		return geographic_maps.NewPostGeomapsDefault(403).WithPayload(utils.PolicyForbidden)
 	} else {
@@ -141,12 +141,6 @@ func (c GeoMapController) GetGeomapsGeoMapID(params geographic_maps.GetGeomapsGe
 		From("geographic_map").
 		Where("id = ?", params.GeomapID)
 
-	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil {
-		return geographic_maps.NewGetGeomapsGeomapIDDefault(403).WithPayload(utils.PolicyForbidden)
-	} else if projectID != "" {
-		q = q.Where("project_id = ?", projectID)
-	}
-
 	sql, args := q.MustSql()
 	var geomap models.Geomap
 	if err := c.db.Get(&geomap, c.db.Rebind(sql), args...); err != nil {
@@ -154,6 +148,11 @@ func (c GeoMapController) GetGeomapsGeoMapID(params geographic_maps.GetGeomapsGe
 			return geographic_maps.NewGetGeomapsGeomapIDNotFound().WithPayload(utils.NotFound)
 		}
 		panic(err)
+	}
+
+	requestVars := map[string]string{"project_id": *geomap.ProjectID, "scope": *geomap.Scope}
+	if _, err := auth.Authenticate(params.HTTPRequest, requestVars); err != nil {
+		return geographic_maps.NewGetGeomapsGeomapIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
 	sql = c.db.Rebind(`SELECT datacenter, country FROM geographic_map_assignment WHERE geographic_map_id = ?`)
@@ -171,21 +170,44 @@ func (c GeoMapController) PutGeomapsGeoMapID(params geographic_maps.PutGeomapsGe
 
 // DeleteGeomapsGeoMapID DELETE /geoMaps/:id
 func (c GeoMapController) DeleteGeomapsGeoMapID(params geographic_maps.DeleteGeomapsGeomapIDParams) middleware.Responder {
-	q := sq.Update("geographic_map").
-		Where("id = ?", params.GeomapID).
-		Set("provisioning_status", "PENDING_DELETE").
-		Set("updated_at", sq.Expr("NOW()"))
+	geomap := models.Geomap{ID: params.GeomapID}
+	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
+		sql, args, err := sq.Select("project_id", "scope").
+			From("geographic_map").
+			Where("id = ?", geomap.ID).
+			Suffix("FOR UPDATE").
+			ToSql()
+		if err != nil {
+			return err
+		}
+		if err = tx.Get(&geomap, tx.Rebind(sql), args...); err != nil {
+			return err
+		}
 
-	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil {
-		return geographic_maps.NewDeleteGeomapsGeomapIDDefault(403).WithPayload(utils.PolicyForbidden)
-	} else if projectID != "" {
-		q = q.Where("project_id = ?", projectID)
-	}
+		requestVars := map[string]string{"project_id": *geomap.ProjectID, "scope": *geomap.Scope}
+		if _, err = auth.Authenticate(params.HTTPRequest, requestVars); err != nil {
+			return err
+		}
 
-	sql, args := q.MustSql()
-	res := c.db.MustExec(c.db.Rebind(sql), args...)
-	if deleted, _ := res.RowsAffected(); deleted != 1 {
-		return geographic_maps.NewDeleteGeomapsGeomapIDNotFound().WithPayload(utils.NotFound)
+		sql, args, err = sq.Update("geographic_map").
+			Where("id = ?", geomap.ID).
+			Set("provisioning_status", "PENDING_DELETE").
+			Set("updated_at", sq.Expr("NOW()")).
+			ToSql()
+		if err != nil {
+			return err
+		}
+		if _, err = c.db.Exec(c.db.Rebind(sql), args...); err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
+		if errors.Is(err, dbsql.ErrNoRows) {
+			return geographic_maps.NewDeleteGeomapsGeomapIDNotFound().WithPayload(utils.NotFound)
+		} else if errors.Is(err, auth.ErrForbidden) {
+			return geographic_maps.NewDeleteGeomapsGeomapIDDefault(403).WithPayload(utils.PolicyForbidden)
+		}
+		panic(err)
 	}
 	return geographic_maps.NewDeleteGeomapsGeomapIDNoContent()
 }

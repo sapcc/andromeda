@@ -34,7 +34,7 @@ type SyncController struct {
 
 // PostSync POST /sync
 func (c SyncController) PostSync(params administrative.PostSyncParams) middleware.Responder {
-	if _, err := auth.Authenticate(params.HTTPRequest); err != nil {
+	if _, err := auth.Authenticate(params.HTTPRequest, nil); err != nil {
 		return administrative.NewPostSyncDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 

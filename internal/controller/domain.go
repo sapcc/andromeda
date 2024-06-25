@@ -63,7 +63,7 @@ func (c DomainController) GetDomains(params domains.GetDomainsParams) middleware
 			panic(err)
 		}
 		requestVars := map[string]string{"project_id": *domain.ProjectID}
-		if err = auth.AuthenticateWithVars(params.HTTPRequest, requestVars); err != nil {
+		if _, err = auth.Authenticate(params.HTTPRequest, requestVars); err != nil {
 			continue
 		}
 
@@ -85,7 +85,7 @@ func (c DomainController) GetDomains(params domains.GetDomainsParams) middleware
 func (c DomainController) PostDomains(params domains.PostDomainsParams) middleware.Responder {
 	domain := params.Domain.Domain
 
-	projectID, err := auth.Authenticate(params.HTTPRequest)
+	projectID, err := auth.Authenticate(params.HTTPRequest, nil)
 	if err != nil {
 		return domains.NewPostDomainsDefault(403).WithPayload(utils.PolicyForbidden)
 	} else {
@@ -154,7 +154,8 @@ func (c DomainController) GetDomainsDomainID(params domains.GetDomainsDomainIDPa
 	if err := PopulateDomain(c.db, &domain, []string{"*"}); err != nil {
 		return domains.NewGetDomainsDomainIDNotFound().WithPayload(utils.NotFound)
 	}
-	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || projectID != *domain.ProjectID {
+	requestVars := map[string]string{"project_id": *domain.ProjectID}
+	if _, err := auth.Authenticate(params.HTTPRequest, requestVars); err != nil {
 		return domains.NewGetDomainsDomainIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
@@ -167,7 +168,8 @@ func (c DomainController) PutDomainsDomainID(params domains.PutDomainsDomainIDPa
 	if err := PopulateDomain(c.db, &domain, []string{"*"}); err != nil {
 		return domains.NewPutDomainsDomainIDNotFound().WithPayload(utils.NotFound)
 	}
-	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || projectID != *domain.ProjectID {
+	requestVars := map[string]string{"project_id": *domain.ProjectID}
+	if _, err := auth.Authenticate(params.HTTPRequest, requestVars); err != nil {
 		return domains.NewPutDomainsDomainIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
@@ -246,7 +248,8 @@ func (c DomainController) DeleteDomainsDomainID(params domains.DeleteDomainsDoma
 	if err := PopulateDomain(c.db, &domain, []string{"id", "project_id"}); err != nil {
 		return domains.NewDeleteDomainsDomainIDNotFound().WithPayload(utils.NotFound)
 	}
-	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || projectID != *domain.ProjectID {
+	requestVars := map[string]string{"project_id": *domain.ProjectID}
+	if _, err := auth.Authenticate(params.HTTPRequest, requestVars); err != nil {
 		return domains.NewDeleteDomainsDomainIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
@@ -271,7 +274,7 @@ func removeDomainPoolRelations(tx *sqlx.Tx, domainID strfmt.UUID, poolIDs []strf
 
 // insertDomainPoolRelations adds pools associated to a domain inside a transaction
 func insertDomainPoolRelations(tx *sqlx.Tx, domainID strfmt.UUID, projectID string, poolIDs []strfmt.UUID) (*strfmt.UUID, error) {
-	//check pools are belonging to same project
+	// check that pools belonging to same project
 	sql := `SELECT id FROM pool WHERE id IN (?) AND project_id = ?;`
 	query, args, err := sqlx.In(sql, poolIDs, projectID)
 	if err != nil {

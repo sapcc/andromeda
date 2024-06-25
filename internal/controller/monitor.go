@@ -74,7 +74,7 @@ func (c MonitorController) GetMonitors(params monitors.GetMonitorsParams) middle
 		}
 		// Filter result based on policy
 		requestVars := map[string]string{"project_id": *monitor.ProjectID}
-		if err = auth.AuthenticateWithVars(params.HTTPRequest, requestVars); err == nil {
+		if _, err = auth.Authenticate(params.HTTPRequest, requestVars); err == nil {
 			_monitors = append(_monitors, &monitor)
 		}
 	}
@@ -90,7 +90,7 @@ func (c MonitorController) PostMonitors(params monitors.PostMonitorsParams) midd
 		return monitors.NewPostMonitorsBadRequest().WithPayload(utils.PoolIDRequired)
 	}
 
-	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil {
+	if projectID, err := auth.Authenticate(params.HTTPRequest, nil); err != nil {
 		return monitors.NewPostMonitorsDefault(403).WithPayload(utils.PolicyForbidden)
 	} else if projectID != "" {
 		monitor.ProjectID = &projectID
@@ -145,8 +145,8 @@ func (c MonitorController) GetMonitorsMonitorID(params monitors.GetMonitorsMonit
 	if err := PopulateMonitor(c.db, &monitor, []string{"*"}); err != nil {
 		return monitors.NewGetMonitorsMonitorIDNotFound().WithPayload(utils.NotFound)
 	}
-
-	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || projectID != *monitor.ProjectID {
+	requestVars := map[string]string{"project_id": *monitor.ProjectID}
+	if _, err := auth.Authenticate(params.HTTPRequest, requestVars); err != nil {
 		return monitors.NewGetMonitorsMonitorIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 	return monitors.NewGetMonitorsMonitorIDOK().WithPayload(&monitors.GetMonitorsMonitorIDOKBody{Monitor: &monitor})
@@ -158,7 +158,8 @@ func (c MonitorController) PutMonitorsMonitorID(params monitors.PutMonitorsMonit
 	if err := PopulateMonitor(c.db, &monitor, []string{"project_id", "pool_id"}); err != nil {
 		return monitors.NewPutMonitorsMonitorIDNotFound().WithPayload(utils.NotFound)
 	}
-	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || projectID != *monitor.ProjectID {
+	requestVars := map[string]string{"project_id": *monitor.ProjectID}
+	if _, err := auth.Authenticate(params.HTTPRequest, requestVars); err != nil {
 		return monitors.NewPutMonitorsMonitorIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
@@ -203,7 +204,8 @@ func (c MonitorController) DeleteMonitorsMonitorID(params monitors.DeleteMonitor
 	if err := PopulateMonitor(c.db, &monitor, []string{"project_id", "pool_id"}); err != nil {
 		return monitors.NewDeleteMonitorsMonitorIDNotFound().WithPayload(utils.NotFound)
 	}
-	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || projectID != *monitor.ProjectID {
+	requestVars := map[string]string{"project_id": *monitor.ProjectID}
+	if _, err := auth.Authenticate(params.HTTPRequest, requestVars); err != nil {
 		return monitors.NewDeleteMonitorsMonitorIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 

@@ -43,7 +43,7 @@ func getMetadata(metadata map[string]string, key string) string {
 
 // GetServices GET /services
 func (c ServiceController) GetServices(params administrative.GetServicesParams) middleware.Responder {
-	if _, err := auth.Authenticate(params.HTTPRequest); err != nil {
+	if _, err := auth.Authenticate(params.HTTPRequest, nil); err != nil {
 		return administrative.NewGetServicesDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 

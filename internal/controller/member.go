@@ -77,7 +77,7 @@ func (c MemberController) GetMembers(params members.GetMembersParams) middleware
 
 		// Filter result based on policy
 		requestVars := map[string]string{"project_id": *member.ProjectID}
-		if err = auth.AuthenticateWithVars(params.HTTPRequest, requestVars); err == nil {
+		if _, err = auth.Authenticate(params.HTTPRequest, requestVars); err == nil {
 			_members = append(_members, &member)
 		}
 	}
@@ -92,7 +92,7 @@ func (c MemberController) PostMembers(params members.PostMembersParams) middlewa
 		return members.NewPostMembersBadRequest().WithPayload(utils.PoolIDRequired)
 	}
 
-	projectID, err := auth.Authenticate(params.HTTPRequest)
+	projectID, err := auth.Authenticate(params.HTTPRequest, nil)
 	if err != nil {
 		return members.NewPostMembersDefault(403).WithPayload(utils.PolicyForbidden)
 	}
@@ -152,7 +152,8 @@ func (c MemberController) GetMembersMemberID(params members.GetMembersMemberIDPa
 		return members.NewGetMembersMemberIDNotFound().WithPayload(utils.NotFound)
 	}
 
-	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || projectID != *member.ProjectID {
+	requestVars := map[string]string{"project_id": *member.ProjectID}
+	if _, err := auth.Authenticate(params.HTTPRequest, requestVars); err != nil {
 		return members.NewGetMembersMemberIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 	return members.NewGetMembersMemberIDOK().
@@ -165,7 +166,8 @@ func (c MemberController) PutMembersMemberID(params members.PutMembersMemberIDPa
 	if err := PopulateMember(c.db, &member, []string{"project_id", "pool_id"}); err != nil {
 		return members.NewPutMembersMemberIDNotFound().WithPayload(utils.NotFound)
 	}
-	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || projectID != *member.ProjectID {
+	requestVars := map[string]string{"project_id": *member.ProjectID}
+	if _, err := auth.Authenticate(params.HTTPRequest, requestVars); err != nil {
 		return members.NewPutMembersMemberIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
@@ -210,7 +212,8 @@ func (c MemberController) DeleteMembersMemberID(params members.DeleteMembersMemb
 	if err := PopulateMember(c.db, &member, []string{"project_id", "pool_id"}); err != nil {
 		return members.NewDeleteMembersMemberIDNotFound().WithPayload(utils.NotFound)
 	}
-	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || projectID != *member.ProjectID {
+	requestVars := map[string]string{"project_id": *member.ProjectID}
+	if _, err := auth.Authenticate(params.HTTPRequest, requestVars); err != nil {
 		return members.NewDeleteMembersMemberIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 

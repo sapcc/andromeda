@@ -60,7 +60,7 @@ func (c DatacenterController) GetDatacenters(params datacenters.GetDatacentersPa
 
 		// Filter result based on policy
 		requestVars := map[string]string{"project_id": *datacenter.ProjectID, "scope": *datacenter.Scope}
-		if err = auth.AuthenticateWithVars(params.HTTPRequest, requestVars); err == nil {
+		if _, err = auth.Authenticate(params.HTTPRequest, requestVars); err == nil {
 			_datacenters = append(_datacenters, &datacenter)
 		}
 	}
@@ -74,7 +74,7 @@ func (c DatacenterController) GetDatacenters(params datacenters.GetDatacentersPa
 func (c DatacenterController) PostDatacenters(params datacenters.PostDatacentersParams) middleware.Responder {
 	datacenter := params.Datacenter.Datacenter
 
-	if projectId, err := auth.Authenticate(params.HTTPRequest); err != nil {
+	if projectId, err := auth.Authenticate(params.HTTPRequest, nil); err != nil {
 		return datacenters.NewPostDatacentersDefault(403).WithPayload(utils.PolicyForbidden)
 	} else {
 		datacenter.ProjectID = &projectId
@@ -111,7 +111,7 @@ func (c DatacenterController) GetDatacentersDatacenterID(params datacenters.GetD
 	}
 
 	requestVars := map[string]string{"project_id": *datacenter.ProjectID, "scope": *datacenter.Scope}
-	if err = auth.AuthenticateWithVars(params.HTTPRequest, requestVars); err != nil {
+	if _, err = auth.Authenticate(params.HTTPRequest, requestVars); err != nil {
 		return datacenters.NewGetDatacentersDatacenterIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
@@ -125,7 +125,8 @@ func (c DatacenterController) PutDatacentersDatacenterID(params datacenters.PutD
 	if err != nil {
 		return datacenters.NewPutDatacentersDatacenterIDNotFound().WithPayload(utils.NotFound)
 	}
-	if projectId, err := auth.Authenticate(params.HTTPRequest); err != nil || *datacenter.ProjectID != projectId {
+	requestVars := map[string]string{"project_id": *datacenter.ProjectID}
+	if _, err := auth.Authenticate(params.HTTPRequest, requestVars); err != nil {
 		return datacenters.NewPutDatacentersDatacenterIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
@@ -163,7 +164,8 @@ func (c DatacenterController) DeleteDatacentersDatacenterID(params datacenters.D
 	if err := PopulateDatacenter(c.db, &datacenter, []string{"project_id"}); err != nil {
 		return datacenters.NewDeleteDatacentersDatacenterIDNotFound().WithPayload(utils.NotFound)
 	}
-	if projectId, err := auth.Authenticate(params.HTTPRequest); err != nil || *datacenter.ProjectID != projectId {
+	requestVars := map[string]string{"project_id": *datacenter.ProjectID}
+	if _, err := auth.Authenticate(params.HTTPRequest, requestVars); err != nil {
 		return datacenters.NewDeleteDatacentersDatacenterIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 

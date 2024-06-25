@@ -60,7 +60,7 @@ func (c PoolController) GetPools(params pools.GetPoolsParams) middleware.Respond
 
 		// Filter result based on policy
 		requestVars := map[string]string{"project_id": *pool.ProjectID}
-		if err = auth.AuthenticateWithVars(params.HTTPRequest, requestVars); err == nil {
+		if _, err = auth.Authenticate(params.HTTPRequest, requestVars); err == nil {
 			if err := PopulatePoolDomains(c.db, &pool); err != nil {
 				panic(err)
 			}
@@ -82,7 +82,7 @@ func (c PoolController) GetPools(params pools.GetPoolsParams) middleware.Respond
 func (c PoolController) PostPools(params pools.PostPoolsParams) middleware.Responder {
 	pool := params.Pool.Pool
 
-	projectID, err := auth.Authenticate(params.HTTPRequest)
+	projectID, err := auth.Authenticate(params.HTTPRequest, nil)
 	if err != nil {
 		return pools.NewPostPoolsDefault(403).WithPayload(utils.PolicyForbidden)
 	} else {
@@ -131,7 +131,8 @@ func (c PoolController) GetPoolsPoolID(params pools.GetPoolsPoolIDParams) middle
 		return pools.NewGetPoolsPoolIDNotFound().WithPayload(utils.NotFound)
 	}
 
-	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || projectID != *pool.ProjectID {
+	requestVars := map[string]string{"project_id": *pool.ProjectID}
+	if _, err := auth.Authenticate(params.HTTPRequest, requestVars); err != nil {
 		return pools.NewGetPoolsPoolIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 	return pools.NewGetPoolsPoolIDOK().WithPayload(&pools.GetPoolsPoolIDOKBody{Pool: &pool})
@@ -144,7 +145,8 @@ func (c PoolController) PutPoolsPoolID(params pools.PutPoolsPoolIDParams) middle
 	if err := PopulatePool(c.db, &pool, []string{"id", "project_id"}, false); err != nil {
 		return pools.NewPutPoolsPoolIDNotFound().WithPayload(utils.NotFound)
 	}
-	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || projectID != *pool.ProjectID {
+	requestVars := map[string]string{"project_id": *pool.ProjectID}
+	if _, err := auth.Authenticate(params.HTTPRequest, requestVars); err != nil {
 		return pools.NewPutPoolsPoolIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
@@ -203,7 +205,8 @@ func (c PoolController) DeletePoolsPoolID(params pools.DeletePoolsPoolIDParams) 
 	if err := PopulatePool(c.db, &pool, []string{"id", "project_id"}, true); err != nil {
 		return pools.NewDeletePoolsPoolIDNotFound().WithPayload(utils.NotFound)
 	}
-	if projectID, err := auth.Authenticate(params.HTTPRequest); err != nil || projectID != *pool.ProjectID {
+	requestVars := map[string]string{"project_id": *pool.ProjectID}
+	if _, err := auth.Authenticate(params.HTTPRequest, requestVars); err != nil {
 		return pools.NewDeletePoolsPoolIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 

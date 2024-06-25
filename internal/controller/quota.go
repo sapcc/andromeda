@@ -29,55 +29,37 @@ import (
 	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/models"
 	"github.com/sapcc/andromeda/restapi/operations/administrative"
-	"github.com/sapcc/andromeda/restapi/operations/domains"
 )
 
 type QuotaController struct {
 	db *sqlx.DB
 }
 
-func getQuotas(db *sqlx.DB, projectID *string) ([]*administrative.GetQuotasOKBodyQuotasItems0, error) {
-	var rows *sqlx.Rows
-	var err error
-	if projectID != nil {
-		rows, err = db.Queryx(`SELECT * FROM quota WHERE project_id = ?`, projectID)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		rows, err = db.Queryx(`SELECT * FROM quota`)
-		if err != nil {
-			return nil, err
-		}
+// GetQuotas GET /quotas
+func (c QuotaController) GetQuotas(params administrative.GetQuotasParams) middleware.Responder {
+	rows, err := c.db.Queryx(`SELECT * FROM quota`)
+	if err != nil {
+		panic(err)
 	}
 
+	//zero-length slice used because we want [] via json encoder, nil encodes null
 	//goland:noinspection GoPreferNilSlice
-	var quotas = []*administrative.GetQuotasOKBodyQuotasItems0{}
+	var _quotas = []*administrative.GetQuotasOKBodyQuotasItems0{}
 	for rows.Next() {
 		var p administrative.GetQuotasOKBodyQuotasItems0
 		if err = rows.StructScan(&p); err != nil {
-			return nil, err
+			panic(err)
 		}
-		quotas = append(quotas, &p)
-	}
-	return quotas, nil
-}
-
-// GetQuotas GET /quotas
-func (c QuotaController) GetQuotas(params administrative.GetQuotasParams) middleware.Responder {
-	if _, err := auth.Authenticate(params.HTTPRequest); err != nil {
-		return administrative.NewGetQuotasDefault(403).WithPayload(utils.PolicyForbidden)
+		if _, err = auth.Authenticate(params.HTTPRequest, map[string]string{"project_id": *p.ProjectID}); err == nil {
+			_quotas = append(_quotas, &p)
+		}
 	}
 
-	responseQuotas, err := getQuotas(c.db, params.ProjectID)
-	if err != nil {
-		return domains.NewGetDomainsDefault(404).WithPayload(utils.NotFound)
-	}
-	return administrative.NewGetQuotasOK().WithPayload(&administrative.GetQuotasOKBody{Quotas: responseQuotas})
+	return administrative.NewGetQuotasOK().WithPayload(&administrative.GetQuotasOKBody{Quotas: _quotas})
 }
 
 func (c QuotaController) GetQuotasProjectID(params administrative.GetQuotasProjectIDParams) middleware.Responder {
-	if _, err := auth.Authenticate(params.HTTPRequest); err != nil {
+	if _, err := auth.Authenticate(params.HTTPRequest, map[string]string{"project_id": params.ProjectID}); err != nil {
 		return administrative.NewGetQuotasProjectIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
@@ -119,7 +101,7 @@ func (c QuotaController) GetQuotasProjectID(params administrative.GetQuotasProje
 }
 
 func (c QuotaController) GetQuotasDefaults(params administrative.GetQuotasDefaultsParams) middleware.Responder {
-	if _, err := auth.Authenticate(params.HTTPRequest); err != nil {
+	if _, err := auth.Authenticate(params.HTTPRequest, nil); err != nil {
 		return administrative.NewGetQuotasDefaultsDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
@@ -136,7 +118,7 @@ func (c QuotaController) GetQuotasDefaults(params administrative.GetQuotasDefaul
 }
 
 func (c QuotaController) PutQuotasProjectID(params administrative.PutQuotasProjectIDParams) middleware.Responder {
-	if _, err := auth.Authenticate(params.HTTPRequest); err != nil {
+	if _, err := auth.Authenticate(params.HTTPRequest, map[string]string{"project_id": params.ProjectID}); err != nil {
 		return administrative.NewPutQuotasProjectIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
@@ -202,7 +184,7 @@ func (c QuotaController) PutQuotasProjectID(params administrative.PutQuotasProje
 }
 
 func (c QuotaController) DeleteQuotasProjectID(params administrative.DeleteQuotasProjectIDParams) middleware.Responder {
-	if _, err := auth.Authenticate(params.HTTPRequest); err != nil {
+	if _, err := auth.Authenticate(params.HTTPRequest, map[string]string{"project_id": params.ProjectID}); err != nil {
 		return administrative.NewDeleteQuotasProjectIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 

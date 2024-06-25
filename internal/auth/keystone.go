@@ -110,34 +110,17 @@ func UserForRequest(r *http.Request) (audittools.UserInfo, error) {
 	return nil, errors.New("failure accessing keystone token")
 }
 
-func AuthenticateWithVars(r *http.Request, requestVars map[string]string) error {
-	if config.Global.ApiSettings.AuthStrategy != "keystone" {
-		return nil
-	}
-
-	if t := TokenFrom(r); t != nil {
-		t.Context.Request = requestVars
-		if t.Check(policy.RuleFromHTTPRequest(r)) {
-			return nil
-		}
-		return ErrForbidden
-	}
-
-	return nil
-}
-
-func Authenticate(r *http.Request) (string, error) {
+func Authenticate(r *http.Request, requestVars map[string]string) (string, error) {
 	if config.Global.ApiSettings.AuthStrategy != "keystone" {
 		return "", nil
 	}
 
 	if t := TokenFrom(r); t != nil {
-		rule := policy.RuleFromHTTPRequest(r)
-		if t.Check(rule) {
+		t.Context.Request = requestVars
+		if t.Check(policy.RuleFromHTTPRequest(r)) {
 			return t.ProjectScopeUUID(), nil
-		} else {
-			return "", ErrForbidden
 		}
+		return "", ErrForbidden
 	}
 
 	return "", nil
