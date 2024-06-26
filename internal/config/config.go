@@ -134,7 +134,6 @@ func parseConfigFlags(flags []string) error {
 }
 
 type Andromeda struct {
-	Verbose      bool                  `short:"v" long:"verbose" description:"Show verbose debug information"`
 	Default      Default               `json:"DEFAULT"`
 	Database     Database              `json:"database"`
 	ApiSettings  ApiSettings           `json:"api_settings"`
@@ -168,6 +167,7 @@ type Quota struct {
 }
 
 type Default struct {
+	Debug            bool   `json:"debug" long:"debug" description:"Enable debug mode."`
 	Host             string `long:"hostname" ini-name:"host" description:"Hostname used by the server/agent. Defaults to auto-discovery."`
 	ApiBaseURL       string `json:"api_base_uri" description:"Base URI for the API for use in pagination links. This will be autodetected from the request if not overridden here."`
 	TransportURL     string `json:"transport_url" description:"The network address and optional user credentials for connecting to the messaging backend."`

@@ -26,6 +26,7 @@ import (
 	"github.com/gophercloud/utils/openstack/clientconfig"
 	"github.com/sapcc/go-bits/audittools"
 	"github.com/sapcc/go-bits/gopherpolicy"
+	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/policy"
@@ -66,13 +67,11 @@ func KeystoneMiddleware(next http.Handler) (http.Handler, error) {
 			http.Error(w, "unauthorized", 401)
 		}
 
-		/*
-			if t.Enforcer != nil {
-				t.Context.Logger = logger.Infof
-				logger.Debug("token has auth = %v", t.Context.Auth)
-				logger.Debug("token has roles = %v", t.Context.Roles)
-			}
-		*/
+		if t.Enforcer != nil && config.Global.Default.Debug {
+			t.Context.Logger = logger.Infof
+			logger.Debug("token has auth = %v", t.Context.Auth)
+			logger.Debug("token has roles = %v", t.Context.Roles)
+		}
 
 		ctx := context.WithValue(r.Context(), projectContextKey, t)
 		r = r.WithContext(ctx)
@@ -116,6 +115,10 @@ func Authenticate(r *http.Request, requestVars map[string]string) (string, error
 	}
 
 	if t := TokenFrom(r); t != nil {
+		if requestVars == nil {
+			// inject project_id from token if not provided
+			requestVars = map[string]string{"project_id": t.ProjectScopeUUID()}
+		}
 		t.Context.Request = requestVars
 		if t.Check(policy.RuleFromHTTPRequest(r)) {
 			return t.ProjectScopeUUID(), nil
