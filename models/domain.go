@@ -89,7 +89,7 @@ type Domain struct {
 
 	// provisioning status
 	// Read Only: true
-	// Enum: [PENDING ACTIVE ERROR]
+	// Enum: [PENDING_CREATE PENDING_UPDATE PENDING_DELETE ACTIVE ERROR]
 	ProvisioningStatus string `json:"provisioning_status,omitempty"`
 
 	// DNS Record type to use.
@@ -346,7 +346,7 @@ var domainTypeProvisioningStatusPropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["PENDING","ACTIVE","ERROR"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["PENDING_CREATE","PENDING_UPDATE","PENDING_DELETE","ACTIVE","ERROR"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -356,8 +356,14 @@ func init() {
 
 const (
 
-	// DomainProvisioningStatusPENDING captures enum value "PENDING"
-	DomainProvisioningStatusPENDING string = "PENDING"
+	// DomainProvisioningStatusPENDINGCREATE captures enum value "PENDING_CREATE"
+	DomainProvisioningStatusPENDINGCREATE string = "PENDING_CREATE"
+
+	// DomainProvisioningStatusPENDINGUPDATE captures enum value "PENDING_UPDATE"
+	DomainProvisioningStatusPENDINGUPDATE string = "PENDING_UPDATE"
+
+	// DomainProvisioningStatusPENDINGDELETE captures enum value "PENDING_DELETE"
+	DomainProvisioningStatusPENDINGDELETE string = "PENDING_DELETE"
 
 	// DomainProvisioningStatusACTIVE captures enum value "ACTIVE"
 	DomainProvisioningStatusACTIVE string = "ACTIVE"
