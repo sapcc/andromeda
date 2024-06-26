@@ -62,7 +62,7 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 		for _, pool := range pools {
 			if pool.ProvisioningStatus == "PENDING_DELETE" {
 				provRequests = append(provRequests,
-					driver.GetProvisioningStatusRequest(pool.Id, "POOL", "DELETE"))
+					driver.GetProvisioningStatusRequest(pool.Id, "POOL", "DELETED"))
 				continue
 			}
 			members = append(members, pool.GetMembers()...)
