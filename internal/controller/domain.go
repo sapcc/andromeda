@@ -143,6 +143,7 @@ func (c DomainController) PostDomains(params domains.PostDomainsParams) middlewa
 		panic(err)
 	}
 
+	_ = PendingSync(c.sv)
 	return domains.NewPostDomainsCreated().WithPayload(&domains.PostDomainsCreatedBody{Domain: domain})
 }
 
@@ -239,6 +240,7 @@ func (c DomainController) PutDomainsDomainID(params domains.PutDomainsDomainIDPa
 		panic(err)
 	}
 
+	_ = PendingSync(c.sv)
 	return domains.NewPutDomainsDomainIDAccepted().WithPayload(&domains.PutDomainsDomainIDAcceptedBody{Domain: &domain})
 }
 
@@ -258,6 +260,8 @@ func (c DomainController) DeleteDomainsDomainID(params domains.DeleteDomainsDoma
 	if deleted, _ := res.RowsAffected(); deleted != 1 {
 		return domains.NewDeleteDomainsDomainIDNotFound().WithPayload(utils.NotFound)
 	}
+
+	_ = PendingSync(c.sv)
 	return domains.NewDeleteDomainsDomainIDNoContent()
 }
 

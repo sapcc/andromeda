@@ -99,6 +99,7 @@ func (c DatacenterController) PostDatacenters(params datacenters.PostDatacenters
 		panic(err)
 	}
 
+	_ = PendingSync(c.sv)
 	return datacenters.NewPostDatacentersCreated().WithPayload(&datacenters.PostDatacentersCreatedBody{Datacenter: datacenter})
 }
 
@@ -154,6 +155,7 @@ func (c DatacenterController) PutDatacentersDatacenterID(params datacenters.PutD
 		panic(err)
 	}
 
+	_ = PendingSync(c.sv)
 	return datacenters.NewPutDatacentersDatacenterIDAccepted().WithPayload(
 		&datacenters.PutDatacentersDatacenterIDAcceptedBody{Datacenter: &datacenter})
 }
@@ -185,6 +187,8 @@ func (c DatacenterController) DeleteDatacentersDatacenterID(params datacenters.D
 	if deleted, _ := res.RowsAffected(); deleted != 1 {
 		return datacenters.NewDeleteDatacentersDatacenterIDNotFound().WithPayload(utils.NotFound)
 	}
+
+	_ = PendingSync(c.sv)
 	return datacenters.NewDeleteDatacentersDatacenterIDNoContent()
 }
 
