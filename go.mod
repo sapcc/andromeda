@@ -42,7 +42,7 @@ require (
 	github.com/prometheus/client_golang v1.19.1
 	github.com/rs/cors v1.11.0
 	github.com/sapcc/go-api-declarations v1.11.2
-	github.com/sapcc/go-bits v0.0.0-20240625092545-d28885ff21f5
+	github.com/sapcc/go-bits v0.0.0-20240627095426-aeda20453e46
 	github.com/scottdware/go-bigip v0.0.0-20230907015320-92d03ba95eca
 	github.com/stretchr/testify v1.9.0
 	github.com/urfave/cli/v2 v2.27.2
@@ -115,6 +115,7 @@ require (
 	github.com/minio/highwayhash v1.0.2 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
+	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/nats-io/jwt/v2 v2.4.1 // indirect
 	github.com/nats-io/nats.go v1.16.0 // indirect
 	github.com/nats-io/nkeys v0.4.4 // indirect
@@ -127,8 +128,8 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
-	github.com/prometheus/common v0.54.0 // indirect
-	github.com/prometheus/procfs v0.12.0 // indirect
+	github.com/prometheus/common v0.55.0 // indirect
+	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/rabbitmq/amqp091-go v1.10.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
