@@ -70,7 +70,7 @@ type Monitor struct {
 
 	// provisioning status
 	// Read Only: true
-	// Enum: [PENDING ACTIVE ERROR]
+	// Enum: [PENDING_CREATE PENDING_UPDATE PENDING_DELETE ACTIVE ERROR]
 	ProvisioningStatus string `json:"provisioning_status,omitempty"`
 
 	// Specifies the text string that the monitor expects to receive from the target member.
@@ -243,7 +243,7 @@ var monitorTypeProvisioningStatusPropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["PENDING","ACTIVE","ERROR"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["PENDING_CREATE","PENDING_UPDATE","PENDING_DELETE","ACTIVE","ERROR"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -253,8 +253,14 @@ func init() {
 
 const (
 
-	// MonitorProvisioningStatusPENDING captures enum value "PENDING"
-	MonitorProvisioningStatusPENDING string = "PENDING"
+	// MonitorProvisioningStatusPENDINGCREATE captures enum value "PENDING_CREATE"
+	MonitorProvisioningStatusPENDINGCREATE string = "PENDING_CREATE"
+
+	// MonitorProvisioningStatusPENDINGUPDATE captures enum value "PENDING_UPDATE"
+	MonitorProvisioningStatusPENDINGUPDATE string = "PENDING_UPDATE"
+
+	// MonitorProvisioningStatusPENDINGDELETE captures enum value "PENDING_DELETE"
+	MonitorProvisioningStatusPENDINGDELETE string = "PENDING_DELETE"
 
 	// MonitorProvisioningStatusACTIVE captures enum value "ACTIVE"
 	MonitorProvisioningStatusACTIVE string = "ACTIVE"

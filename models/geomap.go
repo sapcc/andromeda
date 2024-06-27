@@ -71,7 +71,7 @@ type Geomap struct {
 
 	// provisioning status
 	// Read Only: true
-	// Enum: [PENDING ACTIVE ERROR]
+	// Enum: [PENDING_CREATE PENDING_UPDATE PENDING_DELETE ACTIVE ERROR]
 	ProvisioningStatus string `json:"provisioning_status,omitempty"`
 
 	// Visibility of datacenter between different projects
@@ -272,7 +272,7 @@ var geomapTypeProvisioningStatusPropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["PENDING","ACTIVE","ERROR"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["PENDING_CREATE","PENDING_UPDATE","PENDING_DELETE","ACTIVE","ERROR"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -282,8 +282,14 @@ func init() {
 
 const (
 
-	// GeomapProvisioningStatusPENDING captures enum value "PENDING"
-	GeomapProvisioningStatusPENDING string = "PENDING"
+	// GeomapProvisioningStatusPENDINGCREATE captures enum value "PENDING_CREATE"
+	GeomapProvisioningStatusPENDINGCREATE string = "PENDING_CREATE"
+
+	// GeomapProvisioningStatusPENDINGUPDATE captures enum value "PENDING_UPDATE"
+	GeomapProvisioningStatusPENDINGUPDATE string = "PENDING_UPDATE"
+
+	// GeomapProvisioningStatusPENDINGDELETE captures enum value "PENDING_DELETE"
+	GeomapProvisioningStatusPENDINGDELETE string = "PENDING_DELETE"
 
 	// GeomapProvisioningStatusACTIVE captures enum value "ACTIVE"
 	GeomapProvisioningStatusACTIVE string = "ACTIVE"

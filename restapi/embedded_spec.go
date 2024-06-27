@@ -1903,7 +1903,9 @@ func init() {
         "provisioning_status": {
           "type": "string",
           "enum": [
-            "PENDING",
+            "PENDING_CREATE",
+            "PENDING_UPDATE",
+            "PENDING_DELETE",
             "ACTIVE",
             "ERROR"
           ],
@@ -2151,7 +2153,9 @@ func init() {
         "provisioning_status": {
           "type": "string",
           "enum": [
-            "PENDING",
+            "PENDING_CREATE",
+            "PENDING_UPDATE",
+            "PENDING_DELETE",
             "ACTIVE",
             "ERROR"
           ],
@@ -2261,7 +2265,9 @@ func init() {
         "provisioning_status": {
           "type": "string",
           "enum": [
-            "PENDING",
+            "PENDING_CREATE",
+            "PENDING_UPDATE",
+            "PENDING_DELETE",
             "ACTIVE",
             "ERROR"
           ],
@@ -2339,7 +2345,9 @@ func init() {
         "provisioning_status": {
           "type": "string",
           "enum": [
-            "PENDING",
+            "PENDING_CREATE",
+            "PENDING_UPDATE",
+            "PENDING_DELETE",
             "ACTIVE",
             "ERROR"
           ],
@@ -2455,7 +2463,9 @@ func init() {
         "provisioning_status": {
           "type": "string",
           "enum": [
-            "PENDING",
+            "PENDING_CREATE",
+            "PENDING_UPDATE",
+            "PENDING_DELETE",
             "ACTIVE",
             "ERROR"
           ],
@@ -4798,7 +4808,9 @@ func init() {
         "provisioning_status": {
           "type": "string",
           "enum": [
-            "PENDING",
+            "PENDING_CREATE",
+            "PENDING_UPDATE",
+            "PENDING_DELETE",
             "ACTIVE",
             "ERROR"
           ],
@@ -5032,7 +5044,9 @@ func init() {
         "provisioning_status": {
           "type": "string",
           "enum": [
-            "PENDING",
+            "PENDING_CREATE",
+            "PENDING_UPDATE",
+            "PENDING_DELETE",
             "ACTIVE",
             "ERROR"
           ],
@@ -5143,7 +5157,9 @@ func init() {
         "provisioning_status": {
           "type": "string",
           "enum": [
-            "PENDING",
+            "PENDING_CREATE",
+            "PENDING_UPDATE",
+            "PENDING_DELETE",
             "ACTIVE",
             "ERROR"
           ],
@@ -5221,7 +5237,9 @@ func init() {
         "provisioning_status": {
           "type": "string",
           "enum": [
-            "PENDING",
+            "PENDING_CREATE",
+            "PENDING_UPDATE",
+            "PENDING_DELETE",
             "ACTIVE",
             "ERROR"
           ],
@@ -5338,7 +5356,9 @@ func init() {
         "provisioning_status": {
           "type": "string",
           "enum": [
-            "PENDING",
+            "PENDING_CREATE",
+            "PENDING_UPDATE",
+            "PENDING_DELETE",
             "ACTIVE",
             "ERROR"
           ],

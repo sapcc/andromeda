@@ -82,7 +82,7 @@ type Member struct {
 
 	// provisioning status
 	// Read Only: true
-	// Enum: [PENDING ACTIVE ERROR]
+	// Enum: [PENDING_CREATE PENDING_UPDATE PENDING_DELETE ACTIVE ERROR]
 	ProvisioningStatus string `json:"provisioning_status,omitempty"`
 
 	// status
@@ -262,7 +262,7 @@ var memberTypeProvisioningStatusPropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["PENDING","ACTIVE","ERROR"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["PENDING_CREATE","PENDING_UPDATE","PENDING_DELETE","ACTIVE","ERROR"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -272,8 +272,14 @@ func init() {
 
 const (
 
-	// MemberProvisioningStatusPENDING captures enum value "PENDING"
-	MemberProvisioningStatusPENDING string = "PENDING"
+	// MemberProvisioningStatusPENDINGCREATE captures enum value "PENDING_CREATE"
+	MemberProvisioningStatusPENDINGCREATE string = "PENDING_CREATE"
+
+	// MemberProvisioningStatusPENDINGUPDATE captures enum value "PENDING_UPDATE"
+	MemberProvisioningStatusPENDINGUPDATE string = "PENDING_UPDATE"
+
+	// MemberProvisioningStatusPENDINGDELETE captures enum value "PENDING_DELETE"
+	MemberProvisioningStatusPENDINGDELETE string = "PENDING_DELETE"
 
 	// MemberProvisioningStatusACTIVE captures enum value "ACTIVE"
 	MemberProvisioningStatusACTIVE string = "ACTIVE"
