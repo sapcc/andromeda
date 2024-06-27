@@ -103,6 +103,26 @@ func (s *AkamaiAgent) FetchAndSyncDatacenters(datacenters []string, force bool) 
 	return nil
 }
 
+func getBackendDatacenter(meta int, datacenter *rpcmodels.Datacenter, s *AkamaiAgent) *gtm.Datacenter {
+	if meta != 0 {
+		if backendDatacenter, err := s.gtm.GetDatacenter(context.Background(), meta, config.Global.AkamaiConfig.Domain); err == nil {
+			return backendDatacenter
+		}
+	}
+
+	// try to find datacenter by nickname
+	datacenters, err := s.gtm.ListDatacenters(context.Background(), config.Global.AkamaiConfig.Domain)
+	if err != nil {
+		return nil
+	}
+	for _, d := range datacenters {
+		if d.Nickname == datacenter.Id {
+			return d
+		}
+	}
+	return nil
+}
+
 func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force bool) (*rpcmodels.Datacenter, error) {
 	logger.Debugf("SyncDatacenter(%s, force=%t)", datacenter.Id, force)
 
@@ -112,27 +132,6 @@ func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force boo
 	// Consider synced
 	if !force && meta != 0 {
 		return datacenter, nil
-	}
-
-	var backendDatacenter *gtm.Datacenter
-	if meta != 0 {
-		var err error
-
-		backendDatacenter, err = s.gtm.GetDatacenter(context.Background(), meta, config.Global.AkamaiConfig.Domain)
-		if err != nil {
-			// try to find datacenter by nickname
-			datacenters, err := s.gtm.ListDatacenters(context.Background(), config.Global.AkamaiConfig.Domain)
-			if err != nil {
-				return nil, err
-			}
-
-			for _, d := range datacenters {
-				if d.Nickname == datacenter.Id {
-					backendDatacenter = d
-					break
-				}
-			}
-		}
 	}
 
 	// reference datacenter
@@ -155,6 +154,7 @@ func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force boo
 		"Longitude",
 		"Nickname",
 	}
+	backendDatacenter := getBackendDatacenter(meta, datacenter, s)
 	if utils.DeepEqualFields(&referenceDatacenter, backendDatacenter, fieldsToCompare) {
 		// no change
 		return datacenter, nil
