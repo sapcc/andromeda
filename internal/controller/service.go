@@ -18,9 +18,6 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/go-openapi/strfmt"
-	"github.com/jmoiron/sqlx"
-	"go-micro.dev/v4"
 
 	"github.com/sapcc/andromeda/internal/auth"
 	"github.com/sapcc/andromeda/internal/utils"
@@ -29,16 +26,7 @@ import (
 )
 
 type ServiceController struct {
-	db *sqlx.DB
-	sv micro.Service
-}
-
-func getMetadata(metadata map[string]string, key string) string {
-	res, ok := metadata[key]
-	if !ok {
-		return "Unknown"
-	}
-	return res
+	CommonController
 }
 
 // GetServices GET /services
@@ -49,7 +37,9 @@ func (c ServiceController) GetServices(params administrative.GetServicesParams) 
 
 	//goland:noinspection GoPreferNilSlice
 	var responseServices = []*models.Service{}
-	_listServices, err := c.sv.Options().Registry.ListServices()
+
+	// Unsupported by stormrpc
+	/*_listServices, err := c.rpc.Options().Registry.ListServices()
 	if err != nil {
 		panic(err)
 	}
@@ -58,7 +48,7 @@ func (c ServiceController) GetServices(params administrative.GetServicesParams) 
 			continue
 		}
 
-		_svs, err := c.sv.Options().Registry.GetService(_service.Name)
+		_svs, err := c.rpc.Options().Registry.GetService(_service.Name)
 		if err != nil {
 			panic(err)
 		}
@@ -76,6 +66,7 @@ func (c ServiceController) GetServices(params administrative.GetServicesParams) 
 			}
 		}
 	}
+	*/
 
 	return administrative.NewGetServicesOK().WithPayload(&administrative.GetServicesOKBody{Services: responseServices})
 }

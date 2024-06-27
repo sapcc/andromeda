@@ -22,7 +22,7 @@ import (
 	"net/http"
 	"time"
 
-	"go-micro.dev/v4/logger"
+	"github.com/apex/log"
 
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/driver"
@@ -67,7 +67,7 @@ func (s *AkamaiAgent) syncMemberStatus(domain *rpcmodels.Domain) error {
 		return err
 	} else {
 		bytes, _ := io.ReadAll(out.Body)
-		logger.Debugf("%s", bytes)
+		log.Debugf("%s", bytes)
 	}
 
 	if len(stat.DataRows) == 0 {
@@ -88,10 +88,10 @@ func (s *AkamaiAgent) syncMemberStatus(domain *rpcmodels.Domain) error {
 				memberStatusRequests = append(memberStatusRequests,
 					driver.GetMemberStatusRequest(id, status))
 			} else {
-				logger.Warnf("unknown member with ip %s not found as port of domain %s", ip.IP, domain.Id)
+				log.Warnf("unknown member with ip %s not found as port of domain %s", ip.IP, domain.Id)
 			}
 
-			logger.Infof("status of domain %s: Alive: %+v, HandedOut: %+v, Score: %f", domain.Id, ip.Alive, ip.HandedOut, ip.Score)
+			log.Infof("status of domain %s: Alive: %+v, HandedOut: %+v, Score: %f", domain.Id, ip.Alive, ip.HandedOut, ip.Score)
 		}
 	}
 

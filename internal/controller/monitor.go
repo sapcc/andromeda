@@ -27,7 +27,6 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
-	"go-micro.dev/v4"
 
 	"github.com/sapcc/andromeda/db"
 	"github.com/sapcc/andromeda/internal/auth"
@@ -37,8 +36,7 @@ import (
 )
 
 type MonitorController struct {
-	db *sqlx.DB
-	sv micro.Service
+	CommonController
 }
 
 // GetMonitors GET /monitors

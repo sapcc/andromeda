@@ -26,7 +26,7 @@ import (
 	"github.com/sapcc/andromeda/internal/rpcmodels"
 	"github.com/sapcc/andromeda/models"
 
-	"go-micro.dev/v4/logger"
+	"github.com/apex/log"
 )
 
 type ProvRequests []*server.ProvisioningStatusRequest_ProvisioningStatus
@@ -83,22 +83,22 @@ func (s *AkamaiAgent) syncProvisioningStatus(domain *rpcmodels.Domain) (string, 
 	// and doesn't propagate until the validation errors are resolved.
 	switch status.PropagationStatus {
 	case "PENDING":
-		logger.Debug("Akamai Backend: pending configuration change")
+		log.Debug("Akamai Backend: pending configuration change")
 	case "DENIED":
 		if domain == nil {
-			logger.Error("Akamai Backend: configuration change failed")
+			log.Error("Akamai Backend: configuration change failed")
 			return status.PropagationStatus, nil
 		}
 
 		return status.PropagationStatus, fmt.Errorf("Domain %s failed syncing: %s", domain.Id, status.Message)
 	case "COMPLETE":
 		if domain == nil {
-			logger.Info("Akamai Backend: configuration change completed")
+			log.Info("Akamai Backend: configuration change completed")
 			return status.PropagationStatus, nil
 		}
-		logger.Infof("Domain %s has been propagated", domain.Id)
+		log.Infof("Domain %s has been propagated", domain.Id)
 		if err := s.syncMemberStatus(domain); err != nil {
-			logger.Warn(err)
+			log.Warn(err.Error())
 		}
 	}
 	return status.PropagationStatus, nil

@@ -44,7 +44,7 @@ var (
 )
 
 func Unauthorized(err error) *models.Error {
-	return &models.Error{Code: 401, Message: err.Error()}
+	return &models.Error{Code: 401, Message: fmt.Sprintf("Unauthorized: %s", err.Error())}
 }
 
 func GetQuotaMetResponse(resource string) *models.Error {

@@ -23,7 +23,6 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/jmoiron/sqlx"
 
 	"github.com/sapcc/andromeda/internal/auth"
 	"github.com/sapcc/andromeda/internal/config"
@@ -33,7 +32,7 @@ import (
 )
 
 type QuotaController struct {
-	db *sqlx.DB
+	CommonController
 }
 
 // GetQuotas GET /quotas

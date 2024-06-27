@@ -21,14 +21,13 @@ import (
 	"fmt"
 	"strings"
 
-	"go-micro.dev/v4/logger"
+	"github.com/apex/log"
 
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-sql-driver/mysql"
 	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
-	"go-micro.dev/v4"
 
 	"github.com/sapcc/andromeda/db"
 	"github.com/sapcc/andromeda/internal/auth"
@@ -38,8 +37,7 @@ import (
 )
 
 type MemberController struct {
-	db *sqlx.DB
-	sv micro.Service
+	CommonController
 }
 
 // GetMembers GET /members
@@ -140,7 +138,7 @@ func (c MemberController) PostMembers(params members.PostMembersParams) middlewa
 		panic(err)
 	}
 
-	_ = PendingSync(c.sv)
+	_ = PendingSync(c.rpc)
 	return members.NewPostMembersCreated().
 		WithPayload(&members.PostMembersCreatedBody{Member: member})
 }
@@ -201,7 +199,9 @@ func (c MemberController) PutMembersMemberID(params members.PutMembersMemberIDPa
 		panic(err)
 	}
 
-	logger.Info(PendingSync(c.sv))
+	if err := PendingSync(c.rpc); err != nil {
+		log.WithError(err).Error("Failed to sync provisioning status")
+	}
 	return members.NewPutMembersMemberIDAccepted().
 		WithPayload(&members.PutMembersMemberIDAcceptedBody{Member: &member})
 }
@@ -231,7 +231,7 @@ func (c MemberController) DeleteMembersMemberID(params members.DeleteMembersMemb
 		panic(err)
 	}
 
-	_ = PendingSync(c.sv)
+	_ = PendingSync(c.rpc)
 	return members.NewDeleteMembersMemberIDNoContent()
 }
 

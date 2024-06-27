@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v8/pkg/gtm"
-	"go-micro.dev/v4/logger"
+	"github.com/apex/log"
 
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/driver"
@@ -38,7 +38,7 @@ var MONITOR_LIVENESS_TYPE_MAP = map[rpcmodels.Monitor_MonitorType]string{
 
 func (s *AkamaiAgent) EnsureDomain(domainType string) error {
 	if _, err := s.gtm.GetDomain(context.Background(), config.Global.AkamaiConfig.Domain); err != nil {
-		logger.Warnf("Akamai Domain %s doesn't exist, creating...", config.Global.AkamaiConfig.Domain)
+		log.Warnf("Akamai Domain %s doesn't exist, creating...", config.Global.AkamaiConfig.Domain)
 		domain := gtm.Domain{
 			Name: config.Global.AkamaiConfig.Domain,
 			Type: domainType,
@@ -58,7 +58,7 @@ func (s *AkamaiAgent) FetchAndSyncDomains(domains []string) error {
 	s.executing = true
 	defer func() { s.executing = false }()
 
-	logger.Debugf("Running FetchAndSyncDomains(domains=%+v)", domains)
+	log.Debugf("Running FetchAndSyncDomains(domains=%+v)", domains)
 	response, err := s.rpc.GetDomains(context.Background(), &server.SearchRequest{
 		Provider:       "akamai",
 		PageNumber:     0,
@@ -96,10 +96,8 @@ func (s *AkamaiAgent) FetchAndSyncDomains(domains []string) error {
 
 	for _, domain := range res {
 		var provRequests ProvRequests
-		logger.Infof("domainSync(%s) running...", domain.Id)
-		if err := s.gtmLock.Lock(trafficManagementDomain); err != nil {
-			return err
-		}
+		log.Infof("domainSync(%s) running...", domain.Id)
+		s.gtmLock.Lock()
 
 		if domain.ProvisioningStatus == models.DomainProvisioningStatusPENDINGDELETE {
 			// Run Delete
@@ -120,15 +118,13 @@ func (s *AkamaiAgent) FetchAndSyncDomains(domains []string) error {
 			time.Sleep(5 * time.Second)
 			status, err = s.syncProvisioningStatus(domain)
 			if err != nil {
-				logger.Error(err)
+				log.Error(err.Error())
 			}
 		}
 		driver.UpdateProvisioningStatus(s.rpc, provRequests)
 
-		logger.Infof("FetchAndSyncDomains(%s) finished with '%s'", domain.Id, status)
-		if err := s.gtmLock.Unlock(trafficManagementDomain); err != nil {
-			return err
-		}
+		log.Infof("FetchAndSyncDomains(%s) finished with '%s'", domain.Id, status)
+		s.gtmLock.Unlock()
 	}
 	return nil
 }

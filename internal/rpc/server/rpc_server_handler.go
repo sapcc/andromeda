@@ -23,10 +23,10 @@ import (
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/apex/log"
 	"github.com/go-openapi/strfmt"
 
 	"github.com/jmoiron/sqlx"
-	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/db"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
@@ -66,46 +66,48 @@ func (u *RPCHandler) QueryxWithIds(sql string, request *SearchRequest) (*sqlx.Ro
 	return u.DB.Queryx(sql, args...)
 }
 
-func (u *RPCHandler) GetMembers(ctx context.Context, request *SearchRequest, response *MembersResponse) error {
+func (u *RPCHandler) GetMembers(ctx context.Context, request *SearchRequest) (*MembersResponse, error) {
+	var response = &MembersResponse{}
 	sql := u.DB.Rebind(`SELECT id, admin_state_up, address, port, provisioning_status FROM member;`)
 	rows, err := u.QueryxWithIds(sql, request)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	for rows.Next() {
 		var member rpcmodels.Member
 		var address string
 		if err := rows.Scan(&member.Id, &member.AdminStateUp, &address,
 			&member.Port, &member.ProvisioningStatus); err != nil {
-			return err
+			return nil, err
 		}
 
 		member.Address, err = utils.InetAton(net.ParseIP(address))
 		if err != nil {
-			return err
+			return nil, err
 		}
 		response.Response = append(response.Response, &member)
 	}
-	return nil
+	return response, nil
 }
 
-func (u *RPCHandler) GetPools(ctx context.Context, request *SearchRequest, response *PoolsResponse) error {
+func (u *RPCHandler) GetPools(ctx context.Context, request *SearchRequest) (*PoolsResponse, error) {
+	var response = &PoolsResponse{}
 	sql := u.DB.Rebind(`SELECT id, admin_state_up FROM pool;`)
 	rows, err := u.QueryxWithIds(sql, request)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	for rows.Next() {
 		var pool rpcmodels.Pool
 		if err := rows.Scan(&pool.Id, &pool.AdminStateUp); err != nil {
-			return err
+			return nil, err
 		}
 		response.Response = append(response.Response, &pool)
 	}
-	return nil
+	return response, nil
 }
 
-func (u *RPCHandler) GetDatacenters(ctx context.Context, request *SearchRequest, response *DatacentersResponse) error {
+func (u *RPCHandler) GetDatacenters(ctx context.Context, request *SearchRequest) (response *DatacentersResponse, err error) {
 	q := sq.
 		Select("id", "admin_state_up", "city", "state_or_province", "continent", "country", "latitude",
 			"longitude", "scope", "provisioning_status", "provider", "meta").
@@ -120,22 +122,23 @@ func (u *RPCHandler) GetDatacenters(ctx context.Context, request *SearchRequest,
 	}
 
 	sql, args := q.MustSql()
-	rows, err := u.DB.Queryx(u.DB.Rebind(sql), args...)
+	var rows *sqlx.Rows
+	rows, err = u.DB.Queryx(u.DB.Rebind(sql), args...)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	for rows.Next() {
 		var datacenter rpcmodels.Datacenter
-		if err := rows.StructScan(&datacenter); err != nil {
-			logger.Error(err)
-			return err
+		if err = rows.StructScan(&datacenter); err != nil {
+			log.Error(err.Error())
+			return nil, err
 		}
 		response.Response = append(response.Response, &datacenter)
 	}
-	return nil
+	return response, nil
 }
 
-func (u *RPCHandler) GetGeomaps(ctx context.Context, request *SearchRequest, response *GeomapsResponse) error {
+func (u *RPCHandler) GetGeomaps(ctx context.Context, request *SearchRequest) (*GeomapsResponse, error) {
 	/*
 		SELECT
 		    id, scope, provider, default_datacenter, provisioning_status
@@ -155,7 +158,7 @@ func (u *RPCHandler) GetGeomaps(ctx context.Context, request *SearchRequest, res
 	if request.Ids != nil {
 		q = q.Where(sq.Eq{"id": request.Ids})
 	}
-
+	var response = &GeomapsResponse{Response: []*rpcmodels.Geomap{}}
 	if err := db.TxExecute(u.DB, func(tx *sqlx.Tx) error {
 		sql, args := q.MustSql()
 		rows, err := tx.Queryx(tx.Rebind(sql), args...)
@@ -199,17 +202,18 @@ func (u *RPCHandler) GetGeomaps(ctx context.Context, request *SearchRequest, res
 		}
 		return nil
 	}); err != nil {
-		logger.Error(err)
-		return err
+		log.Error(err.Error())
+		return nil, err
 	}
-	return nil
+	return response, nil
 }
 
-func (u *RPCHandler) GetMonitors(ctx context.Context, request *SearchRequest, response *MonitorsResponse) error {
+func (u *RPCHandler) GetMonitors(ctx context.Context, request *SearchRequest) (*MonitorsResponse, error) {
 	panic("Todo")
 }
 
-func (u *RPCHandler) UpdateDatacenterMeta(ctx context.Context, req *DatacenterMetaRequest, res *rpcmodels.Datacenter) error {
+func (u *RPCHandler) UpdateDatacenterMeta(ctx context.Context, req *DatacenterMetaRequest) (*rpcmodels.Datacenter, error) {
+	var res *rpcmodels.Datacenter
 	if err := db.TxExecute(u.DB, func(tx *sqlx.Tx) error {
 		sql := tx.Rebind(`UPDATE datacenter SET meta = ? WHERE id = ?`)
 		if _, err := tx.Exec(sql, req.GetMeta(), req.GetId()); err != nil {
@@ -224,9 +228,9 @@ func (u *RPCHandler) UpdateDatacenterMeta(ctx context.Context, req *DatacenterMe
 
 		return nil
 	}); err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return res, nil
 }
 
 func populatePools(u *RPCHandler, fullyPopulated bool, domainID string) ([]*rpcmodels.Pool, error) {
@@ -242,8 +246,8 @@ func populatePools(u *RPCHandler, fullyPopulated bool, domainID string) ([]*rpcm
 	var pools []*rpcmodels.Pool
 	for rows.Next() {
 		var pool rpcmodels.Pool
-		if err := rows.StructScan(&pool); err != nil {
-			logger.Error(err)
+		if err = rows.StructScan(&pool); err != nil {
+			log.Error(err.Error())
 			return nil, err
 		}
 
@@ -307,7 +311,7 @@ func populateMembers(u *RPCHandler, poolID string) ([]*rpcmodels.Member, error) 
 		var address string
 		if err := rows.Scan(&member.Id, &member.AdminStateUp, &address,
 			&member.Port, &member.Datacenter, &member.ProvisioningStatus); err != nil {
-			logger.Error(err)
+			log.Error(err.Error())
 			return nil, err
 		}
 
@@ -321,7 +325,7 @@ func populateMembers(u *RPCHandler, poolID string) ([]*rpcmodels.Member, error) 
 	return members, nil
 }
 
-func (u *RPCHandler) GetDomains(ctx context.Context, request *SearchRequest, response *DomainsResponse) error {
+func (u *RPCHandler) GetDomains(ctx context.Context, request *SearchRequest) (*DomainsResponse, error) {
 	sql := `SELECT id, admin_state_up, fqdn, mode, record_type, provisioning_status
                FROM domain WHERE provisioning_status != 'DELETED'`
 	if request.Pending {
@@ -330,22 +334,23 @@ func (u *RPCHandler) GetDomains(ctx context.Context, request *SearchRequest, res
 	rows, err := u.QueryxWithIds(u.DB.Rebind(sql), request)
 
 	if err != nil {
-		logger.Error(err)
-		return err
+		log.Error(err.Error())
+		return nil, err
 	}
+	var response *DomainsResponse
 	for rows.Next() {
 		var domain rpcmodels.Domain
-		if err := rows.StructScan(&domain); err != nil {
-			logger.Error(err)
-			return err
+		if err = rows.StructScan(&domain); err != nil {
+			log.Error(err.Error())
+			return nil, err
 		}
 
 		datacenterIds := []string{}
 
 		if request.GetFullyPopulated() {
 			if domain.Pools, err = populatePools(u, request.GetFullyPopulated(), domain.Id); err != nil {
-				logger.Error(err)
-				return err
+				log.Error(err.Error())
+				return nil, err
 			}
 			for _, pool := range domain.Pools {
 				for _, member := range pool.Members {
@@ -368,19 +373,20 @@ func (u *RPCHandler) GetDomains(ctx context.Context, request *SearchRequest, res
 				Ids:           datacenterIds,
 				Provider:      request.Provider,
 			}
-			r := DatacentersResponse{}
-			if err := u.GetDatacenters(ctx, &s, &r); err != nil {
-				return err
+			var r *DatacentersResponse
+			r, err = u.GetDatacenters(ctx, &s)
+			if err != nil {
+				return nil, err
 			}
 			domain.Datacenters = r.Response
 		}
 
 		response.Response = append(response.Response, &domain)
 	}
-	return nil
+	return response, nil
 }
 
-func (u *RPCHandler) UpdateProvisioningStatus(ctx context.Context, req *ProvisioningStatusRequest, res *ProvisioningStatusResponse) error {
+func (u *RPCHandler) UpdateProvisioningStatus(ctx context.Context, req *ProvisioningStatusRequest) (*ProvisioningStatusResponse, error) {
 	var statusResult []*StatusResult
 	for _, provStatusReq := range req.GetProvisioningStatus() {
 		table := strings.ToLower(provStatusReq.GetModel().String())
@@ -400,7 +406,7 @@ func (u *RPCHandler) UpdateProvisioningStatus(ctx context.Context, req *Provisio
 			_, err = u.DB.Exec(sql, provStatus, provStatusReq.GetId())
 		}
 		if err != nil {
-			logger.Error(err)
+			log.Error(err.Error())
 		}
 
 		statusResult = append(statusResult, &StatusResult{
@@ -408,16 +414,15 @@ func (u *RPCHandler) UpdateProvisioningStatus(ctx context.Context, req *Provisio
 			Success: err == nil,
 		})
 	}
-	res.ProvisioningStatusResult = statusResult
-	return nil
+	return &ProvisioningStatusResponse{ProvisioningStatusResult: statusResult}, nil
 }
 
 // UpdateMemberStatus Updates member status according to the requests, also updates dependend pool and domain status.
-func (u *RPCHandler) UpdateMemberStatus(ctx context.Context, req *MemberStatusRequest, res *MemberStatusResponse) error {
+func (u *RPCHandler) UpdateMemberStatus(ctx context.Context, req *MemberStatusRequest) (*MemberStatusResponse, error) {
 	var statusResult []*StatusResult
 	tx, err := u.DB.Beginx()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer func() { _ = tx.Rollback() }()
 
@@ -429,7 +434,7 @@ func (u *RPCHandler) UpdateMemberStatus(ctx context.Context, req *MemberStatusRe
 			Where("id = ?", memberStatusReq.GetId()).
 			MustSql()
 		if _, err := tx.Exec(tx.Rebind(sql), args...); err != nil {
-			return err
+			return nil, err
 		}
 
 		sql, args = sq.Select("d.id", "p.id").
@@ -441,7 +446,7 @@ func (u *RPCHandler) UpdateMemberStatus(ctx context.Context, req *MemberStatusRe
 			MustSql()
 		var domainID, poolID strfmt.UUID
 		if err := tx.QueryRowx(tx.Rebind(sql), args...).Scan(&domainID, &poolID); err != nil {
-			return err
+			return nil, err
 		}
 
 		sql, args = sq.Select("COUNT(m2.id)").
@@ -454,18 +459,18 @@ func (u *RPCHandler) UpdateMemberStatus(ctx context.Context, req *MemberStatusRe
 			}).MustSql()
 		var membersOnline int
 		if err := tx.Get(&membersOnline, tx.Rebind(sql), args...); err != nil {
-			return err
+			return nil, err
 		}
 
 		if status == "ONLINE" || (membersOnline == 0 && status == "OFFLINE") {
 			sql, args = sq.Update("pool").Set("status", status).Where("id = ?", poolID).MustSql()
 			if _, err := tx.Exec(tx.Rebind(sql), args...); err != nil {
-				return err
+				return nil, err
 			}
 
 			sql, args = sq.Update("domain").Set("status", status).Where("id = ?", domainID).MustSql()
 			if _, err := tx.Exec(tx.Rebind(sql), args...); err != nil {
-				return err
+				return nil, err
 			}
 		}
 
@@ -474,6 +479,5 @@ func (u *RPCHandler) UpdateMemberStatus(ctx context.Context, req *MemberStatusRe
 			Success: err == nil,
 		})
 	}
-	res.MemberStatusResult = statusResult
-	return tx.Commit()
+	return &MemberStatusResponse{MemberStatusResult: statusResult}, tx.Commit()
 }

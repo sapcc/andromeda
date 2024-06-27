@@ -22,7 +22,7 @@ import (
 	"time"
 
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v8/pkg/gtm"
-	"go-micro.dev/v4/logger"
+	"github.com/apex/log"
 
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/driver"
@@ -98,7 +98,7 @@ func (s *AkamaiAgent) GetDatacenters(datacenterIDs []string) ([]*rpcmodels.Datac
 }
 
 func (s *AkamaiAgent) FetchAndSyncDatacenters(datacenters []string, force bool) error {
-	logger.Debugf("Running FetchAndSyncDatacenters(%+v, force=%t)", datacenters, force)
+	log.Debugf("Running FetchAndSyncDatacenters(%+v, force=%t)", datacenters, force)
 
 	res, err := s.GetDatacenters(datacenters)
 	if err != nil {
@@ -137,7 +137,7 @@ func (s *AkamaiAgent) FetchAndSyncDatacenters(datacenters []string, force bool) 
 }
 
 func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force bool) (*rpcmodels.Datacenter, error) {
-	logger.Debugf("SyncDatacenter(%s, force=%t)", datacenter.Id, force)
+	log.Debugf("SyncDatacenter(%s, force=%t)", datacenter.Id, force)
 
 	// akamai datacenterId is a unique numeric reference to a domain specific datacenter
 	var meta = int(datacenter.GetMeta())
@@ -200,22 +200,22 @@ func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force boo
 		referenceDatacenter.DatacenterID = backendDatacenter.DatacenterID
 		_, err = s.gtm.UpdateDatacenter(context.Background(), &referenceDatacenter, config.Global.AkamaiConfig.Domain)
 		if err != nil {
-			logger.Errorf("UpdateDatacenter(%s) for domain %s failed", referenceDatacenter.Nickname,
+			log.Errorf("UpdateDatacenter(%s) for domain %s failed", referenceDatacenter.Nickname,
 				config.Global.AkamaiConfig.Domain)
 			return nil, err
 		} else {
-			logger.Infof("UpdateDatacenter(%s) for domain %s", referenceDatacenter.Nickname,
+			log.Infof("UpdateDatacenter(%s) for domain %s", referenceDatacenter.Nickname,
 				config.Global.AkamaiConfig.Domain)
 		}
 	} else {
 		var res *gtm.DatacenterResponse
 		res, err = s.gtm.CreateDatacenter(context.Background(), &referenceDatacenter, config.Global.AkamaiConfig.Domain)
 		if err != nil {
-			logger.Errorf("CreateDatacenter(%s) for domain %s failed", referenceDatacenter.Nickname,
+			log.Errorf("CreateDatacenter(%s) for domain %s failed", referenceDatacenter.Nickname,
 				config.Global.AkamaiConfig.Domain)
 			return nil, err
 		} else {
-			logger.Infof("CreateDatacenter(%s) for domain %s", referenceDatacenter.Nickname,
+			log.Infof("CreateDatacenter(%s) for domain %s", referenceDatacenter.Nickname,
 				config.Global.AkamaiConfig.Domain)
 		}
 		backendDatacenter = res.Resource

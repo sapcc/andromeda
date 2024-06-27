@@ -17,10 +17,15 @@
 package server
 
 import (
+	"context"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
+	"github.com/actatum/stormrpc"
+	"github.com/apex/log"
 	"github.com/dlmiddlecote/sqlstats"
 	"github.com/getsentry/sentry-go"
 	"github.com/go-openapi/loads"
@@ -28,10 +33,9 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/sapcc/go-api-declarations/bininfo"
 	"github.com/sapcc/go-bits/logg"
 	"github.com/xo/dburl"
-	"go-micro.dev/v4"
-	"go-micro.dev/v4/logger"
 
 	_ "github.com/sapcc/andromeda/db/plugins"
 	"github.com/sapcc/andromeda/internal/config"
@@ -52,7 +56,7 @@ import (
 )
 
 func ExecuteServer(server *restapi.Server) error {
-	logger.Info("Starting up andromeda-server")
+	log.Info("Starting up andromeda-server")
 
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
 	if err != nil {
@@ -97,7 +101,7 @@ func ExecuteServer(server *restapi.Server) error {
 	api := operations.NewAndromedaAPI(swaggerSpec)
 
 	// Logger
-	api.Logger = logger.Infof
+	api.Logger = log.Infof
 
 	// Prometheus Metrics
 	if config.Global.Default.Prometheus {
@@ -159,7 +163,7 @@ func ExecuteServer(server *restapi.Server) error {
 
 	// Quota Middleware
 	if config.Global.Quota.Enabled {
-		logger.Info("Initializing quota middleware")
+		log.Info("Initializing quota middleware")
 
 		// Admin handler
 		api.AdministrativeGetQuotasHandler = administrative.GetQuotasHandlerFunc(c.Quotas.GetQuotas)
@@ -183,46 +187,55 @@ func ExecuteServer(server *restapi.Server) error {
 	server.SetAPI(api)
 
 	//rpc worker
-	go RPCServer(db)
+	rpc := RPCServer(db)
 
-	defer func() {
-		if err := server.Shutdown(); err != nil {
-			logger.Fatal(err)
+	// run the api and rpc server
+	go func() {
+		log.Infof("RPC Listening on %v", rpc.Subjects())
+		if err = rpc.Run(); err != nil {
+			log.Fatal(err.Error())
 		}
 	}()
-	if err := server.Serve(); err != nil {
-		return err
-	}
+	go func() {
+		if err = server.Serve(); err != nil {
+			log.Fatal(err.Error())
+		}
+	}()
+
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
+
+	// Block until a signal is received
+	<-done
+	log.Infof("Shutting down")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	defer func() {
+		if err = rpc.Shutdown(ctx); err != nil {
+			log.Fatal(err.Error())
+		}
+		if err = server.Shutdown(); err != nil {
+			log.Fatal(err.Error())
+		}
+	}()
 
 	return nil
 }
 
-func RPCServer(db *sqlx.DB) {
-	host, err := os.Hostname()
+func RPCServer(db *sqlx.DB) *stormrpc.Server {
+	srv, err := stormrpc.NewServer(&stormrpc.ServerConfig{
+		NatsURL: config.Global.Default.TransportURL,
+		Name:    "andromeda-server",
+		Version: bininfo.Version(),
+	}, stormrpc.WithErrorHandler(func(ctx context.Context, err error) { log.Errorf("server error: %v", err) }))
 	if err != nil {
-		panic(err)
+		log.Fatal(err.Error())
 	}
 
-	service := micro.NewService(
-		micro.Name("andromeda.server"),
-		micro.Metadata(map[string]string{
-			"type": "andromeda",
-			"host": host,
-		}),
-		micro.RegisterTTL(time.Second*60),
-		micro.RegisterInterval(time.Second*30),
-		utils.ConfigureTransport(),
-	)
-	service.Init()
-
-	// Update handler for provisioning and status updates
-	if err := server.RegisterRPCServerHandler(service.Server(), &server.RPCHandler{DB: db}); err != nil {
-		panic(err)
-	}
-
-	if err := service.Run(); err != nil {
-		logger.Fatal(err)
-	}
+	svc := &server.RPCHandler{DB: db}
+	server.RegisterRPCServerServer(srv, svc)
+	return srv
 }
 
 func PrometheusServer() {

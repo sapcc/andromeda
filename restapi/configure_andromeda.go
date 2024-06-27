@@ -22,14 +22,14 @@ import (
 	"time"
 
 	"github.com/getsentry/sentry-go"
+	"github.com/go-openapi/runtime"
 	"github.com/rs/cors"
 
+	"github.com/apex/log"
 	"github.com/didip/tollbooth"
 	"github.com/dre1080/recovr"
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/runtime"
-	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/auth"
 	"github.com/sapcc/andromeda/internal/config"
@@ -46,13 +46,7 @@ func configureFlags(api *operations.AndromedaAPI) {
 func configureAPI(api *operations.AndromedaAPI) http.Handler {
 	// configure the api here
 	api.ServeError = errors.ServeError
-
-	// Set your custom logger if needed. Default one is log.Printf
-	// Expected interface func(string, ...interface{})
-	//
-	// Example:
-	// api.Logger = log.Printf
-	api.Logger = logger.Infof
+	api.Logger = log.Infof
 
 	// To continue using redoc as your UI, uncomment the following line
 	api.UseRedoc()
@@ -83,24 +77,24 @@ func configureServer(s *http.Server, scheme, addr string) {
 // The middleware executes after routing but before authentication, binding and validation
 func setupMiddlewares(handler http.Handler) http.Handler {
 	if rl := config.Global.ApiSettings.RateLimit; rl > .0 {
-		logger.Infof("Initializing rate limit middleware (rate_limit=%f)", rl)
+		log.Infof("Initializing rate limit middleware (rate_limit=%f)", rl)
 		limiter := tollbooth.NewLimiter(rl, nil)
 		handler = tollbooth.LimitHandler(limiter, handler)
 	}
 
 	if config.Global.Audit.Enabled {
-		logger.Info("Initializing audit middleware")
+		log.Info("Initializing audit middleware")
 		auditMiddleware := middlewares.NewAuditController()
 		handler = auditMiddleware.AuditHandler(handler)
 	}
 
 	switch config.Global.ApiSettings.AuthStrategy {
 	case "keystone":
-		logger.Info("Initializing keystone middleware")
+		log.Info("Initializing keystone middleware")
 		var err error
 		handler, err = auth.KeystoneMiddleware(handler)
 		if err != nil {
-			logger.Errorf("Error initializing keystone middleware: %w", err)
+			log.Errorf("Error initializing keystone middleware: %w", err)
 		}
 	}
 
@@ -113,7 +107,7 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
 	handler = middlewares.HealthCheckMiddleware(handler)
 
 	if !config.Global.ApiSettings.DisableCors {
-		logger.Info("Initializing CORS middleware")
+		log.Info("Initializing CORS middleware")
 		handler = cors.New(cors.Options{
 			AllowedOrigins: []string{"*"},
 			AllowedMethods: []string{"HEAD", "GET", "POST", "PUT", "DELETE"},

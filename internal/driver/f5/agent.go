@@ -21,39 +21,44 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
-	"go-micro.dev/v4/metadata"
+	"github.com/actatum/stormrpc"
+	"github.com/apex/log"
+	"github.com/nats-io/nats.go"
 
+	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 
-	"go-micro.dev/v4"
-
 	"github.com/scottdware/go-bigip"
-	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/driver/f5/as3"
-	"github.com/sapcc/andromeda/internal/rpc/worker"
 )
 
 type F5Agent struct {
 	bigIP *bigip.BigIP
-	rpc   server.RPCServerService
+	rpc   server.RPCServerClient
 }
 
-// All methods of Sub will be executed when
-// a message is received
-type Sub struct {
+type FullSync struct {
 	f5 *F5Agent
 }
 
 // Method can be of any name
-func (s *Sub) Process(ctx context.Context, request *worker.SyncRequest) error {
-	md, _ := metadata.FromContext(ctx)
-	logger.Info("[pubsub.1] Received event %+v with metadata %+v\n", request, md)
+func (s *FullSync) FullSync(ctx context.Context, req stormrpc.Request) stormrpc.Response {
+	log.WithField("request", req).Info("[pubsub.1] Received event")
 	// do something with event
 	s.f5.fullSync()
-	return nil
+
+	resp, err := stormrpc.NewResponse(req.Reply, nil)
+	if err != nil {
+		return stormrpc.NewErrorResponse(req.Reply, err)
+	}
+
+	return resp
 }
 
 func ExecuteF5Agent() error {
@@ -66,47 +71,53 @@ func ExecuteF5Agent() error {
 	if err != nil {
 		return err
 	}
-	logger.Infof("connected to %s %s (%s)", device.MarketingName, device.Name, device.Version)
+	log.Infof("connected to %s %s (%s)", device.MarketingName, device.Name, device.Version)
 
-	if err := BigIPSupportsDNS(device); err != nil {
+	if err = BigIPSupportsDNS(device); err != nil {
 		return err
 	}
 
-	metadata := map[string]string{
-		"type":    "F5",
-		"host":    device.Hostname,
-		"version": device.Version,
+	nc, err := nats.Connect(config.Global.Default.TransportURL)
+	if err != nil {
+		return err
 	}
-	service := micro.NewService(
-		micro.Name("andromeda.agent.f5"),
-		micro.Metadata(metadata),
-		micro.RegisterTTL(time.Second*60),
-		micro.RegisterInterval(time.Second*30),
-	)
-	service.Init()
+	client, err := stormrpc.NewClient("", stormrpc.WithNatsConn(nc))
+	if err != nil {
+		return err
+	}
 
 	// Create F5 worker instance with Server RPC interface
 	f5 := F5Agent{
 		session,
-		server.NewRPCServerService("andromeda.server", service.Client()),
+		server.NewRPCServerClient(client),
 	}
 
-	// Register callbacks
-	/*if err := worker.RegisterRPCWorkerHandler(service.Server(), &f5); err != nil {
+	srv, err := stormrpc.NewServer(&stormrpc.ServerConfig{}, stormrpc.WithNatsConn(nc))
+	if err != nil {
 		return err
-	}*/
-	if err := micro.RegisterSubscriber("andromeda.sync_all", service.Server(), &Sub{&f5}); err != nil {
-		logger.Error(err)
 	}
+	fs := &FullSync{&f5}
+	srv.Handle("andromeda.sync", fs.FullSync)
 
 	go f5.periodicSync()
 	go f5.fullSync()
-	return service.Run()
+	go func() {
+		_ = srv.Run()
+	}()
+	log.Infof("👋 Listening on %v", srv.Subjects())
+
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
+	<-done
+	log.Infof("💀 Shutting down")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	return srv.Shutdown(ctx)
 }
 
 func (f5 *F5Agent) fullSync() {
 	if err := f5.Sync(false); err != nil {
-		logger.Error(err)
+		log.Error(err.Error())
 	}
 }
 
@@ -116,18 +127,10 @@ func (f5 *F5Agent) periodicSync() {
 	for {
 		<-t.C // Activate periodically
 		if err := f5.Sync(true); err != nil {
-			logger.Error(err)
+			log.Error(err.Error())
 		}
 	}
 
-}
-
-func (s *F5Agent) SyncAll(ctx context.Context, request *worker.SyncRequest) error {
-	logger.Info("Sync invoked!")
-	md, _ := metadata.FromContext(ctx)
-	logger.Info("[pubsub.1] Received event %+v with metadata %+v\n", request, md)
-	// do something with event
-	return nil
 }
 
 func (f5 *F5Agent) Sync(pending bool) error {
@@ -165,7 +168,7 @@ func (f5 *F5Agent) Sync(pending bool) error {
 
 	var prov []*server.ProvisioningStatusRequest_ProvisioningStatus
 	for _, domain := range response.GetResponse() {
-		logger.Info(domain)
+		log.Infof("%+v", domain)
 		prov = append(prov, &server.ProvisioningStatusRequest_ProvisioningStatus{
 			Id:     domain.GetId(),
 			Model:  server.ProvisioningStatusRequest_ProvisioningStatus_DOMAIN,
@@ -199,7 +202,7 @@ func (f5 *F5Agent) Sync(pending bool) error {
 	if err != nil {
 		return err
 	}
-	logger.Info(resp)
+	log.Infof("%+v", resp)
 	return nil
 }
 
@@ -209,7 +212,7 @@ func postDeclaration(v interface{}) error {
 		return err
 	}
 
-	logger.Info("\n", string(js), "\n")
+	log.Infof("\n%s\n", string(js))
 
 	session, err := GetBigIPSession()
 	if err != nil {
@@ -230,7 +233,7 @@ func postDeclaration(v interface{}) error {
 	if err := json.Indent(&prettyJSON, resp, "", "\t"); err != nil {
 		return err
 	}
-	logger.Info(prettyJSON.String())
+	log.Info(prettyJSON.String())
 
 	var response as3.Response
 	if err := json.Unmarshal(resp, &response); err != nil {
@@ -241,7 +244,7 @@ func postDeclaration(v interface{}) error {
 		if result.Code != 200 {
 			return fmt.Errorf("Failed post! %s", result.Message)
 		} else {
-			logger.Info("Succeeded: ", result.Tenant)
+			log.Infof("Succeeded: %s", result.Tenant)
 		}
 	}
 

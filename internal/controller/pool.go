@@ -24,7 +24,6 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 	"github.com/jmoiron/sqlx"
-	"go-micro.dev/v4"
 
 	"github.com/sapcc/andromeda/db"
 	"github.com/sapcc/andromeda/internal/auth"
@@ -34,8 +33,7 @@ import (
 )
 
 type PoolController struct {
-	db *sqlx.DB
-	sv micro.Service
+	CommonController
 }
 
 // GetPools GET /pools
@@ -120,7 +118,7 @@ func (c PoolController) PostPools(params pools.PostPoolsParams) middleware.Respo
 		panic(err)
 	}
 
-	_ = PendingSync(c.sv)
+	_ = PendingSync(c.rpc)
 	return pools.NewPostPoolsCreated().WithPayload(&pools.PostPoolsCreatedBody{Pool: pool})
 }
 
@@ -196,7 +194,7 @@ func (c PoolController) PutPoolsPoolID(params pools.PutPoolsPoolIDParams) middle
 		panic(err)
 	}
 
-	_ = PendingSync(c.sv)
+	_ = PendingSync(c.rpc)
 	return pools.NewPutPoolsPoolIDAccepted().WithPayload(&pools.PutPoolsPoolIDAcceptedBody{Pool: &pool})
 }
 
@@ -223,7 +221,7 @@ func (c PoolController) DeletePoolsPoolID(params pools.DeletePoolsPoolIDParams) 
 		panic(err)
 	}
 
-	_ = PendingSync(c.sv)
+	_ = PendingSync(c.rpc)
 	return pools.NewDeletePoolsPoolIDNoContent()
 }
 

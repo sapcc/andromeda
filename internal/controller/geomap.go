@@ -25,7 +25,6 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
-	"go-micro.dev/v4"
 
 	"github.com/sapcc/andromeda/db"
 	"github.com/sapcc/andromeda/internal/auth"
@@ -35,8 +34,7 @@ import (
 )
 
 type GeoMapController struct {
-	db *sqlx.DB
-	sv micro.Service
+	CommonController
 }
 
 // GetGeomaps GET /geoMaps
@@ -131,7 +129,7 @@ func (c GeoMapController) PostGeomaps(params geographic_maps.PostGeomapsParams) 
 		panic(err)
 	}
 
-	_ = PendingSync(c.sv)
+	_ = PendingSync(c.rpc)
 	return geographic_maps.NewPostGeomapsCreated().WithPayload(&geographic_maps.PostGeomapsCreatedBody{Geomap: geomap})
 }
 
@@ -210,7 +208,7 @@ func (c GeoMapController) DeleteGeomapsGeoMapID(params geographic_maps.DeleteGeo
 		panic(err)
 	}
 
-	_ = PendingSync(c.sv)
+	_ = PendingSync(c.rpc)
 	return geographic_maps.NewDeleteGeomapsGeomapIDNoContent()
 }
 

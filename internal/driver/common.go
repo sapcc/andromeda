@@ -19,7 +19,7 @@ package driver
 import (
 	"context"
 
-	"go-micro.dev/v4/logger"
+	"github.com/apex/log"
 
 	"github.com/sapcc/andromeda/internal/rpc/server"
 )
@@ -37,10 +37,10 @@ func GetProvisioningStatusRequest(id string, model string, status string) *serve
 	}
 }
 
-func UpdateProvisioningStatus(rpc server.RPCServerService, statusRequests []*server.ProvisioningStatusRequest_ProvisioningStatus) {
+func UpdateProvisioningStatus(rpc server.RPCServerClient, statusRequests []*server.ProvisioningStatusRequest_ProvisioningStatus) {
 	if _, err := rpc.UpdateProvisioningStatus(context.Background(),
 		&server.ProvisioningStatusRequest{ProvisioningStatus: statusRequests}); err != nil {
-		logger.Error(err)
+		log.Error(err.Error())
 	}
 }
 
@@ -54,9 +54,9 @@ func GetMemberStatusRequest(id string, status string) *server.MemberStatusReques
 	}
 }
 
-func UpdateMemberStatus(rpc server.RPCServerService, statusRequests []*server.MemberStatusRequest_MemberStatus) {
+func UpdateMemberStatus(rpc server.RPCServerClient, statusRequests []*server.MemberStatusRequest_MemberStatus) {
 	if _, err := rpc.UpdateMemberStatus(context.Background(),
 		&server.MemberStatusRequest{MemberStatus: statusRequests}); err != nil {
-		logger.Error(err)
+		log.Error(err.Error())
 	}
 }

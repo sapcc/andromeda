@@ -18,14 +18,13 @@ package controller
 
 import (
 	"context"
-	"github.com/sapcc/andromeda/internal/rpc/worker"
-	"os"
 	"time"
 
+	"github.com/actatum/stormrpc"
+	"github.com/apex/log"
 	"github.com/jmoiron/sqlx"
-	"go-micro.dev/v4"
 
-	"github.com/sapcc/andromeda/internal/utils"
+	"github.com/sapcc/andromeda/internal/config"
 )
 
 type Controller struct {
@@ -40,44 +39,48 @@ type Controller struct {
 	GeoMaps     GeoMapController
 }
 
+type CommonController struct {
+	db  *sqlx.DB
+	rpc *stormrpc.Client
+}
+
 func New(db *sqlx.DB) *Controller {
-	host, err := os.Hostname()
+	rpcClient, err := stormrpc.NewClient(config.Global.Default.TransportURL)
 	if err != nil {
-		panic(err)
+		log.Fatal(err.Error())
 	}
 
-	sv := micro.NewService(
-		micro.Name("andromeda-api"),
-		micro.Metadata(map[string]string{
-			"type": "andromeda",
-			"host": host,
-		}),
-		micro.RegisterTTL(time.Second*60),
-		micro.RegisterInterval(time.Second*30),
-		utils.ConfigureTransport(),
-	)
-	sv.Init()
-
+	cc := CommonController{
+		db:  db,
+		rpc: rpcClient,
+	}
 	c := Controller{
-		DomainController{db, sv},
-		PoolController{db, sv},
-		DatacenterController{db, sv},
-		MemberController{db, sv},
-		MonitorController{db, sv},
-		ServiceController{db, sv},
-		QuotaController{db},
-		SyncController{sv},
-		GeoMapController{db, sv},
+		DomainController{cc},
+		PoolController{cc},
+		DatacenterController{cc},
+		MemberController{cc},
+		MonitorController{cc},
+		ServiceController{cc},
+		QuotaController{cc},
+		SyncController{cc},
+		GeoMapController{cc},
 	}
 	return &c
 }
 
-func PendingSync(service micro.Service) error {
-	if service == nil {
+func PendingSync(client *stormrpc.Client) error {
+	if client == nil {
 		return nil
 	}
-	return micro.NewEvent("andromeda.sync", service.Client()).
-		Publish(context.Background(), &worker.SyncRequest{
-			DomainIds: nil,
-		})
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	r, err := stormrpc.NewRequest("andromeda-sync", []string{})
+	if err != nil {
+		return err
+	}
+
+	resp := client.Do(ctx, r)
+	return resp.Err
 }

@@ -18,22 +18,21 @@ package akamai
 
 import (
 	"context"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
 	"time"
 
+	"github.com/actatum/stormrpc"
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v8/pkg/gtm"
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v8/pkg/session"
-	"github.com/go-micro/plugins/v4/sync/memory"
+	"github.com/apex/log"
 	lru "github.com/hashicorp/golang-lru/v2"
-	"go-micro.dev/v4"
-	"go-micro.dev/v4/logger"
-	"go-micro.dev/v4/metadata"
-	"go-micro.dev/v4/sync"
+	"github.com/nats-io/nats.go"
 
 	"github.com/sapcc/andromeda/internal/config"
-	_ "github.com/sapcc/andromeda/internal/plugins"
 	"github.com/sapcc/andromeda/internal/rpc/server"
-	"github.com/sapcc/andromeda/internal/rpc/worker"
-	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/models"
 )
 
@@ -47,9 +46,9 @@ var PROPERTY_TYPE_MAP = map[string]string{
 type AkamaiAgent struct {
 	session           *session.Session
 	gtm               gtm.GTM
-	gtmLock           sync.Sync
+	gtmLock           sync.Mutex
 	domainType        string
-	rpc               server.RPCServerService
+	rpc               server.RPCServerClient
 	workerTicker      *time.Ticker
 	lastSync          time.Time
 	lastMemberStatus  time.Time
@@ -60,74 +59,83 @@ type AkamaiAgent struct {
 
 var akamaiAgent *AkamaiAgent
 
-type Sync struct {
-}
+func Sync(ctx context.Context, req stormrpc.Request) stormrpc.Response {
+	log.Infof("[Sync] Received sync request %+v", req)
+	var domainIDs []string
+	if err := req.Decode(&domainIDs); err != nil {
+		return stormrpc.NewErrorResponse(req.Reply, err)
+	}
 
-// Process Method can be of any name
-func (s *Sync) Process(ctx context.Context, request *worker.SyncRequest) error {
-	md, _ := metadata.FromContext(ctx)
-	logger.Infof("[Sync] Received sync request %+v with metadata %+v", request.DomainIds, md)
-	akamaiAgent.forceSync <- request.DomainIds
-	return nil
+	akamaiAgent.forceSync <- domainIDs
+	resp, err := stormrpc.NewResponse(req.Reply, nil)
+	if err != nil {
+		return stormrpc.NewErrorResponse(req.Reply, err)
+	}
+
+	return resp
 }
 
 func ExecuteAkamaiAgent() error {
-	meta := map[string]string{
-		"type":    "Akamai",
-		"version": "2.0",
+	nc, err := nats.Connect(config.Global.Default.TransportURL)
+	if err != nil {
+		return err
 	}
-	service := micro.NewService(
-		micro.Name("andromeda.agent.akamai"),
-		micro.Metadata(meta),
-		micro.RegisterTTL(time.Second*60),
-		micro.RegisterInterval(time.Second*30),
-		utils.ConfigureTransport(),
-	)
-	service.Init(
-		micro.AfterStart(func() error {
-			// Create F5 worker instance with Server RPC interface
-			s, domainType := NewAkamaiSession(&config.Global.AkamaiConfig)
-
-			// Figure out minimal ticker interval
-			interval := time.Duration(config.Global.AkamaiConfig.SyncInterval) + 1
-			if time.Duration(config.Global.AkamaiConfig.MemberStatusInterval) < interval {
-				interval = time.Duration(config.Global.AkamaiConfig.MemberStatusInterval) + 1
-			}
-
-			cache, _ := lru.New[string, int](64)
-
-			akamaiAgent = &AkamaiAgent{
-				s,
-				gtm.Client(*s),
-				memory.NewSync(),
-				domainType,
-				server.NewRPCServerService("andromeda.server", service.Client()),
-				time.NewTicker(interval * time.Second),
-				time.Unix(0, 0),
-				time.Unix(0, 0),
-				make(chan []string),
-				false,
-				cache,
-			}
-
-			if err := akamaiAgent.EnsureDomain(domainType); err != nil {
-				return err
-			}
-
-			go akamaiAgent.WorkerThread()
-			// full sync immediately
-			akamaiAgent.forceSync <- nil
-			return nil
-		}),
-	)
-
-	// Sync
-	if err := micro.RegisterSubscriber("andromeda.sync",
-		service.Server(), new(Sync)); err != nil {
-		logger.Error(err)
+	client, err := stormrpc.NewClient("", stormrpc.WithNatsConn(nc))
+	if err != nil {
+		return err
 	}
 
-	return service.Run()
+	// Create F5 worker instance with Server RPC interface
+	s, domainType := NewAkamaiSession(&config.Global.AkamaiConfig)
+
+	// Figure out minimal ticker interval
+	interval := time.Duration(config.Global.AkamaiConfig.SyncInterval) + 1
+	if time.Duration(config.Global.AkamaiConfig.MemberStatusInterval) < interval {
+		interval = time.Duration(config.Global.AkamaiConfig.MemberStatusInterval) + 1
+	}
+
+	cache, _ := lru.New[string, int](64)
+
+	akamaiAgent = &AkamaiAgent{
+		s,
+		gtm.Client(*s),
+		sync.Mutex{},
+		domainType,
+		server.NewRPCServerClient(client),
+		time.NewTicker(interval * time.Second),
+		time.Unix(0, 0),
+		time.Unix(0, 0),
+		make(chan []string),
+		false,
+		cache,
+	}
+
+	if err := akamaiAgent.EnsureDomain(domainType); err != nil {
+		return err
+	}
+
+	srv, err := stormrpc.NewServer(&stormrpc.ServerConfig{}, stormrpc.WithNatsConn(nc))
+	if err != nil {
+		return err
+	}
+	srv.Handle("andromeda.sync", Sync)
+
+	go func() {
+		_ = srv.Run()
+	}()
+	go akamaiAgent.WorkerThread()
+	log.Infof("👋 Listening on %v", srv.Subjects())
+
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
+	// full sync immediately
+	akamaiAgent.forceSync <- nil
+	<-done
+	log.Infof("💀 Shutting down")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	return srv.Shutdown(ctx)
 }
 
 func (s *AkamaiAgent) WorkerThread() {
@@ -138,54 +146,44 @@ func (s *AkamaiAgent) WorkerThread() {
 		select {
 		case domains := <-s.forceSync:
 			if err := s.FetchAndSyncDatacenters(nil, true); err != nil {
-				logger.Error(err)
+				log.Error(err.Error())
 			}
 
 			if err := s.FetchAndSyncGeomaps(nil, true); err != nil {
-				logger.Error(err)
+				log.Error(err.Error())
 			}
 
 			if err := s.FetchAndSyncDomains(domains); err != nil {
-				logger.Error(err)
+				log.Error(err.Error())
 			}
 		case <-s.workerTicker.C: // Activate periodically
 			if time.Since(s.lastSync) > syncInterval {
 				if err := s.FetchAndSyncDatacenters(nil, false); err != nil {
-					logger.Error(err)
+					log.Error(err.Error())
 				}
 
 				if err := s.FetchAndSyncGeomaps(nil, false); err != nil {
-					logger.Error(err)
+					log.Error(err.Error())
 				}
 
 				if err := s.FetchAndSyncDomains(nil); err != nil {
-					logger.Error(err)
+					log.Error(err.Error())
 				}
 
 				s.lastSync = time.Now()
 			}
 			if time.Since(s.lastMemberStatus) > memberStatusInterval {
 				if err := s.memberStatusSync(); err != nil {
-					logger.Error(err)
+					log.Error(err.Error())
 				}
 				s.lastMemberStatus = time.Now()
 			}
 		}
 	}
-
-}
-
-func (s *AkamaiAgent) ForceSync(ctx context.Context, request *worker.SyncRequest) error {
-	logger.Infof("Got Sync request %v", request)
-	md, _ := metadata.FromContext(ctx)
-	if domainId, ok := md.Get("domain"); ok {
-		s.forceSync <- []string{domainId}
-	}
-	return nil
 }
 
 func (s *AkamaiAgent) memberStatusSync() error {
-	logger.Debugf("Running member status sync")
+	log.Debugf("Running member status sync")
 	response, err := s.rpc.GetDomains(context.Background(), &server.SearchRequest{
 		Provider:       "akamai",
 		PageNumber:     0,

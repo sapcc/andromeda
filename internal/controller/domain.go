@@ -29,7 +29,6 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
-	"go-micro.dev/v4"
 
 	"github.com/sapcc/andromeda/db"
 	"github.com/sapcc/andromeda/internal/auth"
@@ -40,8 +39,7 @@ import (
 )
 
 type DomainController struct {
-	db *sqlx.DB
-	sv micro.Service
+	CommonController
 }
 
 // GetDomains GET /domains
@@ -148,7 +146,7 @@ func (c DomainController) PostDomains(params domains.PostDomainsParams) middlewa
 		panic(err)
 	}
 
-	_ = PendingSync(c.sv)
+	_ = PendingSync(c.rpc)
 	populateCNAME(domain)
 	return domains.NewPostDomainsCreated().WithPayload(&domains.PostDomainsCreatedBody{Domain: domain})
 }
@@ -258,7 +256,7 @@ func (c DomainController) PutDomainsDomainID(params domains.PutDomainsDomainIDPa
 		panic(err)
 	}
 
-	_ = PendingSync(c.sv)
+	_ = PendingSync(c.rpc)
 	populateCNAME(&domain)
 	return domains.NewPutDomainsDomainIDAccepted().WithPayload(&domains.PutDomainsDomainIDAcceptedBody{Domain: &domain})
 }
@@ -280,7 +278,7 @@ func (c DomainController) DeleteDomainsDomainID(params domains.DeleteDomainsDoma
 		return domains.NewDeleteDomainsDomainIDNotFound().WithPayload(utils.NotFound)
 	}
 
-	_ = PendingSync(c.sv)
+	_ = PendingSync(c.rpc)
 	return domains.NewDeleteDomainsDomainIDNoContent()
 }
 

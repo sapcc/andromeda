@@ -17,19 +17,16 @@
 package controller
 
 import (
-	"context"
-
+	"github.com/actatum/stormrpc"
 	"github.com/go-openapi/runtime/middleware"
-	"go-micro.dev/v4"
 
 	"github.com/sapcc/andromeda/internal/auth"
-	"github.com/sapcc/andromeda/internal/rpc/worker"
 	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/restapi/operations/administrative"
 )
 
 type SyncController struct {
-	sv micro.Service
+	CommonController
 }
 
 // PostSync POST /sync
@@ -43,13 +40,13 @@ func (c SyncController) PostSync(params administrative.PostSyncParams) middlewar
 		domainIDs = append(domainIDs, domainUUID.String())
 	}
 
-	ev := &worker.SyncRequest{
-		DomainIds: domainIDs,
+	r, err := stormrpc.NewRequest("andromeda.sync", domainIDs)
+	if err != nil {
+		panic(err)
 	}
 
-	pub1 := micro.NewEvent("andromeda.sync", c.sv.Client())
-	if err := pub1.Publish(context.Background(), ev); err != nil {
-		panic(err)
+	if resp := c.rpc.Do(params.HTTPRequest.Context(), r); resp.Err != nil {
+		panic(resp.Err)
 	}
 	return administrative.NewPostSyncAccepted()
 }
