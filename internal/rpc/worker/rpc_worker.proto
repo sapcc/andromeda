@@ -1,7 +1,0 @@
-syntax = "proto3";
-option go_package = "github.com/sapcc/andromeda/internal/rpc/worker";
-
-message SyncRequest {
-  repeated string domain_ids = 1;
-}
-

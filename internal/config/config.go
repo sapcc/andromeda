@@ -23,16 +23,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/go-micro/plugins/v4/config/encoder/yaml"
+	"github.com/apex/log"
 	"github.com/gophercloud/utils/openstack/clientconfig"
 	"github.com/mcuadros/go-defaults"
 	"github.com/urfave/cli/v2"
-	"go-micro.dev/v4/config"
-	"go-micro.dev/v4/config/reader"
-	"go-micro.dev/v4/config/reader/json"
-	"go-micro.dev/v4/config/source"
-	"go-micro.dev/v4/config/source/file"
-	"go-micro.dev/v4/logger"
+	"gopkg.in/yaml.v2"
 )
 
 var (
@@ -54,7 +49,7 @@ func ParseArgsAndRun(name string, usage string, action cli.ActionFunc, flags ...
 		Action: action,
 		Before: func(c *cli.Context) error {
 			if !c.IsSet("config-file") {
-				return errors.New("No config files specified")
+				return errors.New("no config files specified")
 			}
 
 			// Set defaults
@@ -97,117 +92,105 @@ func ParseArgsAndRun(name string, usage string, action cli.ActionFunc, flags ...
 	if err := app.Run(os.Args); err != nil {
 		currentErr := err
 		for errors.Unwrap(currentErr) != nil {
-			logger.Fatal(currentErr)
+			log.Fatal(currentErr.Error())
 			currentErr = errors.Unwrap(currentErr)
 		}
-		logger.Fatal(currentErr)
+		log.Fatal(currentErr.Error())
 	}
 }
 
 func parseConfigFlags(flags []string) error {
-	// new yaml encoder
-	enc := yaml.NewEncoder()
-
-	// new config
-	conf, _ := config.NewConfig(
-		config.WithReader(
-			json.NewReader( // json reader for internal config merge
-				reader.WithEncoder(enc),
-			),
-		),
-	)
-
-	logger.Infof("Config files: %s", flags)
+	log.Infof("Config files: %+v", flags)
 	for _, path := range flags {
-		if err := conf.Load(file.NewSource(
-			file.WithPath(path),
-			source.WithEncoder(enc),
-		)); err != nil {
+		file, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		decoder := yaml.NewDecoder(file)
+		if err = decoder.Decode(&Global); err != nil {
+			return err
+		}
+		if err = file.Close(); err != nil {
 			return err
 		}
 	}
 
-	if err := conf.Scan(&Global); err != nil {
-		return err
-	}
 	if Global.Default.Debug {
-		if err := logger.Init(logger.WithLevel(logger.DebugLevel)); err != nil {
-			return err
-		}
+		log.SetLevel(log.DebugLevel)
 	}
 	return nil
 }
 
 type Andromeda struct {
-	Default      Default               `json:"DEFAULT"`
-	Database     Database              `json:"database"`
-	ApiSettings  ApiSettings           `json:"api_settings"`
-	ServiceAuth  clientconfig.AuthInfo `json:"service_auth"`
-	Quota        Quota                 `json:"quota"`
-	F5Config     F5Config              `json:"f5"`
-	AkamaiConfig AkamaiConfig          `json:"akamai"`
-	Audit        Audit                 `json:"audit_middleware_notifications"`
-	HouseKeeping HouseKeeping          `json:"house_keeping"`
+	Default      Default               `yaml:"DEFAULT"`
+	Database     Database              `yaml:"database"`
+	ApiSettings  ApiSettings           `yaml:"api_settings"`
+	ServiceAuth  clientconfig.AuthInfo `yaml:"service_auth"`
+	Quota        Quota                 `yaml:"quota"`
+	F5Config     F5Config              `yaml:"f5"`
+	AkamaiConfig AkamaiConfig          `yaml:"akamai"`
+	Audit        Audit                 `yaml:"audit_middleware_notifications"`
+	HouseKeeping HouseKeeping          `yaml:"house_keeping"`
 }
 
 type ApiSettings struct {
-	PolicyFile                string  `short:"p" json:"policy-file" description:"Use policy file" default:"policy.json"`
-	AuthStrategy              string  `json:"auth_strategy" description:"The auth strategy for API requests, currently supported: [keystone, none]"`
-	PolicyEngine              string  `json:"policy_engine" description:"Policy engine to use, currently supported: [goslo, noop]"`
-	DisablePagination         bool    `json:"disable_pagination" description:"Disable the usage of pagination"`
-	DisableSorting            bool    `json:"disable_sorting" description:"Disable the usage of sorting"`
-	PaginationMaxLimit        int64   `json:"pagination_max_limit" default:"1000" description:"The maximum number of items returned in a single response."`
-	RateLimit                 float64 `json:"rate_limit" default:"100" description:"Maximum number of requests to limit per second."`
-	DisableCors               bool    `json:"disable_cors" description:"Stops sending Access-Control-Allow-Origin Header to allow cross-origin requests."`
-	EnableProxyHeadersParsing bool    `long:"enable-proxy-headers-parsing" ini-name:"enable_proxy_headers_parsing" description:"Try parsing proxy headers for http scheme and base url."`
+	PolicyFile                string  `yaml:"policy-file" description:"Use policy file" default:"policy.json"`
+	AuthStrategy              string  `yaml:"auth_strategy" description:"The auth strategy for API requests, currently supported: [keystone, none]"`
+	PolicyEngine              string  `yaml:"policy_engine" description:"Policy engine to use, currently supported: [goslo, noop]"`
+	DisablePagination         bool    `yaml:"disable_pagination" description:"Disable the usage of pagination"`
+	DisableSorting            bool    `yaml:"disable_sorting" description:"Disable the usage of sorting"`
+	PaginationMaxLimit        int64   `yaml:"pagination_max_limit" default:"1000" description:"The maximum number of items returned in a single response."`
+	RateLimit                 float64 `yaml:"rate_limit" default:"100" description:"Maximum number of requests to limit per second."`
+	DisableCors               bool    `yaml:"disable_cors" description:"Stops sending Access-Control-Allow-Origin Header to allow cross-origin requests."`
+	EnableProxyHeadersParsing bool    `yaml:"enable_proxy_headers_parsing" default:"true" description:"Try parsing proxy headers for http scheme and base url."`
 }
 
 type Quota struct {
-	Enabled                bool  `json:"enabled" description:"Enable quotas."`
-	DefaultQuotaDomain     int64 `json:"domains" default:"0" description:"Default quota of domain per project."`
-	DefaultQuotaPool       int64 `json:"pools" default:"0" description:"Default quota of pool per project."`
-	DefaultQuotaMember     int64 `json:"members" default:"0" description:"Default quota of member per project."`
-	DefaultQuotaMonitor    int64 `json:"monitors" default:"0" description:"Default quota of monitor per project."`
-	DefaultQuotaDatacenter int64 `json:"datacenters" default:"0" description:"Default quota of datacenter per project."`
+	Enabled                bool  `yaml:"enabled" description:"Enable quotas."`
+	DefaultQuotaDomain     int64 `yaml:"domains" default:"0" description:"Default quota of domain per project."`
+	DefaultQuotaPool       int64 `yaml:"pools" default:"0" description:"Default quota of pool per project."`
+	DefaultQuotaMember     int64 `yaml:"members" default:"0" description:"Default quota of member per project."`
+	DefaultQuotaMonitor    int64 `yaml:"monitors" default:"0" description:"Default quota of monitor per project."`
+	DefaultQuotaDatacenter int64 `yaml:"datacenters" default:"0" description:"Default quota of datacenter per project."`
 }
 
 type Default struct {
-	Debug            bool   `json:"debug" long:"debug" description:"Enable debug mode."`
-	Host             string `long:"hostname" ini-name:"host" description:"Hostname used by the server/agent. Defaults to auto-discovery."`
-	ApiBaseURL       string `json:"api_base_uri" description:"Base URI for the API for use in pagination links. This will be autodetected from the request if not overridden here."`
-	TransportURL     string `json:"transport_url" description:"The network address and optional user credentials for connecting to the messaging backend."`
-	Prometheus       bool   `long:"prometheus" description:"Enable prometheus exporter."`
-	PrometheusListen string `long:"prometheus-listen" ini-name:"prometheus_listen" default:"127.0.0.1:9090" description:"Prometheus listen TCP network address."`
-	SentryDSN        string `long:"sentry-dsn" ini-name:"sentry_dsn" description:"Sentry Data Source Name."`
+	Debug            bool   `yaml:"debug" description:"Enable debug mode."`
+	Host             string `yaml:"host" description:"Hostname used by the server/agent. Defaults to auto-discovery."`
+	ApiBaseURL       string `yaml:"api_base_uri" description:"Base URI for the API for use in pagination links. This will be autodetected from the request if not overridden here."`
+	TransportURL     string `yaml:"transport_url" description:"The network address and optional user credentials for connecting to the messaging backend."`
+	Prometheus       bool   `yaml:"prometheus" description:"Enable prometheus exporter."`
+	PrometheusListen string `yaml:"prometheus_listen" default:"127.0.0.1:9090" description:"Prometheus listen TCP network address."`
+	SentryDSN        string `yaml:"sentry_dsn" description:"Sentry Data Source Name."`
 }
 
 type Database struct {
-	Connection string `json:"connection" description:"Connection string to use to connect to the database."`
+	Connection string `yaml:"connection" description:"Connection string to use to connect to the database."`
 }
 
 type F5Config struct {
-	DNSServerAddress string `json:"dns_server_address"`
-	ValidateCert     bool   `json:"validate_certificates"`
+	DNSServerAddress string `yaml:"dns_server_address"`
+	ValidateCert     bool   `yaml:"validate_certificates"`
 }
 
 type AkamaiConfig struct {
-	EdgeRC               string `json:"edgerc" description:"Path to akamai edgerc file, else sourced from AKAMAI_EDGE_RC env variable."`
-	Domain               string `json:"domain" description:"Traffic Management Domain to use (e.g. production.akadns.net)."`
-	DomainType           string `json:"domain_type" description:"Indicates the type of domain available based on your contract, defaults to autodetect. Either failover-only, static, weighted, basic, or full."`
-	ContractId           string `json:"contract_id" description:"Indicated the contract id to use, autodetects if only one contract is associated."`
-	SyncInterval         int64  `json:"sync_interval" default:"30" description:"Sync interval for checking for pending updates"`
-	MemberStatusInterval int64  `json:"member_status_interval" default:"60" description:"Sync interval for checking for member status"`
+	EdgeRC               string `yaml:"edgerc" description:"Path to akamai edgerc file, else sourced from AKAMAI_EDGE_RC env variable."`
+	Domain               string `yaml:"domain" description:"Traffic Management Domain to use (e.g. production.akadns.net)."`
+	DomainType           string `yaml:"domain_type" description:"Indicates the type of domain available based on your contract, defaults to autodetect. Either failover-only, static, weighted, basic, or full."`
+	ContractId           string `yaml:"contract_id" description:"Indicated the contract id to use, autodetects if only one contract is associated."`
+	SyncInterval         int64  `yaml:"sync_interval" default:"30" description:"Sync interval for checking for pending updates"`
+	MemberStatusInterval int64  `yaml:"member_status_interval" default:"60" description:"Sync interval for checking for member status"`
 }
 
 type Audit struct {
-	Enabled      bool   `json:"enabled" description:"Enables message notification bus."`
-	TransportURL string `json:"transport_url" description:"The network address and optional user credentials for connecting to the messaging backend."`
-	QueueName    string `json:"queue_name" description:"RabbitMQ queue name"`
+	Enabled      bool   `yaml:"enabled" description:"Enables message notification bus."`
+	TransportURL string `yaml:"transport_url" description:"The network address and optional user credentials for connecting to the messaging backend."`
+	QueueName    string `yaml:"queue_name" description:"RabbitMQ queue name"`
 }
 
 type HouseKeeping struct {
-	Enabled     bool  `json:"enabled" description:"Enables house keeping."`
-	DeleteAfter int64 `json:"delete_after" default:"600" description:"Minimum seconds elapsed after cleanup of a deleted domain."`
+	Enabled     bool  `yaml:"enabled" description:"Enables house keeping."`
+	DeleteAfter int64 `yaml:"delete_after" default:"600" description:"Minimum seconds elapsed after cleanup of a deleted domain."`
 }
 
 func GetApiBaseUrl(r *http.Request) string {

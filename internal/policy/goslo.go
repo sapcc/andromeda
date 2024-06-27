@@ -17,10 +17,11 @@
 package policy
 
 import (
-	"github.com/sapcc/go-bits/gopherpolicy"
 	"net/http"
 
-	"go-micro.dev/v4/logger"
+	"github.com/sapcc/go-bits/gopherpolicy"
+
+	"github.com/apex/log"
 
 	"github.com/sapcc/andromeda/internal/config"
 )
@@ -29,7 +30,7 @@ type gosloPolicyEngine struct{}
 
 func (p gosloPolicyEngine) init() {
 	if config.Global.ApiSettings.AuthStrategy != "keystone" {
-		logger.Fatal("Policy engine goslo supports only api_settings.auth_strategy = 'keystone'")
+		log.Fatal("Policy engine goslo supports only api_settings.auth_strategy = 'keystone'")
 	}
 }
 

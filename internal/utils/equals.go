@@ -21,7 +21,7 @@ import (
 	"reflect"
 	"strings"
 
-	"go-micro.dev/v4/logger"
+	"github.com/apex/log"
 )
 
 func getSubFields(subFieldName string, fieldsToCompare []string) []string {
@@ -92,7 +92,7 @@ func deepValueEqualField(v1, v2 reflect.Value, fieldsToCompare []string) bool {
 			if in(fieldName, fieldsToCompare) {
 				subFields := getSubFields(fieldName, fieldsToCompare)
 				if !deepValueEqualField(v1.Field(i), v2.Field(i), subFields) {
-					logger.Debugf("Field '%s': '%+v' != '%+v'", fieldName, v1.Field(i).Interface(), v2.Field(i).Interface())
+					log.Debugf("Field '%s': '%+v' != '%+v'", fieldName, v1.Field(i).Interface(), v2.Field(i).Interface())
 					return false
 				}
 			}

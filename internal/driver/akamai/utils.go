@@ -18,7 +18,8 @@ package akamai
 
 import (
 	"encoding/json"
-	"go-micro.dev/v4/logger"
+
+	"github.com/apex/log"
 )
 
 // Max returns the larger of x or y.
@@ -83,7 +84,7 @@ func DetectTypeFromFeatures(features []string) string {
 func PrettyJson(data interface{}) string {
 	val, err := json.MarshalIndent(data, "", " ")
 	if err != nil {
-		logger.Error(err)
+		log.Error(err.Error())
 		return ""
 	}
 	return string(val)

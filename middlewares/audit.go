@@ -23,10 +23,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/apex/log"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/sapcc/go-api-declarations/cadf"
 	"github.com/sapcc/go-bits/audittools"
-	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/auth"
 	"github.com/sapcc/andromeda/internal/config"
@@ -53,10 +53,10 @@ func NewAuditController() *auditController {
 	go audittools.AuditTrail{
 		EventSink: s,
 		OnSuccessfulPublish: func() {
-			logger.Debug("Notification sent")
+			log.Debug("Notification sent")
 		},
 		OnFailedPublish: func() {
-			logger.Debug("Notification failed")
+			log.Debug("Notification failed")
 		},
 	}.Commit(*transportURL, rabbitmqQueueName)
 	return &q
@@ -105,7 +105,7 @@ func (arw *auditResponseWriter) WriteHeader(code int) {
 	resource := strings.Split(policy.RuleFromHTTPRequest(arw.request), ":")[1]
 	user, err := auth.UserForRequest(arw.request)
 	if err != nil {
-		logger.Error(err)
+		log.Error(err.Error())
 		return
 	}
 

@@ -23,7 +23,7 @@ import (
 	"time"
 
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v8/pkg/gtm"
-	"go-micro.dev/v4/logger"
+	"github.com/apex/log"
 
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/driver"
@@ -92,7 +92,7 @@ func (s *AkamaiAgent) constructAkamaiGeoMap(geomap *rpcmodels.Geomap) (*gtm.GeoM
 }
 
 func (s *AkamaiAgent) FetchAndSyncGeomaps(geomaps []string, force bool) error {
-	logger.Debugf("Running FetchAndSyncGeomaps(%+v, force=%t)", geomaps, force)
+	log.Debugf("Running FetchAndSyncGeomaps(%+v, force=%t)", geomaps, force)
 	response, err := s.rpc.GetGeomaps(context.Background(), &server.SearchRequest{
 		Provider:       "akamai",
 		PageNumber:     0,
@@ -138,7 +138,7 @@ func (s *AkamaiAgent) FetchAndSyncGeomaps(geomaps []string, force bool) error {
 }
 
 func (s *AkamaiAgent) SyncGeomap(geomap *rpcmodels.Geomap, force bool) (*gtm.GeoMap, error) {
-	logger.Debugf("SyncGeomap(%s, force=%t)", geomap.Id, force)
+	log.Debugf("SyncGeomap(%s, force=%t)", geomap.Id, force)
 
 	if geomap.ProvisioningStatus == models.GeomapProvisioningStatusPENDINGDELETE {
 		// Run Delete
@@ -182,27 +182,27 @@ func (s *AkamaiAgent) SyncGeomap(geomap *rpcmodels.Geomap, force bool) (*gtm.Geo
 		return backendGeoMap, nil
 	}
 
-	logger.Debugf("SyncGeomap(%s) for domain %s, changes identified",
+	log.Debugf("SyncGeomap(%s) for domain %s, changes identified",
 		geomap.Id, config.Global.AkamaiConfig.Domain)
 
 	if backendGeoMap == nil {
 		var res *gtm.GeoMapResponse
 		res, err = s.gtm.CreateGeoMap(context.Background(), referenceGeoMap, config.Global.AkamaiConfig.Domain)
 		if err != nil {
-			logger.Errorf("CreateGeomap(%s) for domain %s failed", referenceGeoMap.Name,
+			log.Errorf("CreateGeomap(%s) for domain %s failed", referenceGeoMap.Name,
 				config.Global.AkamaiConfig.Domain)
 			return nil, err
 		}
-		logger.Infof("CreateGeomap(%s) for domain %s", referenceGeoMap.Name, config.Global.AkamaiConfig.Domain)
+		log.Infof("CreateGeomap(%s) for domain %s", referenceGeoMap.Name, config.Global.AkamaiConfig.Domain)
 		return res.Resource, nil
 	}
 
 	_, err = s.gtm.UpdateGeoMap(context.Background(), referenceGeoMap, config.Global.AkamaiConfig.Domain)
 	if err != nil {
-		logger.Errorf("UpdateGeomap(%s) for domain %s failed", referenceGeoMap.Name,
+		log.Errorf("UpdateGeomap(%s) for domain %s failed", referenceGeoMap.Name,
 			config.Global.AkamaiConfig.Domain)
 		return nil, err
 	}
-	logger.Infof("UpdateGeomap(%s) for domain %s", referenceGeoMap.Name, config.Global.AkamaiConfig.Domain)
+	log.Infof("UpdateGeomap(%s) for domain %s", referenceGeoMap.Name, config.Global.AkamaiConfig.Domain)
 	return referenceGeoMap, nil
 }

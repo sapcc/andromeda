@@ -21,8 +21,8 @@ import (
 	"fmt"
 
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v8/pkg/gtm"
+	"github.com/apex/log"
 	"github.com/go-openapi/swag"
-	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/driver"
@@ -33,11 +33,11 @@ import (
 
 func (s *AkamaiAgent) DeleteProperty(domain *rpcmodels.Domain, trafficManagementDomain string) error {
 	// Delete
-	logger.Infof("DeleteProperty(domain=%s, property=%s)", trafficManagementDomain, domain.GetFqdn())
+	log.Infof("DeleteProperty(domain=%s, property=%s)", trafficManagementDomain, domain.GetFqdn())
 
 	property, err := s.gtm.GetProperty(context.Background(), domain.GetFqdn(), config.Global.AkamaiConfig.Domain)
 	if err != nil {
-		logger.Warnf("Property '%s' doesn't exist...", domain.GetFqdn())
+		log.Warnf("Property '%s' doesn't exist...", domain.GetFqdn())
 		return nil
 	}
 
@@ -46,11 +46,9 @@ func (s *AkamaiAgent) DeleteProperty(domain *rpcmodels.Domain, trafficManagement
 		return fmt.Errorf("Request %s: %w", PrettyJson(property), err)
 	}
 
-	if !logger.V(logger.DebugLevel, nil) {
-		logger.Debugf("Request: %s\nResponse: %s",
-			PrettyJson(property),
-			PrettyJson(ret))
-	}
+	log.Debugf("Request: %s\nResponse: %s",
+		PrettyJson(property),
+		PrettyJson(ret))
 	return nil
 }
 
@@ -106,7 +104,7 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 
 		if len(datacenterUUID) > 0 {
 			if trafficTarget.DatacenterID, err = s.GetDatacenterMeta(datacenterUUID, domain.Datacenters); err != nil {
-				logger.Error(err)
+				log.Error(err.Error())
 				continue
 			}
 		}
@@ -166,13 +164,13 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 	// Pre-Validation
 	if len(property.TrafficTargets) == 0 {
 		// Need traffictargets with datacenters before posting
-		logger.Debugf("Skipping Property '%s': No traffic targets", property.Name)
+		log.Debugf("Skipping Property '%s': No traffic targets", property.Name)
 		return
 	}
 
 	existingProperty, err2 := s.gtm.GetProperty(context.Background(), property.Name, config.Global.AkamaiConfig.Domain)
 	if err2 != nil {
-		logger.Debugf("Property '%s' doesn't exist, creating...", property.Name)
+		log.Debugf("Property '%s' doesn't exist, creating...", property.Name)
 	}
 
 	fieldsToCompare := []string{
@@ -201,17 +199,15 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 	}
 
 	// Update
-	logger.Infof("UpdateProperty(domain=%s, property=%s)", trafficManagementDomain, property.Name)
+	log.Infof("UpdateProperty(domain=%s, property=%s)", trafficManagementDomain, property.Name)
 	ret, err3 := s.gtm.UpdateProperty(context.Background(), &property, trafficManagementDomain)
 	if err3 != nil {
 		err = fmt.Errorf("request %s: %w", PrettyJson(property), err3)
 		return
 	}
 
-	if !logger.V(logger.DebugLevel, nil) {
-		logger.Debugf("Request: %s\nResponse: %s",
-			PrettyJson(property),
-			PrettyJson(ret))
-	}
+	log.Debugf("Request: %s\nResponse: %s",
+		PrettyJson(property),
+		PrettyJson(ret))
 	return
 }

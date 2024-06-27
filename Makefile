@@ -1,10 +1,10 @@
 .PHONY: build-all clean swagger migrate
 PROTOC_FILES = $(shell find . -type f -name '*.proto')
 PB_FILES = $(patsubst %.proto, %.pb.go, $(PROTOC_FILES))
-PB_MICRO_FILES = $(patsubst %.proto, %.pb.micro.go, $(PROTOC_FILES))
+PB_STORM_FILES = $(patsubst %.proto, %.pb.storm.go, $(PROTOC_FILES))
 BIN = $(addprefix bin/,$(shell ls cmd))
 
-build-all: $(PB_FILES) $(PB_MICRO_FILES) $(BIN)
+build-all: $(PB_FILES) $(PB_STORM_FILES) $(BIN)
 
 bin/%: cmd/%/main.go
 	go build -o $@ $<
@@ -21,8 +21,8 @@ migrate:
 	migrate -path db/migrations -database "cockroachdb://root@localhost:26257/andromeda?sslmode=disable" drop -f
 	migrate -path db/migrations -database "cockroachdb://root@localhost:26257/andromeda?sslmode=disable" up
 
-%.pb.micro.go: %.proto
-	protoc --micro_out=../../.. -I. $<
+%.pb.storm.go: %.proto
+	protoc --stormrpc_out=../../.. -I. $<
 
 %.pb.go: %.proto
 	protoc --go_out=../../.. -I. $<

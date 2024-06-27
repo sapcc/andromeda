@@ -21,15 +21,18 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/apex/log"
+	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/runtime/middleware"
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/utils/openstack/clientconfig"
 	"github.com/sapcc/go-bits/audittools"
 	"github.com/sapcc/go-bits/gopherpolicy"
-	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/policy"
+	"github.com/sapcc/andromeda/internal/utils"
 )
 
 var (
@@ -64,13 +67,16 @@ func KeystoneMiddleware(next http.Handler) (http.Handler, error) {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		t := tv.CheckToken(r)
 		if t.Err != nil {
-			http.Error(w, "unauthorized", 401)
+			middleware.
+				Error(403, utils.Unauthorized(t.Err), utils.JSONHeader).
+				WriteResponse(w, runtime.JSONProducer())
+			return
 		}
 
 		if t.Enforcer != nil && config.Global.Default.Debug {
-			t.Context.Logger = logger.Infof
-			logger.Debug("token has auth = %v", t.Context.Auth)
-			logger.Debug("token has roles = %v", t.Context.Roles)
+			t.Context.Logger = log.Infof
+			log.Debugf("token has auth = %v", t.Context.Auth)
+			log.Debugf("token has roles = %v", t.Context.Roles)
 		}
 
 		ctx := context.WithValue(r.Context(), projectContextKey, t)

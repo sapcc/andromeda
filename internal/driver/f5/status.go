@@ -23,17 +23,18 @@ import (
 	"strings"
 	"time"
 
+	"github.com/actatum/stormrpc"
+	"github.com/apex/log"
+	"github.com/nats-io/nats.go"
 	"github.com/scottdware/go-bigip"
-	"go-micro.dev/v4"
-	"go-micro.dev/v4/logger"
 
+	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 )
 
 type StatusController struct {
 	bigIP *bigip.BigIP
-	sv    micro.Service
-	rpc   server.RPCServerService
+	rpc   server.RPCServerClient
 }
 
 func ExecuteF5StatusAgent() error {
@@ -46,28 +47,26 @@ func ExecuteF5StatusAgent() error {
 	if err != nil {
 		return err
 	}
-	logger.Infof("Connected to %s %s (%s)", device.MarketingName, device.Name, device.Version)
+	log.Infof("Connected to %s %s (%s)", device.MarketingName, device.Name, device.Version)
 
 	// check if DNS module activated
 	if err := BigIPSupportsDNS(device); err != nil {
 		return err
 	}
 
-	service := micro.NewService(
-		micro.Name("andromeda.agent.f5-status-agent"),
-		micro.Metadata(map[string]string{
-			"type":    "F5",
-			"host":    device.Hostname,
-			"version": device.Version,
-		}),
-		micro.RegisterTTL(time.Second*60),
-		micro.RegisterInterval(time.Second*30),
-	)
-	service.Init()
+	// RPC server
+	nc, err := nats.Connect(config.Global.Default.TransportURL)
+	if err != nil {
+		return err
+	}
+	client, err := stormrpc.NewClient("", stormrpc.WithNatsConn(nc))
+	if err != nil {
+		return err
+	}
+
 	sc := StatusController{
 		session,
-		service,
-		server.NewRPCServerService("andromeda.server", service.Client()),
+		server.NewRPCServerClient(client),
 	}
 
 	go func() {
@@ -78,18 +77,15 @@ func ExecuteF5StatusAgent() error {
 			// Refresh token if needed
 			if time.Until(sc.bigIP.TokenExpiry) <= 60 {
 				if err := sc.bigIP.RefreshTokenSession(36000); err != nil {
-					logger.Error(err)
+					log.Error(err.Error())
 				}
 			}
 			if err := sc.StatusHandler(); err != nil {
-				logger.Error(err)
+				log.Error(err.Error())
 				_ = sc.bigIP.RefreshTokenSession(36000)
 			}
 		}
 	}()
-	if err := sc.sv.Run(); err != nil {
-		return err
-	}
 
 	return nil
 }
@@ -158,7 +154,7 @@ func (c StatusController) StatusHandler() error {
 			for _, partitons := range stats.Entries {
 				memberStats := MembersStats{}
 				if err := json.Unmarshal(partitons, &memberStats); err != nil {
-					logger.Warnf("Could not decode nested member stats: %s", err)
+					log.Warnf("Could not decode nested member stats: %s", err)
 					continue
 				}
 
@@ -175,7 +171,7 @@ func (c StatusController) StatusHandler() error {
 					Id:     memberID,
 					Status: memberStatus,
 				}
-				logger.Debugf("Member %s has status %s", memberID, msr.GetStatus().String())
+				log.Debugf("Member %s has status %s", memberID, msr.GetStatus().String())
 
 				msrs = append(msrs, msr)
 			}
@@ -186,7 +182,7 @@ func (c StatusController) StatusHandler() error {
 	if err != nil {
 		return err
 	}
-	logger.Infof("Refreshed status of %d members", len(msrs))
+	log.Infof("Refreshed status of %d members", len(msrs))
 
 	return nil
 }

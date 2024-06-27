@@ -25,6 +25,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/apex/log"
 	"github.com/go-openapi/strfmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/iancoleman/strcase"
@@ -33,7 +34,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sapcc/go-bits/jobloop"
 	"github.com/xo/dburl"
-	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/config"
 )
@@ -76,7 +76,7 @@ func (e *Executor) poolCascadeActive(_ context.Context, tx *sqlx.Tx, poolID *str
 		return err
 	}
 
-	logger.Infof("Unbound pool activation %s", poolID)
+	log.Infof("Unbound pool activation %s", poolID)
 	return tx.Commit()
 }
 
@@ -95,7 +95,7 @@ func (e *Executor) CleanupDeletedDomains(_ context.Context, labels prometheus.La
 		return err
 	}
 	labels["count"] = strconv.FormatInt(rowsAffected, 10)
-	logger.Infof("Cleaned up %d domains", rowsAffected)
+	log.Infof("Cleaned up %d domains", rowsAffected)
 	return nil
 }
 
@@ -127,9 +127,9 @@ func (e *Executor) CleanupDeletedDomainsCronJob(registerer prometheus.Registerer
 
 func HouseKeeping() error {
 	if !config.Global.HouseKeeping.Enabled {
-		logger.Fatal("Housekeeping disabled")
+		log.Fatal("Housekeeping disabled")
 	}
-	logger.Info("Running housekeeping")
+	log.Info("Running housekeeping")
 
 	// Database
 	u, err := dburl.Parse(config.Global.Database.Connection)
@@ -153,7 +153,7 @@ func HouseKeeping() error {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	sig := <-sigs
-	logger.Infof("Got signal %s, terminating.", sig)
+	log.Infof("Got signal %s, terminating.", sig)
 	cancel()
 	return db.Close()
 }

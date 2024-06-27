@@ -17,12 +17,13 @@
 package main
 
 import (
+	"github.com/apex/log"
+
 	"github.com/sapcc/andromeda/internal/driver/f5"
-	"go-micro.dev/v4/logger"
 )
 
 func main() {
 	if err := f5.ExecuteF5StatusAgent(); err != nil {
-		logger.Fatal(err)
+		log.Fatal(err.Error())
 	}
 }

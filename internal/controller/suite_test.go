@@ -75,16 +75,19 @@ func (t *SuiteTest) SetupSuite() {
 	utils.SwaggerSpec = swaggerSpec
 	config.Global.ApiSettings.PaginationMaxLimit = 1000
 
+	cc := CommonController{
+		db: t.db,
+	}
 	// initialize controller
 	t.c = &Controller{
-		Domains:     DomainController{t.db, nil},
-		Pools:       PoolController{t.db, nil},
-		Datacenters: DatacenterController{t.db, nil},
-		Members:     MemberController{t.db, nil},
-		Monitors:    MonitorController{t.db, nil},
-		Services:    ServiceController{t.db, nil},
-		Quotas:      QuotaController{t.db},
-		Sync:        SyncController{nil},
+		Domains:     DomainController{cc},
+		Pools:       PoolController{cc},
+		Datacenters: DatacenterController{cc},
+		Members:     MemberController{cc},
+		Monitors:    MonitorController{cc},
+		Services:    ServiceController{cc},
+		Quotas:      QuotaController{cc},
+		Sync:        SyncController{cc},
 	}
 
 	if err := migration.Migrate(t.dbUrl); err != nil {

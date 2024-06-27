@@ -25,7 +25,6 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
-	"go-micro.dev/v4"
 
 	"github.com/sapcc/andromeda/db"
 	"github.com/sapcc/andromeda/internal/auth"
@@ -35,8 +34,7 @@ import (
 )
 
 type DatacenterController struct {
-	db *sqlx.DB
-	sv micro.Service
+	CommonController
 }
 
 // GetDatacenters GET /datacenters
@@ -99,7 +97,7 @@ func (c DatacenterController) PostDatacenters(params datacenters.PostDatacenters
 		panic(err)
 	}
 
-	_ = PendingSync(c.sv)
+	_ = PendingSync(c.rpc)
 	return datacenters.NewPostDatacentersCreated().WithPayload(&datacenters.PostDatacentersCreatedBody{Datacenter: datacenter})
 }
 
@@ -155,7 +153,7 @@ func (c DatacenterController) PutDatacentersDatacenterID(params datacenters.PutD
 		panic(err)
 	}
 
-	_ = PendingSync(c.sv)
+	_ = PendingSync(c.rpc)
 	return datacenters.NewPutDatacentersDatacenterIDAccepted().WithPayload(
 		&datacenters.PutDatacentersDatacenterIDAcceptedBody{Datacenter: &datacenter})
 }
@@ -188,7 +186,7 @@ func (c DatacenterController) DeleteDatacentersDatacenterID(params datacenters.D
 		return datacenters.NewDeleteDatacentersDatacenterIDNotFound().WithPayload(utils.NotFound)
 	}
 
-	_ = PendingSync(c.sv)
+	_ = PendingSync(c.rpc)
 	return datacenters.NewDeleteDatacentersDatacenterIDNoContent()
 }
 

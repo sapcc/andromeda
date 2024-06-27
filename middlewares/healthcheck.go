@@ -19,17 +19,17 @@ package middlewares
 import (
 	"net/http"
 
-	"go-micro.dev/v4/logger"
+	"github.com/apex/log"
 )
 
-//HealthCheckHandler provides the GET /healthcheck endpoint.
+// HealthCheckHandler provides the GET /healthcheck endpoint.
 func HealthCheckMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		if r.URL.Path == "/healthcheck" && r.Method == "GET" {
+			w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 			w.WriteHeader(http.StatusOK)
 			if _, err := w.Write([]byte("ok")); err != nil {
-				logger.Error("Error replying health check")
+				log.Error("Error replying health check")
 			}
 		} else {
 			next.ServeHTTP(w, r)

@@ -21,10 +21,10 @@ import (
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/apex/log"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
-	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/auth"
 	"github.com/sapcc/andromeda/internal/config"
@@ -124,7 +124,7 @@ func (qc *quotaController) QuotaHandler(next http.Handler) http.Handler {
 			panic(err)
 		}
 
-		logger.Debugf("Quota %s of project %s is %d of %d", resource, project, quotaUsed, quotaAvailable)
+		log.Debugf("Quota %s of project %s is %d of %d", resource, project, quotaUsed, quotaAvailable)
 		if quotaAvailable-quotaUsed < 1 {
 			middleware.
 				Error(403, utils.GetQuotaMetResponse(resource), utils.JSONHeader).

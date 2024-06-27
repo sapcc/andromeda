@@ -21,6 +21,7 @@ import (
 	"net/url"
 	"os"
 
+	"github.com/apex/log"
 	"github.com/go-openapi/runtime"
 	runtimeclient "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
@@ -31,7 +32,6 @@ import (
 	"github.com/jedib0t/go-pretty/table"
 	"github.com/jessevdk/go-flags"
 	"github.com/jmoiron/sqlx/reflectx"
-	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/client"
 )
@@ -141,7 +141,7 @@ func SetupClient() {
 			if fe.Type == flags.ErrHelp {
 				code = 0
 			} else {
-				logger.Error(err)
+				log.WithError(err).Error("while parsing command line arguments")
 			}
 		}
 		os.Exit(code)

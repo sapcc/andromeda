@@ -17,11 +17,12 @@
 package policy
 
 import (
-	"github.com/sapcc/go-bits/gopherpolicy"
 	"net/http"
 
+	"github.com/sapcc/go-bits/gopherpolicy"
+
+	"github.com/apex/log"
 	openapiMiddleware "github.com/go-openapi/runtime/middleware"
-	"go-micro.dev/v4/logger"
 )
 
 // global policy engine
@@ -40,14 +41,14 @@ func SetPolicyEngine(engine string) {
 	switch engine {
 	case "goslo":
 		Engine = gosloPolicyEngine{}
-		logger.Info("Initializing goslo policy engine")
+		log.Info("Initializing goslo policy engine")
 		Engine.init()
 	case "noop":
-		logger.Info("Initializing no-op policy engine")
+		log.Info("Initializing no-op policy engine")
 		Engine = noOpPolicyEngine{}
 		Engine.init()
 	default:
-		logger.Fatalf("Policy engine '%s' not supported", engine)
+		log.Fatalf("Policy engine '%s' not supported", engine)
 	}
 }
 

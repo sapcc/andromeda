@@ -22,7 +22,7 @@ import (
 
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v8/pkg/edgegrid"
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v8/pkg/session"
-	"go-micro.dev/v4/logger"
+	"github.com/apex/log"
 
 	"github.com/sapcc/andromeda/internal/config"
 )
@@ -57,7 +57,7 @@ func NewAkamaiSession(akamaiConfig *config.AkamaiConfig) (*session.Session, stri
 	}
 
 	if len(identity.Contracts) != 1 && akamaiConfig.ContractId == "" {
-		logger.Fatalf("More than one contract detected, specificy contract_id.")
+		log.Fatalf("More than one contract detected, specificy contract_id.")
 	}
 
 	var domainType string
@@ -67,7 +67,7 @@ func NewAkamaiSession(akamaiConfig *config.AkamaiConfig) (*session.Session, stri
 		}
 
 		domainType = DetectTypeFromFeatures(contract.Features)
-		logger.Infof("Detected Akamai Contract '%s' with best features enabling '%s' domain type.",
+		log.Infof("Detected Akamai Contract '%s' with best features enabling '%s' domain type.",
 			contract.ContractID, domainType)
 		break
 	}
