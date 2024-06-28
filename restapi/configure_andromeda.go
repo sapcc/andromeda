@@ -18,10 +18,11 @@ package restapi
 
 import (
 	"crypto/tls"
-	"github.com/getsentry/sentry-go"
-	"github.com/rs/cors"
 	"net/http"
 	"time"
+
+	"github.com/getsentry/sentry-go"
+	"github.com/rs/cors"
 
 	"github.com/didip/tollbooth"
 	"github.com/dre1080/recovr"
@@ -99,7 +100,7 @@ func setupMiddlewares(handler http.Handler) http.Handler {
 		var err error
 		handler, err = auth.KeystoneMiddleware(handler)
 		if err != nil {
-			logger.Fatal(err)
+			logger.Errorf("Error initializing keystone middleware: %w", err)
 		}
 	}
 

@@ -29,6 +29,7 @@ import (
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
 	"github.com/sapcc/andromeda/internal/utils"
+	"github.com/sapcc/andromeda/models"
 )
 
 func (s *AkamaiAgent) GetGeomap(geomapID string) (*rpcmodels.Geomap, error) {
@@ -103,35 +104,42 @@ func (s *AkamaiAgent) FetchAndSyncGeomaps(geomaps []string, force bool) error {
 		return err
 	}
 
+	var provRequests []*server.ProvisioningStatusRequest_ProvisioningStatus
 	for _, geomap := range response.GetResponse() {
+		if geomap.ProvisioningStatus == models.DatacenterProvisioningStatusPENDINGDELETE {
+			provRequests = append(provRequests,
+				driver.GetProvisioningStatusRequest(geomap.Id, "GEOGRAPHIC_MAP", "DELETED"))
+		} else {
+			provRequests = append(provRequests,
+				driver.GetProvisioningStatusRequest(geomap.Id, "GEOGRAPHIC_MAP", "ACTIVE"))
+		}
+
 		if _, err = s.SyncGeomap(geomap, force); err != nil {
 			return err
 		}
+	}
 
-		// Wait for status propagation
-		var status string
-		for ok := true; ok; ok = status == "PENDING" {
-			time.Sleep(5 * time.Second)
-			status, err = s.syncProvisioningStatus(nil)
-			if err != nil {
-				return err
-			}
-		}
-
-		if status == "COMPLETE" {
-			driver.UpdateProvisioningStatus(s.rpc,
-				[]*server.ProvisioningStatusRequest_ProvisioningStatus{
-					driver.GetProvisioningStatusRequest(geomap.Id, "GEOGRAPHIC_MAP", "ACTIVE"),
-				})
+	// Wait for status propagation
+	var status string
+	for ok := true; ok; ok = status == "PENDING" {
+		time.Sleep(5 * time.Second)
+		status, err = s.syncProvisioningStatus(nil)
+		if err != nil {
+			return err
 		}
 	}
+
+	if status == "COMPLETE" {
+		driver.UpdateProvisioningStatus(s.rpc, provRequests)
+	}
+
 	return nil
 }
 
 func (s *AkamaiAgent) SyncGeomap(geomap *rpcmodels.Geomap, force bool) (*gtm.GeoMap, error) {
 	logger.Debugf("SyncGeomap(%s, force=%t)", geomap.Id, force)
 
-	if geomap.ProvisioningStatus == "PENDING_DELETE" {
+	if geomap.ProvisioningStatus == models.GeomapProvisioningStatusPENDINGDELETE {
 		// Run Delete
 		toDelete, err := s.gtm.GetGeoMap(context.Background(), geomap.Id, config.Global.AkamaiConfig.Domain)
 		if err != nil {

@@ -28,6 +28,7 @@ import (
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
 	"github.com/sapcc/andromeda/internal/utils"
+	"github.com/sapcc/andromeda/models"
 )
 
 func (s *AkamaiAgent) GetDatacenterReference(datacenterUUID string, datacenters []*rpcmodels.Datacenter) (int, error) {
@@ -78,28 +79,35 @@ func (s *AkamaiAgent) FetchAndSyncDatacenters(datacenters []string, force bool) 
 	if err != nil {
 		return err
 	}
+	var provRequests []*server.ProvisioningStatusRequest_ProvisioningStatus
 	for _, datacenter := range res {
+		if datacenter.ProvisioningStatus == models.DatacenterProvisioningStatusPENDINGDELETE {
+			provRequests = append(provRequests,
+				driver.GetProvisioningStatusRequest(datacenter.Id, "DATACENTER", "DELETED"))
+		} else {
+			provRequests = append(provRequests,
+				driver.GetProvisioningStatusRequest(datacenter.Id, "DATACENTER", "ACTIVE"))
+		}
+
 		if _, err = s.SyncDatacenter(datacenter, force); err != nil {
 			return err
 		}
+	}
 
-		// Wait for status propagation
-		var status string
-		for ok := true; ok; ok = status == "PENDING" {
-			time.Sleep(5 * time.Second)
-			status, err = s.syncProvisioningStatus(nil)
-			if err != nil {
-				return err
-			}
-		}
-
-		if status == "COMPLETE" {
-			driver.UpdateProvisioningStatus(s.rpc,
-				[]*server.ProvisioningStatusRequest_ProvisioningStatus{
-					driver.GetProvisioningStatusRequest(datacenter.Id, "DATACENTER", "ACTIVE"),
-				})
+	// Wait for status propagation
+	var status string
+	for ok := true; ok; ok = status == "PENDING" {
+		time.Sleep(5 * time.Second)
+		status, err = s.syncProvisioningStatus(nil)
+		if err != nil {
+			return err
 		}
 	}
+
+	if status == "COMPLETE" {
+		driver.UpdateProvisioningStatus(s.rpc, provRequests)
+	}
+
 	return nil
 }
 
@@ -128,6 +136,18 @@ func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force boo
 
 	// akamai datacenterId is a unique numeric reference to a domain specific datacenter
 	meta := int(datacenter.GetMeta())
+
+	if datacenter.ProvisioningStatus == models.DatacenterProvisioningStatusPENDINGDELETE {
+		// Run Delete
+		toDelete := getBackendDatacenter(meta, datacenter, s)
+		if toDelete == nil {
+			// datacenter already deleted
+			return nil, nil
+		}
+
+		_, err := s.gtm.DeleteDatacenter(context.Background(), toDelete, config.Global.AkamaiConfig.Domain)
+		return nil, err
+	}
 
 	// Consider synced
 	if !force && meta != 0 {

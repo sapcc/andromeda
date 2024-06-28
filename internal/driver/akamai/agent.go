@@ -58,15 +58,16 @@ type AkamaiAgent struct {
 	datacenterIdCache *lru.Cache[string, int]
 }
 
+var akamaiAgent *AkamaiAgent
+
 type Sync struct {
-	akamai *AkamaiAgent
 }
 
 // Process Method can be of any name
 func (s *Sync) Process(ctx context.Context, request *worker.SyncRequest) error {
 	md, _ := metadata.FromContext(ctx)
 	logger.Infof("[Sync] Received sync request %+v with metadata %+v", request.DomainIds, md)
-	s.akamai.forceSync <- request.DomainIds
+	akamaiAgent.forceSync <- request.DomainIds
 	return nil
 }
 
@@ -82,7 +83,6 @@ func ExecuteAkamaiAgent() error {
 		micro.RegisterInterval(time.Second*30),
 		utils.ConfigureTransport(),
 	)
-	syncer := &Sync{}
 	service.Init(
 		micro.AfterStart(func() error {
 			// Create F5 worker instance with Server RPC interface
@@ -96,7 +96,7 @@ func ExecuteAkamaiAgent() error {
 
 			cache, _ := lru.New[string, int](64)
 
-			akamai := AkamaiAgent{
+			akamaiAgent = &AkamaiAgent{
 				s,
 				gtm.Client(*s),
 				memory.NewSync(),
@@ -109,15 +109,14 @@ func ExecuteAkamaiAgent() error {
 				false,
 				cache,
 			}
-			syncer.akamai = &akamai
 
-			if err := akamai.EnsureDomain(domainType); err != nil {
+			if err := akamaiAgent.EnsureDomain(domainType); err != nil {
 				return err
 			}
 
-			go akamai.WorkerThread()
+			go akamaiAgent.WorkerThread()
 			// full sync immediately
-			akamai.forceSync <- nil
+			akamaiAgent.forceSync <- nil
 			return nil
 		}),
 	)
