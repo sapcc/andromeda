@@ -19,6 +19,7 @@ package controller
 import (
 	dbsql "database/sql"
 	"errors"
+	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/go-openapi/runtime/middleware"
@@ -122,37 +123,23 @@ func (c QuotaController) PutQuotasProjectID(params administrative.PutQuotasProje
 		return administrative.NewPutQuotasProjectIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
-	// Set defaults
-	if params.Quota.Quota.Datacenter == nil {
-		params.Quota.Quota.Datacenter = &config.Global.Quota.DefaultQuotaDatacenter
-	}
-	if params.Quota.Quota.Domain == nil {
-		params.Quota.Quota.Domain = &config.Global.Quota.DefaultQuotaDomain
-	}
-	if params.Quota.Quota.Member == nil {
-		params.Quota.Quota.Member = &config.Global.Quota.DefaultQuotaMember
-	}
-	if params.Quota.Quota.Monitor == nil {
-		params.Quota.Quota.Monitor = &config.Global.Quota.DefaultQuotaMonitor
-	}
-	if params.Quota.Quota.Pool == nil {
-		params.Quota.Quota.Pool = &config.Global.Quota.DefaultQuotaPool
-	}
-
 	quota := struct {
 		*models.Quota
 		ProjectID *string
-	}{params.Quota.Quota, &params.ProjectID}
+	}{
+		params.Quota.Quota,
+		&params.ProjectID,
+	}
 
 	var sql string
 	if c.db.DriverName() == "mysql" {
 		sql = `
 			INSERT INTO quota SET
-				domain = :domain,
-				pool = :pool,
-				member = :member,
-				monitor = :monitor,
-			    datacenter = :datacenter,
+				domain = COALESCE(:domain, %d),
+				pool = COALESCE(:pool, %d),
+				member = COALESCE(:member, %d),
+				monitor = COALESCE(:monitor, %d),
+			    datacenter = COALESCE(:datacenter, %d),
 				project_id = :project_id
 			ON DUPLICATE KEY UPDATE
 				domain = COALESCE(:domain, domain),
@@ -160,25 +147,43 @@ func (c QuotaController) PutQuotasProjectID(params administrative.PutQuotasProje
 				member = COALESCE(:member, member), 
 				monitor = COALESCE(:monitor, monitor),
 				datacenter = COALESCE(:datacenter, datacenter)
+			RETURNING *
 		`
 	} else {
 		sql = `
 			INSERT INTO quota
 				(domain, pool, member, monitor, datacenter, project_id)
 			VALUES 
-			    (:domain, :pool, :member, :monitor, :datacenter, :project_id)
+			    (
+					 COALESCE(:domain, %d),
+					 COALESCE(:pool, %d),
+					 COALESCE(:member, %d),
+					 COALESCE(:monitor, %d),
+					 COALESCE(:datacenter, %d),
+					 :project_id
+			     )
 			ON CONFLICT (project_id) DO UPDATE SET 
 				domain = COALESCE(:domain, quota.domain),
 				pool = COALESCE(:pool, quota.pool),
 				member = COALESCE(:member, quota.member), 
 				monitor = COALESCE(:monitor, quota.monitor),
 				datacenter = COALESCE(:datacenter, quota.datacenter)
+			RETURNING *
 		`
 	}
-	if _, err := c.db.NamedExec(sql, quota); err != nil {
+	sql = fmt.Sprintf(sql,
+		config.Global.Quota.DefaultQuotaDomain,
+		config.Global.Quota.DefaultQuotaPool,
+		config.Global.Quota.DefaultQuotaMember,
+		config.Global.Quota.DefaultQuotaMonitor,
+		config.Global.Quota.DefaultQuotaDatacenter)
+	nstmt, err := c.db.PrepareNamed(sql)
+	if err != nil {
 		panic(err)
 	}
-
+	if err = nstmt.Get(&quota, quota); err != nil {
+		panic(err)
+	}
 	return administrative.NewPutQuotasProjectIDAccepted().WithPayload(
 		&administrative.PutQuotasProjectIDAcceptedBody{Quota: quota.Quota})
 }

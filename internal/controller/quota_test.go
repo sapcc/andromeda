@@ -34,7 +34,7 @@ func (t *SuiteTest) TestQuotas() {
 	res := dc.GetQuotasProjectID(administrative.GetQuotasProjectIDParams{
 		ProjectID: projectID})
 	res.WriteResponse(rr, runtime.JSONProducer())
-	assert.Equal(t.T(), rr.Code, http.StatusNotFound, rr.Body)
+	assert.Equal(t.T(), rr.Code, http.StatusNotFound)
 
 	quota := administrative.PutQuotasProjectIDBody{}
 	_ = quota.UnmarshalBinary([]byte(`{ "quota": { "domain": 1234 } }`))
@@ -45,13 +45,13 @@ func (t *SuiteTest) TestQuotas() {
 		ProjectID: projectID})
 	rr = httptest.NewRecorder()
 	res.WriteResponse(rr, runtime.JSONProducer())
-	assert.Equal(t.T(), http.StatusAccepted, rr.Code, rr.Body)
+	assert.Equal(t.T(), http.StatusAccepted, rr.Code)
 
 	// Get all quotas
 	res = dc.GetQuotas(administrative.GetQuotasParams{})
 	rr = httptest.NewRecorder()
 	res.WriteResponse(rr, runtime.JSONProducer())
-	assert.Equal(t.T(), http.StatusOK, rr.Code, rr.Body)
+	assert.Equal(t.T(), http.StatusOK, rr.Code)
 
 	quotasResponse := administrative.GetQuotasOKBody{}
 	_ = quotasResponse.UnmarshalBinary(rr.Body.Bytes())
@@ -71,4 +71,35 @@ func (t *SuiteTest) TestQuotas() {
 	rr = httptest.NewRecorder()
 	res.WriteResponse(rr, runtime.JSONProducer())
 	assert.Equal(t.T(), rr.Code, http.StatusNoContent, rr.Body)
+}
+
+func (t *SuiteTest) TestQuotasUpdateSelective() {
+	dc := t.c.Quotas
+	rr := httptest.NewRecorder()
+	projectID := "test123"
+
+	quota := administrative.PutQuotasProjectIDBody{}
+	_ = quota.UnmarshalBinary([]byte(`{ "quota": { "domain": 1234 } }`))
+
+	// Write new quota
+	res := dc.PutQuotasProjectID(administrative.PutQuotasProjectIDParams{
+		Quota:     quota,
+		ProjectID: projectID})
+	rr = httptest.NewRecorder()
+	res.WriteResponse(rr, runtime.JSONProducer())
+	assert.Equal(t.T(), http.StatusAccepted, rr.Code)
+	assert.JSONEq(t.T(), `{"quota":{"datacenter":0, "domain":1234, "member":0, "monitor":0, "pool":0}}`,
+		rr.Body.String())
+
+	// Update selective
+	quota = administrative.PutQuotasProjectIDBody{}
+	_ = quota.UnmarshalBinary([]byte(`{ "quota": { "datacenter": 1 } }`))
+	res = dc.PutQuotasProjectID(administrative.PutQuotasProjectIDParams{
+		Quota:     quota,
+		ProjectID: projectID})
+	rr = httptest.NewRecorder()
+	res.WriteResponse(rr, runtime.JSONProducer())
+	assert.Equal(t.T(), http.StatusAccepted, rr.Code)
+	assert.JSONEq(t.T(), `{"quota":{"datacenter":1, "domain":1234, "member":0, "monitor":0, "pool":0}}`,
+		rr.Body.String())
 }
