@@ -75,7 +75,6 @@ func (t *SuiteTest) TestQuotas() {
 
 func (t *SuiteTest) TestQuotasUpdateSelective() {
 	dc := t.c.Quotas
-	rr := httptest.NewRecorder()
 	projectID := "test123"
 
 	quota := administrative.PutQuotasProjectIDBody{}
@@ -85,7 +84,7 @@ func (t *SuiteTest) TestQuotasUpdateSelective() {
 	res := dc.PutQuotasProjectID(administrative.PutQuotasProjectIDParams{
 		Quota:     quota,
 		ProjectID: projectID})
-	rr = httptest.NewRecorder()
+	rr := httptest.NewRecorder()
 	res.WriteResponse(rr, runtime.JSONProducer())
 	assert.Equal(t.T(), http.StatusAccepted, rr.Code)
 	assert.JSONEq(t.T(), `{"quota":{"datacenter":0, "domain":1234, "member":0, "monitor":0, "pool":0}}`,
