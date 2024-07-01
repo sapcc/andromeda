@@ -22,6 +22,7 @@ import (
 
 	"github.com/go-openapi/strfmt"
 	"github.com/go-sql-driver/mysql"
+
 	"github.com/sapcc/andromeda/models"
 )
 
@@ -37,6 +38,10 @@ var (
 	DatacenterInUse          = &models.Error{Code: 409, Message: "datacenter is in use"}
 	MySQLForeignKeyViolation = &mysql.MySQLError{Number: 1451}
 )
+
+func Unauthorized(err error) *models.Error {
+	return &models.Error{Code: 401, Message: err.Error()}
+}
 
 func GetQuotaMetResponse(resource string) *models.Error {
 	return &models.Error{Code: 403, Message: fmt.Sprintf(

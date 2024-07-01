@@ -21,6 +21,8 @@ import (
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
 	"go-micro.dev/v4/logger"
 
@@ -52,7 +54,7 @@ func (qc *quotaController) QuotaHandler(next http.Handler) http.Handler {
 		resource := target[1]
 		action := target[2]
 
-		// Handle quota only for resource creation/deletion
+		// Handle quota only for resource creation
 		if action != "post" {
 			next.ServeHTTP(w, r)
 			return
@@ -61,6 +63,14 @@ func (qc *quotaController) QuotaHandler(next http.Handler) http.Handler {
 		// Get project scope
 		project, err := auth.ProjectScopeForRequest(r)
 		if err != nil {
+			middleware.
+				Error(401, utils.Unauthorized(err), utils.JSONHeader).
+				WriteResponse(w, runtime.JSONProducer())
+			return
+		}
+
+		// Skip quota check disabled keystonemiddleware
+		if project == "" {
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -116,12 +126,9 @@ func (qc *quotaController) QuotaHandler(next http.Handler) http.Handler {
 
 		logger.Debugf("Quota %s of project %s is %d of %d", resource, project, quotaUsed, quotaAvailable)
 		if quotaAvailable-quotaUsed < 1 {
-			ret, _ := utils.GetQuotaMetResponse(resource).MarshalBinary()
-			w.Header().Set("Content-Type", "application/json; charset=utf-8")
-			w.WriteHeader(403)
-			if _, err := w.Write(ret); err != nil {
-				panic(err)
-			}
+			middleware.
+				Error(403, utils.GetQuotaMetResponse(resource), utils.JSONHeader).
+				WriteResponse(w, runtime.JSONProducer())
 			return
 		}
 

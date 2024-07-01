@@ -93,10 +93,11 @@ func ProjectScopeForRequest(r *http.Request) (string, error) {
 	if config.Global.ApiSettings.AuthStrategy != "keystone" {
 		return "", nil
 	}
-	if ksToken := TokenFrom(r); ksToken != nil {
-		return ksToken.ProjectScopeUUID(), nil
+	ksToken := TokenFrom(r)
+	if ksToken.Err != nil {
+		return "", ksToken.Err
 	}
-	return "", errors.New("failure accessing keystone token")
+	return ksToken.ProjectScopeUUID(), nil
 }
 
 func UserForRequest(r *http.Request) (audittools.UserInfo, error) {
