@@ -2895,7 +2895,7 @@ Unexpected Error
 | project_id | string| `string` |  | | The ID of the project owning this resource. | `fa84c217f361441986a220edf9b1e337` |
 | provisioning_status | string| `string` |  | |  |  |
 | receive | string| `string` |  | | Specifies the text string that the monitor expects to receive from the target member. | `HTTP/1.` |
-| send | string| `string` |  | | Specifies the text string that the monitor sends to the target member. | `HEAD / HTTP/1.0\\r\\n\\r\\n` |
+| send | string| `string` |  | | Specifies the text string that the monitor sends to the target member. For HTTP/S monitors, this is a GET request and must be a HTTP path, e.g. `/status`. | `/stats` |
 | timeout | integer| `int64` |  | `10`| The time in total, in seconds, after which a health check times out. | `30` |
 | type | string| `string` |  | `"ICMP"`| Type of the health check monitor. | `HTTP` |
 | updated_at | date-time (formatted string)| `strfmt.DateTime` |  | | The UTC date and timestamp when the resource was created. | `2020-09-09T14:52:15` |
