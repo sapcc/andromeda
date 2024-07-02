@@ -18,6 +18,7 @@ package akamai
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -162,12 +163,13 @@ func (s *AkamaiAgent) SyncGeomap(geomap *rpcmodels.Geomap, force bool) (*gtm.Geo
 
 	var backendGeoMap *gtm.GeoMap
 	backendGeoMap, err = s.gtm.GetGeoMap(context.Background(), geomap.Id, config.Global.AkamaiConfig.Domain)
-	if err != nil {
+	var gtmErr *gtm.Error
+	if errors.As(err, &gtmErr) && gtmErr.StatusCode != 404 {
 		return nil, err
 	}
 
 	fieldsToCompare := []string{
-		"Name",
+		//"Name", # Name is unique identifier, we don't want to compare it
 		"DefaultDatacenter",
 		"DefaultDatacenter.Nickname",
 		"DefaultDatacenter.DatacenterId",
@@ -183,14 +185,24 @@ func (s *AkamaiAgent) SyncGeomap(geomap *rpcmodels.Geomap, force bool) (*gtm.Geo
 	logger.Debugf("SyncGeomap(%s) for domain %s, changes identified",
 		geomap.Id, config.Global.AkamaiConfig.Domain)
 
-	// create or update
-	res, err := s.gtm.CreateGeoMap(context.Background(), referenceGeoMap, config.Global.AkamaiConfig.Domain)
+	if backendGeoMap == nil {
+		var res *gtm.GeoMapResponse
+		res, err = s.gtm.CreateGeoMap(context.Background(), referenceGeoMap, config.Global.AkamaiConfig.Domain)
+		if err != nil {
+			logger.Errorf("CreateGeomap(%s) for domain %s failed", referenceGeoMap.Name,
+				config.Global.AkamaiConfig.Domain)
+			return nil, err
+		}
+		logger.Infof("CreateGeomap(%s) for domain %s", referenceGeoMap.Name, config.Global.AkamaiConfig.Domain)
+		return res.Resource, nil
+	}
+
+	_, err = s.gtm.UpdateGeoMap(context.Background(), referenceGeoMap, config.Global.AkamaiConfig.Domain)
 	if err != nil {
-		logger.Errorf("CreateGeomap(%s) for domain %s failed", referenceGeoMap.Name,
+		logger.Errorf("UpdateGeomap(%s) for domain %s failed", referenceGeoMap.Name,
 			config.Global.AkamaiConfig.Domain)
 		return nil, err
 	}
-
-	logger.Infof("CreateGeomap(%s) for domain %s", referenceGeoMap.Name, config.Global.AkamaiConfig.Domain)
-	return res.Resource, nil
+	logger.Infof("UpdateGeomap(%s) for domain %s", referenceGeoMap.Name, config.Global.AkamaiConfig.Domain)
+	return referenceGeoMap, nil
 }
