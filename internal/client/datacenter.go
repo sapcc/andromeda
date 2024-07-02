@@ -46,8 +46,8 @@ type DatacenterCreate struct {
 	Country         *string  `long:"country" description:"A two-letter ISO 3166 country code that specifies the country where the data center maps to"`
 	StateOrProvince *string  `long:"state_or_province" description:"Specifies a two-letter ISO 3166 country code for the state or province where the data center is located"`
 	City            *string  `long:"city" description:"The name of the city where the data center is located"`
-	Latitude        *float32 `long:"latitude" description:"Specifies the geographical latitude of the data center's position"`
-	Longitude       *float32 `long:"longitude" description:"Specifies the geographical longitude of the data center's position"`
+	Latitude        *float64 `long:"latitude" description:"Specifies the geographical latitude of the data center's position"`
+	Longitude       *float64 `long:"longitude" description:"Specifies the geographical longitude of the data center's position"`
 	Disable         bool     `short:"d" long:"disable" description:"Disable Datacenter" optional:"true" optional-value:"false"`
 }
 

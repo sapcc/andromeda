@@ -160,8 +160,8 @@ func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force boo
 		Continent:       datacenter.GetContinent(),
 		Country:         datacenter.GetCountry(),
 		StateOrProvince: datacenter.GetStateOrProvince(),
-		Latitude:        float64(datacenter.GetLatitude()),
-		Longitude:       float64(datacenter.GetLongitude()),
+		Latitude:        datacenter.GetLatitude(),
+		Longitude:       datacenter.GetLongitude(),
 		Nickname:        datacenter.Id,
 	}
 
@@ -180,18 +180,31 @@ func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force boo
 		return datacenter, nil
 	}
 
-	res, err := s.gtm.CreateDatacenter(context.Background(), &referenceDatacenter, config.Global.AkamaiConfig.Domain)
-	if err != nil {
-		logger.Errorf("CreateDatacenter(%s) for domain %s failed", referenceDatacenter.Nickname,
-			config.Global.AkamaiConfig.Domain)
-		return nil, err
+	if backendDatacenter != nil {
+		// Run Update
+		referenceDatacenter.DatacenterID = backendDatacenter.DatacenterID
+		_, err := s.gtm.UpdateDatacenter(context.Background(), &referenceDatacenter, config.Global.AkamaiConfig.Domain)
+		if err != nil {
+			logger.Errorf("UpdateDatacenter(%s) for domain %s failed", referenceDatacenter.Nickname,
+				config.Global.AkamaiConfig.Domain)
+			return nil, err
+		} else {
+			logger.Infof("UpdateDatacenter(%s) for domain %s", referenceDatacenter.Nickname,
+				config.Global.AkamaiConfig.Domain)
+		}
 	} else {
-		logger.Infof("CreateDatacenter(%s) for domain %s", referenceDatacenter.Nickname,
-			config.Global.AkamaiConfig.Domain)
+		res, err := s.gtm.CreateDatacenter(context.Background(), &referenceDatacenter, config.Global.AkamaiConfig.Domain)
+		if err != nil {
+			logger.Errorf("CreateDatacenter(%s) for domain %s failed", referenceDatacenter.Nickname,
+				config.Global.AkamaiConfig.Domain)
+			return nil, err
+		} else {
+			logger.Infof("CreateDatacenter(%s) for domain %s", referenceDatacenter.Nickname,
+				config.Global.AkamaiConfig.Domain)
+		}
+		backendDatacenter = res.Resource
 	}
-
 	// update backend datacenter
-	backendDatacenter = res.Resource
 
 	if backendDatacenter.DatacenterID != meta {
 		req := &server.DatacenterMetaRequest{Id: datacenter.Id, Meta: int32(backendDatacenter.DatacenterID)}

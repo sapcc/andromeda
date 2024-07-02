@@ -16,7 +16,7 @@
 
 CREATE TABLE domain
 (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id                  UUID PRIMARY KEY      DEFAULT gen_random_uuid(),
     name                VARCHAR(255) NULL,
     provisioning_status VARCHAR(16)  NOT NULL DEFAULT 'PENDING_CREATE',
     status              VARCHAR(16)  NOT NULL DEFAULT 'OFFLINE',
@@ -33,7 +33,7 @@ CREATE TABLE domain
 
 CREATE TABLE pool
 (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id                  UUID PRIMARY KEY      DEFAULT gen_random_uuid(),
     name                VARCHAR(255) NULL,
     provisioning_status VARCHAR(16)  NOT NULL DEFAULT 'PENDING_CREATE',
     status              VARCHAR(16)  NOT NULL DEFAULT 'OFFLINE',
@@ -46,33 +46,33 @@ CREATE TABLE pool
 CREATE TABLE domain_pool_relation
 (
     domain_id UUID NOT NULL REFERENCES domain ON DELETE CASCADE,
-    pool_id UUID NOT NULL REFERENCES pool ON DELETE CASCADE,
+    pool_id   UUID NOT NULL REFERENCES pool ON DELETE CASCADE,
     PRIMARY KEY (domain_id, pool_id)
 );
 
 CREATE TABLE datacenter
 (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name                VARCHAR(255) NULL,
-    provisioning_status VARCHAR(16)  NOT NULL DEFAULT 'PENDING_CREATE',
-    admin_state_up      BOOLEAN      NOT NULL,
-    created_at          TIMESTAMP    NOT NULL DEFAULT now(),
-    updated_at          TIMESTAMP    NOT NULL DEFAULT now(),
-    state_or_province   VARCHAR(255) NOT NULL DEFAULT '',
-    city                VARCHAR(255) NOT NULL DEFAULT '',
-    continent           VARCHAR(2)   NOT NULL DEFAULT '',
-    country             VARCHAR(2)   NOT NULL DEFAULT '',
-    latitude            FLOAT        NOT NULL DEFAULT 52.52,
-    longitude           FLOAT        NOT NULL DEFAULT 13.40,
-    scope               VARCHAR(8)   NOT NULL DEFAULT 'private' CHECK ( scope IN ('private', 'public')),
-    project_id          VARCHAR(36)  NOT NULL,
-    provider            VARCHAR(64)  NOT NULL,
-    meta                INTEGER      NOT NULL DEFAULT 0
+    id                  UUID PRIMARY KEY          DEFAULT gen_random_uuid(),
+    name                VARCHAR(255)     NULL,
+    provisioning_status VARCHAR(16)      NOT NULL DEFAULT 'PENDING_CREATE',
+    admin_state_up      BOOLEAN          NOT NULL,
+    created_at          TIMESTAMP        NOT NULL DEFAULT now(),
+    updated_at          TIMESTAMP        NOT NULL DEFAULT now(),
+    state_or_province   VARCHAR(255)     NOT NULL DEFAULT '',
+    city                VARCHAR(255)     NOT NULL DEFAULT '',
+    continent           VARCHAR(2)       NOT NULL DEFAULT '',
+    country             VARCHAR(2)       NOT NULL DEFAULT '',
+    latitude            DOUBLE PRECISION NOT NULL DEFAULT 52.52,
+    longitude           DOUBLE PRECISION NOT NULL DEFAULT 13.40,
+    scope               VARCHAR(8)       NOT NULL DEFAULT 'private' CHECK ( scope IN ('private', 'public')),
+    project_id          VARCHAR(36)      NOT NULL,
+    provider            VARCHAR(64)      NOT NULL,
+    meta                INTEGER          NOT NULL DEFAULT 0
 );
 
 CREATE TABLE member
 (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id                  UUID PRIMARY KEY      DEFAULT gen_random_uuid(),
     name                VARCHAR(255) NULL,
     provisioning_status VARCHAR(16)  NOT NULL DEFAULT 'PENDING_CREATE',
     admin_state_up      BOOLEAN      NOT NULL,
@@ -81,22 +81,22 @@ CREATE TABLE member
     port                BIGINT       NOT NULL,
     status              VARCHAR(16)  NOT NULL DEFAULT 'UNKNOWN',
     address             VARCHAR(255) NOT NULL,
-    pool_id UUID NOT NULL REFERENCES pool ON DELETE CASCADE,
+    pool_id             UUID         NOT NULL REFERENCES pool ON DELETE CASCADE,
     project_id          VARCHAR(36)  NOT NULL,
-    datacenter_id UUID NULL REFERENCES datacenter,
+    datacenter_id       UUID         NULL REFERENCES datacenter,
     UNIQUE (pool_id, address, port)
 );
 
 CREATE TABLE monitor
 (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id                  UUID PRIMARY KEY      DEFAULT gen_random_uuid(),
     name                VARCHAR(255) NULL,
     provisioning_status VARCHAR(16)  NOT NULL DEFAULT 'PENDING_CREATE',
     admin_state_up      BOOLEAN      NOT NULL,
     created_at          TIMESTAMP    NOT NULL DEFAULT now(),
     updated_at          TIMESTAMP    NOT NULL DEFAULT now(),
     interval            BIGINT       NOT NULL,
-    pool_id             UUID NOT NULL REFERENCES pool ON DELETE CASCADE,
+    pool_id             UUID         NOT NULL REFERENCES pool ON DELETE CASCADE,
     receive             VARCHAR(255) NULL,
     send                VARCHAR(255) NULL,
     timeout             BIGINT       NULL,
@@ -106,12 +106,12 @@ CREATE TABLE monitor
 
 CREATE TABLE quota
 (
-    project_id        VARCHAR(36) PRIMARY KEY,
-    domain            BIGINT NOT NULL,
-    pool              BIGINT NOT NULL,
-    member            BIGINT NOT NULL,
-    monitor           BIGINT NOT NULL,
-    datacenter        BIGINT NOT NULL
+    project_id VARCHAR(36) PRIMARY KEY,
+    domain     BIGINT NOT NULL,
+    pool       BIGINT NOT NULL,
+    member     BIGINT NOT NULL,
+    monitor    BIGINT NOT NULL,
+    datacenter BIGINT NOT NULL
 );
 
 CREATE TABLE agent

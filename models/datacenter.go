@@ -65,11 +65,11 @@ type Datacenter struct {
 
 	// latitude
 	// Example: 52.526055
-	Latitude *float32 `json:"latitude"`
+	Latitude *float64 `json:"latitude"`
 
 	// longitude
 	// Example: 13.403454
-	Longitude *float32 `json:"longitude"`
+	Longitude *float64 `json:"longitude"`
 
 	// meta
 	// Read Only: true

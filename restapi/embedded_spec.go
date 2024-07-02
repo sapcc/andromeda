@@ -1859,7 +1859,7 @@ func init() {
         },
         "latitude": {
           "type": "number",
-          "format": "float",
+          "format": "double",
           "default": 52.52,
           "x-nullable": true,
           "x-omitempty": false,
@@ -1867,7 +1867,7 @@ func init() {
         },
         "longitude": {
           "type": "number",
-          "format": "float",
+          "format": "double",
           "default": 13.4,
           "x-nullable": true,
           "x-omitempty": false,
@@ -4764,7 +4764,7 @@ func init() {
         },
         "latitude": {
           "type": "number",
-          "format": "float",
+          "format": "double",
           "default": 52.52,
           "x-nullable": true,
           "x-omitempty": false,
@@ -4772,7 +4772,7 @@ func init() {
         },
         "longitude": {
           "type": "number",
-          "format": "float",
+          "format": "double",
           "default": 13.4,
           "x-nullable": true,
           "x-omitempty": false,
