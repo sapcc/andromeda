@@ -78,8 +78,8 @@ type Monitor struct {
 	// Max Length: 255
 	Receive *string `json:"receive,omitempty"`
 
-	// Specifies the text string that the monitor sends to the target member.
-	// Example: HEAD / HTTP/1.0\\r\\n\\r\\n
+	// Specifies the text string that the monitor sends to the target member. For HTTP/S monitors, this is a GET request and must be a HTTP path, e.g. `/status`.
+	// Example: /stats
 	// Max Length: 255
 	Send *string `json:"send,omitempty"`
 

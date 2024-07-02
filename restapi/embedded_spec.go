@@ -2361,11 +2361,11 @@ func init() {
           "example": "HTTP/1."
         },
         "send": {
-          "description": "Specifies the text string that the monitor sends to the target member.",
+          "description": "Specifies the text string that the monitor sends to the target member. For HTTP/S monitors, this is a GET request and must be a HTTP path, e.g. ` + "`" + `/status` + "`" + `.",
           "type": "string",
           "maxLength": 255,
           "x-nullable": true,
-          "example": "HEAD / HTTP/1.0\\r\\n\\r\\n"
+          "example": "/stats"
         },
         "timeout": {
           "description": "The time in total, in seconds, after which a health check times out.",
@@ -5253,11 +5253,11 @@ func init() {
           "example": "HTTP/1."
         },
         "send": {
-          "description": "Specifies the text string that the monitor sends to the target member.",
+          "description": "Specifies the text string that the monitor sends to the target member. For HTTP/S monitors, this is a GET request and must be a HTTP path, e.g. ` + "`" + `/status` + "`" + `.",
           "type": "string",
           "maxLength": 255,
           "x-nullable": true,
-          "example": "HEAD / HTTP/1.0\\r\\n\\r\\n"
+          "example": "/stats"
         },
         "timeout": {
           "description": "The time in total, in seconds, after which a health check times out.",
