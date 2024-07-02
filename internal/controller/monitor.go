@@ -19,6 +19,7 @@ package controller
 import (
 	"errors"
 	"fmt"
+	"net/url"
 	"strings"
 
 	"github.com/go-openapi/runtime/middleware"
@@ -90,6 +91,10 @@ func (c MonitorController) PostMonitors(params monitors.PostMonitorsParams) midd
 		return monitors.NewPostMonitorsBadRequest().WithPayload(utils.PoolIDRequired)
 	}
 
+	if err := validateMonitor(monitor); err != nil {
+		return monitors.NewPostMonitorsBadRequest().WithPayload(err)
+	}
+
 	if projectID, err := auth.Authenticate(params.HTTPRequest, nil); err != nil {
 		return monitors.NewPostMonitorsDefault(403).WithPayload(utils.PolicyForbidden)
 	} else if projectID != "" {
@@ -155,6 +160,11 @@ func (c MonitorController) GetMonitorsMonitorID(params monitors.GetMonitorsMonit
 // PutMonitorsMonitorID PUT /monitors/:id
 func (c MonitorController) PutMonitorsMonitorID(params monitors.PutMonitorsMonitorIDParams) middleware.Responder {
 	monitor := models.Monitor{ID: params.MonitorID}
+
+	if err := validateMonitor(params.Monitor.Monitor); err != nil {
+		return monitors.NewPutMonitorsMonitorIDBadRequest().WithPayload(err)
+	}
+
 	if err := PopulateMonitor(c.db, &monitor, []string{"project_id", "pool_id"}); err != nil {
 		return monitors.NewPutMonitorsMonitorIDNotFound().WithPayload(utils.NotFound)
 	}
@@ -230,6 +240,17 @@ func PopulateMonitor(db *sqlx.DB, monitor *models.Monitor, fields []string) erro
 	sql := fmt.Sprintf(`SELECT %s FROM monitor WHERE id = ?`, strings.Join(fields, ", "))
 	if err := db.Get(monitor, db.Rebind(sql), monitor.ID); err != nil {
 		return err
+	}
+	return nil
+}
+
+// validateMonitor 2nd pass checks if the monitor is valid
+func validateMonitor(monitor *models.Monitor) *models.Error {
+	if monitor.Send != nil && (*monitor.Type == models.MonitorTypeHTTP || *monitor.Type == models.MonitorTypeHTTPS) {
+		u, err := url.ParseRequestURI(*monitor.Send)
+		if err != nil || u.Host != "" || u.Scheme != "" {
+			return utils.InvalidSendString
+		}
 	}
 	return nil
 }

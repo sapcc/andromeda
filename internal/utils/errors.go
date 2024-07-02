@@ -36,6 +36,7 @@ var (
 	DuplicateMember          = &models.Error{Code: 409, Message: "invalid value for 'address' and 'port': endpoint already exists in pool"}
 	DuplicateDomain          = &models.Error{Code: 409, Message: "invalid value for 'domain' and 'provider': domain already exists"}
 	DatacenterInUse          = &models.Error{Code: 409, Message: "datacenter is in use"}
+	InvalidSendString        = &models.Error{Code: 409, Message: "invalid value for 'send': must be a URL path"}
 	MySQLForeignKeyViolation = &mysql.MySQLError{Number: 1451}
 )
 

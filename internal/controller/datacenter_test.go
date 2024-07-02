@@ -21,8 +21,10 @@ import (
 	"net/http/httptest"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/swag"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/sapcc/andromeda/models"
 	"github.com/sapcc/andromeda/restapi/operations/datacenters"
 )
 
@@ -65,4 +67,31 @@ func (t *SuiteTest) TestDatacenters() {
 	rr = httptest.NewRecorder()
 	res.WriteResponse(rr, runtime.JSONProducer())
 	assert.Equal(t.T(), rr.Code, http.StatusNoContent, rr.Body)
+}
+
+func (t *SuiteTest) TestUpdateDatacenterSelective() {
+	dc := t.c.Datacenters
+
+	testDatacenter := datacenters.PostDatacentersBody{Datacenter: &models.Datacenter{Name: swag.String("test")}}
+
+	// Write new datacenter
+	res := dc.PostDatacenters(datacenters.PostDatacentersParams{Datacenter: testDatacenter})
+	rr := httptest.NewRecorder()
+	res.WriteResponse(rr, runtime.JSONProducer())
+	assert.Equal(t.T(), rr.Code, http.StatusCreated, rr.Body)
+	datacenter := datacenters.PostDatacentersBody{}
+	_ = datacenter.UnmarshalBinary(rr.Body.Bytes())
+	assert.Equal(t.T(), datacenter.Datacenter.Name, testDatacenter.Datacenter.Name)
+
+	// Update datacenter
+	testDatacenter.Datacenter.City = swag.String("berlin")
+	testDatacenter.Datacenter.Name = nil
+	res = dc.PutDatacentersDatacenterID(datacenters.PutDatacentersDatacenterIDParams{DatacenterID: datacenter.Datacenter.ID,
+		Datacenter: datacenters.PutDatacentersDatacenterIDBody(testDatacenter)})
+	rr = httptest.NewRecorder()
+	res.WriteResponse(rr, runtime.JSONProducer())
+	assert.Equal(t.T(), http.StatusAccepted, rr.Code, rr.Body)
+	_ = datacenter.UnmarshalBinary(rr.Body.Bytes())
+	assert.Equal(t.T(), "test", *datacenter.Datacenter.Name)
+	assert.Equal(t.T(), "berlin", *datacenter.Datacenter.City)
 }

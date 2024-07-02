@@ -19,10 +19,14 @@ package controller
 import (
 	"net/http"
 	"net/http/httptest"
+	"testing"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/swag"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/sapcc/andromeda/internal/utils"
+	"github.com/sapcc/andromeda/models"
 	"github.com/sapcc/andromeda/restapi/operations/monitors"
 )
 
@@ -73,4 +77,18 @@ func (t *SuiteTest) TestMonitors() {
 	if _, err := t.db.Exec("DELETE FROM pool"); err != nil {
 		t.FailNow(err.Error())
 	}
+}
+
+func TestValidateMonitor(t *testing.T) {
+	monitor := models.Monitor{
+		Send: swag.String("GET /"),
+		Type: swag.String(models.MonitorTypeHTTP),
+	}
+	assert.Equal(t, validateMonitor(&monitor), utils.InvalidSendString)
+
+	monitor.Send = swag.String("http://example.com/test")
+	assert.Equal(t, validateMonitor(&monitor), utils.InvalidSendString)
+
+	monitor.Send = swag.String("/test/site?param1=1&param2=2")
+	assert.Nil(t, validateMonitor(&monitor))
 }
