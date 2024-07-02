@@ -1472,14 +1472,14 @@ definitions:
         default: ""
       latitude:
         type: number
-        format: float
+        format: double
         example: 52.526055
         x-omitempty: false
         x-nullable: true
         default: 52.52
       longitude:
         type: number
-        format: float
+        format: double
         example: 13.403454
         x-omitempty: false
         x-nullable: true
