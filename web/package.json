@@ -10,7 +10,7 @@
     "autoprefixer": "^10.4.19",
     "chalk": "^5.3.0",
     "countries-list": "^3.1.0",
-    "esbuild": "^0.22.0",
+    "esbuild": "^0.23.0",
     "esbuild-plugin-inline-image": "^0.0.9",
     "esbuild-style-plugin": "^1.6.3",
     "juno-ui-components": "https://assets.juno.global.cloud.sap/libs/juno-ui-components@2.15.0/package.tgz",
