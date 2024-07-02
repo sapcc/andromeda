@@ -1727,9 +1727,9 @@ definitions:
         x-nullable: true
       send:
         type: string
-        description: Specifies the text string that the monitor sends to the target member.
+        description: Specifies the text string that the monitor sends to the target member. For HTTP/S monitors, this is a GET request and must be a HTTP path, e.g. `/status`.
         maxLength: 255
-        example: HEAD / HTTP/1.0\r\n\r\n
+        example: /stats
         x-nullable: true
       receive:
         type: string
