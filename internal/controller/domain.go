@@ -186,8 +186,15 @@ func (c DomainController) PutDomainsDomainID(params domains.PutDomainsDomainIDPa
 		return domains.NewPutDomainsDomainIDNotFound().WithPayload(utils.ProviderUnchangeable)
 	}
 
-	if params.Domain.Domain.Fqdn != nil && *params.Domain.Domain.Fqdn == "" {
-		return domains.NewPutDomainsDomainIDBadRequest().WithPayload(utils.MissingFQDN)
+	if params.Domain.Domain.Fqdn != nil {
+		if *params.Domain.Domain.Fqdn == "" {
+			return domains.NewPutDomainsDomainIDBadRequest().WithPayload(utils.MissingFQDN)
+		}
+
+		// disallow FQDN changes for akamai - it's the primary key to identify akamai API objects
+		if *domain.Provider == "akamai" && *params.Domain.Domain.Fqdn != *domain.Fqdn {
+			return domains.NewPutDomainsDomainIDBadRequest().WithPayload(utils.FQDNImmutable)
+		}
 	}
 
 	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
