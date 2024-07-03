@@ -114,9 +114,9 @@ func (c MonitorController) PostMonitors(params monitors.PostMonitorsParams) midd
 	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
 		sql := `
 			INSERT INTO monitor 
-				(name, admin_state_up, type, "interval", timeout, pool_id, send, receive, project_id)
+				(name, admin_state_up, type, "interval", timeout, pool_id, send, receive, http_method, project_id)
 			VALUES 
-				(:name, :admin_state_up, :type, :interval, :timeout, :pool_id, :send, :receive, :project_id)
+				(:name, :admin_state_up, :type, :interval, :timeout, :pool_id, :send, :receive, :http_method, :project_id)
 			RETURNING *
 		`
 		stmt, err := tx.PrepareNamed(sql)
@@ -188,6 +188,7 @@ func (c MonitorController) PutMonitorsMonitorID(params monitors.PutMonitorsMonit
 			send = COALESCE(:send, send),
 			timeout = COALESCE(:timeout, timeout),
 			type = COALESCE(:type, type),
+			http_method = COALESCE(:http_method, http_method),
 		    updated_at = NOW(),
 		    provisioning_status = 'PENDING_UPDATE'
 		WHERE id = :id

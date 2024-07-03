@@ -57,7 +57,7 @@ type Domain struct {
 	// Example: example.org
 	// Max Length: 512
 	// Format: hostname
-	Fqdn strfmt.Hostname `json:"fqdn,omitempty"`
+	Fqdn *strfmt.Hostname `json:"fqdn,omitempty"`
 
 	// The id of the resource.
 	// Read Only: true

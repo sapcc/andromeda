@@ -67,10 +67,7 @@ func (c DomainController) GetDomains(params domains.GetDomainsParams) middleware
 			continue
 		}
 
-		if *domain.Provider == "akamai" {
-			cname := strfmt.Hostname(fmt.Sprintf("%s.%s", domain.Fqdn.String(), config.Global.AkamaiConfig.Domain))
-			domain.CnameTarget = &cname
-		}
+		populateCNAME(&domain)
 		if err := PopulateDomainPools(c.db, &domain); err != nil {
 			panic(err)
 		}
@@ -92,7 +89,7 @@ func (c DomainController) PostDomains(params domains.PostDomainsParams) middlewa
 		domain.ProjectID = &projectID
 	}
 
-	if domain.Fqdn == "" {
+	if domain.Fqdn == nil {
 		return domains.NewPostDomainsDefault(400).WithPayload(utils.MissingFQDN)
 	}
 
@@ -152,6 +149,7 @@ func (c DomainController) PostDomains(params domains.PostDomainsParams) middlewa
 	}
 
 	_ = PendingSync(c.sv)
+	populateCNAME(domain)
 	return domains.NewPostDomainsCreated().WithPayload(&domains.PostDomainsCreatedBody{Domain: domain})
 }
 
@@ -168,6 +166,7 @@ func (c DomainController) GetDomainsDomainID(params domains.GetDomainsDomainIDPa
 		return domains.NewGetDomainsDomainIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
+	populateCNAME(&domain)
 	return domains.NewGetDomainsDomainIDOK().WithPayload(&domains.GetDomainsDomainIDOKBody{Domain: &domain})
 }
 
@@ -185,6 +184,10 @@ func (c DomainController) PutDomainsDomainID(params domains.PutDomainsDomainIDPa
 	if params.Domain.Domain.Provider != nil && *params.Domain.Domain.Provider != *domain.Provider {
 		// cannot change provider
 		return domains.NewPutDomainsDomainIDNotFound().WithPayload(utils.ProviderUnchangeable)
+	}
+
+	if params.Domain.Domain.Fqdn != nil && *params.Domain.Domain.Fqdn == "" {
+		return domains.NewPutDomainsDomainIDBadRequest().WithPayload(utils.MissingFQDN)
 	}
 
 	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
@@ -249,6 +252,7 @@ func (c DomainController) PutDomainsDomainID(params domains.PutDomainsDomainIDPa
 	}
 
 	_ = PendingSync(c.sv)
+	populateCNAME(&domain)
 	return domains.NewPutDomainsDomainIDAccepted().WithPayload(&domains.PutDomainsDomainIDAcceptedBody{Domain: &domain})
 }
 
@@ -347,4 +351,11 @@ func UpdateCascadeDomain(tx *sqlx.Tx, domainID strfmt.UUID, provisioningStatus s
 		return err
 	}
 	return nil
+}
+
+func populateCNAME(domain *models.Domain) {
+	if *domain.Provider == "akamai" {
+		cname := strfmt.Hostname(fmt.Sprintf("%s.%s", domain.Fqdn.String(), config.Global.AkamaiConfig.Domain))
+		domain.CnameTarget = &cname
+	}
 }

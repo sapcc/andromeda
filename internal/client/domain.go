@@ -87,9 +87,10 @@ func (*DomainList) Execute(_ []string) error {
 }
 
 func (*DomainCreate) Execute(_ []string) error {
+	fqdn := strfmt.Hostname(DomainOptions.DomainCreate.FQDN)
 	domain := domains.PostDomainsBody{Domain: &models.Domain{
 		Name:       &DomainOptions.DomainCreate.Name,
-		Fqdn:       strfmt.Hostname(DomainOptions.DomainCreate.FQDN),
+		Fqdn:       &fqdn,
 		Mode:       &DomainOptions.DomainCreate.Mode,
 		Provider:   &DomainOptions.Provider,
 		RecordType: &DomainOptions.DomainCreate.RecordType,
@@ -144,7 +145,8 @@ func (*DomainSet) Execute(_ []string) error {
 		domain.Domain.Name = &DomainOptions.DomainSet.Name
 	}
 	if DomainOptions.DomainSet.FQDN != "" {
-		domain.Domain.Fqdn = strfmt.Hostname(DomainOptions.DomainSet.FQDN)
+		fqdn := strfmt.Hostname(DomainOptions.DomainSet.FQDN)
+		domain.Domain.Fqdn = &fqdn
 	}
 	if DomainOptions.DomainSet.Mode != "" {
 		domain.Domain.Mode = &DomainOptions.DomainSet.Mode

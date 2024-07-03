@@ -43,6 +43,10 @@ type Monitor struct {
 	// Format: date-time
 	CreatedAt strfmt.DateTime `json:"created_at,omitempty"`
 
+	// HTTP method to use for monitor checks. Only used for HTTP/S monitors.
+	// Enum: [GET POST PUT HEAD PATCH DELETE OPTIONS]
+	HTTPMethod *string `json:"http_method,omitempty"`
+
 	// The id of the resource.
 	// Read Only: true
 	// Format: uuid
@@ -109,6 +113,10 @@ func (m *Monitor) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateHTTPMethod(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateID(formats); err != nil {
 		res = append(res, err)
 	}
@@ -165,6 +173,63 @@ func (m *Monitor) validateCreatedAt(formats strfmt.Registry) error {
 	}
 
 	if err := validate.FormatOf("created_at", "body", "date-time", m.CreatedAt.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var monitorTypeHTTPMethodPropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["GET","POST","PUT","HEAD","PATCH","DELETE","OPTIONS"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		monitorTypeHTTPMethodPropEnum = append(monitorTypeHTTPMethodPropEnum, v)
+	}
+}
+
+const (
+
+	// MonitorHTTPMethodGET captures enum value "GET"
+	MonitorHTTPMethodGET string = "GET"
+
+	// MonitorHTTPMethodPOST captures enum value "POST"
+	MonitorHTTPMethodPOST string = "POST"
+
+	// MonitorHTTPMethodPUT captures enum value "PUT"
+	MonitorHTTPMethodPUT string = "PUT"
+
+	// MonitorHTTPMethodHEAD captures enum value "HEAD"
+	MonitorHTTPMethodHEAD string = "HEAD"
+
+	// MonitorHTTPMethodPATCH captures enum value "PATCH"
+	MonitorHTTPMethodPATCH string = "PATCH"
+
+	// MonitorHTTPMethodDELETE captures enum value "DELETE"
+	MonitorHTTPMethodDELETE string = "DELETE"
+
+	// MonitorHTTPMethodOPTIONS captures enum value "OPTIONS"
+	MonitorHTTPMethodOPTIONS string = "OPTIONS"
+)
+
+// prop value enum
+func (m *Monitor) validateHTTPMethodEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, monitorTypeHTTPMethodPropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Monitor) validateHTTPMethod(formats strfmt.Registry) error {
+	if swag.IsZero(m.HTTPMethod) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateHTTPMethodEnum("http_method", "body", *m.HTTPMethod); err != nil {
 		return err
 	}
 

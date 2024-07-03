@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v8/pkg/gtm"
+	"github.com/go-openapi/swag"
 	"go-micro.dev/v4/logger"
 
 	"github.com/sapcc/andromeda/internal/config"
@@ -136,8 +137,14 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 			} else {
 				livenessTest.TestObject = monitor.GetSend()
 			}
-			livenessTest.TestObjectPort = 80
+			var testPort uint32 = 80
+			for _, member := range members {
+				testPort = member.GetPort()
+				break
+			}
+			livenessTest.TestObjectPort = int(testPort)
 			livenessTest.HTTPHeaders = []*gtm.HTTPHeader{{Name: "Host", Value: domain.GetFqdn()}}
+			livenessTest.HTTPMethod = swag.String(monitor.GetMethod().String())
 		case rpcmodels.Monitor_TCP:
 			livenessTest.RequestString = monitor.GetSend()
 			livenessTest.ResponseString = monitor.GetReceive()
@@ -176,15 +183,17 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 		"TrafficTargets.Enabled",
 		"TrafficTargets.Weight",
 		"TrafficTargets.Servers",
-		"TrafficTargets.Name",
+		//"TrafficTargets.Name", # bug in Akamai API
 		"LivenessTests",
 		"LivenessTests.Name",
 		"LivenessTests.TestObject",
+		"LivenessTests.TestObjectPort",
 		"LivenessTests.TestInterval",
 		"LivenessTests.TestTimeout",
 		"LivenessTests.RequestString",
 		"LivenessTests.ResponseString",
 		"LivenessTests.TestObjectProtocol",
+		"LivenessTests.HTTPMethod",
 	}
 	if utils.DeepEqualFields(&property, existingProperty, fieldsToCompare) {
 		return
@@ -194,7 +203,7 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 	logger.Infof("UpdateProperty(domain=%s, property=%s)", trafficManagementDomain, property.Name)
 	ret, err3 := s.gtm.UpdateProperty(context.Background(), &property, trafficManagementDomain)
 	if err3 != nil {
-		err = fmt.Errorf("Request %s: %w", PrettyJson(property), err3)
+		err = fmt.Errorf("request %s: %w", PrettyJson(property), err3)
 		return
 	}
 

@@ -42,7 +42,7 @@ func init() {
   "info": {
     "description": "Platform agnostic GSLB frontend",
     "title": "Andromeda",
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "basePath": "/v1",
   "paths": {
@@ -1975,6 +1975,7 @@ func init() {
           "type": "string",
           "format": "hostname",
           "maxLength": 512,
+          "x-nullable": true,
           "example": "example.org"
         },
         "id": {
@@ -2302,6 +2303,20 @@ func init() {
           "format": "date-time",
           "readOnly": true,
           "example": "2020-05-11T17:21:34"
+        },
+        "http_method": {
+          "description": "HTTP method to use for monitor checks. Only used for HTTP/S monitors.",
+          "type": "string",
+          "default": "GET",
+          "enum": [
+            "GET",
+            "POST",
+            "PUT",
+            "HEAD",
+            "PATCH",
+            "DELETE",
+            "OPTIONS"
+          ]
         },
         "id": {
           "description": "The id of the resource.",
@@ -2701,7 +2716,7 @@ func init() {
   "info": {
     "description": "Platform agnostic GSLB frontend",
     "title": "Andromeda",
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "basePath": "/v1",
   "paths": {
@@ -4876,6 +4891,7 @@ func init() {
           "type": "string",
           "format": "hostname",
           "maxLength": 512,
+          "x-nullable": true,
           "example": "example.org"
         },
         "id": {
@@ -5190,6 +5206,20 @@ func init() {
           "format": "date-time",
           "readOnly": true,
           "example": "2020-05-11T17:21:34"
+        },
+        "http_method": {
+          "description": "HTTP method to use for monitor checks. Only used for HTTP/S monitors.",
+          "type": "string",
+          "default": "GET",
+          "enum": [
+            "GET",
+            "POST",
+            "PUT",
+            "HEAD",
+            "PATCH",
+            "DELETE",
+            "OPTIONS"
+          ]
         },
         "id": {
           "description": "The id of the resource.",

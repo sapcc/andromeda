@@ -76,4 +76,14 @@ message Monitor {
   }
   MonitorType type = 8;
   string provisioning_status = 9;
+  enum HttpMethod {
+    GET = 0;
+    POST = 1;
+    PUT = 2;
+    HEAD = 3;
+    PATCH = 4;
+    DELETE = 5;
+    OPTIONS = 6;
+  }
+  HttpMethod method = 10;
 }

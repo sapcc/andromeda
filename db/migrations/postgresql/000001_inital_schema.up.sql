@@ -99,6 +99,7 @@ CREATE TABLE monitor
     pool_id             UUID         NOT NULL REFERENCES pool ON DELETE CASCADE,
     receive             VARCHAR(255) NULL,
     send                VARCHAR(255) NULL,
+    http_method         VARCHAR(16)  NOT NULL DEFAULT 'GET',
     timeout             BIGINT       NULL,
     type                VARCHAR(16)  NULL,
     project_id          VARCHAR(36)  NOT NULL

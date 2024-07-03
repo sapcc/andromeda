@@ -3,7 +3,7 @@ consumes:
 info:
   description: Platform agnostic GSLB frontend
   title: Andromeda
-  version: 1.0.0
+  version: 1.1.0
 produces:
 - application/json
 swagger: "2.0"
@@ -1259,6 +1259,7 @@ definitions:
         description: Desired Fully-Qualified Host Name.
         example: example.org
         maxLength: 512
+        x-nullable: true
       cname_target:
         type: string
         format: hostname
@@ -1734,6 +1735,18 @@ definitions:
         maxLength: 255
         example: HTTP/1.
         x-nullable: true
+      http_method:
+        type: string
+        description: HTTP method to use for monitor checks. Only used for HTTP/S monitors.
+        enum:
+          - GET
+          - POST
+          - PUT
+          - HEAD
+          - PATCH
+          - DELETE
+          - OPTIONS
+        default: GET
 
   service:
     type: object

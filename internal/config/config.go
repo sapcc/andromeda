@@ -130,6 +130,11 @@ func parseConfigFlags(flags []string) error {
 	if err := conf.Scan(&Global); err != nil {
 		return err
 	}
+	if Global.Default.Debug {
+		if err := logger.Init(logger.WithLevel(logger.DebugLevel)); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
