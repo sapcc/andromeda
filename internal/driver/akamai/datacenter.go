@@ -18,6 +18,7 @@ package akamai
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v8/pkg/gtm"
@@ -31,7 +32,8 @@ import (
 	"github.com/sapcc/andromeda/models"
 )
 
-func (s *AkamaiAgent) GetDatacenterReference(datacenterUUID string, datacenters []*rpcmodels.Datacenter) (int, error) {
+// GetDatacenterMeta return the meta id for a given datacenter uuid
+func (s *AkamaiAgent) GetDatacenterMeta(datacenterUUID string, datacenters []*rpcmodels.Datacenter) (int, error) {
 	// Fetch from cache
 	if id, ok := s.datacenterIdCache.Get(datacenterUUID); ok {
 		return id, nil
@@ -44,17 +46,40 @@ func (s *AkamaiAgent) GetDatacenterReference(datacenterUUID string, datacenters 
 		}
 	}
 
-	var aDatacenter *rpcmodels.Datacenter
+	var meta int
 	for _, datacenter := range datacenters {
 		if datacenter.GetId() == datacenterUUID {
-			aDatacenter = datacenter
-			break
+			meta = int(datacenter.GetMeta())
+			if meta != 0 {
+				return meta, nil
+			}
 		}
 	}
 
-	// DatacenterId is a unique number for an akamai datacenter
-	s.datacenterIdCache.Add(datacenterUUID, int(aDatacenter.GetMeta()))
-	return int(aDatacenter.GetMeta()), nil
+	// Refresh datacenter meta id from akamai
+	dcs, err := s.gtm.ListDatacenters(context.Background(), config.Global.AkamaiConfig.Domain)
+	if err != nil {
+		return 0, nil
+	}
+	for _, d := range dcs {
+		if d.Nickname == datacenterUUID {
+			meta = d.DatacenterID
+			break
+		}
+	}
+	if meta == 0 {
+		return 0, errors.New("datacenter/GetDatacenterMeta: datacenter not found")
+	}
+
+	// sync meta id with andromeda database
+	req := &server.DatacenterMetaRequest{Id: datacenterUUID, Meta: int32(meta)}
+	if _, err = s.rpc.UpdateDatacenterMeta(context.Background(), req); err != nil {
+		return meta, err
+	}
+
+	// cache meta id
+	s.datacenterIdCache.Add(datacenterUUID, meta)
+	return meta, nil
 }
 
 func (s *AkamaiAgent) GetDatacenters(datacenterIDs []string) ([]*rpcmodels.Datacenter, error) {
@@ -111,41 +136,32 @@ func (s *AkamaiAgent) FetchAndSyncDatacenters(datacenters []string, force bool) 
 	return nil
 }
 
-func getBackendDatacenter(meta int, datacenter *rpcmodels.Datacenter, s *AkamaiAgent) *gtm.Datacenter {
-	if meta != 0 {
-		if backendDatacenter, err := s.gtm.GetDatacenter(context.Background(), meta, config.Global.AkamaiConfig.Domain); err == nil {
-			return backendDatacenter
-		}
-	}
-
-	// try to find datacenter by nickname
-	datacenters, err := s.gtm.ListDatacenters(context.Background(), config.Global.AkamaiConfig.Domain)
-	if err != nil {
-		return nil
-	}
-	for _, d := range datacenters {
-		if d.Nickname == datacenter.Id {
-			return d
-		}
-	}
-	return nil
-}
-
 func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force bool) (*rpcmodels.Datacenter, error) {
 	logger.Debugf("SyncDatacenter(%s, force=%t)", datacenter.Id, force)
 
 	// akamai datacenterId is a unique numeric reference to a domain specific datacenter
-	meta := int(datacenter.GetMeta())
+	var meta = int(datacenter.GetMeta())
+	var backendDatacenter *gtm.Datacenter
+	var err error
+
+	if meta == 0 && datacenter.ProvisioningStatus != models.DatacenterProvisioningStatusPENDINGCREATE {
+		meta, err = s.GetDatacenterMeta(datacenter.Id, nil)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if backendDatacenter, err = s.gtm.GetDatacenter(context.Background(), meta, config.Global.AkamaiConfig.Domain); err != nil {
+		return nil, err
+	}
 
 	if datacenter.ProvisioningStatus == models.DatacenterProvisioningStatusPENDINGDELETE {
 		// Run Delete
-		toDelete := getBackendDatacenter(meta, datacenter, s)
-		if toDelete == nil {
+		if backendDatacenter == nil {
 			// datacenter already deleted
 			return nil, nil
 		}
 
-		_, err := s.gtm.DeleteDatacenter(context.Background(), toDelete, config.Global.AkamaiConfig.Domain)
+		_, err = s.gtm.DeleteDatacenter(context.Background(), backendDatacenter, config.Global.AkamaiConfig.Domain)
 		return nil, err
 	}
 
@@ -174,7 +190,6 @@ func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force boo
 		"Longitude",
 		"Nickname",
 	}
-	backendDatacenter := getBackendDatacenter(meta, datacenter, s)
 	if utils.DeepEqualFields(&referenceDatacenter, backendDatacenter, fieldsToCompare) {
 		// no change
 		return datacenter, nil
@@ -183,7 +198,7 @@ func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force boo
 	if backendDatacenter != nil {
 		// Run Update
 		referenceDatacenter.DatacenterID = backendDatacenter.DatacenterID
-		_, err := s.gtm.UpdateDatacenter(context.Background(), &referenceDatacenter, config.Global.AkamaiConfig.Domain)
+		_, err = s.gtm.UpdateDatacenter(context.Background(), &referenceDatacenter, config.Global.AkamaiConfig.Domain)
 		if err != nil {
 			logger.Errorf("UpdateDatacenter(%s) for domain %s failed", referenceDatacenter.Nickname,
 				config.Global.AkamaiConfig.Domain)
@@ -193,7 +208,8 @@ func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force boo
 				config.Global.AkamaiConfig.Domain)
 		}
 	} else {
-		res, err := s.gtm.CreateDatacenter(context.Background(), &referenceDatacenter, config.Global.AkamaiConfig.Domain)
+		var res *gtm.DatacenterResponse
+		res, err = s.gtm.CreateDatacenter(context.Background(), &referenceDatacenter, config.Global.AkamaiConfig.Domain)
 		if err != nil {
 			logger.Errorf("CreateDatacenter(%s) for domain %s failed", referenceDatacenter.Nickname,
 				config.Global.AkamaiConfig.Domain)

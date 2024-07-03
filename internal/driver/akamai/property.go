@@ -103,16 +103,10 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 		datacenterUUID := member.GetDatacenter()
 
 		if len(datacenterUUID) > 0 {
-			var aDatacenter *rpcmodels.Datacenter
-			for _, datacenter := range domain.Datacenters {
-				if datacenter.GetId() == datacenterUUID {
-					aDatacenter = datacenter
-					break
-				}
+			if trafficTarget.DatacenterID, err = s.GetDatacenterMeta(datacenterUUID, domain.Datacenters); err != nil {
+				logger.Error(err)
+				continue
 			}
-
-			// DatacenterId is a unique number for an akamai datacenter
-			trafficTarget.DatacenterID = int(aDatacenter.GetMeta())
 		}
 		property.TrafficTargets = append(property.TrafficTargets, &trafficTarget)
 		provRequests = append(provRequests,

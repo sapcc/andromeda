@@ -53,7 +53,7 @@ func (s *AkamaiAgent) GetGeomap(geomapID string) (*rpcmodels.Geomap, error) {
 }
 
 func (s *AkamaiAgent) constructAkamaiGeoMap(geomap *rpcmodels.Geomap) (*gtm.GeoMap, error) {
-	defaultDatacenterReference, err := s.GetDatacenterReference(geomap.DefaultDatacenter, nil)
+	defaultDatacenterReference, err := s.GetDatacenterMeta(geomap.DefaultDatacenter, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (s *AkamaiAgent) constructAkamaiGeoMap(geomap *rpcmodels.Geomap) (*gtm.GeoM
 			continue
 		}
 
-		datacenterReference, err := s.GetDatacenterReference(dc.Datacenter, nil)
+		datacenterReference, err := s.GetDatacenterMeta(dc.Datacenter, nil)
 		if err != nil {
 			return nil, err
 		}
