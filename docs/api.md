@@ -9,7 +9,7 @@ Platform agnostic GSLB frontend
 
 ### Version
 
-1.0.0
+1.1.0
 
 ## Tags
 
@@ -2888,6 +2888,7 @@ Unexpected Error
 |------|------|---------|:--------:| ------- |-------------|---------|
 | admin_state_up | boolean| `bool` |  | `true`| The administrative state of the resource, which is up (true) or down (false). Default is true. |  |
 | created_at | date-time (formatted string)| `strfmt.DateTime` |  | | The UTC date and timestamp when the resource was created. | `2020-05-11T17:21:34` |
+| http_method | string| `string` |  | `"GET"`| HTTP method to use for monitor checks. Only used for HTTP/S monitors. |  |
 | id | uuid (formatted string)| `strfmt.UUID` |  | | The id of the resource. |  |
 | interval | integer| `int64` |  | `60`| The interval, in seconds, between health checks. | `10` |
 | name | string| `string` |  | | Human-readable name of the resource. |  |
