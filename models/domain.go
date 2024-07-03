@@ -55,10 +55,9 @@ type Domain struct {
 
 	// Desired Fully-Qualified Host Name.
 	// Example: example.org
-	// Required: true
 	// Max Length: 512
 	// Format: hostname
-	Fqdn *strfmt.Hostname `json:"fqdn"`
+	Fqdn strfmt.Hostname `json:"fqdn,omitempty"`
 
 	// The id of the resource.
 	// Read Only: true
@@ -83,9 +82,8 @@ type Domain struct {
 
 	// Supported provider drivers
 	// Example: akamai
-	// Required: true
 	// Enum: [akamai f5]
-	Provider *string `json:"provider"`
+	Provider *string `json:"provider,omitempty"`
 
 	// provisioning status
 	// Read Only: true
@@ -191,9 +189,8 @@ func (m *Domain) validateCreatedAt(formats strfmt.Registry) error {
 }
 
 func (m *Domain) validateFqdn(formats strfmt.Registry) error {
-
-	if err := validate.Required("fqdn", "body", m.Fqdn); err != nil {
-		return err
+	if swag.IsZero(m.Fqdn) { // not required
+		return nil
 	}
 
 	if err := validate.MaxLength("fqdn", "body", m.Fqdn.String(), 512); err != nil {
@@ -329,9 +326,8 @@ func (m *Domain) validateProviderEnum(path, location string, value string) error
 }
 
 func (m *Domain) validateProvider(formats strfmt.Registry) error {
-
-	if err := validate.Required("provider", "body", m.Provider); err != nil {
-		return err
+	if swag.IsZero(m.Provider) { // not required
+		return nil
 	}
 
 	// value enum

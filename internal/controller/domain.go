@@ -92,6 +92,14 @@ func (c DomainController) PostDomains(params domains.PostDomainsParams) middlewa
 		domain.ProjectID = &projectID
 	}
 
+	if domain.Fqdn == "" {
+		return domains.NewPostDomainsDefault(400).WithPayload(utils.MissingFQDN)
+	}
+
+	if domain.Provider == nil {
+		return domains.NewPostDomainsDefault(400).WithPayload(utils.MissingProvider)
+	}
+
 	if domain.Pools == nil {
 		domain.Pools = []strfmt.UUID{}
 	}

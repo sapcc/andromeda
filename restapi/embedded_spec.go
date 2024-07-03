@@ -1941,10 +1941,6 @@ func init() {
     "domain": {
       "description": "A representation of a domain",
       "type": "object",
-      "required": [
-        "fqdn",
-        "provider"
-      ],
       "properties": {
         "admin_state_up": {
           "description": "The administrative state of the resource, which is up (true) or down (false). Default is true.",
@@ -4846,10 +4842,6 @@ func init() {
     "domain": {
       "description": "A representation of a domain",
       "type": "object",
-      "required": [
-        "fqdn",
-        "provider"
-      ],
       "properties": {
         "admin_state_up": {
           "description": "The administrative state of the resource, which is up (true) or down (false). Default is true.",
