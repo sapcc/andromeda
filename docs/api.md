@@ -2758,13 +2758,13 @@ Unexpected Error
 | aliases | []string (formatted string)| `[]string` |  | |  |  |
 | cname_target | hostname (formatted string)| `strfmt.Hostname` |  | | If not empty, the backend created a CNAME target to be used for the FQDN. | `example.org.production.gtm.com` |
 | created_at | date-time (formatted string)| `strfmt.DateTime` |  | | The UTC date and timestamp when the resource was created. | `2020-05-11T17:21:34` |
-| fqdn | hostname (formatted string)| `strfmt.Hostname` | ✓ | | Desired Fully-Qualified Host Name. | `example.org` |
+| fqdn | hostname (formatted string)| `strfmt.Hostname` |  | | Desired Fully-Qualified Host Name. | `example.org` |
 | id | uuid (formatted string)| `strfmt.UUID` |  | | The id of the resource. |  |
 | mode | string| `string` |  | `"ROUND_ROBIN"`| Load balancing method to use for the references pools. |  |
 | name | string| `string` |  | | Human-readable name of the resource. |  |
 | pools | []uuid (formatted string)| `[]strfmt.UUID` |  | |  |  |
 | project_id | string| `string` |  | | The ID of the project owning this resource. | `fa84c217f361441986a220edf9b1e337` |
-| provider | string| `string` | ✓ | | Supported provider drivers | `akamai` |
+| provider | string| `string` |  | | Supported provider drivers | `akamai` |
 | provisioning_status | string| `string` |  | |  |  |
 | record_type | string| `string` |  | `"A"`| DNS Record type to use. |  |
 | status | string| `string` |  | |  |  |
