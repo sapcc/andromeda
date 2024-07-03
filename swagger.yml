@@ -1205,9 +1205,6 @@ definitions:
   domain:
     type: object
     description: A representation of a domain
-    required:
-      - fqdn
-      - provider
     properties:
       id:
         type: string
