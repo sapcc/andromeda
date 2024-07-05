@@ -22,7 +22,7 @@ import (
 	"strings"
 
 	"github.com/go-openapi/loads"
-	"github.com/iancoleman/strcase"
+	"github.com/go-openapi/swag"
 )
 
 var (
@@ -48,7 +48,7 @@ func SetModelDefaults(s interface{}) error {
 
 				// Check if model has default set
 				if property.Default != nil {
-					propertyField := reflect.ValueOf(s).Elem().FieldByName(strcase.ToCamel(propName))
+					propertyField := reflect.ValueOf(s).Elem().FieldByName(swag.ToGoName(propName))
 					if propertyField.Kind() != reflect.Ptr && propertyField.Kind() != reflect.Uintptr {
 						return fmt.Errorf("unexpected field %s for specDefinitionModel %s", propName, specDefinitionName)
 					}
