@@ -1,5 +1,5 @@
 FROM golang:1.22-alpine as builder
-RUN apk add --no-cache make gcc musl-dev protoc git && go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28 && go install github.com/go-micro/generator/cmd/protoc-gen-micro@latest
+RUN apk add --no-cache make gcc musl-dev protoc git && go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28 && go install github.com/actatum/stormrpc/cmd/protoc-gen-stormrpc@latest
 
 COPY . /src
 RUN make -C /src
