@@ -84,10 +84,14 @@ func (s *AkamaiAgent) syncMemberStatus(domain *rpcmodels.Domain) error {
 				status = "ONLINE"
 			}
 
-			memberStatusRequests = append(memberStatusRequests,
-				driver.GetMemberStatusRequest(memberMap[ip.IP], status))
+			if id, ok := memberMap[ip.IP]; ok {
+				memberStatusRequests = append(memberStatusRequests,
+					driver.GetMemberStatusRequest(id, status))
+			} else {
+				logger.Warnf("unknown member with ip %s not found as port of domain %s", ip.IP, domain.Id)
+			}
 
-			logger.Infof("status of %s: Alive: %+v ,HandedOut: %+v, %f", domain.Id, ip.Alive, ip.HandedOut, ip.Score)
+			logger.Infof("status of domain %s: Alive: %+v, HandedOut: %+v, Score: %f", domain.Id, ip.Alive, ip.HandedOut, ip.Score)
 		}
 	}
 
