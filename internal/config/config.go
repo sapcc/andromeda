@@ -28,7 +28,7 @@ import (
 	"github.com/gophercloud/utils/openstack/clientconfig"
 	"github.com/mcuadros/go-defaults"
 	"github.com/urfave/cli/v2"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 var (
