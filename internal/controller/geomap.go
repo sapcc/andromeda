@@ -191,13 +191,13 @@ func (c GeoMapController) DeleteGeomapsGeoMapID(params geographic_maps.DeleteGeo
 
 		sql, args, err = sq.Update("geographic_map").
 			Where("id = ?", geomap.ID).
-			Set("provisioning_status", "PENDING_DELETE").
+			Set("provisioning_status", models.GeomapProvisioningStatusPENDINGDELETE).
 			Set("updated_at", sq.Expr("NOW()")).
 			ToSql()
 		if err != nil {
 			return err
 		}
-		if _, err = c.db.Exec(c.db.Rebind(sql), args...); err != nil {
+		if _, err = tx.Exec(c.db.Rebind(sql), args...); err != nil {
 			return err
 		}
 		return nil
