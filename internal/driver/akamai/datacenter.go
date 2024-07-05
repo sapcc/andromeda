@@ -111,7 +111,7 @@ func (s *AkamaiAgent) FetchAndSyncDatacenters(datacenters []string, force bool) 
 				driver.GetProvisioningStatusRequest(datacenter.Id, "DATACENTER", "DELETED"))
 		} else {
 			provRequests = append(provRequests,
-				driver.GetProvisioningStatusRequest(datacenter.Id, "DATACENTER", "ACTIVE"))
+				driver.GetProvisioningStatusRequest(datacenter.Id, "DATACENTER", models.DatacenterProvisioningStatusACTIVE))
 		}
 
 		if _, err = s.SyncDatacenter(datacenter, force); err != nil {

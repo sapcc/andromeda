@@ -27,6 +27,7 @@ import (
 	"github.com/sapcc/andromeda/internal/driver"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
+	"github.com/sapcc/andromeda/models"
 )
 
 var MONITOR_LIVENESS_TYPE_MAP = map[rpcmodels.Monitor_MonitorType]string{
@@ -82,7 +83,7 @@ func (s *AkamaiAgent) FetchAndSyncDomains(domains []string) error {
 	var datacenters []string
 	for _, domain := range res {
 		for _, datacenter := range domain.Datacenters {
-			if datacenter.ProvisioningStatus != "ACTIVE" {
+			if datacenter.ProvisioningStatus != models.DatacenterProvisioningStatusACTIVE {
 				datacenters = append(datacenters, datacenter.Id)
 			}
 		}
@@ -100,7 +101,7 @@ func (s *AkamaiAgent) FetchAndSyncDomains(domains []string) error {
 			return err
 		}
 
-		if domain.ProvisioningStatus == "PENDING_DELETE" {
+		if domain.ProvisioningStatus == models.DomainProvisioningStatusPENDINGDELETE {
 			// Run Delete
 			if err := s.DeleteProperty(domain, trafficManagementDomain); err != nil {
 				return err

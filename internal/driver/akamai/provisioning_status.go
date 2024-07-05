@@ -19,10 +19,13 @@ package akamai
 import (
 	"context"
 	"fmt"
+
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/driver"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
+	"github.com/sapcc/andromeda/models"
+
 	"go-micro.dev/v4/logger"
 )
 
@@ -35,11 +38,11 @@ func (s *AkamaiAgent) CascadeUpdateDomainProvisioningStatus(domain *rpcmodels.Do
 		driver.GetProvisioningStatusRequest(domain.Id, "DOMAIN", value))
 	if value == "DELETED" {
 		// Only delete domain, set related objects to active
-		value = "ACTIVE"
+		value = models.DomainProvisioningStatusACTIVE
 	}
 
 	for _, datacenter := range domain.Datacenters {
-		if datacenter.ProvisioningStatus != "ACTIVE" {
+		if datacenter.ProvisioningStatus != models.DatacenterProvisioningStatusACTIVE {
 			provisioningStatusRequests = append(provisioningStatusRequests,
 				driver.GetProvisioningStatusRequest(datacenter.Id, "DATACENTER", value))
 		}
@@ -47,18 +50,18 @@ func (s *AkamaiAgent) CascadeUpdateDomainProvisioningStatus(domain *rpcmodels.Do
 
 	for _, pool := range domain.Pools {
 		// No pool representation in Akamai
-		if pool.ProvisioningStatus != "ACTIVE" {
+		if pool.ProvisioningStatus != models.PoolProvisioningStatusACTIVE {
 			provisioningStatusRequests = append(provisioningStatusRequests,
 				driver.GetProvisioningStatusRequest(pool.Id, "POOL", value))
 		}
 		for _, monitor := range pool.Monitors {
-			if monitor.ProvisioningStatus != "ACTIVE" {
+			if monitor.ProvisioningStatus != models.MonitorProvisioningStatusACTIVE {
 				provisioningStatusRequests = append(provisioningStatusRequests,
 					driver.GetProvisioningStatusRequest(monitor.Id, "MONITOR", value))
 			}
 		}
 		for _, member := range pool.Members {
-			if member.ProvisioningStatus != "ACTIVE" {
+			if member.ProvisioningStatus != models.MemberProvisioningStatusACTIVE {
 				provisioningStatusRequests = append(provisioningStatusRequests,
 					driver.GetProvisioningStatusRequest(member.Id, "MEMBER", value))
 			}

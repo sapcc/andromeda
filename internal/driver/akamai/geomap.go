@@ -112,7 +112,7 @@ func (s *AkamaiAgent) FetchAndSyncGeomaps(geomaps []string, force bool) error {
 				driver.GetProvisioningStatusRequest(geomap.Id, "GEOGRAPHIC_MAP", "DELETED"))
 		} else {
 			provRequests = append(provRequests,
-				driver.GetProvisioningStatusRequest(geomap.Id, "GEOGRAPHIC_MAP", "ACTIVE"))
+				driver.GetProvisioningStatusRequest(geomap.Id, "GEOGRAPHIC_MAP", models.GeomapProvisioningStatusACTIVE))
 		}
 
 		if _, err = s.SyncGeomap(geomap, force); err != nil {

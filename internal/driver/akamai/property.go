@@ -28,6 +28,7 @@ import (
 	"github.com/sapcc/andromeda/internal/driver"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
 	"github.com/sapcc/andromeda/internal/utils"
+	"github.com/sapcc/andromeda/models"
 )
 
 func (s *AkamaiAgent) DeleteProperty(domain *rpcmodels.Domain, trafficManagementDomain string) error {
@@ -61,7 +62,7 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 	if len(pools) > 0 {
 		// flatten Members and Monitors
 		for _, pool := range pools {
-			if pool.ProvisioningStatus == "PENDING_DELETE" {
+			if pool.ProvisioningStatus == models.PoolProvisioningStatusPENDINGDELETE {
 				provRequests = append(provRequests,
 					driver.GetProvisioningStatusRequest(pool.Id, "POOL", "DELETED"))
 				continue
@@ -69,7 +70,7 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 			members = append(members, pool.GetMembers()...)
 			monitors = append(monitors, pool.GetMonitors()...)
 			provRequests = append(provRequests,
-				driver.GetProvisioningStatusRequest(pool.Id, "POOL", "ACTIVE"))
+				driver.GetProvisioningStatusRequest(pool.Id, "POOL", models.PoolProvisioningStatusACTIVE))
 		}
 	}
 
@@ -86,11 +87,11 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 		LivenessTests:        []*gtm.LivenessTest{},
 	}
 
-	// Add new Members
+	// Process Members
 	for _, member := range members {
-		if member.ProvisioningStatus == "PENDING_DELETE" {
+		if member.ProvisioningStatus == models.MemberProvisioningStatusPENDINGDELETE {
 			provRequests = append(provRequests,
-				driver.GetProvisioningStatusRequest(member.Id, "MEMBER", "DELETE"))
+				driver.GetProvisioningStatusRequest(member.Id, "MEMBER", "DELETED"))
 			continue
 		}
 
@@ -116,7 +117,7 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 
 	// Add new Monitors
 	for _, monitor := range monitors {
-		if monitor.ProvisioningStatus == "PENDING_DELETE" {
+		if monitor.ProvisioningStatus == models.MonitorProvisioningStatusPENDINGDELETE {
 			provRequests = append(provRequests,
 				driver.GetProvisioningStatusRequest(monitor.Id, "MONITOR", "DELETED"))
 			continue
@@ -151,16 +152,16 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 		default:
 			// unsupported type
 			provRequests = append(provRequests,
-				driver.GetProvisioningStatusRequest(monitor.Id, "MONITOR", "ERROR"))
+				driver.GetProvisioningStatusRequest(monitor.Id, "MONITOR", models.MonitorProvisioningStatusERROR))
 			continue
 		}
 		property.LivenessTests = append(property.LivenessTests, &livenessTest)
 		provRequests = append(provRequests,
-			driver.GetProvisioningStatusRequest(monitor.Id, "MONITOR", "ACTIVE"))
+			driver.GetProvisioningStatusRequest(monitor.Id, "MONITOR", models.MonitorProvisioningStatusACTIVE))
 	}
 
 	provRequests = append(provRequests,
-		driver.GetProvisioningStatusRequest(domain.Id, "DOMAIN", "ACTIVE"))
+		driver.GetProvisioningStatusRequest(domain.Id, "DOMAIN", models.DomainProvisioningStatusACTIVE))
 
 	// Pre-Validation
 	if len(property.TrafficTargets) == 0 {
