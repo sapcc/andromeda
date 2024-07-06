@@ -117,6 +117,9 @@ func parseConfigFlags(flags []string) error {
 	}
 
 	log.SetLevelFromString(Global.Default.LogLevel)
+	if Global.Default.Debug {
+		log.SetLevel(log.DebugLevel)
+	}
 	log.SetHandler(text.Default)
 	return nil
 }
