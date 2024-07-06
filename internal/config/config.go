@@ -24,6 +24,7 @@ import (
 	"strings"
 
 	"github.com/apex/log"
+	"github.com/apex/log/handlers/text"
 	"github.com/gophercloud/utils/openstack/clientconfig"
 	"github.com/mcuadros/go-defaults"
 	"github.com/urfave/cli/v2"
@@ -115,9 +116,8 @@ func parseConfigFlags(flags []string) error {
 		}
 	}
 
-	if Global.Default.Debug {
-		log.SetLevel(log.DebugLevel)
-	}
+	log.SetLevelFromString(Global.Default.LogLevel)
+	log.SetHandler(text.Default)
 	return nil
 }
 
@@ -143,6 +143,7 @@ type ApiSettings struct {
 	RateLimit                 float64 `yaml:"rate_limit" default:"100" description:"Maximum number of requests to limit per second."`
 	DisableCors               bool    `yaml:"disable_cors" description:"Stops sending Access-Control-Allow-Origin Header to allow cross-origin requests."`
 	EnableProxyHeadersParsing bool    `yaml:"enable_proxy_headers_parsing" default:"true" description:"Try parsing proxy headers for http scheme and base url."`
+	EnablePolicyTracing       bool    `yaml:"enable_policy_tracing" description:"Enable policy tracing."`
 }
 
 type Quota struct {
@@ -156,6 +157,7 @@ type Quota struct {
 
 type Default struct {
 	Debug            bool   `yaml:"debug" description:"Enable debug mode."`
+	LogLevel         string `yaml:"log_level" description:"Log level." default:"info"`
 	Host             string `yaml:"host" description:"Hostname used by the server/agent. Defaults to auto-discovery."`
 	ApiBaseURL       string `yaml:"api_base_uri" description:"Base URI for the API for use in pagination links. This will be autodetected from the request if not overridden here."`
 	TransportURL     string `yaml:"transport_url" description:"The network address and optional user credentials for connecting to the messaging backend."`

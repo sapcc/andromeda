@@ -107,7 +107,7 @@ func (u *RPCHandler) GetPools(ctx context.Context, request *SearchRequest) (*Poo
 	return response, nil
 }
 
-func (u *RPCHandler) GetDatacenters(ctx context.Context, request *SearchRequest) (response *DatacentersResponse, err error) {
+func (u *RPCHandler) GetDatacenters(ctx context.Context, request *SearchRequest) (*DatacentersResponse, error) {
 	q := sq.
 		Select("id", "admin_state_up", "city", "state_or_province", "continent", "country", "latitude",
 			"longitude", "scope", "provisioning_status", "provider", "meta").
@@ -122,11 +122,12 @@ func (u *RPCHandler) GetDatacenters(ctx context.Context, request *SearchRequest)
 	}
 
 	sql, args := q.MustSql()
-	var rows *sqlx.Rows
-	rows, err = u.DB.Queryx(u.DB.Rebind(sql), args...)
+	rows, err := u.DB.Queryx(u.DB.Rebind(sql), args...)
 	if err != nil {
 		return nil, err
 	}
+
+	response := &DatacentersResponse{Response: []*rpcmodels.Datacenter{}}
 	for rows.Next() {
 		var datacenter rpcmodels.Datacenter
 		if err = rows.StructScan(&datacenter); err != nil {
@@ -337,7 +338,7 @@ func (u *RPCHandler) GetDomains(ctx context.Context, request *SearchRequest) (*D
 		log.Error(err.Error())
 		return nil, err
 	}
-	var response *DomainsResponse
+	response := &DomainsResponse{Response: []*rpcmodels.Domain{}}
 	for rows.Next() {
 		var domain rpcmodels.Domain
 		if err = rows.StructScan(&domain); err != nil {
@@ -345,8 +346,7 @@ func (u *RPCHandler) GetDomains(ctx context.Context, request *SearchRequest) (*D
 			return nil, err
 		}
 
-		datacenterIds := []string{}
-
+		var datacenterIds []string
 		if request.GetFullyPopulated() {
 			if domain.Pools, err = populatePools(u, request.GetFullyPopulated(), domain.Id); err != nil {
 				log.Error(err.Error())

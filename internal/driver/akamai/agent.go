@@ -32,6 +32,7 @@ import (
 	"github.com/nats-io/nats.go"
 
 	"github.com/sapcc/andromeda/internal/config"
+	"github.com/sapcc/andromeda/internal/rpc"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/models"
 )
@@ -60,11 +61,11 @@ type AkamaiAgent struct {
 var akamaiAgent *AkamaiAgent
 
 func Sync(ctx context.Context, req stormrpc.Request) stormrpc.Response {
-	log.Infof("[Sync] Received sync request %+v", req)
 	var domainIDs []string
 	if err := req.Decode(&domainIDs); err != nil {
 		return stormrpc.NewErrorResponse(req.Reply, err)
 	}
+	log.WithField("domainIDs", domainIDs).Info("[Sync] Syncing domains")
 
 	akamaiAgent.forceSync <- domainIDs
 	resp, err := stormrpc.NewResponse(req.Reply, nil)
@@ -114,24 +115,21 @@ func ExecuteAkamaiAgent() error {
 		return err
 	}
 
-	srv, err := stormrpc.NewServer(&stormrpc.ServerConfig{}, stormrpc.WithNatsConn(nc))
-	if err != nil {
-		return err
-	}
+	srv := rpc.NewServer("andromeda-akamai-agent", stormrpc.WithNatsConn(nc))
 	srv.Handle("andromeda.sync", Sync)
 
 	go func() {
 		_ = srv.Run()
 	}()
 	go akamaiAgent.WorkerThread()
-	log.Infof("👋 Listening on %v", srv.Subjects())
+	log.WithField("subjects", srv.Subjects()).Info("Subscribed")
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
 	// full sync immediately
 	akamaiAgent.forceSync <- nil
 	<-done
-	log.Infof("💀 Shutting down")
+	log.Info("Shutting down")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -145,6 +143,7 @@ func (s *AkamaiAgent) WorkerThread() {
 	for {
 		select {
 		case domains := <-s.forceSync:
+			log.Debug("Running force sync")
 			if err := s.FetchAndSyncDatacenters(nil, true); err != nil {
 				log.Error(err.Error())
 			}
@@ -158,6 +157,7 @@ func (s *AkamaiAgent) WorkerThread() {
 			}
 		case <-s.workerTicker.C: // Activate periodically
 			if time.Since(s.lastSync) > syncInterval {
+				log.Debug("Running periodic sync")
 				if err := s.FetchAndSyncDatacenters(nil, false); err != nil {
 					log.Error(err.Error())
 				}

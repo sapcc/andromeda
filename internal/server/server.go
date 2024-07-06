@@ -33,7 +33,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/sapcc/go-api-declarations/bininfo"
 	"github.com/sapcc/go-bits/logg"
 	"github.com/xo/dburl"
 
@@ -41,6 +40,7 @@ import (
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/controller"
 	"github.com/sapcc/andromeda/internal/policy"
+	"github.com/sapcc/andromeda/internal/rpc"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/middlewares"
@@ -224,15 +224,7 @@ func ExecuteServer(server *restapi.Server) error {
 }
 
 func RPCServer(db *sqlx.DB) *stormrpc.Server {
-	srv, err := stormrpc.NewServer(&stormrpc.ServerConfig{
-		NatsURL: config.Global.Default.TransportURL,
-		Name:    "andromeda-server",
-		Version: bininfo.Version(),
-	}, stormrpc.WithErrorHandler(func(ctx context.Context, err error) { log.Errorf("server error: %v", err) }))
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
+	srv := rpc.NewServer("andromeda-server")
 	svc := &server.RPCHandler{DB: db}
 	server.RegisterRPCServerServer(srv, svc)
 	return srv

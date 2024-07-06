@@ -31,6 +31,7 @@ import (
 	"github.com/nats-io/nats.go"
 
 	"github.com/sapcc/andromeda/internal/config"
+	"github.com/sapcc/andromeda/internal/rpc"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 
 	"github.com/scottdware/go-bigip"
@@ -92,10 +93,7 @@ func ExecuteF5Agent() error {
 		server.NewRPCServerClient(client),
 	}
 
-	srv, err := stormrpc.NewServer(&stormrpc.ServerConfig{}, stormrpc.WithNatsConn(nc))
-	if err != nil {
-		return err
-	}
+	srv := rpc.NewServer("andromeda-f5-agent", stormrpc.WithNatsConn(nc))
 	fs := &FullSync{&f5}
 	srv.Handle("andromeda.sync", fs.FullSync)
 

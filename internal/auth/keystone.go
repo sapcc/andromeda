@@ -73,8 +73,8 @@ func KeystoneMiddleware(next http.Handler) (http.Handler, error) {
 			return
 		}
 
-		if t.Enforcer != nil && config.Global.Default.Debug {
-			t.Context.Logger = log.Infof
+		if t.Enforcer != nil && config.Global.ApiSettings.EnablePolicyTracing {
+			t.Context.Logger = log.Debugf
 			log.Debugf("token has auth = %v", t.Context.Auth)
 			log.Debugf("token has roles = %v", t.Context.Roles)
 		}
