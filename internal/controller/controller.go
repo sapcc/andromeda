@@ -23,6 +23,7 @@ import (
 	"github.com/actatum/stormrpc"
 	"github.com/apex/log"
 	"github.com/jmoiron/sqlx"
+	"github.com/nats-io/nats.go"
 
 	"github.com/sapcc/andromeda/internal/config"
 )
@@ -41,17 +42,24 @@ type Controller struct {
 
 type CommonController struct {
 	db  *sqlx.DB
+	nc  *nats.Conn
 	rpc *stormrpc.Client
 }
 
 func New(db *sqlx.DB) *Controller {
-	rpcClient, err := stormrpc.NewClient(config.Global.Default.TransportURL)
+	nc, err := nats.Connect(config.Global.Default.TransportURL)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	rpcClient, err := stormrpc.NewClient("", stormrpc.WithNatsConn(nc))
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
 	cc := CommonController{
 		db:  db,
+		nc:  nc,
 		rpc: rpcClient,
 	}
 	c := Controller{

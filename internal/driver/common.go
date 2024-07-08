@@ -60,3 +60,22 @@ func UpdateMemberStatus(rpc server.RPCServerClient, statusRequests []*server.Mem
 		log.Error(err.Error())
 	}
 }
+
+const (
+	AgentAkamai = "andromeda-akamai-agent"
+	AgentF5     = "andromeda-f5-agent"
+	Server      = "andromeda-server"
+)
+
+func GetServiceType(name string) string {
+	switch name {
+	case AgentAkamai:
+		return "akamai"
+	case AgentF5:
+		return "f5"
+	case Server:
+		return "server"
+	default:
+		return "unknown"
+	}
+}

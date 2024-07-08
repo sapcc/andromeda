@@ -17,9 +17,16 @@
 package controller
 
 import (
+	"encoding/json"
+	"time"
+
+	"github.com/apex/log"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/nats-io/nats.go"
+	"github.com/nats-io/nats.go/micro"
 
 	"github.com/sapcc/andromeda/internal/auth"
+	"github.com/sapcc/andromeda/internal/driver"
 	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/models"
 	"github.com/sapcc/andromeda/restapi/operations/administrative"
@@ -37,36 +44,44 @@ func (c ServiceController) GetServices(params administrative.GetServicesParams) 
 
 	//goland:noinspection GoPreferNilSlice
 	var responseServices = []*models.Service{}
+	var response micro.Info
 
-	// Unsupported by stormrpc
-	/*_listServices, err := c.rpc.Options().Registry.ListServices()
+	replyTo := nats.NewInbox()
+	sub, err := c.nc.SubscribeSync(replyTo)
 	if err != nil {
-		panic(err)
+		log.Fatal(err.Error())
 	}
-	for _, _service := range _listServices {
-		if _service.Name == "" {
-			continue
+	_ = c.nc.Flush()
+
+	// Send the request
+	subject, _ := micro.ControlSubject(micro.InfoVerb, "", "")
+	if err = c.nc.PublishRequest(subject, replyTo, nil); err != nil {
+		log.Fatal(err.Error())
+	}
+
+	timeout := 100 * time.Millisecond
+	start := time.Now()
+	for time.Since(start) < timeout {
+		var msg *nats.Msg
+		msg, err = sub.NextMsg(1 * time.Second)
+		if err != nil {
+			break
 		}
 
-		_svs, err := c.rpc.Options().Registry.GetService(_service.Name)
-		if err != nil {
-			panic(err)
+		if err = json.Unmarshal(msg.Data, &response); err != nil {
+			log.Fatal(err.Error())
 		}
-		for _, _service := range _svs {
-			for _, _node := range _service.Nodes {
-				responseServices = append(responseServices, &models.Service{
-					ID:         _node.Id,
-					RPCAddress: _node.Address,
-					Provider:   getMetadata(_node.Metadata, "type"),
-					Host:       strfmt.Hostname(getMetadata(_node.Metadata, "host")),
-					Type:       _service.Name,
-					Version:    _service.Version,
-					Metadata:   _node.Metadata,
-				})
-			}
-		}
+
+		responseServices = append(responseServices, &models.Service{
+			ID:       response.ID,
+			Version:  response.Version,
+			Type:     response.Name,
+			Provider: driver.GetServiceType(response.Name),
+			Metadata: response.Metadata,
+			// Todo: add metadata support to stormRPC
+		})
 	}
-	*/
+	_ = sub.Unsubscribe()
 
 	return administrative.NewGetServicesOK().WithPayload(&administrative.GetServicesOKBody{Services: responseServices})
 }
