@@ -22,10 +22,10 @@ migrate:
 	migrate -path db/migrations -database "cockroachdb://root@localhost:26257/andromeda?sslmode=disable" up
 
 %.pb.storm.go: %.proto
-	protoc --stormrpc_out=../../.. -I. $<
+	protoc --stormrpc_out=. --stormrpc_opt=paths=source_relative -I. $<
 
 %.pb.go: %.proto
-	protoc --go_out=../../.. -I. $<
+	protoc --go_out=. --go_opt=paths=source_relative -I. $<
 
 
 clean:
