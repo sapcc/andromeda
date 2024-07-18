@@ -24,9 +24,9 @@ import (
 	"github.com/apex/log"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/gophercloud/gophercloud"
-	"github.com/gophercloud/gophercloud/openstack"
-	"github.com/gophercloud/utils/openstack/clientconfig"
+	"github.com/gophercloud/gophercloud/v2"
+	"github.com/gophercloud/gophercloud/v2/openstack"
+	"github.com/gophercloud/utils/v2/openstack/clientconfig"
 	"github.com/sapcc/go-bits/audittools"
 	"github.com/sapcc/go-bits/gopherpolicy"
 
@@ -47,7 +47,7 @@ type contextKey struct {
 // Middleware Keystone token injector, also implements goslo policy checker
 func KeystoneMiddleware(next http.Handler) (http.Handler, error) {
 	authInfo := config.Global.ServiceAuth
-	providerClient, err := clientconfig.AuthenticatedClient(&clientconfig.ClientOpts{
+	providerClient, err := clientconfig.AuthenticatedClient(context.Background(), &clientconfig.ClientOpts{
 		AuthInfo: &authInfo})
 	if err != nil {
 		return nil, err

@@ -25,8 +25,8 @@ require (
 	github.com/go-openapi/swag v0.23.0
 	github.com/go-openapi/validate v0.24.0
 	github.com/go-sql-driver/mysql v1.8.1
-	github.com/gophercloud/gophercloud v1.13.0
-	github.com/gophercloud/utils v0.0.0-20231010081019-80377eca5d56
+	github.com/gophercloud/gophercloud/v2 v2.0.0
+	github.com/gophercloud/utils/v2 v2.0.0-20240705071316-780b64d153e3
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/iancoleman/strcase v0.3.0
 	github.com/jackc/pgerrcode v0.0.0-20240316143900-6e2875d9b438
@@ -40,7 +40,7 @@ require (
 	github.com/prometheus/client_golang v1.19.1
 	github.com/rs/cors v1.11.0
 	github.com/sapcc/go-api-declarations v1.11.3
-	github.com/sapcc/go-bits v0.0.0-20240704034903-8a2e97b1eaf1
+	github.com/sapcc/go-bits v0.0.0-20240718093810-9d9ecb2e98b2
 	github.com/scottdware/go-bigip v0.0.0-20230907015320-92d03ba95eca
 	github.com/stretchr/testify v1.9.0
 	github.com/urfave/cli/v2 v2.27.2
@@ -71,7 +71,6 @@ require (
 	github.com/gobuffalo/packr/v2 v2.8.0 // indirect
 	github.com/gofrs/uuid/v5 v5.2.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20231201235250-de7065d80cb9 // indirect
 	github.com/jackc/puddle/v2 v2.2.1 // indirect

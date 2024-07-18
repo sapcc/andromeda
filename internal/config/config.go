@@ -25,7 +25,7 @@ import (
 
 	"github.com/apex/log"
 	"github.com/apex/log/handlers/text"
-	"github.com/gophercloud/utils/openstack/clientconfig"
+	"github.com/gophercloud/utils/v2/openstack/clientconfig"
 	"github.com/mcuadros/go-defaults"
 	"github.com/urfave/cli/v2"
 	"gopkg.in/yaml.v3"

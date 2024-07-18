@@ -17,6 +17,7 @@
 package client
 
 import (
+	"context"
 	"net/http"
 	"net/url"
 	"os"
@@ -25,10 +26,10 @@ import (
 	"github.com/go-openapi/runtime"
 	runtimeclient "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
-	"github.com/gophercloud/gophercloud"
-	"github.com/gophercloud/gophercloud/openstack"
-	osclient "github.com/gophercloud/utils/client"
-	"github.com/gophercloud/utils/openstack/clientconfig"
+	"github.com/gophercloud/gophercloud/v2"
+	"github.com/gophercloud/gophercloud/v2/openstack"
+	osclient "github.com/gophercloud/utils/v2/client"
+	"github.com/gophercloud/utils/v2/openstack/clientconfig"
 	"github.com/jedib0t/go-pretty/table"
 	"github.com/jessevdk/go-flags"
 	"github.com/jmoiron/sqlx/reflectx"
@@ -99,7 +100,7 @@ func SetupClient() {
 			}
 		}
 
-		err = openstack.Authenticate(provider, *ao)
+		err = openstack.Authenticate(context.Background(), provider, *ao)
 		if err != nil {
 			return err
 		}
