@@ -3,7 +3,7 @@ consumes:
 info:
   description: Platform agnostic GSLB frontend
   title: Andromeda
-  version: 1.1.0
+  version: 1.1.1
 produces:
 - application/json
 swagger: "2.0"
@@ -1747,6 +1747,13 @@ definitions:
           - DELETE
           - OPTIONS
         default: GET
+      domain_name:
+        type: string
+        description: The domain name, which be injected into the HTTP Host Header to the backend server for HTTP health check. Only used for HTTP/S monitors.
+        format: hostname
+        example: example.org
+        x-nullable: true
+        maxLength: 255
 
   service:
     type: object
