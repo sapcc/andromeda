@@ -73,6 +73,9 @@ const EditMonitorPanel = ({closeCallback}) => {
         setFormState({...formState, [event.target.name]: event.target.value});
     };
 
+    const isHTTP = (type) => ["HTTP", "HTTPS"].includes(type)
+
+
     return (
         <Form>
             <PanelBody
@@ -136,19 +139,23 @@ const EditMonitorPanel = ({closeCallback}) => {
                     {formState.type !== "ICMP" && (
                         <Stack gap="2" distribution="between">
                             <Textarea
-                                label="Monitor send string"
+                                name="send"
+                                label={isHTTP(formState.type) ? "HTTP Path" : "send data"}
                                 className={"flex-auto"}
                                 disabled={isLoading}
                                 value={formState?.send}
                                 onChange={handleChange}
                             />
-                            <Textarea
-                                label="Monitor expected receive string"
-                                className={"flex-auto"}
-                                disabled={isLoading}
-                                value={formState?.receive}
-                                onChange={handleChange}
-                            />
+                            {formState.type === "TCP" && (
+                                <Textarea
+                                    name="receive"
+                                    label="receive data"
+                                    className={"flex-auto"}
+                                    disabled={isLoading}
+                                    value={formState?.receive}
+                                    onChange={handleChange}
+                                />
+                            )}
                         </Stack>
                     )}
                 </Stack>

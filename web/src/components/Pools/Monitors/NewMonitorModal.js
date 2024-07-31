@@ -13,7 +13,7 @@ const NewMonitorModal = () => {
     const [formState, setFormState] = useState({
         name: "",
         pool_id: pool,
-        send: null,
+        send: "/",
         receive: null,
         timeout: 10,
         type: "HTTP",
@@ -53,6 +53,7 @@ const NewMonitorModal = () => {
             </>
         )
     }, [pool])
+    const isHTTP = (type) => ["HTTP", "HTTPS"].includes(type)
 
     return (
         <Modal
@@ -95,7 +96,7 @@ const NewMonitorModal = () => {
                 <Select
                     label="Type"
                     value={formState?.type}
-                    onChange={(target) => setFormState({...formState, type: target})}
+                    onChange={(target) => setFormState({...formState, ...{type: target, send: isHTTP(target) ? "/" : null}})}
                 >
                     <SelectOption key="icmp" value="ICMP" label="ICMP (Unsupported on Akamai)"/>
                     <SelectOption key="http" value="HTTP" label="HTTP"/>
@@ -107,17 +108,21 @@ const NewMonitorModal = () => {
                 {formState.type !== "ICMP" && (
                     <Stack gap="2" distribution="between">
                         <Textarea
+                            name="send"
                             className={"flex-auto"}
-                            label="Monitor send string"
+                            label={isHTTP(formState.type) ? "HTTP Path" : "send data"}
                             value={formState.send || ""}
                             onChange={handleChange}
                         />
-                        <Textarea
-                            className={"flex-auto"}
-                            label="Monitor expected receive string"
-                            value={formState.receive || ""}
-                            onChange={handleChange}
-                        />
+                        {formState.type === "TCP" && (
+                            <Textarea
+                                name="receive"
+                                className={"flex-auto"}
+                                label="receive data"
+                                value={formState.receive || ""}
+                                onChange={handleChange}
+                            />
+                        )}
                     </Stack>
                 )}
             </Stack>

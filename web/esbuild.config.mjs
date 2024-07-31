@@ -51,7 +51,7 @@ if (watch || serve) {
     if (watch) await ctx.watch()
     if (serve) {
         let {host, port} = await ctx.serve({
-            host: "0.0.0.0",
+            host: process.env.HOST || "127.0.0.1",
             port: parseInt(process.env.PORT || "3000"),
             servedir: "public",
         })
