@@ -268,7 +268,7 @@ func populatePools(u *RPCHandler, fullyPopulated bool, domainID string) ([]*rpcm
 
 func populateMonitors(u *RPCHandler, poolID string) ([]*rpcmodels.Monitor, error) {
 	sql := u.DB.Rebind(`SELECT id, admin_state_up, "interval", send, receive, timeout, type, http_method, 
-       provisioning_status FROM monitor WHERE pool_id = ?`)
+       domain_name, provisioning_status FROM monitor WHERE pool_id = ?`)
 	rows, err := u.DB.Queryx(sql, poolID)
 	if err != nil {
 		return nil, err
@@ -280,9 +280,10 @@ func populateMonitors(u *RPCHandler, poolID string) ([]*rpcmodels.Monitor, error
 		var send, receive *string
 		var monitorType string
 		var httpMethod string
+		var domainName *string
 
 		if err := rows.Scan(&monitor.Id, &monitor.AdminStateUp, &monitor.Interval, &send,
-			&receive, &monitor.Timeout, &monitorType, &httpMethod, &monitor.ProvisioningStatus); err != nil {
+			&receive, &monitor.Timeout, &monitorType, &httpMethod, &domainName, &monitor.ProvisioningStatus); err != nil {
 			return nil, err
 		}
 		if send != nil {
@@ -290,6 +291,9 @@ func populateMonitors(u *RPCHandler, poolID string) ([]*rpcmodels.Monitor, error
 		}
 		if receive != nil {
 			monitor.Receive = *receive
+		}
+		if domainName != nil {
+			monitor.DomainName = *domainName
 		}
 		monitor.Type = rpcmodels.Monitor_MonitorType(rpcmodels.Monitor_MonitorType_value[monitorType])
 		monitor.Method = rpcmodels.Monitor_HttpMethod(rpcmodels.Monitor_HttpMethod_value[httpMethod])

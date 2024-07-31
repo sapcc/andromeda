@@ -42,7 +42,7 @@ func init() {
   "info": {
     "description": "Platform agnostic GSLB frontend",
     "title": "Andromeda",
-    "version": "1.1.0"
+    "version": "1.1.1"
   },
   "basePath": "/v1",
   "paths": {
@@ -2304,6 +2304,13 @@ func init() {
           "readOnly": true,
           "example": "2020-05-11T17:21:34"
         },
+        "domain_name": {
+          "description": "The domain name, which be injected into the HTTP Host Header to the backend server for HTTP health check. Only used for HTTP/S monitors.",
+          "type": "string",
+          "format": "hostname",
+          "x-nullable": true,
+          "example": "example.org"
+        },
         "http_method": {
           "description": "HTTP method to use for monitor checks. Only used for HTTP/S monitors.",
           "type": "string",
@@ -2716,7 +2723,7 @@ func init() {
   "info": {
     "description": "Platform agnostic GSLB frontend",
     "title": "Andromeda",
-    "version": "1.1.0"
+    "version": "1.1.1"
   },
   "basePath": "/v1",
   "paths": {
@@ -5206,6 +5213,13 @@ func init() {
           "format": "date-time",
           "readOnly": true,
           "example": "2020-05-11T17:21:34"
+        },
+        "domain_name": {
+          "description": "The domain name, which be injected into the HTTP Host Header to the backend server for HTTP health check. Only used for HTTP/S monitors.",
+          "type": "string",
+          "format": "hostname",
+          "x-nullable": true,
+          "example": "example.org"
         },
         "http_method": {
           "description": "HTTP method to use for monitor checks. Only used for HTTP/S monitors.",

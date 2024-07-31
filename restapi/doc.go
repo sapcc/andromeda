@@ -20,7 +20,7 @@
 //	  http
 //	Host: localhost
 //	BasePath: /v1
-//	Version: 1.1.0
+//	Version: 1.1.1
 //
 //	Consumes:
 //	  - application/json

@@ -102,6 +102,7 @@ CREATE TABLE monitor
     http_method         VARCHAR(16)  NOT NULL DEFAULT 'GET',
     timeout             BIGINT       NULL,
     type                VARCHAR(16)  NULL,
+    domain_name         VARCHAR(255) NULL,
     project_id          VARCHAR(36)  NOT NULL
 );
 

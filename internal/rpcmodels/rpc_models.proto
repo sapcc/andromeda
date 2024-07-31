@@ -86,4 +86,5 @@ message Monitor {
     OPTIONS = 6;
   }
   HttpMethod method = 10;
+  string domain_name = 11;
 }

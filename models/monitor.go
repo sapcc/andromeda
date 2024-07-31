@@ -43,6 +43,11 @@ type Monitor struct {
 	// Format: date-time
 	CreatedAt strfmt.DateTime `json:"created_at,omitempty"`
 
+	// The domain name, which be injected into the HTTP Host Header to the backend server for HTTP health check. Only used for HTTP/S monitors.
+	// Example: example.org
+	// Format: hostname
+	DomainName *strfmt.Hostname `json:"domain_name,omitempty"`
+
 	// HTTP method to use for monitor checks. Only used for HTTP/S monitors.
 	// Enum: [GET POST PUT HEAD PATCH DELETE OPTIONS]
 	HTTPMethod *string `json:"http_method,omitempty"`
@@ -113,6 +118,10 @@ func (m *Monitor) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateDomainName(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateHTTPMethod(formats); err != nil {
 		res = append(res, err)
 	}
@@ -173,6 +182,18 @@ func (m *Monitor) validateCreatedAt(formats strfmt.Registry) error {
 	}
 
 	if err := validate.FormatOf("created_at", "body", "date-time", m.CreatedAt.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Monitor) validateDomainName(formats strfmt.Registry) error {
+	if swag.IsZero(m.DomainName) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("domain_name", "body", "hostname", m.DomainName.String(), formats); err != nil {
 		return err
 	}
 

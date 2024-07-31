@@ -112,9 +112,9 @@ func (c MonitorController) PostMonitors(params monitors.PostMonitorsParams) midd
 	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
 		sql := `
 			INSERT INTO monitor 
-				(name, admin_state_up, type, "interval", timeout, pool_id, send, receive, http_method, project_id)
+				(name, admin_state_up, type, "interval", timeout, pool_id, send, receive, http_method, domain_name, project_id)
 			VALUES 
-				(:name, :admin_state_up, :type, :interval, :timeout, :pool_id, :send, :receive, :http_method, :project_id)
+				(:name, :admin_state_up, :type, :interval, :timeout, :pool_id, :send, :receive, :http_method, :domain_name, :project_id)
 			RETURNING *
 		`
 		stmt, err := tx.PrepareNamed(sql)
@@ -139,6 +139,7 @@ func (c MonitorController) PostMonitors(params monitors.PostMonitorsParams) midd
 		panic(err)
 	}
 
+	_ = PendingSync(c.rpc)
 	return monitors.NewPostMonitorsCreated().WithPayload(&monitors.PostMonitorsCreatedBody{Monitor: monitor})
 }
 
@@ -187,6 +188,7 @@ func (c MonitorController) PutMonitorsMonitorID(params monitors.PutMonitorsMonit
 			timeout = COALESCE(:timeout, timeout),
 			type = COALESCE(:type, type),
 			http_method = COALESCE(:http_method, http_method),
+			domain_name = COALESCE(:domain_name, domain_name),
 		    updated_at = NOW(),
 		    provisioning_status = 'PENDING_UPDATE'
 		WHERE id = :id
@@ -203,6 +205,7 @@ func (c MonitorController) PutMonitorsMonitorID(params monitors.PutMonitorsMonit
 	if err := PopulateMonitor(c.db, &monitor, []string{"*"}); err != nil {
 		panic(err)
 	}
+	_ = PendingSync(c.rpc)
 	return monitors.NewPutMonitorsMonitorIDAccepted().WithPayload(
 		&monitors.PutMonitorsMonitorIDAcceptedBody{Monitor: &monitor})
 }
@@ -231,6 +234,7 @@ func (c MonitorController) DeleteMonitorsMonitorID(params monitors.DeleteMonitor
 		}
 		panic(err)
 	}
+	_ = PendingSync(c.rpc)
 	return monitors.NewDeleteMonitorsMonitorIDNoContent()
 }
 
