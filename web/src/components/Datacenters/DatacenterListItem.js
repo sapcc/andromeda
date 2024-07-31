@@ -1,5 +1,5 @@
 import React, {useMemo} from "react"
-import {DataGridCell, DataGridRow, Icon, Stack} from "juno-ui-components"
+import {DataGridCell, DataGridRow, Icon, Stack} from "@cloudoperators/juno-ui-components"
 import {authStore, urlStore} from "../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {deleteItem} from "../../actions"

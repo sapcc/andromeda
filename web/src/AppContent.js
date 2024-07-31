@@ -1,6 +1,6 @@
 import React from "react"
 
-import {Container, IntroBox, MainTabs, Tab, TabList, TabPanel,} from "juno-ui-components"
+import {Container, IntroBox, MainTabs, Tab, TabList, TabPanel,} from "@cloudoperators/juno-ui-components"
 import {urlStore} from "./store"
 import ModalManager from "./components/ModalManager"
 import PanelManager from "./components/PanelManager"

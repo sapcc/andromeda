@@ -11,7 +11,7 @@ import {
     Stack,
     Textarea,
     TextInput,
-} from "juno-ui-components"
+} from "@cloudoperators/juno-ui-components"
 import {authStore, urlStore} from "../../../store"
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {fetchItem, updateAttributes, updateItem} from "../../../actions"

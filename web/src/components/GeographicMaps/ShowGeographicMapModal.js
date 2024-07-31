@@ -3,7 +3,7 @@ import React, {useEffect, useMemo, useState} from "react"
 import {authStore, urlStore} from "../../store"
 import {useQuery} from '@tanstack/react-query'
 import {fetchItem} from "../../actions"
-import {Badge, DataGrid, DataGridCell, DataGridHeadCell, DataGridRow, Modal, Spinner, Stack} from "juno-ui-components"
+import {Badge, DataGrid, DataGridCell, DataGridHeadCell, DataGridRow, Modal, Spinner, Stack} from "@cloudoperators/juno-ui-components"
 import {Error} from "../Components";
 import {continents, countries, getEmojiFlag} from "countries-list";
 import {DateTime} from "luxon";

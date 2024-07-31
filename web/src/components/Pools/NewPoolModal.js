@@ -3,7 +3,7 @@ import React, {useState} from "react"
 import {authStore, urlStore} from "../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {createItem} from "../../actions"
-import {Checkbox, Modal, TextInput} from "juno-ui-components"
+import {Checkbox, Modal, TextInput} from "@cloudoperators/juno-ui-components"
 import DomainMenu from "./DomainMenu";
 import {Error} from "../Components";
 

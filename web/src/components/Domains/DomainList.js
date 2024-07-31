@@ -1,6 +1,6 @@
 import React, {useState} from "react"
 
-import {Box, Button, ContentAreaToolbar, DataGrid, DataGridHeadCell, DataGridRow, Spinner,} from "juno-ui-components"
+import {Box, Button, ContentAreaToolbar, DataGrid, DataGridHeadCell, DataGridRow, Spinner,} from "@cloudoperators/juno-ui-components"
 import DomainListItem from "./DomainListItem"
 import {authStore, urlStore} from "../../store"
 import {fetchAll, nextPageParam} from "../../actions";

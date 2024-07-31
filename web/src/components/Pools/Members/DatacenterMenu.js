@@ -3,7 +3,7 @@ import React from "react";
 import {useInfiniteQuery} from "@tanstack/react-query";
 import {fetchAll, nextPageParam} from "../../../actions";
 import {authStore} from "../../../store";
-import {Menu, MenuItem} from "juno-ui-components";
+import {Menu, MenuItem} from "@cloudoperators/juno-ui-components";
 
 const DatacenterMenu = ({formState, setFormState, setError}) => {
     const auth = authStore((state) => state.auth)

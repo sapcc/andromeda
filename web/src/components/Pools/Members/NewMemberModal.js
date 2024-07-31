@@ -2,7 +2,7 @@ import React, {useMemo, useState} from "react"
 
 import {authStore, urlStore} from "../../../store"
 import {createItem} from "../../../actions"
-import {Badge, Checkbox, Modal, Stack, TextInput} from "juno-ui-components"
+import {Badge, Checkbox, Modal, Stack, TextInput} from "@cloudoperators/juno-ui-components"
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import DatacenterMenu from "./DatacenterMenu";
 import {Error} from "../../Components";

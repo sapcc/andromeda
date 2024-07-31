@@ -1,6 +1,6 @@
 import React, {useEffect} from "react"
 
-import {DataGridCell, DataGridRow, Icon, Stack} from "juno-ui-components"
+import {DataGridCell, DataGridRow, Icon, Stack} from "@cloudoperators/juno-ui-components"
 import {authStore, urlStore} from "../../../store"
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {deleteItem, fetchItem, updateAttributes} from "../../../actions"

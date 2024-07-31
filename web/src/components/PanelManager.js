@@ -1,6 +1,6 @@
 import React, {useMemo} from "react"
 
-import {Badge, Panel} from "juno-ui-components"
+import {Badge, Panel} from "@cloudoperators/juno-ui-components"
 import EditDomainPanel from "./Domains/EditDomainPanel"
 import EditDatacenterPanel from "./Datacenters/EditDatacenterPanel";
 import EditPoolPanel from "./Pools/EditPoolPanel";

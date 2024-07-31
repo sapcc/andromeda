@@ -1,6 +1,6 @@
 import React, {useState} from "react"
 
-import {Badge, Box, Button, DataGrid, DataGridHeadCell, DataGridRow, Stack,} from "juno-ui-components"
+import {Badge, Box, Button, DataGrid, DataGridHeadCell, DataGridRow, Stack,} from "@cloudoperators/juno-ui-components"
 import MemberListItem from "./MemberListItem"
 import {authStore, urlStore} from "../../../store"
 import {fetchAll, nextPageParam} from "../../../actions";

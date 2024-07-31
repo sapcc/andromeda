@@ -13,7 +13,7 @@ import {
     Tooltip,
     TooltipContent,
     TooltipTrigger
-} from "juno-ui-components";
+} from "@cloudoperators/juno-ui-components";
 
 export const Error = ({error}) => {
     if (error) {

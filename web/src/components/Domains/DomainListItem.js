@@ -11,7 +11,7 @@ import {
     Label,
     ContextMenu,
     MenuItem
-} from "juno-ui-components"
+} from "@cloudoperators/juno-ui-components"
 import {authStore, urlStore} from "../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {deleteItem} from "../../actions"

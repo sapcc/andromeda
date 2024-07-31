@@ -3,7 +3,7 @@ import React, {useState} from "react"
 import {authStore, urlStore} from "../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {createItem} from "../../actions"
-import {Box, Button, Icon, JsonViewer, Label, Modal, Stack, TextInput} from "juno-ui-components"
+import {Box, Button, Icon, JsonViewer, Label, Modal, Stack, TextInput} from "@cloudoperators/juno-ui-components"
 import {Error} from "../Components";
 import {continents, countries} from "countries-list";
 import DatacenterSelect from "./DatacenterSelect";

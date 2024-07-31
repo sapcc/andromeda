@@ -3,7 +3,7 @@ import React, {useMemo, useState} from "react"
 import {authStore, urlStore} from "../../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {createItem} from "../../../actions"
-import {Badge, Checkbox, Modal, Select, SelectOption, Stack, Textarea, TextInput} from "juno-ui-components"
+import {Badge, Checkbox, Modal, Select, SelectOption, Stack, Textarea, TextInput} from "@cloudoperators/juno-ui-components"
 import {Error} from "../../Components";
 
 const NewMonitorModal = () => {

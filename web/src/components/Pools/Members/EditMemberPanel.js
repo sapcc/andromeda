@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react"
 
-import {Button, Checkbox, Form, PanelBody, PanelFooter, Stack, TextInput,} from "juno-ui-components"
+import {Button, Checkbox, Form, PanelBody, PanelFooter, Stack, TextInput,} from "@cloudoperators/juno-ui-components"
 import {authStore, urlStore} from "../../../store"
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {fetchItem, updateAttributes, updateItem} from "../../../actions"
