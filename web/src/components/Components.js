@@ -166,6 +166,15 @@ export const HeaderUser = ({ auth, logout, theme, setTheme }) => {
                 />
 
                 <Button
+                    href={`https://github.com/sapcc/andromeda/releases`}
+                    target="_blank"
+                    icon="download"
+                    label="CLI Client"
+                    variant="subdued"
+                    size="small"
+                />
+
+                <Button
                     href={`${auth.endpoint}/docs`}
                     target="_blank"
                     icon="openInNew"
