@@ -86,6 +86,7 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 	}
 
 	// Process Members
+MEMBERLOOP:
 	for _, member := range members {
 		if member.ProvisioningStatus == models.MemberProvisioningStatusPENDINGDELETE {
 			provRequests = append(provRequests,
@@ -93,20 +94,31 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 			continue
 		}
 
-		// Add new traffic target
-		trafficTarget := gtm.TrafficTarget{
-			Name:    member.GetDatacenter(),
-			Enabled: member.GetAdminStateUp(),
-			Servers: []string{utils.InetNtoa(member.Address).String()},
-			Weight:  50,
-		}
 		datacenterUUID := member.GetDatacenter()
-
+		var datacenterID int
 		if len(datacenterUUID) > 0 {
-			if trafficTarget.DatacenterID, err = s.GetDatacenterMeta(datacenterUUID, domain.Datacenters); err != nil {
+			datacenterID, err = s.GetDatacenterMeta(datacenterUUID, domain.Datacenters)
+			if err != nil {
 				log.Error(err.Error())
 				continue
 			}
+
+			// check if we have already a traffic target for this datacenter
+			for _, target := range property.TrafficTargets {
+				if target.DatacenterID == datacenterID {
+					target.Servers = append(target.Servers, utils.InetNtoa(member.Address).String())
+					continue MEMBERLOOP
+				}
+			}
+		}
+
+		// Add new traffic target
+		trafficTarget := gtm.TrafficTarget{
+			Name:         member.GetDatacenter(),
+			Enabled:      member.GetAdminStateUp(),
+			Servers:      []string{utils.InetNtoa(member.Address).String()},
+			Weight:       50,
+			DatacenterID: datacenterID,
 		}
 		property.TrafficTargets = append(property.TrafficTargets, &trafficTarget)
 		provRequests = append(provRequests,
