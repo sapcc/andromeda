@@ -21,7 +21,8 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint, loginDomains, loginProj
     const setAuth = authStore((state) => state.setAuth)
     const setModal = urlStore((state) => state.openModal)
     const queryClient = useQueryClient()
-    const {mutate, isLoading, error} = useMutation({mutationFn: login})
+    const {mutate, error} = useMutation({mutationFn: login})
+    const [isLoading, setIsLoading] = useState(false)
     const [showCredentials, setShowCredentials] = useState(false)
     const [mounted, setMounted] = useState(false)
     const [credentials, setCredentials] = useState({
@@ -32,6 +33,7 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint, loginDomains, loginProj
     })
 
     const onSubmit = (event) => {
+        setIsLoading(true)
         event.preventDefault();
         mutate({
                 endpoint: keystoneEndpoint,
@@ -61,7 +63,8 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint, loginDomains, loginProj
                         queryClient.invalidateQueries().then()
                     }.bind(this), 700)
                     setModal(null)
-                }
+                },
+                onSettled: setIsLoading(false),
             }
         )
     }
@@ -115,6 +118,7 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint, loginDomains, loginProj
                         value={credentials.project}
                         disabled={isLoading}
                         onChange={handleChange}
+                        autocomplete="on"
                     />
                     <Button
                         className="jn-h-textinput"
