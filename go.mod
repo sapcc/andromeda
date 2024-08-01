@@ -39,7 +39,7 @@ require (
 	github.com/nats-io/nats.go v1.36.0
 	github.com/prometheus/client_golang v1.19.1
 	github.com/rs/cors v1.11.0
-	github.com/sapcc/go-api-declarations v1.12.0
+	github.com/sapcc/go-api-declarations v1.12.1
 	github.com/sapcc/go-bits v0.0.0-20240731091844-5766a5223044
 	github.com/scottdware/go-bigip v0.0.0-20230907015320-92d03ba95eca
 	github.com/stretchr/testify v1.9.0
