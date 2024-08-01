@@ -2860,14 +2860,14 @@ Unexpected Error
 
 | Name | Type | Go type | Required | Default | Description | Example |
 |------|------|---------|:--------:| ------- |-------------|---------|
-| address | ipv4 (formatted string)| `strfmt.IPv4` | ✓ | | Address to use. | `1.2.3.4` |
+| address | ipv4 (formatted string)| `strfmt.IPv4` |  | | Address to use. | `1.2.3.4` |
 | admin_state_up | boolean| `bool` |  | `true`| The administrative state of the resource, which is up (true) or down (false). Default is true. |  |
 | created_at | date-time (formatted string)| `strfmt.DateTime` |  | | The UTC date and timestamp when the resource was created. | `2020-05-11T17:21:34` |
 | datacenter_id | uuid (formatted string)| `strfmt.UUID` |  | | Datacenter assigned for this member. |  |
 | id | uuid (formatted string)| `strfmt.UUID` |  | | The id of the resource. |  |
 | name | string| `string` |  | | Human-readable name of the resource. |  |
-| pool_id | uuid (formatted string)| `strfmt.UUID` | ✓ | | pool id. |  |
-| port | integer| `int64` | ✓ | | Port to use for monitor checks. | `80` |
+| pool_id | uuid (formatted string)| `strfmt.UUID` |  | | pool id. |  |
+| port | integer| `int64` |  | | Port to use for monitor checks. | `80` |
 | project_id | string| `string` |  | | The ID of the project owning this resource. | `fa84c217f361441986a220edf9b1e337` |
 | provisioning_status | string| `string` |  | |  |  |
 | status | string| `string` |  | |  |  |
