@@ -142,6 +142,8 @@ MEMBERLOOP:
 		}
 
 		switch monitor.GetType() {
+		case rpcmodels.Monitor_HTTPS:
+			fallthrough
 		case rpcmodels.Monitor_HTTP:
 			if monitor.GetSend() == "" {
 				livenessTest.TestObject = "/"
@@ -164,6 +166,7 @@ MEMBERLOOP:
 			livenessTest.ResponseString = monitor.GetReceive()
 		default:
 			// unsupported type
+			log.Warnf("Unsupported monitor type: %s", monitor.GetType())
 			provRequests = append(provRequests,
 				driver.GetProvisioningStatusRequest(monitor.Id, "MONITOR", models.MonitorProvisioningStatusERROR))
 			continue
