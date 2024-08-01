@@ -1567,10 +1567,6 @@ definitions:
 
   member:
     type: object
-    required:
-      - address
-      - port
-      - pool_id
     properties:
       id:
         type: string
@@ -1628,11 +1624,13 @@ definitions:
         example: 80
         minimum: 0
         maximum: 65535
+        x-nullabe: true
       address:
         type: string
         format: ipv4
         description: Address to use.
         example: 1.2.3.4
+        x-nullable: true
       pool_id:
         type: string
         format: uuid

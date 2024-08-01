@@ -39,6 +39,7 @@ var (
 	InvalidSendString        = &models.Error{Code: 409, Message: "invalid value for 'send': must be a URL path"}
 	MissingFQDN              = &models.Error{Code: 400, Message: "invalid value for 'fqdn': 'fqdn' is required"}
 	MissingProvider          = &models.Error{Code: 400, Message: "invalid value for 'provider': 'provider' is required"}
+	MissingAddressOrPort     = &models.Error{Code: 400, Message: "invalid value for 'address' and 'port': 'address' and 'port' are required"}
 	FQDNImmutable            = &models.Error{Code: 400, Message: "invalid value for 'fqdn': change of immutable attribute 'fqdn' not allowed"}
 	MySQLForeignKeyViolation = &mysql.MySQLError{Number: 1451}
 )

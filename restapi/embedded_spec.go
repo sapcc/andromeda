@@ -2196,16 +2196,12 @@ func init() {
     },
     "member": {
       "type": "object",
-      "required": [
-        "address",
-        "port",
-        "pool_id"
-      ],
       "properties": {
         "address": {
           "description": "Address to use.",
           "type": "string",
           "format": "ipv4",
+          "x-nullable": true,
           "example": "1.2.3.4"
         },
         "admin_state_up": {
@@ -2249,6 +2245,7 @@ func init() {
           "description": "Port to use for monitor checks.",
           "type": "integer",
           "maximum": 65535,
+          "x-nullabe": true,
           "example": 80
         },
         "project_id": {
@@ -2308,6 +2305,7 @@ func init() {
           "description": "The domain name, which be injected into the HTTP Host Header to the backend server for HTTP health check. Only used for HTTP/S monitors.",
           "type": "string",
           "format": "hostname",
+          "maxLength": 255,
           "x-nullable": true,
           "example": "example.org"
         },
@@ -5105,16 +5103,12 @@ func init() {
     },
     "member": {
       "type": "object",
-      "required": [
-        "address",
-        "port",
-        "pool_id"
-      ],
       "properties": {
         "address": {
           "description": "Address to use.",
           "type": "string",
           "format": "ipv4",
+          "x-nullable": true,
           "example": "1.2.3.4"
         },
         "admin_state_up": {
@@ -5159,6 +5153,7 @@ func init() {
           "type": "integer",
           "maximum": 65535,
           "minimum": 0,
+          "x-nullabe": true,
           "example": 80
         },
         "project_id": {
@@ -5218,6 +5213,7 @@ func init() {
           "description": "The domain name, which be injected into the HTTP Host Header to the backend server for HTTP health check. Only used for HTTP/S monitors.",
           "type": "string",
           "format": "hostname",
+          "maxLength": 255,
           "x-nullable": true,
           "example": "example.org"
         },

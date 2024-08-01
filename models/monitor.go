@@ -45,6 +45,7 @@ type Monitor struct {
 
 	// The domain name, which be injected into the HTTP Host Header to the backend server for HTTP health check. Only used for HTTP/S monitors.
 	// Example: example.org
+	// Max Length: 255
 	// Format: hostname
 	DomainName *strfmt.Hostname `json:"domain_name,omitempty"`
 
@@ -191,6 +192,10 @@ func (m *Monitor) validateCreatedAt(formats strfmt.Registry) error {
 func (m *Monitor) validateDomainName(formats strfmt.Registry) error {
 	if swag.IsZero(m.DomainName) { // not required
 		return nil
+	}
+
+	if err := validate.MaxLength("domain_name", "body", m.DomainName.String(), 255); err != nil {
+		return err
 	}
 
 	if err := validate.FormatOf("domain_name", "body", "hostname", m.DomainName.String(), formats); err != nil {

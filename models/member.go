@@ -36,9 +36,8 @@ type Member struct {
 
 	// Address to use.
 	// Example: 1.2.3.4
-	// Required: true
 	// Format: ipv4
-	Address *strfmt.IPv4 `json:"address"`
+	Address *strfmt.IPv4 `json:"address,omitempty"`
 
 	// The administrative state of the resource, which is up (true) or down (false). Default is true.
 	AdminStateUp *bool `json:"admin_state_up,omitempty"`
@@ -63,16 +62,14 @@ type Member struct {
 	Name *string `json:"name,omitempty"`
 
 	// pool id.
-	// Required: true
 	// Format: uuid
-	PoolID *strfmt.UUID `json:"pool_id"`
+	PoolID *strfmt.UUID `json:"pool_id,omitempty"`
 
 	// Port to use for monitor checks.
 	// Example: 80
-	// Required: true
 	// Maximum: 65535
 	// Minimum: 0
-	Port *int64 `json:"port"`
+	Port *int64 `json:"port,omitempty"`
 
 	// The ID of the project owning this resource.
 	// Example: fa84c217f361441986a220edf9b1e337
@@ -152,9 +149,8 @@ func (m *Member) Validate(formats strfmt.Registry) error {
 }
 
 func (m *Member) validateAddress(formats strfmt.Registry) error {
-
-	if err := validate.Required("address", "body", m.Address); err != nil {
-		return err
+	if swag.IsZero(m.Address) { // not required
+		return nil
 	}
 
 	if err := validate.FormatOf("address", "body", "ipv4", m.Address.String(), formats); err != nil {
@@ -213,9 +209,8 @@ func (m *Member) validateName(formats strfmt.Registry) error {
 }
 
 func (m *Member) validatePoolID(formats strfmt.Registry) error {
-
-	if err := validate.Required("pool_id", "body", m.PoolID); err != nil {
-		return err
+	if swag.IsZero(m.PoolID) { // not required
+		return nil
 	}
 
 	if err := validate.FormatOf("pool_id", "body", "uuid", m.PoolID.String(), formats); err != nil {
@@ -226,9 +221,8 @@ func (m *Member) validatePoolID(formats strfmt.Registry) error {
 }
 
 func (m *Member) validatePort(formats strfmt.Registry) error {
-
-	if err := validate.Required("port", "body", m.Port); err != nil {
-		return err
+	if swag.IsZero(m.Port) { // not required
+		return nil
 	}
 
 	if err := validate.MinimumInt("port", "body", *m.Port, 0, false); err != nil {

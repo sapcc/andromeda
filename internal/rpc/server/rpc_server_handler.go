@@ -214,7 +214,7 @@ func (u *RPCHandler) GetMonitors(ctx context.Context, request *SearchRequest) (*
 }
 
 func (u *RPCHandler) UpdateDatacenterMeta(ctx context.Context, req *DatacenterMetaRequest) (*rpcmodels.Datacenter, error) {
-	var res *rpcmodels.Datacenter
+	var res rpcmodels.Datacenter
 	if err := db.TxExecute(u.DB, func(tx *sqlx.Tx) error {
 		sql := tx.Rebind(`UPDATE datacenter SET meta = ? WHERE id = ?`)
 		if _, err := tx.Exec(sql, req.GetMeta(), req.GetId()); err != nil {
@@ -223,7 +223,7 @@ func (u *RPCHandler) UpdateDatacenterMeta(ctx context.Context, req *DatacenterMe
 
 		sql = tx.Rebind(`SELECT id, admin_state_up, city, state_or_province, continent, country, 
                latitude, longitude, scope, provisioning_status, provider, meta FROM datacenter WHERE id = ?`)
-		if err := tx.Get(res, sql, req.GetId()); err != nil {
+		if err := tx.Get(&res, sql, req.GetId()); err != nil {
 			return err
 		}
 
@@ -231,7 +231,7 @@ func (u *RPCHandler) UpdateDatacenterMeta(ctx context.Context, req *DatacenterMe
 	}); err != nil {
 		return nil, err
 	}
-	return res, nil
+	return &res, nil
 }
 
 func populatePools(u *RPCHandler, fullyPopulated bool, domainID string) ([]*rpcmodels.Pool, error) {

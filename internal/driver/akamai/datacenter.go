@@ -32,6 +32,8 @@ import (
 	"github.com/sapcc/andromeda/models"
 )
 
+var datacenterNotFound = errors.New("datacenter/GetDatacenterMeta: datacenter not found")
+
 // GetDatacenterMeta return the meta id for a given datacenter uuid
 func (s *AkamaiAgent) GetDatacenterMeta(datacenterUUID string, datacenters []*rpcmodels.Datacenter) (int, error) {
 	// Fetch from cache
@@ -68,13 +70,13 @@ func (s *AkamaiAgent) GetDatacenterMeta(datacenterUUID string, datacenters []*rp
 		}
 	}
 	if meta == 0 {
-		return 0, errors.New("datacenter/GetDatacenterMeta: datacenter not found")
+		return 0, datacenterNotFound
 	}
 
-	// sync meta id with andromeda database
+	// try syncing meta id with andromeda database
 	req := &server.DatacenterMetaRequest{Id: datacenterUUID, Meta: int32(meta)}
 	if _, err = s.rpc.UpdateDatacenterMeta(context.Background(), req); err != nil {
-		return meta, err
+		log.Errorf("UpdateDatacenterMeta(%s) failed: %v", datacenterUUID, err)
 	}
 
 	// cache meta id
@@ -144,28 +146,34 @@ func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force boo
 	var backendDatacenter *gtm.Datacenter
 	var err error
 
-	if meta == 0 && datacenter.ProvisioningStatus != models.DatacenterProvisioningStatusPENDINGCREATE {
-		meta, err = s.GetDatacenterMeta(datacenter.Id, nil)
-		if err != nil {
+	if meta == 0 {
+		if meta, err = s.GetDatacenterMeta(datacenter.Id, nil); err != nil {
 			return nil, err
 		}
 	}
-	if backendDatacenter, err = s.gtm.GetDatacenter(context.Background(), meta, config.Global.AkamaiConfig.Domain); err != nil {
-		return nil, err
+	if meta != 0 {
+		if backendDatacenter, err = s.gtm.GetDatacenter(context.Background(), meta, config.Global.AkamaiConfig.Domain); err != nil {
+			// check if datacenter is not found
+			var gtmErr *gtm.Error
+			if errors.As(err, &gtmErr) && gtmErr.StatusCode != 404 {
+				return nil, err
+			}
+		}
 	}
 
 	if datacenter.ProvisioningStatus == models.DatacenterProvisioningStatusPENDINGDELETE {
-		// Run Delete
+		// nothing to delete?
 		if backendDatacenter == nil {
 			// datacenter already deleted
 			return nil, nil
 		}
 
+		// run Delete
 		_, err = s.gtm.DeleteDatacenter(context.Background(), backendDatacenter, config.Global.AkamaiConfig.Domain)
 		return nil, err
 	}
 
-	// Consider synced
+	// consider synced
 	if !force && meta != 0 {
 		return datacenter, nil
 	}

@@ -126,7 +126,6 @@ func (*DomainDelete) Execute(_ []string) error {
 }
 
 func (*DomainSet) Execute(_ []string) error {
-
 	if DomainOptions.DomainSet.Disable && DomainOptions.DomainSet.Enable {
 		return fmt.Errorf("cannot enable and disable domain at the same time")
 	}

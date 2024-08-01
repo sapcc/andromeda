@@ -89,6 +89,9 @@ func (c MemberController) PostMembers(params members.PostMembersParams) middlewa
 	if params.Member.Member.PoolID == nil {
 		return members.NewPostMembersBadRequest().WithPayload(utils.PoolIDRequired)
 	}
+	if params.Member.Member.Address == nil || params.Member.Member.Port == nil {
+		return members.NewPostMembersBadRequest().WithPayload(utils.MissingAddressOrPort)
+	}
 
 	projectID, err := auth.Authenticate(params.HTTPRequest, nil)
 	if err != nil {
