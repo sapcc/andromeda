@@ -40,7 +40,7 @@ require (
 	github.com/prometheus/client_golang v1.19.1
 	github.com/rs/cors v1.11.0
 	github.com/sapcc/go-api-declarations v1.12.1
-	github.com/sapcc/go-bits v0.0.0-20240801042524-e8521835de20
+	github.com/sapcc/go-bits v0.0.0-20240801093859-8ef04d19f38d
 	github.com/scottdware/go-bigip v0.0.0-20230907015320-92d03ba95eca
 	github.com/stretchr/testify v1.9.0
 	github.com/urfave/cli/v2 v2.27.3
