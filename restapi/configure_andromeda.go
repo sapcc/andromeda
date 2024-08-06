@@ -123,7 +123,8 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
 
 	if config.Global.Default.Prometheus {
 		handler = std.Handler("", middleware.New(middleware.Config{
-			Recorder: metrics.NewRecorder(metrics.Config{}),
+			Recorder:      metrics.NewRecorder(metrics.Config{}),
+			GroupedStatus: true,
 		}), handler)
 	}
 
