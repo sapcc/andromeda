@@ -77,6 +77,7 @@ func deepValueEqualField(v1, v2 reflect.Value, fieldsToCompare []string) bool {
 				}
 			}
 			if !found {
+				log.Debugf("Arrays: ['%+v'] != ['%+v']", v1.Field(i).Interface(), v2.Field(i).Interface())
 				return false
 			}
 		}

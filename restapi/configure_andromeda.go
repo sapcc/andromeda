@@ -21,15 +21,17 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/getsentry/sentry-go"
-	"github.com/go-openapi/runtime"
-	"github.com/rs/cors"
-
 	"github.com/apex/log"
 	"github.com/didip/tollbooth"
 	"github.com/dre1080/recovr"
+	"github.com/getsentry/sentry-go"
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/runtime"
+	"github.com/rs/cors"
+	metrics "github.com/slok/go-http-metrics/metrics/prometheus"
+	"github.com/slok/go-http-metrics/middleware"
+	"github.com/slok/go-http-metrics/middleware/std"
 
 	"github.com/sapcc/andromeda/internal/auth"
 	"github.com/sapcc/andromeda/internal/config"
@@ -118,6 +120,12 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
 	handler = sentryhttp.New(sentryhttp.Options{
 		Repanic: true,
 	}).Handle(handler)
+
+	if config.Global.Default.Prometheus {
+		handler = std.Handler("", middleware.New(middleware.Config{
+			Recorder: metrics.NewRecorder(metrics.Config{}),
+		}), handler)
+	}
 
 	return recovr.New()(handler)
 }
