@@ -106,7 +106,10 @@ MEMBERLOOP:
 			// check if we have already a traffic target for this datacenter
 			for _, target := range property.TrafficTargets {
 				if target.DatacenterID == datacenterID {
+					// just add the server to the existing traffic target
 					target.Servers = append(target.Servers, utils.InetNtoa(member.Address).String())
+					provRequests = append(provRequests,
+						driver.GetProvisioningStatusRequest(member.Id, "MEMBER", "ACTIVE"))
 					continue MEMBERLOOP
 				}
 			}
