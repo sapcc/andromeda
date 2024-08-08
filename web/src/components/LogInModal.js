@@ -118,7 +118,7 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint, loginDomains, loginProj
                         value={credentials.project}
                         disabled={isLoading}
                         onChange={handleChange}
-                        autocomplete="on"
+                        autoComplete="on"
                     />
                     <Button
                         className="jn-h-textinput"

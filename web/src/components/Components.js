@@ -67,36 +67,33 @@ export async function copyTextToClipboard(text) {
     }
 }
 
-export const ListItemSpinner = ({data, onClick, className, maxLength=15}) => {
+export const ListItemSpinner = ({data, onClick, className, maxLength=25}) => {
     const name = data.name || data.id
     const [showToast, setToast] = useState(false)
 
     return (
-        <Stack
-            alignment="center"
-            className={`${className} ${backgroundClass(data.provisioning_status)} jn-font-bold`}
-            onClick={onClick}
-            gap="1.5"
-        >
-            {["ACTIVE", "DELETED", "ERROR"].includes(data.provisioning_status) || <Spinner
-                variant={variantClass(data.provisioning_status)} size="small"/>}
-                <Tooltip triggerEvent="hover">
-                    <TooltipTrigger asChild>
-                        {name.substring(0, maxLength)}{name > maxLength && "..."}
-                    </TooltipTrigger>
-                    <TooltipContent>{data.id}</TooltipContent>
-                </Tooltip>
-            <div>
-                {showToast && <Toast text="ID copied to clipboard" className="absolute"/>}
-                <Icon size="16" icon="contentCopy" onClick={() => {
-                    copyTextToClipboard(data.id).then(() => {
-                        setToast(true)
-                    setTimeout(function () { //Start the timer
-                        setToast(false)
-                    }.bind(this), 1000)
-                })
-                }} />
-            </div>
+        <Stack alignment="center">
+            {["ACTIVE", "DELETED", "ERROR"].includes(data.provisioning_status) && <></> || <Spinner variant={variantClass(data.provisioning_status)} size="small"/>}
+            <Stack
+                direction="vertical"
+                className={`${backgroundClass(data.provisioning_status)}`}
+                onClick={onClick}
+            >
+                <div>
+                    {name === data.id && <b>{name}</b> || <small className={className}>{data.id} </small>}
+                    {showToast && <Toast text="ID copied to clipboard" className="absolute"/>}
+                    &nbsp;
+                    <Icon size={name === data.id && "16" || "14"} icon="contentCopy" title="Copy" onClick={() => {
+                        copyTextToClipboard(data.id).then(() => {
+                            setToast(true)
+                            setTimeout(function () { //Start the timer
+                                setToast(false)
+                            }.bind(this), 1000)
+                        })
+                    }}/>
+                </div>
+                {name !== data.id && <p className="jn-font-bold">{name.substring(0, maxLength)}{name.length >= maxLength && "..."}</p> || ""}
+            </Stack>
         </Stack>
     )
 }

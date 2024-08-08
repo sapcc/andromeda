@@ -66,7 +66,7 @@ const MonitorListItem = ({monitor, setError}) => {
     return (
         <DataGridRow>
             <DataGridCell>
-                <ListItemSpinner data={monitor} maxLength="6" />
+                <ListItemSpinner data={monitor} />
             </DataGridCell>
             <DataGridCell>{createdAt}</DataGridCell>
             <DataGridCell>{updatedAt}</DataGridCell>

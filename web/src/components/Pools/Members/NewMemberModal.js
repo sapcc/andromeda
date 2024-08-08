@@ -16,13 +16,17 @@ const NewMemberModal = () => {
         name: "",
         address: "",
         datacenter_id: "",
-        port: 0,
+        port: 80,
         admin_state_up: true,
         pool_id: pool,
     })
 
     const {mutate} = useMutation({mutationFn: createItem})
     const onSubmit = () => {
+        if (!formState.datacenter_id) {
+            setError({message: "You must select at least one Datacenter"})
+            return
+        }
         mutate(
             {
                 key: "members",
