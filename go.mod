@@ -26,7 +26,7 @@ require (
 	github.com/go-openapi/validate v0.24.0
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/gophercloud/gophercloud/v2 v2.1.0
-	github.com/gophercloud/utils/v2 v2.0.0-20240809055823-c3c26a732379
+	github.com/gophercloud/utils/v2 v2.0.0-20240812072210-8ce1fc0f2894
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/iancoleman/strcase v0.3.0
 	github.com/jackc/pgerrcode v0.0.0-20240316143900-6e2875d9b438
@@ -70,7 +70,7 @@ require (
 	github.com/gobuffalo/logger v1.0.3 // indirect
 	github.com/gobuffalo/packd v1.0.0 // indirect
 	github.com/gobuffalo/packr/v2 v2.8.0 // indirect
-	github.com/gofrs/uuid/v5 v5.2.0 // indirect
+	github.com/gofrs/uuid/v5 v5.3.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20231201235250-de7065d80cb9 // indirect
