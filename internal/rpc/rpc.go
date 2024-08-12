@@ -50,7 +50,7 @@ func NewServer(name string, opts ...stormrpc.ServerOption) *stormrpc.Server {
 			log.Info("Enabling Prometheus RPC metrics")
 			rpcRequestHistogram := prometheus.NewHistogramVec(prometheus.HistogramOpts{
 				Subsystem: "rpc",
-				Name:      "rpc_request_duration_seconds",
+				Name:      "request_duration_seconds",
 				Help:      "The latency of the RPC requests.",
 				Buckets:   prometheus.DefBuckets,
 			}, []string{"subject"})
