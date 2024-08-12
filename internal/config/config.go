@@ -159,14 +159,15 @@ type Quota struct {
 }
 
 type Default struct {
-	Debug            bool   `yaml:"debug" description:"Enable debug mode."`
-	LogLevel         string `yaml:"log_level" description:"Log level." default:"info"`
-	Host             string `yaml:"host" description:"Hostname used by the server/agent. Defaults to auto-discovery."`
-	ApiBaseURL       string `yaml:"api_base_uri" description:"Base URI for the API for use in pagination links. This will be autodetected from the request if not overridden here."`
-	TransportURL     string `yaml:"transport_url" description:"The network address and optional user credentials for connecting to the messaging backend."`
-	Prometheus       bool   `yaml:"prometheus" description:"Enable prometheus exporter."`
-	PrometheusListen string `yaml:"prometheus_listen" default:"127.0.0.1:9090" description:"Prometheus listen TCP network address."`
-	SentryDSN        string `yaml:"sentry_dsn" description:"Sentry Data Source Name."`
+	Debug                bool   `yaml:"debug" description:"Enable debug mode."`
+	LogLevel             string `yaml:"log_level" description:"Log level." default:"info"`
+	Host                 string `yaml:"host" description:"Hostname used by the server/agent. Defaults to auto-discovery."`
+	ApiBaseURL           string `yaml:"api_base_uri" description:"Base URI for the API for use in pagination links. This will be autodetected from the request if not overridden here."`
+	TransportURL         string `yaml:"transport_url" description:"The network address and optional user credentials for connecting to the messaging backend."`
+	Prometheus           bool   `yaml:"prometheus" description:"Enable prometheus exporter."`
+	PrometheusListen     string `yaml:"prometheus_listen" default:"127.0.0.1:9090" description:"Prometheus listen TCP network address."`
+	PrometheusRPCMetrics bool   `yaml:"prometheus_rpc_metrics" description:"Enable Prometheus metrics for RPC calls." default:"true"`
+	SentryDSN            string `yaml:"sentry_dsn" description:"Sentry Data Source Name."`
 }
 
 type Database struct {

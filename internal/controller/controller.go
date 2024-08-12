@@ -49,12 +49,12 @@ type CommonController struct {
 func New(db *sqlx.DB) *Controller {
 	nc, err := nats.Connect(config.Global.Default.TransportURL)
 	if err != nil {
-		log.Fatal(err.Error())
+		log.WithError(err).Fatal("Failed to connect to NATS")
 	}
 
 	rpcClient, err := stormrpc.NewClient("", stormrpc.WithNatsConn(nc))
 	if err != nil {
-		log.Fatal(err.Error())
+		log.WithError(err).Fatal("Failed to create RPC client")
 	}
 
 	cc := CommonController{

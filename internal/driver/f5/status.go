@@ -30,6 +30,7 @@ import (
 
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/rpc/server"
+	"github.com/sapcc/andromeda/internal/utils"
 )
 
 type StatusController struct {
@@ -67,6 +68,10 @@ func ExecuteF5StatusAgent() error {
 	sc := StatusController{
 		session,
 		server.NewRPCServerClient(client),
+	}
+
+	if config.Global.Default.Prometheus {
+		go utils.PrometheusListen()
 	}
 
 	go func() {

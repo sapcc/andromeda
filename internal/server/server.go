@@ -18,7 +18,6 @@ package server
 
 import (
 	"context"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -32,7 +31,6 @@ import (
 	"github.com/iancoleman/strcase"
 	"github.com/jmoiron/sqlx"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sapcc/go-bits/logg"
 	"github.com/xo/dburl"
 
@@ -74,7 +72,10 @@ func ExecuteServer(server *restapi.Server) error {
 	if u.Driver == "postgres" {
 		u.Driver = "pgx"
 	}
-	db := sqlx.MustConnect(u.Driver, u.DSN)
+	db, err := sqlx.Connect(u.Driver, u.DSN)
+	if err != nil {
+		log.WithError(err).WithField("driver", u.Driver).Fatal("Failed to connect to database")
+	}
 
 	if config.Global.Default.SentryDSN != "" {
 		if err := sentry.Init(sentry.ClientOptions{
@@ -105,8 +106,7 @@ func ExecuteServer(server *restapi.Server) error {
 
 	// Prometheus Metrics
 	if config.Global.Default.Prometheus {
-		http.Handle("/metrics", promhttp.Handler())
-		go PrometheusServer()
+		go utils.PrometheusListen()
 
 		// Create a new collector, the name will be used as a label on the metrics
 		collector := sqlstats.NewStatsCollector("db_name", db)
@@ -186,19 +186,19 @@ func ExecuteServer(server *restapi.Server) error {
 	}
 	server.SetAPI(api)
 
-	//rpc worker
-	rpc := RPCServer(db)
+	//_rpc worker
+	_rpc := RPCServer(db)
 
-	// run the api and rpc server
+	// run the api and _rpc server
 	go func() {
-		log.Infof("RPC Listening on %v", rpc.Subjects())
-		if err = rpc.Run(); err != nil {
-			log.Fatal(err.Error())
+		log.Infof("RPC Listening on %v", _rpc.Subjects())
+		if err = _rpc.Run(); err != nil {
+			log.WithError(err).Fatal("listening on RPC")
 		}
 	}()
 	go func() {
 		if err = server.Serve(); err != nil {
-			log.Fatal(err.Error())
+			log.WithError(err).Fatal("listening on API")
 		}
 	}()
 
@@ -212,11 +212,11 @@ func ExecuteServer(server *restapi.Server) error {
 	defer cancel()
 
 	defer func() {
-		if err = rpc.Shutdown(ctx); err != nil {
-			log.Fatal(err.Error())
+		if err = _rpc.Shutdown(ctx); err != nil {
+			log.WithError(err).Fatal("shutting down RPC")
 		}
 		if err = server.Shutdown(); err != nil {
-			log.Fatal(err.Error())
+			log.WithError(err).Fatal("shutting down API")
 		}
 	}()
 
@@ -228,11 +228,4 @@ func RPCServer(db *sqlx.DB) *stormrpc.Server {
 	svc := &server.RPCHandler{DB: db}
 	server.RegisterRPCServerServer(srv, svc)
 	return srv
-}
-
-func PrometheusServer() {
-	logg.Info("Serving prometheus metrics at http://%s/metrics", config.Global.Default.PrometheusListen)
-	if err := http.ListenAndServe(config.Global.Default.PrometheusListen, nil); err != nil {
-		logg.Fatal(err.Error())
-	}
 }

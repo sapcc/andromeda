@@ -34,6 +34,7 @@ import (
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/rpc"
 	"github.com/sapcc/andromeda/internal/rpc/server"
+	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/models"
 )
 
@@ -122,6 +123,9 @@ func ExecuteAkamaiAgent() error {
 		_ = srv.Run()
 	}()
 	go akamaiAgent.WorkerThread()
+	if config.Global.Default.Prometheus {
+		go utils.PrometheusListen()
+	}
 	log.WithField("subjects", srv.Subjects()).Info("Subscribed")
 
 	done := make(chan os.Signal, 1)

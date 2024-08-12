@@ -139,7 +139,10 @@ func HouseKeeping() error {
 	if u.Driver == "postgres" {
 		u.Driver = "pgx"
 	}
-	db := sqlx.MustConnect(u.Driver, u.DSN)
+	db, err := sqlx.Connect(u.Driver, u.DSN)
+	if err != nil {
+		log.WithError(err).WithField("driver", u.Driver).Fatal("Failed to connect to database")
+	}
 
 	// Mapper function for SQL name mapping, snake_case table names
 	db.MapperFunc(strcase.ToSnake)

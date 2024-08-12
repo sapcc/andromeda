@@ -22,12 +22,14 @@ import (
 	"github.com/actatum/stormrpc"
 	"github.com/actatum/stormrpc/middleware"
 	"github.com/apex/log"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sapcc/go-api-declarations/bininfo"
 
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/middlewares"
 )
 
+// NewServer creates a new RPC server with the given name and options.
 func NewServer(name string, opts ...stormrpc.ServerOption) *stormrpc.Server {
 	opts = append(opts, stormrpc.WithErrorHandler(func(ctx context.Context, err error) {
 		log.WithError(err).Error("RPC Error")
@@ -43,7 +45,21 @@ func NewServer(name string, opts ...stormrpc.ServerOption) *stormrpc.Server {
 
 	if srv != nil {
 		log.Info("Loading RPC middleware")
-		srv.Use(middleware.RequestID, middlewares.Logging, middleware.Recoverer)
+
+		if config.Global.Default.Prometheus && config.Global.Default.PrometheusRPCMetrics {
+			log.Info("Enabling Prometheus RPC metrics")
+			rpcRequestHistogram := prometheus.NewHistogramVec(prometheus.HistogramOpts{
+				Subsystem: "rpc",
+				Name:      "rpc_request_duration_seconds",
+				Help:      "The latency of the RPC requests.",
+				Buckets:   prometheus.DefBuckets,
+			}, []string{"subject"})
+			prometheus.MustRegister(rpcRequestHistogram)
+
+			srv.Use(middlewares.Tracing(rpcRequestHistogram))
+		}
+
+		srv.Use(middleware.RequestID, middlewares.Logging, middlewares.Recoverer)
 	}
 	return srv
 }

@@ -33,6 +33,7 @@ import (
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/rpc"
 	"github.com/sapcc/andromeda/internal/rpc/server"
+	"github.com/sapcc/andromeda/internal/utils"
 
 	"github.com/scottdware/go-bigip"
 
@@ -102,6 +103,10 @@ func ExecuteF5Agent() error {
 	go func() {
 		_ = srv.Run()
 	}()
+	if config.Global.Default.Prometheus {
+		go utils.PrometheusListen()
+	}
+
 	log.Infof("👋 Listening on %v", srv.Subjects())
 
 	done := make(chan os.Signal, 1)
