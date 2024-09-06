@@ -46,7 +46,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/urfave/cli/v2 v2.27.4
 	github.com/xo/dburl v0.23.2
-	golang.org/x/net v0.28.0
+	golang.org/x/net v0.29.0
 	google.golang.org/protobuf v1.34.2
 	gopkg.in/yaml.v3 v3.0.1
 )
