@@ -79,7 +79,7 @@ func configureServer(s *http.Server, scheme, addr string) {
 // The middleware executes after routing but before authentication, binding and validation
 func setupMiddlewares(handler http.Handler) http.Handler {
 	if rl := config.Global.ApiSettings.RateLimit; rl > .0 {
-		log.Infof("Initializing rate limit middleware (rate_limit=%f)", rl)
+		log.WithField("rate_limit", rl).Info("Initializing rate limit middleware")
 		limiter := tollbooth.NewLimiter(rl, nil)
 		handler = tollbooth.LimitHandler(limiter, handler)
 	}
@@ -96,7 +96,7 @@ func setupMiddlewares(handler http.Handler) http.Handler {
 		var err error
 		handler, err = auth.KeystoneMiddleware(handler)
 		if err != nil {
-			log.Errorf("Error initializing keystone middleware: %w", err)
+			log.WithError(err).Error("Error initializing keystone middleware")
 		}
 	}
 
