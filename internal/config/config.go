@@ -25,6 +25,7 @@ import (
 
 	"github.com/apex/log"
 	"github.com/apex/log/handlers/text"
+	"github.com/getsentry/sentry-go"
 	"github.com/gophercloud/utils/v2/openstack/clientconfig"
 	"github.com/mcuadros/go-defaults"
 	"github.com/urfave/cli/v2"
@@ -121,6 +122,19 @@ func parseConfigFlags(flags []string) error {
 		log.SetLevel(log.DebugLevel)
 	}
 	log.SetHandler(text.Default)
+
+	if Global.Default.SentryDSN != "" || os.Getenv("SENTRY_DSN") != "" {
+		if err := sentry.Init(sentry.ClientOptions{
+			Dsn:              Global.Default.SentryDSN,
+			AttachStacktrace: true,
+			Release:          "TODO Version",
+		}); err != nil {
+			log.Fatalf("Sentry initialization failed: %v", err)
+		}
+
+		log.Info("Sentry is enabled")
+	}
+
 	return nil
 }
 

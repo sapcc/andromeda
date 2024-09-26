@@ -26,12 +26,10 @@ import (
 	"github.com/actatum/stormrpc"
 	"github.com/apex/log"
 	"github.com/dlmiddlecote/sqlstats"
-	"github.com/getsentry/sentry-go"
 	"github.com/go-openapi/loads"
 	"github.com/iancoleman/strcase"
 	"github.com/jmoiron/sqlx"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/sapcc/go-bits/logg"
 	"github.com/xo/dburl"
 
 	_ "github.com/sapcc/andromeda/db/plugins"
@@ -75,18 +73,6 @@ func ExecuteServer(server *restapi.Server) error {
 	db, err := sqlx.Connect(u.Driver, u.DSN)
 	if err != nil {
 		log.WithError(err).WithField("driver", u.Driver).Fatal("Failed to connect to database")
-	}
-
-	if config.Global.Default.SentryDSN != "" {
-		if err := sentry.Init(sentry.ClientOptions{
-			Dsn:              config.Global.Default.SentryDSN,
-			AttachStacktrace: true,
-			Release:          "TODO Version",
-		}); err != nil {
-			logg.Fatal("Sentry initialization failed: %v", err)
-		}
-
-		logg.Info("Sentry is enabled")
 	}
 
 	// Mapper function for SQL name mapping, snake_case table names
