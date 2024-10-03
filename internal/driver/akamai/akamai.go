@@ -20,8 +20,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v8/pkg/edgegrid"
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v8/pkg/session"
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v9/pkg/edgegrid"
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v9/pkg/session"
 	"github.com/apex/log"
 
 	"github.com/sapcc/andromeda/internal/config"
