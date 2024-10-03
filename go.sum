@@ -289,8 +289,8 @@ github.com/prometheus/common v0.0.0-20181113130724-41aa239b4cce/go.mod h1:daVV7q
 github.com/prometheus/common v0.4.0/go.mod h1:TNfzLD0ON7rHzMJeJkieUDPYmFC7Snx/y86RQel1bk4=
 github.com/prometheus/common v0.4.1/go.mod h1:TNfzLD0ON7rHzMJeJkieUDPYmFC7Snx/y86RQel1bk4=
 github.com/prometheus/common v0.7.0/go.mod h1:DjGbpBbp5NYNiECxcL/VnbXCCaQpKd3tt26CguLLsqA=
-github.com/prometheus/common v0.59.1 h1:LXb1quJHWm1P6wq/U824uxYi4Sg0oGvNeUm1z5dJoX0=
-github.com/prometheus/common v0.59.1/go.mod h1:GpWM7dewqmVYcd7SmRaiWVe9SSqjf0UrwnYnpEZNuT0=
+github.com/prometheus/common v0.60.0 h1:+V9PAREWNvJMAuJ1x1BaWl9dewMW4YrHZQbx0sJNllA=
+github.com/prometheus/common v0.60.0/go.mod h1:h0LYf1R1deLSKtD4Vdg8gy4RuOvENW2J/h19V5NADQw=
 github.com/prometheus/procfs v0.0.0-20181005140218-185b4288413d/go.mod h1:c3At6R/oaqEKCNdg8wHV1ftS6bRYblBhIjjI8uT2IGk=
 github.com/prometheus/procfs v0.0.0-20190507164030-5867b95ac084/go.mod h1:TjEm7ze935MbeOT/UhFTIMYKhuLP4wbCsTZCD3I8kEA=
 github.com/prometheus/procfs v0.0.2/go.mod h1:TjEm7ze935MbeOT/UhFTIMYKhuLP4wbCsTZCD3I8kEA=
@@ -312,8 +312,8 @@ github.com/russross/blackfriday/v2 v2.1.0 h1:JIOH55/0cWyOuilr9/qlrm0BSXldqnqwMsf
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/sapcc/go-api-declarations v1.12.6 h1:04sQmS3ipzPc+ENSCWW9A4FgCN7Qa5JIbNUNh7ziQJA=
 github.com/sapcc/go-api-declarations v1.12.6/go.mod h1:83R3hTANhuRXt/pXDby37IJetw8l7DG41s33Tp9NXxI=
-github.com/sapcc/go-bits v0.0.0-20240925150026-37945f71a03e h1:HJRF3mL9TnBtF0x4oNb3+F9BC9H2Ez7lxKqaVqVBqgk=
-github.com/sapcc/go-bits v0.0.0-20240925150026-37945f71a03e/go.mod h1:mDSCc/u8EOqT79GNcSug5G25/Tt3PfWItGZCtdLvDQo=
+github.com/sapcc/go-bits v0.0.0-20241003120606-28dc119912ca h1:6w06gfEooueh3A3s7CWlfKB5FhMYTkBcBj9Bkq1Pfjs=
+github.com/sapcc/go-bits v0.0.0-20241003120606-28dc119912ca/go.mod h1:+cPgviCQwtnoQSGTQ055dUpG183roXK4IwaYHSh8mSs=
 github.com/scottdware/go-bigip v0.0.0-20240809002616-deb9b0aff84a h1:Dp0HN76Jl1n0orM9UVB/AnwqJOBWETm1hHBPDVMKWeE=
 github.com/scottdware/go-bigip v0.0.0-20240809002616-deb9b0aff84a/go.mod h1:ElPIUv+P7DTtT71aHpeNomJ4naq2RTvCA8o5gBIru3w=
 github.com/sergi/go-diff v1.0.0/go.mod h1:0CfEIISq7TuYL3j771MWULgwwjU+GofnZX9QAmXWZgo=
