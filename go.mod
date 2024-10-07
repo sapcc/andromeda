@@ -26,7 +26,7 @@ require (
 	github.com/go-openapi/validate v0.24.0
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/gophercloud/gophercloud/v2 v2.1.1
-	github.com/gophercloud/utils/v2 v2.0.0-20240919072936-a66ae2ba6ef0
+	github.com/gophercloud/utils/v2 v2.0.0-20241007085019-c541a54f6e4b
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/iancoleman/strcase v0.3.0
 	github.com/jackc/pgerrcode v0.0.0-20240316143900-6e2875d9b438
