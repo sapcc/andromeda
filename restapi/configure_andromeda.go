@@ -78,6 +78,8 @@ func configureServer(s *http.Server, scheme, addr string) {
 // The middleware configuration is for the handler executors. These do not apply to the swagger.json document.
 // The middleware executes after routing but before authentication, binding and validation
 func setupMiddlewares(handler http.Handler) http.Handler {
+	defer sentry.Recover()
+
 	if rl := config.Global.ApiSettings.RateLimit; rl > .0 {
 		log.WithField("rate_limit", rl).Info("Initializing rate limit middleware")
 		limiter := tollbooth.NewLimiter(rl, nil)
@@ -96,7 +98,7 @@ func setupMiddlewares(handler http.Handler) http.Handler {
 		var err error
 		handler, err = auth.KeystoneMiddleware(handler)
 		if err != nil {
-			log.WithError(err).Error("Error initializing keystone middleware")
+			log.WithError(err).Fatal("Failed to initialize keystone middleware")
 		}
 	}
 
@@ -106,6 +108,7 @@ func setupMiddlewares(handler http.Handler) http.Handler {
 // The middleware configuration happens before anything, this middleware also applies to serving the swagger.json document.
 // So this is a good place to plug in a panic handling middleware, logging and metrics
 func setupGlobalMiddleware(handler http.Handler) http.Handler {
+	defer sentry.Recover()
 	handler = middlewares.HealthCheckMiddleware(handler)
 
 	if !config.Global.ApiSettings.DisableCors {

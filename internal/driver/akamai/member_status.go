@@ -50,6 +50,7 @@ type IPAvailability struct {
 }
 
 func (s *AkamaiAgent) syncMemberStatus(domain *rpcmodels.Domain) error {
+	logger := log.WithField("domain.id", domain.Id)
 	trafficManagementDomain := config.Global.AkamaiConfig.Domain
 	hostURL := fmt.Sprintf("/gtm-api/v1/reports/ip-availability/domains/%s/properties/%s?mostRecent=true",
 		trafficManagementDomain, domain.GetFqdn())
@@ -61,17 +62,22 @@ func (s *AkamaiAgent) syncMemberStatus(domain *rpcmodels.Domain) error {
 		}
 	}
 
+	if len(memberMap) == 0 {
+		// Nothing to do
+		return nil
+	}
+
 	stat := &IPAvailability{}
 	req, _ := http.NewRequest(http.MethodGet, hostURL, nil)
 	if out, err := (*s.session).Exec(req, &stat); err != nil {
 		return err
 	} else {
 		bytes, _ := io.ReadAll(out.Body)
-		log.Debugf("%s", bytes)
+		logger.Debugf("syncMemberStatus: %s", bytes)
 	}
 
 	if len(stat.DataRows) == 0 {
-		// Nothing to do
+		logger.Warn("syncMemberStatus: no data rows found")
 		return nil
 	}
 

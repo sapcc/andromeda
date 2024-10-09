@@ -43,7 +43,7 @@ func (s *AkamaiAgent) DeleteProperty(domain *rpcmodels.Domain, trafficManagement
 
 	ret, err := s.gtm.DeleteProperty(context.Background(), property, trafficManagementDomain)
 	if err != nil {
-		return fmt.Errorf("Request %s: %w", PrettyJson(property), err)
+		return fmt.Errorf("request %s: %w", PrettyJson(property), err)
 	}
 
 	log.Debugf("Request: %s\nResponse: %s",
@@ -52,7 +52,8 @@ func (s *AkamaiAgent) DeleteProperty(domain *rpcmodels.Domain, trafficManagement
 	return nil
 }
 
-func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDomain string) (provRequests ProvRequests, err error) {
+func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDomain string) (ProvRequests, error) {
+	var provRequests ProvRequests
 	var members []*rpcmodels.Member
 	var monitors []*rpcmodels.Monitor
 
@@ -97,9 +98,11 @@ MEMBERLOOP:
 		datacenterUUID := member.GetDatacenter()
 		var datacenterID int
 		if len(datacenterUUID) > 0 {
+			var err error
 			datacenterID, err = s.GetDatacenterMeta(datacenterUUID, domain.Datacenters)
 			if err != nil {
-				log.Error(err.Error())
+				log.WithField("datacenterUUID", datacenterUUID).
+					WithError(err).Error("Failed to get datacenter meta")
 				continue
 			}
 
@@ -186,7 +189,7 @@ MEMBERLOOP:
 	if len(property.TrafficTargets) == 0 {
 		// Need traffictargets with datacenters before posting
 		log.Debugf("Skipping Property '%s': No traffic targets", property.Name)
-		return
+		return provRequests, nil
 	}
 
 	existingProperty, err2 := s.gtm.GetProperty(context.Background(), property.Name, config.Global.AkamaiConfig.Domain)
@@ -216,19 +219,18 @@ MEMBERLOOP:
 		"LivenessTests.HTTPMethod",
 	}
 	if utils.DeepEqualFields(&property, existingProperty, fieldsToCompare) {
-		return
+		return provRequests, nil
 	}
 
 	// Update
 	log.Infof("UpdateProperty(domain=%s, property=%s)", trafficManagementDomain, property.Name)
 	ret, err3 := s.gtm.UpdateProperty(context.Background(), &property, trafficManagementDomain)
 	if err3 != nil {
-		err = fmt.Errorf("request %s: %w", PrettyJson(property), err3)
-		return
+		return nil, fmt.Errorf("request %s: %w", PrettyJson(property), err3)
 	}
 
 	log.Debugf("Request: %s\nResponse: %s",
 		PrettyJson(property),
 		PrettyJson(ret))
-	return
+	return provRequests, nil
 }

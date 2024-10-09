@@ -97,8 +97,8 @@ func (s *AkamaiAgent) syncProvisioningStatus(domain *rpcmodels.Domain) (string, 
 			return status.PropagationStatus, nil
 		}
 		log.Infof("Domain %s has been propagated", domain.Id)
-		if err := s.syncMemberStatus(domain); err != nil {
-			log.Warn(err.Error())
+		if err = s.syncMemberStatus(domain); err != nil {
+			log.Warnf("syncProvisioningStatus: %s", err.Error())
 		}
 	}
 	return status.PropagationStatus, nil
