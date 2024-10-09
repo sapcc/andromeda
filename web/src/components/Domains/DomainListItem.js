@@ -79,9 +79,9 @@ const DomainListItem = ({domain, setError}) => {
                 <DataGridCell>{createdAt}</DataGridCell>
                 <DataGridCell>{updatedAt}</DataGridCell>
                 <DataGridCell><Pill
-                    onClick={() => {setTab(1); setDomain(domain.id)}}
+                    onClick={() => {if(domain.pools.length) {setDomain(domain.id);  setTab(1); }}}
                     pillKeyLabel="#"
-                    pillValueLabel={domain.pools.length}
+                    pillValueLabel={domain.pools.length || "0"}
                 /></DataGridCell>
                 <DataGridCell><ListItemStatus data={domain} /></DataGridCell>
                 <DataGridCell className="jn-items-end">
