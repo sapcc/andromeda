@@ -52,17 +52,17 @@ const PoolList = () => {
                 />
                 <span>
                     <Select
-                        defaultValue="Filter for Domain..."
+                        placeholder="Filter for Domain..."
                         onChange={(e) => setDomain(e === "All" ? null : e)}
-                        value={domain || "All"}
+                        value={domain}
                     >
-                        <SelectOption>All</SelectOption>
+                        <SelectOption value="All" label="All" />
                         {/* Filter for domains */}
                         {isSuccess && [...new Set(data.pages.map((group, _) =>
                             group.pools.map((pool, _) =>
                                 pool.domains
                             ).flat()).flat())].map((domain, i) => (
-                                <SelectOption key={i} value={domain}>{domain}</SelectOption>
+                                <SelectOption key={i} value={domain} />
                             )
                         )}
                     </Select>
