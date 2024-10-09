@@ -1,6 +1,6 @@
 import React, {useState} from "react"
 
-import {Box, Button, DataGrid, DataGridHeadCell, DataGridRow, Stack,} from "@cloudoperators/juno-ui-components"
+import {Box, Button, DataGrid, DataGridHeadCell, DataGridRow, Stack, Select, SelectOption, SearchInput} from "@cloudoperators/juno-ui-components"
 import PoolListItem from "./PoolListItem"
 import {authStore, urlStore} from "../../store"
 import {fetchAll, nextPageParam} from "../../actions";
@@ -13,6 +13,7 @@ const PoolList = () => {
     const auth = authStore((state) => state.auth)
     const setModal = urlStore((state) => state.openModal)
     const selectedPool = urlStore((state) => state.pool)
+    const [domain, setDomain] = urlStore((state) => [state.domain, state.setDomain])
     const [error, setError] = useState()
 
     const {
@@ -39,12 +40,7 @@ const PoolList = () => {
 
             {/* Loading indicator for page content */}
             <Loading isLoading={isLoading} />
-
-            <Stack
-                distribution="between"
-                direction="horizontal"
-                alignment="center"
-                className="jn-px-6 jn-py-3 mt-6 jn-bg-theme-background-lvl-1">
+            <Stack gap="2" className="jn-px-2 jn-py-2 jn-bg-theme-background-lvl-1">
                 <div className="jn-text-lg jn-text-theme-high">
                     <strong>Pools</strong>
                 </div>
@@ -54,10 +50,27 @@ const PoolList = () => {
                     onClick={() => setModal("NewPoolsItem")}
                     label="Add a Pool"
                 />
+                <span>
+                    <Select
+                        defaultValue="Filter for Domain..."
+                        onChange={(e) => setDomain(e === "All" ? null : e)}
+                        value={domain || "All"}
+                    >
+                        <SelectOption>All</SelectOption>
+                        {/* Filter for domains */}
+                        {isSuccess && [...new Set(data.pages.map((group, _) =>
+                            group.pools.map((pool, _) =>
+                                pool.domains
+                            ).flat()).flat())].map((domain, i) => (
+                                <SelectOption key={i} value={domain}>{domain}</SelectOption>
+                            )
+                        )}
+                    </Select>
+                </span>
             </Stack>
             {isSuccess ? (
                 <DataGrid columns={6}>
-                    <DataGridRow>
+                <DataGridRow>
                         <DataGridHeadCell>ID/Name</DataGridHeadCell>
                         <DataGridHeadCell>#Domains/#Members/#Monitors</DataGridHeadCell>
                         <DataGridHeadCell>Created</DataGridHeadCell>
@@ -68,7 +81,7 @@ const PoolList = () => {
 
                     {/* Render items: */}
                     {data.pages.map((group, i) =>
-                        group.pools.map((pool, index) => (
+                        group.pools.map((pool, index) => (domain == null || pool.domains.includes(domain)) && (
                             <PoolListItem
                                 key={index}
                                 pool={pool}

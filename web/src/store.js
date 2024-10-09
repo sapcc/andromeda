@@ -17,11 +17,12 @@ export const authStore = create(
 
 export const urlStore = create(
     querystring((set) => ({
-            t: 0,       // tab index
-            m: null,    // modal
-            p: null,    // panel
-            id: null,   // id
-            pool: null, // pool
+            t: 0,         // tab index
+            m: null,      // modal
+            p: null,      // panel
+            id: null,     // id
+            pool: null,   // pool
+            domain: null, // domain
             openModal: (newModal) => set(() => ({m: newModal})),
             openModalWithId: (newModal, newId) => set(() => ({m: newModal, id: newId})),
             closeModal: () => set(() => ({m: null})),
@@ -29,6 +30,7 @@ export const urlStore = create(
             setTab: (newTab) => set(() => ({t: newTab})),
             setPool: (newPool) => set(() => ({pool: newPool})),
             clearPool: () => set(() => ({pool: null})),
+            setDomain: (newDomain) => set(() => ({domain: newDomain})),
         })
     )
 )

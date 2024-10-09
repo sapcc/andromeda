@@ -46,7 +46,7 @@ const DomainList = () => {
                 />
             </ContentAreaToolbar>
             {isSuccess ? (
-                <DataGrid columns={8}>
+                <DataGrid columns={9}>
                     <DataGridRow>
                         <DataGridHeadCell>ID/Name</DataGridHeadCell>
                         <DataGridHeadCell>FQDN</DataGridHeadCell>
@@ -54,6 +54,7 @@ const DomainList = () => {
                         <DataGridHeadCell>Provider</DataGridHeadCell>
                         <DataGridHeadCell>Created</DataGridHeadCell>
                         <DataGridHeadCell>Updated</DataGridHeadCell>
+                        <DataGridHeadCell>Pools</DataGridHeadCell>
                         <DataGridHeadCell>Status</DataGridHeadCell>
                         <DataGridHeadCell className="jn-items-end">Options</DataGridHeadCell>
                     </DataGridRow>

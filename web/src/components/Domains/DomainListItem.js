@@ -5,12 +5,9 @@ import {
     DataGridRow,
     Icon,
     Stack,
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-    Label,
     ContextMenu,
-    MenuItem
+    MenuItem,
+    Pill,
 } from "@cloudoperators/juno-ui-components"
 import {authStore, urlStore} from "../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
@@ -20,6 +17,7 @@ import {JsonModal, ListItemSpinner, ListItemStatus} from "../Components";
 
 const DomainListItem = ({domain, setError}) => {
     const setPanel = urlStore((state) => state.openPanel)
+    const [setTab, setDomain] = urlStore((state) => [state.setTab, state.setDomain])
     const auth = authStore((state) => state.auth)
     const [showJson, setShowJson] = useState(false)
     const queryClient = useQueryClient()
@@ -80,6 +78,11 @@ const DomainListItem = ({domain, setError}) => {
                 <DataGridCell>{domain.provider}</DataGridCell>
                 <DataGridCell>{createdAt}</DataGridCell>
                 <DataGridCell>{updatedAt}</DataGridCell>
+                <DataGridCell><Pill
+                    onClick={() => {setTab(1); setDomain(domain.id)}}
+                    pillKeyLabel="#"
+                    pillValueLabel={domain.pools.length}
+                /></DataGridCell>
                 <DataGridCell><ListItemStatus data={domain} /></DataGridCell>
                 <DataGridCell className="jn-items-end">
                     {/* Use <Stack> to align and space elements: */}
