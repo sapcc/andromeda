@@ -95,36 +95,40 @@ func (s *AkamaiAgent) FetchAndSyncDomains(domains []string) error {
 	}
 
 	for _, domain := range res {
-		var provRequests ProvRequests
-		log.Infof("domainSync(%s) running...", domain.Id)
-		s.gtmLock.Lock()
+		if err = func() error {
+			var provRequests ProvRequests
+			log.Infof("domainSync(%s) running...", domain.Id)
+			defer s.gtmLock.Unlock()
+			s.gtmLock.Lock()
 
-		if domain.ProvisioningStatus == models.DomainProvisioningStatusPENDINGDELETE {
-			// Run Delete
-			if err := s.DeleteProperty(domain, trafficManagementDomain); err != nil {
-				return err
+			if domain.ProvisioningStatus == models.DomainProvisioningStatusPENDINGDELETE {
+				// Run Delete
+				if err := s.DeleteProperty(domain, trafficManagementDomain); err != nil {
+					return err
+				}
+				provRequests = s.CascadeUpdateDomainProvisioningStatus(domain, "DELETED")
+			} else {
+				// Run Sync
+				if provRequests, err = s.SyncProperty(domain, trafficManagementDomain); err != nil {
+					return err
+				}
 			}
-			provRequests = s.CascadeUpdateDomainProvisioningStatus(domain, "DELETED")
-		} else {
-			// Run Sync
-			if provRequests, err = s.SyncProperty(domain, trafficManagementDomain); err != nil {
-				return err
+
+			// Wait for status propagation
+			var status string
+			for ok := true; ok; ok = status == "PENDING" {
+				time.Sleep(5 * time.Second)
+				status, err = s.syncProvisioningStatus(domain)
+				if err != nil {
+					log.Error(err.Error())
+				}
 			}
+			driver.UpdateProvisioningStatus(s.rpc, provRequests)
+			log.Infof("FetchAndSyncDomains(%s) finished with '%s'", domain.Id, status)
+			return nil
+		}(); err != nil {
+			return err
 		}
-
-		// Wait for status propagation
-		var status string
-		for ok := true; ok; ok = status == "PENDING" {
-			time.Sleep(5 * time.Second)
-			status, err = s.syncProvisioningStatus(domain)
-			if err != nil {
-				log.Error(err.Error())
-			}
-		}
-		driver.UpdateProvisioningStatus(s.rpc, provRequests)
-
-		log.Infof("FetchAndSyncDomains(%s) finished with '%s'", domain.Id, status)
-		s.gtmLock.Unlock()
 	}
 	return nil
 }
