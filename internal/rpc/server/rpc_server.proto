@@ -83,7 +83,8 @@ message MemberStatusRequest {
     enum StatusType {
       ONLINE = 0;
       OFFLINE = 1;
-      UNKNOWN = 2;
+      NO_MONITOR = 2;
+      UNKNOWN = 3;
     }
     StatusType status = 2;
   }

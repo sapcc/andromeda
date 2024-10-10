@@ -44,13 +44,10 @@ func UpdateProvisioningStatus(rpc server.RPCServerClient, statusRequests []*serv
 	}
 }
 
-func GetMemberStatusRequest(id string, status string) *server.MemberStatusRequest_MemberStatus {
-	memberStatus := server.MemberStatusRequest_MemberStatus_StatusType(
-		server.MemberStatusRequest_MemberStatus_StatusType_value[status])
-
+func GetMemberStatusRequest(id string, status server.MemberStatusRequest_MemberStatus_StatusType) *server.MemberStatusRequest_MemberStatus {
 	return &server.MemberStatusRequest_MemberStatus{
 		Id:     id,
-		Status: memberStatus,
+		Status: status,
 	}
 }
 

@@ -1616,7 +1616,7 @@ definitions:
         enum:
           - ONLINE
           - NO_MONITOR
-          - DOWN
+          - OFFLINE
         readOnly: true
       port:
         type: integer

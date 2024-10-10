@@ -18,7 +18,6 @@ package akamai
 
 import (
 	"fmt"
-	"io"
 	"net/http"
 	"time"
 
@@ -69,11 +68,8 @@ func (s *AkamaiAgent) syncMemberStatus(domain *rpcmodels.Domain) error {
 
 	stat := &IPAvailability{}
 	req, _ := http.NewRequest(http.MethodGet, hostURL, nil)
-	if out, err := (*s.session).Exec(req, &stat); err != nil {
+	if _, err := (*s.session).Exec(req, &stat); err != nil {
 		return err
-	} else {
-		bytes, _ := io.ReadAll(out.Body)
-		logger.Debugf("syncMemberStatus: %s", bytes)
 	}
 
 	if len(stat.DataRows) == 0 {
@@ -85,9 +81,11 @@ func (s *AkamaiAgent) syncMemberStatus(domain *rpcmodels.Domain) error {
 	var memberStatusRequests []*server.MemberStatusRequest_MemberStatus
 	for _, datacenter := range stat.DataRows[0].Datacenters {
 		for _, ip := range datacenter.IPs {
-			status := "OFFLINE"
-			if ip.HandedOut {
-				status = "ONLINE"
+			status := server.MemberStatusRequest_MemberStatus_OFFLINE
+			if ip.HandedOut && ip.Alive {
+				status = server.MemberStatusRequest_MemberStatus_ONLINE
+			} else if ip.HandedOut && !ip.Alive {
+				status = server.MemberStatusRequest_MemberStatus_NO_MONITOR
 			}
 
 			if id, ok := memberMap[ip.IP]; ok {
@@ -97,7 +95,8 @@ func (s *AkamaiAgent) syncMemberStatus(domain *rpcmodels.Domain) error {
 				log.Warnf("unknown member with ip %s not found as port of domain %s", ip.IP, domain.Id)
 			}
 
-			log.Infof("status of domain %s: Alive: %+v, HandedOut: %+v, Score: %f", domain.Id, ip.Alive, ip.HandedOut, ip.Score)
+			log.Infof("status of domain %s: Alive: %+v, HandedOut: %+v, Score: %f -> Status: %s",
+				domain.Id, ip.Alive, ip.HandedOut, ip.Score, status)
 		}
 	}
 

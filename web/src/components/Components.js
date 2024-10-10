@@ -101,10 +101,46 @@ export const ListItemSpinner = ({data, onClick, className, maxLength=25}) => {
 export const ListItemStatus = ({data}) => {
     if (data.provisioning_status === "ACTIVE") {
         if ("status" in data) {
-            return <Badge
-                text={data.status}
-                variant={data.status === "ONLINE" ? "info" : (data.status === "UNKNOWN" ? "warning" : "danger") }
-            />
+            let icon = "help"
+            let variant = "warning"
+            let helptext = "Unknown status"
+
+            switch (data.status) {
+                case "ACTIVE":
+                case "ONLINE":
+                    icon = "wbSunny"
+                    variant = "success"
+                    helptext = "Online"
+                    break
+                case "OFFLINE":
+                    icon = "danger"
+                    variant = "danger"
+                    helptext = "Offline"
+                    break
+                case "ERROR":
+                    icon = "error"
+                    variant = "danger"
+                    helptext = "Error"
+                    break
+                case "NO_MONITOR":
+                    icon = "warning"
+                    variant = "warning"
+                    helptext = "Member is handed out, but Monitor failed or doesn't exist"
+            }
+            return <Tooltip triggerEvent="hover">
+                <TooltipTrigger>
+                    <span>
+                        <Badge
+                            icon={icon}
+                            text={data.status}
+                            variant={variant}
+                        />
+                    </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                    {helptext}
+                </TooltipContent>
+            </Tooltip>
         } else {
             return <Badge
                 text={data.provisioning_status}

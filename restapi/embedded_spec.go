@@ -2272,7 +2272,7 @@ func init() {
           "enum": [
             "ONLINE",
             "NO_MONITOR",
-            "DOWN"
+            "OFFLINE"
           ],
           "readOnly": true
         },
@@ -5180,7 +5180,7 @@ func init() {
           "enum": [
             "ONLINE",
             "NO_MONITOR",
-            "DOWN"
+            "OFFLINE"
           ],
           "readOnly": true
         },

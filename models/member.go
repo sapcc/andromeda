@@ -84,7 +84,7 @@ type Member struct {
 
 	// status
 	// Read Only: true
-	// Enum: [ONLINE NO_MONITOR DOWN]
+	// Enum: [ONLINE NO_MONITOR OFFLINE]
 	Status string `json:"status,omitempty"`
 
 	// The UTC date and timestamp when the resource was created.
@@ -307,7 +307,7 @@ var memberTypeStatusPropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["ONLINE","NO_MONITOR","DOWN"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["ONLINE","NO_MONITOR","OFFLINE"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -323,8 +323,8 @@ const (
 	// MemberStatusNOMONITOR captures enum value "NO_MONITOR"
 	MemberStatusNOMONITOR string = "NO_MONITOR"
 
-	// MemberStatusDOWN captures enum value "DOWN"
-	MemberStatusDOWN string = "DOWN"
+	// MemberStatusOFFLINE captures enum value "OFFLINE"
+	MemberStatusOFFLINE string = "OFFLINE"
 )
 
 // prop value enum
