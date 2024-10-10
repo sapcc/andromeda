@@ -39,7 +39,7 @@ import (
 )
 
 var PROPERTY_TYPE_MAP = map[string]string{
-	models.DomainModeAVAILABILITY: "failover",
+	models.DomainModeAVAILABILITY: "weighted-round-robin",
 	models.DomainModeGEOGRAPHIC:   "geographic",
 	models.DomainModeWEIGHTED:     "weighted-round-robin",
 	models.DomainModeROUNDROBIN:   "weighted-round-robin",
