@@ -121,7 +121,7 @@ export const ListItemStatus = ({data}) => {
                 case "NO_MONITOR":
                     return (
                         <Tooltip triggerEvent="hover">
-                            <TooltipTrigger><Badge icon="warning" text="warning" variant="warning" /></TooltipTrigger>
+                            <TooltipTrigger><Badge icon="warning" text={data.status} variant="warning" /></TooltipTrigger>
                             <TooltipContent>Member is handed out, but Monitor failed or doesn't exist</TooltipContent>
                         </Tooltip>
                         )
