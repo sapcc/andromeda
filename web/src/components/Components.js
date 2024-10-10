@@ -103,55 +103,43 @@ export const ListItemStatus = ({data}) => {
         if ("status" in data) {
             let icon = "help"
             let variant = "warning"
-            let helptext = "Unknown status"
 
             switch (data.status) {
                 case "ACTIVE":
                 case "ONLINE":
                     icon = "wbSunny"
-                    variant = "success"
-                    helptext = "Online"
+                    variant = "info"
                     break
                 case "OFFLINE":
                     icon = "danger"
                     variant = "danger"
-                    helptext = "Offline"
                     break
                 case "ERROR":
                     icon = "error"
                     variant = "danger"
-                    helptext = "Error"
                     break
                 case "NO_MONITOR":
-                    icon = "warning"
-                    variant = "warning"
-                    helptext = "Member is handed out, but Monitor failed or doesn't exist"
+                    return (
+                        <Tooltip triggerEvent="hover">
+                            <TooltipTrigger><Badge icon="warning" text="warning" variant="warning" /></TooltipTrigger>
+                            <TooltipContent>Member is handed out, but Monitor failed or doesn't exist</TooltipContent>
+                        </Tooltip>
+                        )
             }
-            return <Tooltip triggerEvent="hover">
-                <TooltipTrigger>
-                    <span>
-                        <Badge
-                            icon={icon}
-                            text={data.status}
-                            variant={variant}
-                        />
-                    </span>
-                </TooltipTrigger>
-                <TooltipContent>
-                    {helptext}
-                </TooltipContent>
-            </Tooltip>
+            return <Badge text={data.status} variant={variant} icon={icon} />
         } else {
             return <Badge
                 text={data.provisioning_status}
                 variant={data.provisioning_status === "ACTIVE" ? "info" : "danger"}
+                icon={data.provisioning_status === "ACTIVE" ? "check" : "error"}
             />
         }
     } else {
+        let variant = ["PENDING_DELETE", "DELETED", "ERROR"].includes(data.provisioning_status) ? "danger" : "warning"
         return <Badge
-            variant={["PENDING_DELETE", "DELETED", "ERROR"].includes(
-                data.provisioning_status) ? "danger" : "warning"}
-                text={data.provisioning_status}
+            variant={variant}
+            text={data.provisioning_status}
+            icon={variant}
             />
     }
 }
