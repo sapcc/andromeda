@@ -147,7 +147,8 @@ func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force boo
 	var err error
 
 	if meta == 0 {
-		if meta, err = s.GetDatacenterMeta(datacenter.Id, nil); err != nil {
+		meta, err = s.GetDatacenterMeta(datacenter.Id, nil)
+		if err != nil && !errors.Is(err, datacenterNotFound) {
 			return nil, err
 		}
 	}
