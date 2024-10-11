@@ -1,6 +1,6 @@
 import React, {useMemo} from "react"
 
-import {DataGridCell, DataGridRow, Icon, Stack} from "@cloudoperators/juno-ui-components"
+import {DataGridCell, DataGridRow, Icon, Stack, Pill} from "@cloudoperators/juno-ui-components"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {deleteItem} from "../../actions"
 import {DateTime} from "luxon";
@@ -10,6 +10,7 @@ import {ListItemSpinner, ListItemStatus} from "../Components";
 const PoolListItem = ({pool, isActive, setError}) => {
     const auth = authStore((state) => state.auth)
     const [openPanel, setSelectedPool] = urlStore((state) => [state.openPanel, state.setPool])
+    const [setTab] = urlStore((state) => [state.setTab])
     const queryClient = useQueryClient()
     const createdAt = useMemo(() => {
         if (pool.created_at) {
@@ -55,13 +56,30 @@ const PoolListItem = ({pool, isActive, setError}) => {
 
     return (
         <DataGridRow>
-            <DataGridCell>
+            <DataGridCell className={"hover:text-theme-accent"}>
                 <ListItemSpinner
                     data={pool} onClick={handlePoolClick}
                     className={`cursor-pointer ${isActive ? "jn-text-theme-accent" : "hover:text-theme-accent"}`}
                 />
             </DataGridCell>
-            <DataGridCell>{pool.domains?.length || 0}/{pool.members?.length || 0}/{pool.monitors?.length || 0}</DataGridCell>
+            <DataGridCell>
+                <Stack direction="horizontal" gap="2">
+                    <Pill
+                        onClick={() => setTab(0)}
+                        pillKeyLabel="Domains"
+                        pillValueLabel={pool.domains?.length || "0"}
+                    />
+                    <Pill
+                        pillKeyLabel="Members"
+                        pillValueLabel={pool.members?.length || "0"}
+                    />
+                    <Pill
+                        pillKeyLabel="Monitors"
+                        pillValueLabel={pool.monitors?.length || "0"}
+                    />
+
+                </Stack>
+            </DataGridCell>
             <DataGridCell>{createdAt}</DataGridCell>
             <DataGridCell>{updatedAt}</DataGridCell>
             <DataGridCell>

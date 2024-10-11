@@ -14,6 +14,7 @@ import {
     TooltipContent,
     TooltipTrigger
 } from "@cloudoperators/juno-ui-components";
+import {FormattedText} from "@cloudoperators/juno-ui-components/build/FormattedText";
 
 export const Error = ({error}) => {
     if (error) {
@@ -72,15 +73,14 @@ export const ListItemSpinner = ({data, onClick, className, maxLength=25}) => {
     const [showToast, setToast] = useState(false)
 
     return (
-        <Stack alignment="center">
+        <Stack alignment="center" className={className} onClick={onClick}>
             {["ACTIVE", "DELETED", "ERROR"].includes(data.provisioning_status) && <></> || <Spinner variant={variantClass(data.provisioning_status)} size="small"/>}
             <Stack
                 direction="vertical"
                 className={`${backgroundClass(data.provisioning_status)}`}
-                onClick={onClick}
             >
                 <div>
-                    {name === data.id && <b>{name}</b> || <small className={className}>{data.id} </small>}
+                    {name === data.id && <b>{name}</b> || <small>{data.id} </small>}
                     {showToast && <Toast text="ID copied to clipboard" className="absolute"/>}
                     &nbsp;
                     <Icon size={name === data.id && "16" || "14"} icon="contentCopy" title="Copy" onClick={() => {
@@ -91,8 +91,8 @@ export const ListItemSpinner = ({data, onClick, className, maxLength=25}) => {
                             }.bind(this), 1000)
                         })
                     }}/>
+                    {name !== data.id && <p>{name.substring(0, maxLength)}{name.length >= maxLength && "..."}</p> || ""}
                 </div>
-                {name !== data.id && <p className="jn-font-bold">{name.substring(0, maxLength)}{name.length >= maxLength && "..."}</p> || ""}
             </Stack>
         </Stack>
     )

@@ -4,7 +4,7 @@ import {authStore, urlStore} from "../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {createItem} from "../../actions"
 import {Checkbox, Modal, Select, SelectOption, Stack, TextInput} from "@cloudoperators/juno-ui-components"
-import {Error} from "../Components";
+import {Error, Loading} from "../Components";
 
 const NewDomainModal = () => {
     const auth = authStore((state) => state.auth)
@@ -17,7 +17,7 @@ const NewDomainModal = () => {
         admin_state_up: true,
     })
     const queryClient = useQueryClient()
-    const {error, mutate} = useMutation({mutationFn: createItem})
+    const {error, mutate, isPending} = useMutation({mutationFn: createItem})
 
     const onSubmit = () => {
         mutate(
@@ -56,14 +56,19 @@ const NewDomainModal = () => {
                 {/* Error Bar */}
                 <Error error={error}/>
 
+                {/* Loading indicator for page content */}
+                <Loading isLoading={isPending}/>
+
                 <Checkbox
                     id="selectable"
+                    disabled={isPending}
                     label="Enabled"
                     checked={formState.admin_state_up}
                     onChange={(event) => setFormState({...formState, admin_state_up: event.target.checked})}
                 />
                 <TextInput
                     label="Name"
+                    disabled={isPending}
                     helptext="The name of the domain, e.g. example-com"
                     name="name"
                     value={formState.name}
@@ -71,6 +76,7 @@ const NewDomainModal = () => {
                 />
                 <Select
                     label="Provider"
+                    disabled={isPending}
                     value={formState.provider}
                     helptext="Currently, only Akamai is supported."
                     onChange={(target) => setFormState({...formState, provider: target})}
@@ -83,6 +89,7 @@ const NewDomainModal = () => {
                 </Select>
                 <TextInput
                     label="Fully Qualified Domain Name"
+                    disabled={isPending}
                     helptext="The fully qualified domain name of the domain, e.g. example.com"
                     name="fqdn"
                     value={formState.fqdn}
@@ -91,6 +98,7 @@ const NewDomainModal = () => {
                 />
                 <Select
                     label="Record Type"
+                    disabled={isPending}
                     helptext="The type of DNS record to create."
                     value={formState.record_type}
                     onChange={(target) => setFormState({...formState, record_type: target})}

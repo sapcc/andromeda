@@ -78,11 +78,13 @@ const DomainListItem = ({domain, setError}) => {
                 <DataGridCell>{domain.provider}</DataGridCell>
                 <DataGridCell>{createdAt}</DataGridCell>
                 <DataGridCell>{updatedAt}</DataGridCell>
-                <DataGridCell><Pill
-                    onClick={() => {if(domain.pools.length) {setDomain(domain.id);  setTab(1); }}}
-                    pillKeyLabel="#"
-                    pillValueLabel={domain.pools.length || "0"}
-                /></DataGridCell>
+                <DataGridCell>
+                    <Pill
+                        onClick={() => {if(domain.pools.length) {setDomain(domain.id);  setTab(1); }}}
+                        pillKeyLabel="#"
+                        pillValueLabel={domain.pools.length || "0"}
+                    />
+                </DataGridCell>
                 <DataGridCell><ListItemStatus data={domain} /></DataGridCell>
                 <DataGridCell className="jn-items-end">
                     {/* Use <Stack> to align and space elements: */}
