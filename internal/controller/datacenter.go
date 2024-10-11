@@ -169,8 +169,15 @@ func (c DatacenterController) DeleteDatacentersDatacenterID(params datacenters.D
 		return datacenters.NewDeleteDatacentersDatacenterIDDefault(403).WithPayload(utils.PolicyForbidden)
 	}
 
-	// todo: check for related members
-	sql := c.db.Rebind(`UPDATE datacenter SET provisioning_status = 'PENDING_DELETE' WHERE id = ?`)
+	var count int
+	sql := c.db.Rebind(`SELECT count(*) FROM member WHERE datacenter_id = ?`)
+	if err := c.db.Get(&count, sql, datacenter.ID); err != nil {
+		panic(err)
+	} else if count > 0 {
+		return datacenters.NewDeleteDatacentersDatacenterIDDefault(409).WithPayload(utils.DatacenterInUse)
+	}
+
+	sql = c.db.Rebind(`UPDATE datacenter SET provisioning_status = 'PENDING_DELETE' WHERE id = ?`)
 	res, err := c.db.Exec(sql, params.DatacenterID)
 	if err != nil {
 		var pe *pq.Error

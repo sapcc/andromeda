@@ -83,7 +83,8 @@ func (s *AkamaiAgent) FetchAndSyncDomains(domains []string) error {
 	var datacenters []string
 	for _, domain := range res {
 		for _, datacenter := range domain.Datacenters {
-			if datacenter.ProvisioningStatus != models.DatacenterProvisioningStatusACTIVE {
+			if datacenter.ProvisioningStatus != models.DatacenterProvisioningStatusACTIVE &&
+				datacenter.ProvisioningStatus != models.DatacenterProvisioningStatusPENDINGDELETE {
 				datacenters = append(datacenters, datacenter.Id)
 			}
 		}
