@@ -131,6 +131,13 @@ MEMBERLOOP:
 			driver.GetProvisioningStatusRequest(member.Id, "MEMBER", "ACTIVE"))
 	}
 
+	// due shortcoming of individual liveness test per member, we have to replicate a monitor per unique member port
+	// collect unique member ports
+	uniquePorts := make(map[uint32]interface{})
+	for _, member := range members {
+		uniquePorts[member.GetPort()] = nil
+	}
+
 	// Add new Monitors
 	for _, monitor := range monitors {
 		if monitor.ProvisioningStatus == models.MonitorProvisioningStatusPENDINGDELETE {
@@ -139,45 +146,43 @@ MEMBERLOOP:
 			continue
 		}
 
-		livenessTest := gtm.LivenessTest{
-			Name:               monitor.GetId(),
-			TestObjectProtocol: MONITOR_LIVENESS_TYPE_MAP[monitor.GetType()],
-			TestInterval:       int(monitor.GetInterval()),
-			TestTimeout:        float32(monitor.GetTimeout()),
-			Disabled:           !monitor.GetAdminStateUp(),
-		}
+	monitorLoop:
+		for testPort := range uniquePorts {
+			livenessTest := gtm.LivenessTest{
+				Name:               fmt.Sprintf("%s-%d", monitor.GetId(), testPort),
+				TestObjectPort:     int(testPort),
+				TestObjectProtocol: MONITOR_LIVENESS_TYPE_MAP[monitor.GetType()],
+				TestInterval:       int(monitor.GetInterval()),
+				TestTimeout:        float32(monitor.GetTimeout()),
+				Disabled:           !monitor.GetAdminStateUp(),
+			}
 
-		switch monitor.GetType() {
-		case rpcmodels.Monitor_HTTPS:
-			fallthrough
-		case rpcmodels.Monitor_HTTP:
-			if monitor.GetSend() == "" {
-				livenessTest.TestObject = "/"
-			} else {
-				livenessTest.TestObject = monitor.GetSend()
+			switch monitor.GetType() {
+			case rpcmodels.Monitor_HTTPS:
+				fallthrough
+			case rpcmodels.Monitor_HTTP:
+				if monitor.GetSend() == "" {
+					livenessTest.TestObject = "/"
+				} else {
+					livenessTest.TestObject = monitor.GetSend()
+				}
+				livenessTest.HTTPHeaders = []*gtm.HTTPHeader{{Name: "Host", Value: domain.GetFqdn()}}
+				if domainName := monitor.GetDomainName(); domainName != "" {
+					livenessTest.HTTPHeaders = []*gtm.HTTPHeader{{Name: "Host", Value: domainName}}
+				}
+				livenessTest.HTTPMethod = swag.String(monitor.GetMethod().String())
+			case rpcmodels.Monitor_TCP:
+				livenessTest.RequestString = monitor.GetSend()
+				livenessTest.ResponseString = monitor.GetReceive()
+			default:
+				// unsupported type
+				log.Warnf("Unsupported monitor type: %s", monitor.GetType())
+				provRequests = append(provRequests,
+					driver.GetProvisioningStatusRequest(monitor.Id, "MONITOR", models.MonitorProvisioningStatusERROR))
+				continue monitorLoop
 			}
-			var testPort uint32 = 80
-			for _, member := range members {
-				testPort = member.GetPort()
-				break
-			}
-			livenessTest.TestObjectPort = int(testPort)
-			livenessTest.HTTPHeaders = []*gtm.HTTPHeader{{Name: "Host", Value: domain.GetFqdn()}}
-			if domainName := monitor.GetDomainName(); domainName != "" {
-				livenessTest.HTTPHeaders = []*gtm.HTTPHeader{{Name: "Host", Value: domainName}}
-			}
-			livenessTest.HTTPMethod = swag.String(monitor.GetMethod().String())
-		case rpcmodels.Monitor_TCP:
-			livenessTest.RequestString = monitor.GetSend()
-			livenessTest.ResponseString = monitor.GetReceive()
-		default:
-			// unsupported type
-			log.Warnf("Unsupported monitor type: %s", monitor.GetType())
-			provRequests = append(provRequests,
-				driver.GetProvisioningStatusRequest(monitor.Id, "MONITOR", models.MonitorProvisioningStatusERROR))
-			continue
+			property.LivenessTests = append(property.LivenessTests, &livenessTest)
 		}
-		property.LivenessTests = append(property.LivenessTests, &livenessTest)
 		provRequests = append(provRequests,
 			driver.GetProvisioningStatusRequest(monitor.Id, "MONITOR", models.MonitorProvisioningStatusACTIVE))
 	}

@@ -50,7 +50,7 @@ func (s *AkamaiAgent) EnsureDomain(domainType string) error {
 	return nil
 }
 
-func (s *AkamaiAgent) FetchAndSyncDomains(domains []string) error {
+func (s *AkamaiAgent) FetchAndSyncDomains(domains []string, force bool) error {
 	if s.executing {
 		return nil
 	}
@@ -58,13 +58,13 @@ func (s *AkamaiAgent) FetchAndSyncDomains(domains []string) error {
 	s.executing = true
 	defer func() { s.executing = false }()
 
-	log.Debugf("Running FetchAndSyncDomains(domains=%+v)", domains)
+	log.Debugf("Running FetchAndSyncDomains(domains=%+v, force=%t)", domains, force)
 	response, err := s.rpc.GetDomains(context.Background(), &server.SearchRequest{
 		Provider:       "akamai",
 		PageNumber:     0,
 		ResultPerPage:  1,
 		FullyPopulated: true,
-		Pending:        domains == nil,
+		Pending:        domains == nil && !force,
 		Ids:            domains,
 	})
 	if err != nil {

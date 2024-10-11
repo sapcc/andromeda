@@ -156,7 +156,7 @@ func (s *AkamaiAgent) WorkerThread() {
 				log.Error(err.Error())
 			}
 
-			if err := s.FetchAndSyncDomains(domains); err != nil {
+			if err := s.FetchAndSyncDomains(domains, true); err != nil {
 				log.Error(err.Error())
 			}
 		case <-s.workerTicker.C: // Activate periodically
@@ -170,7 +170,7 @@ func (s *AkamaiAgent) WorkerThread() {
 					log.Error(err.Error())
 				}
 
-				if err := s.FetchAndSyncDomains(nil); err != nil {
+				if err := s.FetchAndSyncDomains(nil, false); err != nil {
 					log.Error(err.Error())
 				}
 
