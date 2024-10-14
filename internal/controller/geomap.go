@@ -82,6 +82,10 @@ func (c GeoMapController) PostGeomaps(params geographic_maps.PostGeomapsParams) 
 		geomap.ProjectID = &projectID
 	}
 
+	if geomap.Provider == "" {
+		return geographic_maps.NewPostGeomapsBadRequest().WithPayload(utils.MissingProvider)
+	}
+
 	// Set default values
 	if err := utils.SetModelDefaults(geomap); err != nil {
 		panic(err)
