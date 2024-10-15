@@ -145,5 +145,7 @@ func DeepEqualFields(x, y interface{}, fieldsToCompare []string) bool {
 	if v1.Type() != v2.Type() {
 		return false
 	}
-	return deepValueEqualField(v1, v2, fieldsToCompare)
+	ret := deepValueEqualField(v1, v2, fieldsToCompare)
+	log.Debugf("DeepEqualFields: %t", ret)
+	return ret
 }
