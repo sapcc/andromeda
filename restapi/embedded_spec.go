@@ -64,18 +64,6 @@ func init() {
           },
           {
             "$ref": "#/parameters/page_reverse"
-          },
-          {
-            "$ref": "#/parameters/tags"
-          },
-          {
-            "$ref": "#/parameters/tags-any"
-          },
-          {
-            "$ref": "#/parameters/not-tags"
-          },
-          {
-            "$ref": "#/parameters/not-tags-any"
           }
         ],
         "responses": {
@@ -302,18 +290,6 @@ func init() {
           },
           {
             "$ref": "#/parameters/page_reverse"
-          },
-          {
-            "$ref": "#/parameters/tags"
-          },
-          {
-            "$ref": "#/parameters/tags-any"
-          },
-          {
-            "$ref": "#/parameters/not-tags"
-          },
-          {
-            "$ref": "#/parameters/not-tags-any"
           }
         ],
         "responses": {
@@ -546,18 +522,6 @@ func init() {
           },
           {
             "$ref": "#/parameters/page_reverse"
-          },
-          {
-            "$ref": "#/parameters/tags"
-          },
-          {
-            "$ref": "#/parameters/tags-any"
-          },
-          {
-            "$ref": "#/parameters/not-tags"
-          },
-          {
-            "$ref": "#/parameters/not-tags-any"
           }
         ],
         "responses": {
@@ -796,18 +760,6 @@ func init() {
           },
           {
             "$ref": "#/parameters/page_reverse"
-          },
-          {
-            "$ref": "#/parameters/tags"
-          },
-          {
-            "$ref": "#/parameters/tags-any"
-          },
-          {
-            "$ref": "#/parameters/not-tags"
-          },
-          {
-            "$ref": "#/parameters/not-tags-any"
           },
           {
             "type": "string",
@@ -1056,18 +1008,6 @@ func init() {
             "$ref": "#/parameters/page_reverse"
           },
           {
-            "$ref": "#/parameters/tags"
-          },
-          {
-            "$ref": "#/parameters/tags-any"
-          },
-          {
-            "$ref": "#/parameters/not-tags"
-          },
-          {
-            "$ref": "#/parameters/not-tags-any"
-          },
-          {
             "type": "string",
             "format": "uuid",
             "x-nullable": true,
@@ -1312,18 +1252,6 @@ func init() {
           },
           {
             "$ref": "#/parameters/page_reverse"
-          },
-          {
-            "$ref": "#/parameters/tags"
-          },
-          {
-            "$ref": "#/parameters/tags-any"
-          },
-          {
-            "$ref": "#/parameters/not-tags"
-          },
-          {
-            "$ref": "#/parameters/not-tags-any"
           }
         ],
         "responses": {
@@ -2634,24 +2562,6 @@ func init() {
       "name": "marker",
       "in": "query"
     },
-    "not-tags": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "Filter for resources not having tags, multiple not-tags are considered as logical AND.\nShould be provided in a comma separated list.\n",
-      "name": "not-tags",
-      "in": "query"
-    },
-    "not-tags-any": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "Filter for resources not having tags, multiple tags are considered as logical OR.\nShould be provided in a comma separated list.\n",
-      "name": "not-tags-any",
-      "in": "query"
-    },
     "page_reverse": {
       "type": "boolean",
       "description": "Sets the page direction.",
@@ -2662,24 +2572,6 @@ func init() {
       "type": "string",
       "description": "Comma-separated list of sort keys, optinally prefix with - to reverse sort order.",
       "name": "sort",
-      "in": "query"
-    },
-    "tags": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "Filter for tags, multiple tags are considered as logical AND. \nShould be provided in a comma separated list.\n",
-      "name": "tags",
-      "in": "query"
-    },
-    "tags-any": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "Filter for tags, multiple tags are considered as logical OR.\nShould be provided in a comma separated list.\n",
-      "name": "tags-any",
       "in": "query"
     }
   },
@@ -2755,42 +2647,6 @@ func init() {
             "type": "boolean",
             "description": "Sets the page direction.",
             "name": "page_reverse",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter for tags, multiple tags are considered as logical AND. \nShould be provided in a comma separated list.\n",
-            "name": "tags",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter for tags, multiple tags are considered as logical OR.\nShould be provided in a comma separated list.\n",
-            "name": "tags-any",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter for resources not having tags, multiple not-tags are considered as logical AND.\nShould be provided in a comma separated list.\n",
-            "name": "not-tags",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter for resources not having tags, multiple tags are considered as logical OR.\nShould be provided in a comma separated list.\n",
-            "name": "not-tags-any",
             "in": "query"
           }
         ],
@@ -3030,42 +2886,6 @@ func init() {
             "type": "boolean",
             "description": "Sets the page direction.",
             "name": "page_reverse",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter for tags, multiple tags are considered as logical AND. \nShould be provided in a comma separated list.\n",
-            "name": "tags",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter for tags, multiple tags are considered as logical OR.\nShould be provided in a comma separated list.\n",
-            "name": "tags-any",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter for resources not having tags, multiple not-tags are considered as logical AND.\nShould be provided in a comma separated list.\n",
-            "name": "not-tags",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter for resources not having tags, multiple tags are considered as logical OR.\nShould be provided in a comma separated list.\n",
-            "name": "not-tags-any",
             "in": "query"
           }
         ],
@@ -3311,42 +3131,6 @@ func init() {
             "type": "boolean",
             "description": "Sets the page direction.",
             "name": "page_reverse",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter for tags, multiple tags are considered as logical AND. \nShould be provided in a comma separated list.\n",
-            "name": "tags",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter for tags, multiple tags are considered as logical OR.\nShould be provided in a comma separated list.\n",
-            "name": "tags-any",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter for resources not having tags, multiple not-tags are considered as logical AND.\nShould be provided in a comma separated list.\n",
-            "name": "not-tags",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter for resources not having tags, multiple tags are considered as logical OR.\nShould be provided in a comma separated list.\n",
-            "name": "not-tags-any",
             "in": "query"
           }
         ],
@@ -3598,42 +3382,6 @@ func init() {
             "type": "boolean",
             "description": "Sets the page direction.",
             "name": "page_reverse",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter for tags, multiple tags are considered as logical AND. \nShould be provided in a comma separated list.\n",
-            "name": "tags",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter for tags, multiple tags are considered as logical OR.\nShould be provided in a comma separated list.\n",
-            "name": "tags-any",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter for resources not having tags, multiple not-tags are considered as logical AND.\nShould be provided in a comma separated list.\n",
-            "name": "not-tags",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter for resources not having tags, multiple tags are considered as logical OR.\nShould be provided in a comma separated list.\n",
-            "name": "not-tags-any",
             "in": "query"
           },
           {
@@ -3896,42 +3644,6 @@ func init() {
             "in": "query"
           },
           {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter for tags, multiple tags are considered as logical AND. \nShould be provided in a comma separated list.\n",
-            "name": "tags",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter for tags, multiple tags are considered as logical OR.\nShould be provided in a comma separated list.\n",
-            "name": "tags-any",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter for resources not having tags, multiple not-tags are considered as logical AND.\nShould be provided in a comma separated list.\n",
-            "name": "not-tags",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter for resources not having tags, multiple tags are considered as logical OR.\nShould be provided in a comma separated list.\n",
-            "name": "not-tags-any",
-            "in": "query"
-          },
-          {
             "type": "string",
             "format": "uuid",
             "x-nullable": true,
@@ -4188,42 +3900,6 @@ func init() {
             "type": "boolean",
             "description": "Sets the page direction.",
             "name": "page_reverse",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter for tags, multiple tags are considered as logical AND. \nShould be provided in a comma separated list.\n",
-            "name": "tags",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter for tags, multiple tags are considered as logical OR.\nShould be provided in a comma separated list.\n",
-            "name": "tags-any",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter for resources not having tags, multiple not-tags are considered as logical AND.\nShould be provided in a comma separated list.\n",
-            "name": "not-tags",
-            "in": "query"
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Filter for resources not having tags, multiple tags are considered as logical OR.\nShould be provided in a comma separated list.\n",
-            "name": "not-tags-any",
             "in": "query"
           }
         ],
@@ -5543,24 +5219,6 @@ func init() {
       "name": "marker",
       "in": "query"
     },
-    "not-tags": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "Filter for resources not having tags, multiple not-tags are considered as logical AND.\nShould be provided in a comma separated list.\n",
-      "name": "not-tags",
-      "in": "query"
-    },
-    "not-tags-any": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "Filter for resources not having tags, multiple tags are considered as logical OR.\nShould be provided in a comma separated list.\n",
-      "name": "not-tags-any",
-      "in": "query"
-    },
     "page_reverse": {
       "type": "boolean",
       "description": "Sets the page direction.",
@@ -5571,24 +5229,6 @@ func init() {
       "type": "string",
       "description": "Comma-separated list of sort keys, optinally prefix with - to reverse sort order.",
       "name": "sort",
-      "in": "query"
-    },
-    "tags": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "Filter for tags, multiple tags are considered as logical AND. \nShould be provided in a comma separated list.\n",
-      "name": "tags",
-      "in": "query"
-    },
-    "tags-any": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "Filter for tags, multiple tags are considered as logical OR.\nShould be provided in a comma separated list.\n",
-      "name": "tags-any",
       "in": "query"
     }
   },

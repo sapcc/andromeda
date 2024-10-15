@@ -31,42 +31,6 @@ parameters:
     in: query
     type: boolean
     description: Sets the page direction.
-  tags:
-    name: tags
-    in: query
-    type: array
-    description: |
-      Filter for tags, multiple tags are considered as logical AND. 
-      Should be provided in a comma separated list.
-    items:
-      type: string
-  tags-any:
-    name: tags-any
-    in: query
-    type: array
-    description: |
-      Filter for tags, multiple tags are considered as logical OR.
-      Should be provided in a comma separated list.
-    items:
-      type: string
-  not-tags:
-    name: not-tags
-    in: query
-    type: array
-    description: |
-      Filter for resources not having tags, multiple not-tags are considered as logical AND.
-      Should be provided in a comma separated list.
-    items:
-      type: string
-  not-tags-any:
-    name: not-tags-any
-    in: query
-    type: array
-    description: |
-      Filter for resources not having tags, multiple tags are considered as logical OR.
-      Should be provided in a comma separated list.
-    items:
-      type: string
 
 paths:
   /domains:
@@ -80,10 +44,6 @@ paths:
         - $ref: '#/parameters/limit'
         - $ref: '#/parameters/sort'
         - $ref: '#/parameters/page_reverse'
-        - $ref: '#/parameters/tags'
-        - $ref: '#/parameters/tags-any'
-        - $ref: '#/parameters/not-tags'
-        - $ref: '#/parameters/not-tags-any'
       responses:
         200:
           description: A JSON array of domains
@@ -236,10 +196,6 @@ paths:
         - $ref: '#/parameters/limit'
         - $ref: '#/parameters/sort'
         - $ref: '#/parameters/page_reverse'
-        - $ref: '#/parameters/tags'
-        - $ref: '#/parameters/tags-any'
-        - $ref: '#/parameters/not-tags'
-        - $ref: '#/parameters/not-tags-any'
       responses:
         200:
           description: A JSON array of pools
@@ -388,10 +344,6 @@ paths:
         - $ref: '#/parameters/limit'
         - $ref: '#/parameters/sort'
         - $ref: '#/parameters/page_reverse'
-        - $ref: '#/parameters/tags'
-        - $ref: '#/parameters/tags-any'
-        - $ref: '#/parameters/not-tags'
-        - $ref: '#/parameters/not-tags-any'
       responses:
         200:
           description: A JSON array of datacenters
@@ -540,10 +492,6 @@ paths:
         - $ref: '#/parameters/limit'
         - $ref: '#/parameters/sort'
         - $ref: '#/parameters/page_reverse'
-        - $ref: '#/parameters/tags'
-        - $ref: '#/parameters/tags-any'
-        - $ref: '#/parameters/not-tags'
-        - $ref: '#/parameters/not-tags-any'
         - in: query
           name: pool_id
           required: false
@@ -707,10 +655,6 @@ paths:
         - $ref: '#/parameters/limit'
         - $ref: '#/parameters/sort'
         - $ref: '#/parameters/page_reverse'
-        - $ref: '#/parameters/tags'
-        - $ref: '#/parameters/tags-any'
-        - $ref: '#/parameters/not-tags'
-        - $ref: '#/parameters/not-tags-any'
         - in: query
           name: pool_id
           required: false
@@ -874,10 +818,6 @@ paths:
         - $ref: '#/parameters/limit'
         - $ref: '#/parameters/sort'
         - $ref: '#/parameters/page_reverse'
-        - $ref: '#/parameters/tags'
-        - $ref: '#/parameters/tags-any'
-        - $ref: '#/parameters/not-tags'
-        - $ref: '#/parameters/not-tags-any'
       responses:
         200:
           description: A JSON array of geographic maps

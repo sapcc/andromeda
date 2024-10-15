@@ -46,12 +46,8 @@ func (c MonitorController) GetMonitors(params monitors.GetMonitorsParams) middle
 		HTTPRequest: params.HTTPRequest,
 		Limit:       params.Limit,
 		Marker:      params.Marker,
-		NotTags:     params.NotTags,
-		NotTagsAny:  params.NotTagsAny,
 		PageReverse: params.PageReverse,
 		Sort:        params.Sort,
-		Tags:        params.Tags,
-		TagsAny:     params.TagsAny,
 	}
 	if params.PoolID != nil {
 		filter["pool_id"] = params.PoolID

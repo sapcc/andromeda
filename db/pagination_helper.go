@@ -26,6 +26,7 @@ import (
 
 	"github.com/go-openapi/strfmt"
 	"github.com/jmoiron/sqlx"
+
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/models"
 )
@@ -49,18 +50,6 @@ type Pagination struct {
 	  In: query
 	*/
 	Marker *strfmt.UUID
-	/*Filter for resources not having tags, multiple not-tags are considered as logical AND.
-	Should be provided in a comma separated list.
-
-	  In: query
-	*/
-	NotTags []string
-	/*Filter for resources not having tags, multiple tags are considered as logical OR.
-	Should be provided in a comma separated list.
-
-	  In: query
-	*/
-	NotTagsAny []string
 	/*Sets the page direction.
 	  In: query
 	*/
@@ -69,18 +58,6 @@ type Pagination struct {
 	  In: query
 	*/
 	Sort *string
-	/*Filter for tags, multiple tags are considered as logical AND.
-	Should be provided in a comma separated list.
-
-	  In: query
-	*/
-	Tags []string
-	/*Filter for tags, multiple tags are considered as logical OR.
-	Should be provided in a comma separated list.
-
-	  In: query
-	*/
-	TagsAny []string
 }
 
 func stripDesc(sortDirKey string) (string, bool) {
@@ -102,24 +79,6 @@ func (p *Pagination) Query(db *sqlx.DB, query string, filter map[string]any) (*s
 		} else {
 			whereClauses = append(whereClauses, fmt.Sprintf("%s = :%s", key, key))
 		}
-	}
-
-	// tags Filter
-	if p.Tags != nil {
-		whereClauses = append(whereClauses, "tags @> @tags")
-		filter["tags"] = p.Tags
-	}
-	if p.TagsAny != nil {
-		whereClauses = append(whereClauses, "tags && @tags_any")
-		filter["tags_any"] = p.TagsAny
-	}
-	if p.NotTags != nil {
-		whereClauses = append(whereClauses, "NOT ( tags @> @not_tags )")
-		filter["not_tags"] = p.NotTags
-	}
-	if p.NotTagsAny != nil {
-		whereClauses = append(whereClauses, "NOT ( tags && @not_tags_any )")
-		filter["not_tags_any"] = p.NotTagsAny
 	}
 
 	// page reverse
