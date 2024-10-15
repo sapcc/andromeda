@@ -463,6 +463,7 @@ GET /v1/datacenters
 
 | Name | Source | Type | Go type | Separator | Required | Default | Description |
 |------|--------|------|---------|-----------| :------: |---------|-------------|
+| datacenter_id | `query` | uuid (formatted string) | `strfmt.UUID` |  |  |  | Filter datacenters by datacenter ID |
 | limit | `query` | integer | `int64` |  |  |  | Sets the page size. |
 | marker | `query` | uuid (formatted string) | `strfmt.UUID` |  |  |  | Pagination ID of the last item in the previous list. |
 | page_reverse | `query` | boolean | `bool` |  |  |  | Sets the page direction. |
@@ -599,6 +600,7 @@ GET /v1/domains
 
 | Name | Source | Type | Go type | Separator | Required | Default | Description |
 |------|--------|------|---------|-----------| :------: |---------|-------------|
+| domain_id | `query` | uuid (formatted string) | `strfmt.UUID` |  |  |  | Filter domains by domain ID |
 | limit | `query` | integer | `int64` |  |  |  | Sets the page size. |
 | marker | `query` | uuid (formatted string) | `strfmt.UUID` |  |  |  | Pagination ID of the last item in the previous list. |
 | page_reverse | `query` | boolean | `bool` |  |  |  | Sets the page direction. |
@@ -735,6 +737,8 @@ GET /v1/geomaps
 
 | Name | Source | Type | Go type | Separator | Required | Default | Description |
 |------|--------|------|---------|-----------| :------: |---------|-------------|
+| datacenter_id | `query` | uuid (formatted string) | `strfmt.UUID` |  |  |  | Filter geographic map by datacenter ID |
+| default_datacenter_id | `query` | uuid (formatted string) | `strfmt.UUID` |  |  |  | Filter geographic map by default datacenter ID |
 | limit | `query` | integer | `int64` |  |  |  | Sets the page size. |
 | marker | `query` | uuid (formatted string) | `strfmt.UUID` |  |  |  | Pagination ID of the last item in the previous list. |
 | page_reverse | `query` | boolean | `bool` |  |  |  | Sets the page direction. |
@@ -1149,6 +1153,7 @@ GET /v1/pools
 | limit | `query` | integer | `int64` |  |  |  | Sets the page size. |
 | marker | `query` | uuid (formatted string) | `strfmt.UUID` |  |  |  | Pagination ID of the last item in the previous list. |
 | page_reverse | `query` | boolean | `bool` |  |  |  | Sets the page direction. |
+| pool_id | `query` | uuid (formatted string) | `strfmt.UUID` |  |  |  | Filter pools by pool ID |
 | sort | `query` | string | `string` |  |  |  | Comma-separated list of sort keys, optinally prefix with - to reverse sort order. |
 
 #### All responses
