@@ -38,6 +38,7 @@ type PoolController struct {
 
 // GetPools GET /pools
 func (c PoolController) GetPools(params pools.GetPoolsParams) middleware.Responder {
+	filter := make(map[string]any)
 	pagination := db.Pagination{
 		HTTPRequest: params.HTTPRequest,
 		Limit:       params.Limit,
@@ -45,10 +46,9 @@ func (c PoolController) GetPools(params pools.GetPoolsParams) middleware.Respond
 		PageReverse: params.PageReverse,
 		Sort:        params.Sort,
 	}
-	filter := make(map[string]any)
 	sql := `SELECT * FROM pool`
 	if params.DomainID != nil {
-		filter = map[string]any{"domain_id": *params.DomainID}
+		filter["domain_id"] = *params.DomainID
 		sql = `SELECT 
     		pool.id AS id, 
     		pool.name AS name, 
@@ -59,6 +59,9 @@ func (c PoolController) GetPools(params pools.GetPoolsParams) middleware.Respond
     		pool.created_at AS created_at,
     		pool.updated_at AS updated_at
 		FROM pool JOIN domain_pool_relation ON pool.id = domain_pool_relation.pool_id`
+	}
+	if params.PoolID != nil {
+		filter["id"] = *params.PoolID
 	}
 	rows, err := pagination.Query(c.db, sql, filter)
 	if err != nil {

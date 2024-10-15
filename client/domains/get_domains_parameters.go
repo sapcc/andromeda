@@ -76,6 +76,14 @@ GetDomainsParams contains all the parameters to send to the API endpoint
 */
 type GetDomainsParams struct {
 
+	/* DomainID.
+
+	   Filter domains by domain ID
+
+	   Format: uuid
+	*/
+	DomainID *strfmt.UUID
+
 	/* Limit.
 
 	   Sets the page size.
@@ -155,6 +163,17 @@ func (o *GetDomainsParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
+// WithDomainID adds the domainID to the get domains params
+func (o *GetDomainsParams) WithDomainID(domainID *strfmt.UUID) *GetDomainsParams {
+	o.SetDomainID(domainID)
+	return o
+}
+
+// SetDomainID adds the domainId to the get domains params
+func (o *GetDomainsParams) SetDomainID(domainID *strfmt.UUID) {
+	o.DomainID = domainID
+}
+
 // WithLimit adds the limit to the get domains params
 func (o *GetDomainsParams) WithLimit(limit *int64) *GetDomainsParams {
 	o.SetLimit(limit)
@@ -206,6 +225,23 @@ func (o *GetDomainsParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Re
 		return err
 	}
 	var res []error
+
+	if o.DomainID != nil {
+
+		// query param domain_id
+		var qrDomainID strfmt.UUID
+
+		if o.DomainID != nil {
+			qrDomainID = *o.DomainID
+		}
+		qDomainID := qrDomainID.String()
+		if qDomainID != "" {
+
+			if err := r.SetQueryParam("domain_id", qDomainID); err != nil {
+				return err
+			}
+		}
+	}
 
 	if o.Limit != nil {
 

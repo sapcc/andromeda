@@ -47,6 +47,10 @@ type GetDatacentersParams struct {
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
+	/*Filter datacenters by datacenter ID
+	  In: query
+	*/
+	DatacenterID *strfmt.UUID
 	/*Sets the page size.
 	  In: query
 	*/
@@ -76,6 +80,11 @@ func (o *GetDatacentersParams) BindRequest(r *http.Request, route *middleware.Ma
 
 	qs := runtime.Values(r.URL.Query())
 
+	qDatacenterID, qhkDatacenterID, _ := qs.GetOK("datacenter_id")
+	if err := o.bindDatacenterID(qDatacenterID, qhkDatacenterID, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
 	qLimit, qhkLimit, _ := qs.GetOK("limit")
 	if err := o.bindLimit(qLimit, qhkLimit, route.Formats); err != nil {
 		res = append(res, err)
@@ -97,6 +106,43 @@ func (o *GetDatacentersParams) BindRequest(r *http.Request, route *middleware.Ma
 	}
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+// bindDatacenterID binds and validates parameter DatacenterID from query.
+func (o *GetDatacentersParams) bindDatacenterID(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
+
+	// Format: uuid
+	value, err := formats.Parse("uuid", raw)
+	if err != nil {
+		return errors.InvalidType("datacenter_id", "query", "strfmt.UUID", raw)
+	}
+	o.DatacenterID = (value.(*strfmt.UUID))
+
+	if err := o.validateDatacenterID(formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// validateDatacenterID carries on validations for parameter DatacenterID
+func (o *GetDatacentersParams) validateDatacenterID(formats strfmt.Registry) error {
+
+	if err := validate.FormatOf("datacenter_id", "query", "uuid", o.DatacenterID.String(), formats); err != nil {
+		return err
 	}
 	return nil
 }

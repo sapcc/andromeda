@@ -34,6 +34,7 @@ type GetPoolsURL struct {
 	Limit       *int64
 	Marker      *strfmt.UUID
 	PageReverse *bool
+	PoolID      *strfmt.UUID
 	Sort        *string
 
 	_basePath string
@@ -100,6 +101,14 @@ func (o *GetPoolsURL) Build() (*url.URL, error) {
 	}
 	if pageReverseQ != "" {
 		qs.Set("page_reverse", pageReverseQ)
+	}
+
+	var poolIDQ string
+	if o.PoolID != nil {
+		poolIDQ = o.PoolID.String()
+	}
+	if poolIDQ != "" {
+		qs.Set("pool_id", poolIDQ)
 	}
 
 	var sortQ string

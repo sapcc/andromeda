@@ -64,6 +64,14 @@ func init() {
           },
           {
             "$ref": "#/parameters/page_reverse"
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "x-nullable": true,
+            "description": "Filter datacenters by datacenter ID",
+            "name": "datacenter_id",
+            "in": "query"
           }
         ],
         "responses": {
@@ -290,6 +298,14 @@ func init() {
           },
           {
             "$ref": "#/parameters/page_reverse"
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "x-nullable": true,
+            "description": "Filter domains by domain ID",
+            "name": "domain_id",
+            "in": "query"
           }
         ],
         "responses": {
@@ -522,6 +538,22 @@ func init() {
           },
           {
             "$ref": "#/parameters/page_reverse"
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "x-nullable": true,
+            "description": "Filter geographic map by datacenter ID",
+            "name": "datacenter_id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "x-nullable": true,
+            "description": "Filter geographic map by default datacenter ID",
+            "name": "default_datacenter_id",
+            "in": "query"
           }
         ],
         "responses": {
@@ -1259,6 +1291,14 @@ func init() {
             "x-nullable": true,
             "description": "Filter pools by domain ID",
             "name": "domain_id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "x-nullable": true,
+            "description": "Filter pools by pool ID",
+            "name": "pool_id",
             "in": "query"
           }
         ],
@@ -2656,6 +2696,14 @@ func init() {
             "description": "Sets the page direction.",
             "name": "page_reverse",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "x-nullable": true,
+            "description": "Filter datacenters by datacenter ID",
+            "name": "datacenter_id",
+            "in": "query"
           }
         ],
         "responses": {
@@ -2894,6 +2942,14 @@ func init() {
             "type": "boolean",
             "description": "Sets the page direction.",
             "name": "page_reverse",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "x-nullable": true,
+            "description": "Filter domains by domain ID",
+            "name": "domain_id",
             "in": "query"
           }
         ],
@@ -3139,6 +3195,22 @@ func init() {
             "type": "boolean",
             "description": "Sets the page direction.",
             "name": "page_reverse",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "x-nullable": true,
+            "description": "Filter geographic map by datacenter ID",
+            "name": "datacenter_id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "x-nullable": true,
+            "description": "Filter geographic map by default datacenter ID",
+            "name": "default_datacenter_id",
             "in": "query"
           }
         ],
@@ -3916,6 +3988,14 @@ func init() {
             "x-nullable": true,
             "description": "Filter pools by domain ID",
             "name": "domain_id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "x-nullable": true,
+            "description": "Filter pools by pool ID",
+            "name": "pool_id",
             "in": "query"
           }
         ],

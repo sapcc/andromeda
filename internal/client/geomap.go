@@ -31,6 +31,8 @@ var GeomapOptions struct {
 }
 
 type GeomapList struct {
+	Datacenter        *strfmt.UUID `short:"d" long:"datacenter" description:"Filter by Datacenter ID"`
+	DefaultDatacenter *strfmt.UUID `short:"e" long:"default_datacenter" description:"Filter by default Datacenter ID"`
 }
 
 type GeomapShow struct {
@@ -55,7 +57,11 @@ type GeomapDelete struct {
 }
 
 func (*GeomapList) Execute(_ []string) error {
-	resp, err := AndromedaClient.GeographicMaps.GetGeomaps(nil)
+	resp, err := AndromedaClient.GeographicMaps.GetGeomaps(
+		geographic_maps.NewGetGeomapsParams().
+			WithDatacenterID(GeomapOptions.GeomapList.Datacenter).
+			WithDefaultDatacenterID(GeomapOptions.GeomapList.DefaultDatacenter),
+	)
 	if err != nil {
 		return err
 	}

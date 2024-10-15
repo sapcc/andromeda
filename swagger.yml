@@ -44,6 +44,13 @@ paths:
         - $ref: '#/parameters/limit'
         - $ref: '#/parameters/sort'
         - $ref: '#/parameters/page_reverse'
+        - in: query
+          name: domain_id
+          required: false
+          type: string
+          format: uuid
+          description: Filter domains by domain ID
+          x-nullable: true
       responses:
         200:
           description: A JSON array of domains
@@ -203,6 +210,13 @@ paths:
           format: uuid
           description: Filter pools by domain ID
           x-nullable: true
+        - in: query
+          name: pool_id
+          required: false
+          type: string
+          format: uuid
+          description: Filter pools by pool ID
+          x-nullable: true
       responses:
         200:
           description: A JSON array of pools
@@ -351,6 +365,13 @@ paths:
         - $ref: '#/parameters/limit'
         - $ref: '#/parameters/sort'
         - $ref: '#/parameters/page_reverse'
+        - in: query
+          name: datacenter_id
+          required: false
+          type: string
+          format: uuid
+          description: Filter datacenters by datacenter ID
+          x-nullable: true
       responses:
         200:
           description: A JSON array of datacenters
@@ -825,6 +846,20 @@ paths:
         - $ref: '#/parameters/limit'
         - $ref: '#/parameters/sort'
         - $ref: '#/parameters/page_reverse'
+        - in: query
+          name: datacenter_id
+          required: false
+          type: string
+          format: uuid
+          description: Filter geographic map by datacenter ID
+          x-nullable: true
+        - in: query
+          name: default_datacenter_id
+          required: false
+          type: string
+          format: uuid
+          description: Filter geographic map by default datacenter ID
+          x-nullable: true
       responses:
         200:
           description: A JSON array of geographic maps

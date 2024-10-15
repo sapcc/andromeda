@@ -44,8 +44,18 @@ type DomainController struct {
 
 // GetDomains GET /domains
 func (c DomainController) GetDomains(params domains.GetDomainsParams) middleware.Responder {
-	pagination := db.Pagination(params)
-	rows, err := pagination.Query(c.db, "SELECT * FROM domain", nil)
+	filter := make(map[string]any, 0)
+	pagination := db.Pagination{
+		HTTPRequest: params.HTTPRequest,
+		Limit:       params.Limit,
+		Marker:      params.Marker,
+		PageReverse: params.PageReverse,
+		Sort:        params.Sort,
+	}
+	if params.DomainID != nil {
+		filter["id"] = *params.DomainID
+	}
+	rows, err := pagination.Query(c.db, "SELECT * FROM domain", filter)
 	if err != nil {
 		if errors.Is(err, db.ErrInvalidMarker) {
 			return domains.NewGetDomainsDefault(400).WithPayload(utils.InvalidMarker)

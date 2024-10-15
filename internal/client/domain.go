@@ -35,7 +35,8 @@ var DomainOptions struct {
 }
 
 type DomainList struct {
-	Long bool `long:"long" description:"List additional fields in output"`
+	Long   bool         `long:"long" description:"List additional fields in output"`
+	Domain *strfmt.UUID `short:"a" long:"domain" description:"Filter by Domain ID"`
 }
 
 type DomainShow struct {
@@ -75,7 +76,8 @@ type DomainSet struct {
 }
 
 func (*DomainList) Execute(_ []string) error {
-	resp, err := AndromedaClient.Domains.GetDomains(nil)
+	resp, err := AndromedaClient.Domains.GetDomains(
+		domains.NewGetDomainsParams().WithDomainID(DomainOptions.DomainList.Domain))
 
 	if err != nil {
 		return err

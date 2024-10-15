@@ -39,8 +39,35 @@ type GeoMapController struct {
 
 // GetGeomaps GET /geoMaps
 func (c GeoMapController) GetGeomaps(params geographic_maps.GetGeomapsParams) middleware.Responder {
-	pagination := db.Pagination(params)
-	rows, err := pagination.Query(c.db, "SELECT * FROM geographic_map", nil)
+	filter := make(map[string]any, 0)
+	pagination := db.Pagination{
+		HTTPRequest: params.HTTPRequest,
+		Limit:       params.Limit,
+		Marker:      params.Marker,
+		PageReverse: params.PageReverse,
+		Sort:        params.Sort,
+	}
+	sql := `SELECT * FROM geographic_map`
+	if params.DatacenterID != nil {
+		filter["datacenter"] = *params.DatacenterID
+		sql = `SELECT 
+    		geographic_map.id AS id, 
+    		geographic_map.name AS name, 
+    		geographic_map.provisioning_status AS provisioning_status,
+    		geographic_map.scope AS scope,
+    		geographic_map.project_id AS project_id,
+    		geographic_map.provider AS provider,
+    		geographic_map.created_at AS created_at,
+    		geographic_map.updated_at AS updated_at
+			FROM geographic_map
+		    JOIN geographic_map_assignment ON 
+		        geographic_map.id = geographic_map_assignment.geographic_map_id OR 
+		        geographic_map.default_datacenter = geographic_map_assignment.datacenter`
+	}
+	if params.DefaultDatacenterID != nil {
+		filter["default_datacenter"] = *params.DefaultDatacenterID
+	}
+	rows, err := pagination.Query(c.db, sql, filter)
 	if err != nil {
 		if errors.Is(err, db.ErrInvalidMarker) {
 			return geographic_maps.NewGetGeomapsBadRequest().WithPayload(utils.InvalidMarker)

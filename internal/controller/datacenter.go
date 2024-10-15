@@ -39,8 +39,18 @@ type DatacenterController struct {
 
 // GetDatacenters GET /datacenters
 func (c DatacenterController) GetDatacenters(params datacenters.GetDatacentersParams) middleware.Responder {
-	pagination := db.Pagination(params)
-	rows, err := pagination.Query(c.db, "SELECT * FROM datacenter", nil)
+	filter := make(map[string]interface{}, 0)
+	pagination := db.Pagination{
+		HTTPRequest: params.HTTPRequest,
+		Limit:       params.Limit,
+		Marker:      params.Marker,
+		PageReverse: params.PageReverse,
+		Sort:        params.Sort,
+	}
+	if params.DatacenterID != nil {
+		filter["id"] = *params.DatacenterID
+	}
+	rows, err := pagination.Query(c.db, "SELECT * FROM datacenter", filter)
 	if err != nil {
 		if errors.Is(err, db.ErrInvalidMarker) {
 			return datacenters.NewGetDatacentersBadRequest().WithPayload(utils.InvalidMarker)

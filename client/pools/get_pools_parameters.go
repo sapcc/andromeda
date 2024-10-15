@@ -104,6 +104,14 @@ type GetPoolsParams struct {
 	*/
 	PageReverse *bool
 
+	/* PoolID.
+
+	   Filter pools by pool ID
+
+	   Format: uuid
+	*/
+	PoolID *strfmt.UUID
+
 	/* Sort.
 
 	   Comma-separated list of sort keys, optinally prefix with - to reverse sort order.
@@ -207,6 +215,17 @@ func (o *GetPoolsParams) SetPageReverse(pageReverse *bool) {
 	o.PageReverse = pageReverse
 }
 
+// WithPoolID adds the poolID to the get pools params
+func (o *GetPoolsParams) WithPoolID(poolID *strfmt.UUID) *GetPoolsParams {
+	o.SetPoolID(poolID)
+	return o
+}
+
+// SetPoolID adds the poolId to the get pools params
+func (o *GetPoolsParams) SetPoolID(poolID *strfmt.UUID) {
+	o.PoolID = poolID
+}
+
 // WithSort adds the sort to the get pools params
 func (o *GetPoolsParams) WithSort(sort *string) *GetPoolsParams {
 	o.SetSort(sort)
@@ -289,6 +308,23 @@ func (o *GetPoolsParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Regi
 		if qPageReverse != "" {
 
 			if err := r.SetQueryParam("page_reverse", qPageReverse); err != nil {
+				return err
+			}
+		}
+	}
+
+	if o.PoolID != nil {
+
+		// query param pool_id
+		var qrPoolID strfmt.UUID
+
+		if o.PoolID != nil {
+			qrPoolID = *o.PoolID
+		}
+		qPoolID := qrPoolID.String()
+		if qPoolID != "" {
+
+			if err := r.SetQueryParam("pool_id", qPoolID); err != nil {
 				return err
 			}
 		}

@@ -47,6 +47,14 @@ type GetGeomapsParams struct {
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
+	/*Filter geographic map by datacenter ID
+	  In: query
+	*/
+	DatacenterID *strfmt.UUID
+	/*Filter geographic map by default datacenter ID
+	  In: query
+	*/
+	DefaultDatacenterID *strfmt.UUID
 	/*Sets the page size.
 	  In: query
 	*/
@@ -76,6 +84,16 @@ func (o *GetGeomapsParams) BindRequest(r *http.Request, route *middleware.Matche
 
 	qs := runtime.Values(r.URL.Query())
 
+	qDatacenterID, qhkDatacenterID, _ := qs.GetOK("datacenter_id")
+	if err := o.bindDatacenterID(qDatacenterID, qhkDatacenterID, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
+	qDefaultDatacenterID, qhkDefaultDatacenterID, _ := qs.GetOK("default_datacenter_id")
+	if err := o.bindDefaultDatacenterID(qDefaultDatacenterID, qhkDefaultDatacenterID, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
 	qLimit, qhkLimit, _ := qs.GetOK("limit")
 	if err := o.bindLimit(qLimit, qhkLimit, route.Formats); err != nil {
 		res = append(res, err)
@@ -97,6 +115,80 @@ func (o *GetGeomapsParams) BindRequest(r *http.Request, route *middleware.Matche
 	}
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+// bindDatacenterID binds and validates parameter DatacenterID from query.
+func (o *GetGeomapsParams) bindDatacenterID(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
+
+	// Format: uuid
+	value, err := formats.Parse("uuid", raw)
+	if err != nil {
+		return errors.InvalidType("datacenter_id", "query", "strfmt.UUID", raw)
+	}
+	o.DatacenterID = (value.(*strfmt.UUID))
+
+	if err := o.validateDatacenterID(formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// validateDatacenterID carries on validations for parameter DatacenterID
+func (o *GetGeomapsParams) validateDatacenterID(formats strfmt.Registry) error {
+
+	if err := validate.FormatOf("datacenter_id", "query", "uuid", o.DatacenterID.String(), formats); err != nil {
+		return err
+	}
+	return nil
+}
+
+// bindDefaultDatacenterID binds and validates parameter DefaultDatacenterID from query.
+func (o *GetGeomapsParams) bindDefaultDatacenterID(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
+
+	// Format: uuid
+	value, err := formats.Parse("uuid", raw)
+	if err != nil {
+		return errors.InvalidType("default_datacenter_id", "query", "strfmt.UUID", raw)
+	}
+	o.DefaultDatacenterID = (value.(*strfmt.UUID))
+
+	if err := o.validateDefaultDatacenterID(formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// validateDefaultDatacenterID carries on validations for parameter DefaultDatacenterID
+func (o *GetGeomapsParams) validateDefaultDatacenterID(formats strfmt.Registry) error {
+
+	if err := validate.FormatOf("default_datacenter_id", "query", "uuid", o.DefaultDatacenterID.String(), formats); err != nil {
+		return err
 	}
 	return nil
 }

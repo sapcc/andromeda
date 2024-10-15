@@ -30,10 +30,11 @@ import (
 
 // GetDatacentersURL generates an URL for the get datacenters operation
 type GetDatacentersURL struct {
-	Limit       *int64
-	Marker      *strfmt.UUID
-	PageReverse *bool
-	Sort        *string
+	DatacenterID *strfmt.UUID
+	Limit        *int64
+	Marker       *strfmt.UUID
+	PageReverse  *bool
+	Sort         *string
 
 	_basePath string
 	// avoid unkeyed usage
@@ -68,6 +69,14 @@ func (o *GetDatacentersURL) Build() (*url.URL, error) {
 	_result.Path = golangswaggerpaths.Join(_basePath, _path)
 
 	qs := make(url.Values)
+
+	var datacenterIDQ string
+	if o.DatacenterID != nil {
+		datacenterIDQ = o.DatacenterID.String()
+	}
+	if datacenterIDQ != "" {
+		qs.Set("datacenter_id", datacenterIDQ)
+	}
 
 	var limitQ string
 	if o.Limit != nil {

@@ -76,6 +76,14 @@ GetDatacentersParams contains all the parameters to send to the API endpoint
 */
 type GetDatacentersParams struct {
 
+	/* DatacenterID.
+
+	   Filter datacenters by datacenter ID
+
+	   Format: uuid
+	*/
+	DatacenterID *strfmt.UUID
+
 	/* Limit.
 
 	   Sets the page size.
@@ -155,6 +163,17 @@ func (o *GetDatacentersParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
+// WithDatacenterID adds the datacenterID to the get datacenters params
+func (o *GetDatacentersParams) WithDatacenterID(datacenterID *strfmt.UUID) *GetDatacentersParams {
+	o.SetDatacenterID(datacenterID)
+	return o
+}
+
+// SetDatacenterID adds the datacenterId to the get datacenters params
+func (o *GetDatacentersParams) SetDatacenterID(datacenterID *strfmt.UUID) {
+	o.DatacenterID = datacenterID
+}
+
 // WithLimit adds the limit to the get datacenters params
 func (o *GetDatacentersParams) WithLimit(limit *int64) *GetDatacentersParams {
 	o.SetLimit(limit)
@@ -206,6 +225,23 @@ func (o *GetDatacentersParams) WriteToRequest(r runtime.ClientRequest, reg strfm
 		return err
 	}
 	var res []error
+
+	if o.DatacenterID != nil {
+
+		// query param datacenter_id
+		var qrDatacenterID strfmt.UUID
+
+		if o.DatacenterID != nil {
+			qrDatacenterID = *o.DatacenterID
+		}
+		qDatacenterID := qrDatacenterID.String()
+		if qDatacenterID != "" {
+
+			if err := r.SetQueryParam("datacenter_id", qDatacenterID); err != nil {
+				return err
+			}
+		}
+	}
 
 	if o.Limit != nil {
 

@@ -76,6 +76,22 @@ GetGeomapsParams contains all the parameters to send to the API endpoint
 */
 type GetGeomapsParams struct {
 
+	/* DatacenterID.
+
+	   Filter geographic map by datacenter ID
+
+	   Format: uuid
+	*/
+	DatacenterID *strfmt.UUID
+
+	/* DefaultDatacenterID.
+
+	   Filter geographic map by default datacenter ID
+
+	   Format: uuid
+	*/
+	DefaultDatacenterID *strfmt.UUID
+
 	/* Limit.
 
 	   Sets the page size.
@@ -155,6 +171,28 @@ func (o *GetGeomapsParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
+// WithDatacenterID adds the datacenterID to the get geomaps params
+func (o *GetGeomapsParams) WithDatacenterID(datacenterID *strfmt.UUID) *GetGeomapsParams {
+	o.SetDatacenterID(datacenterID)
+	return o
+}
+
+// SetDatacenterID adds the datacenterId to the get geomaps params
+func (o *GetGeomapsParams) SetDatacenterID(datacenterID *strfmt.UUID) {
+	o.DatacenterID = datacenterID
+}
+
+// WithDefaultDatacenterID adds the defaultDatacenterID to the get geomaps params
+func (o *GetGeomapsParams) WithDefaultDatacenterID(defaultDatacenterID *strfmt.UUID) *GetGeomapsParams {
+	o.SetDefaultDatacenterID(defaultDatacenterID)
+	return o
+}
+
+// SetDefaultDatacenterID adds the defaultDatacenterId to the get geomaps params
+func (o *GetGeomapsParams) SetDefaultDatacenterID(defaultDatacenterID *strfmt.UUID) {
+	o.DefaultDatacenterID = defaultDatacenterID
+}
+
 // WithLimit adds the limit to the get geomaps params
 func (o *GetGeomapsParams) WithLimit(limit *int64) *GetGeomapsParams {
 	o.SetLimit(limit)
@@ -206,6 +244,40 @@ func (o *GetGeomapsParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Re
 		return err
 	}
 	var res []error
+
+	if o.DatacenterID != nil {
+
+		// query param datacenter_id
+		var qrDatacenterID strfmt.UUID
+
+		if o.DatacenterID != nil {
+			qrDatacenterID = *o.DatacenterID
+		}
+		qDatacenterID := qrDatacenterID.String()
+		if qDatacenterID != "" {
+
+			if err := r.SetQueryParam("datacenter_id", qDatacenterID); err != nil {
+				return err
+			}
+		}
+	}
+
+	if o.DefaultDatacenterID != nil {
+
+		// query param default_datacenter_id
+		var qrDefaultDatacenterID strfmt.UUID
+
+		if o.DefaultDatacenterID != nil {
+			qrDefaultDatacenterID = *o.DefaultDatacenterID
+		}
+		qDefaultDatacenterID := qrDefaultDatacenterID.String()
+		if qDefaultDatacenterID != "" {
+
+			if err := r.SetQueryParam("default_datacenter_id", qDefaultDatacenterID); err != nil {
+				return err
+			}
+		}
+	}
 
 	if o.Limit != nil {
 

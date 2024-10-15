@@ -31,6 +31,7 @@ var DatacenterOptions struct {
 }
 
 type DatacenterList struct {
+	Datacenter *strfmt.UUID `short:"d" long:"datacenter" description:"Filter by Datacenter ID"`
 }
 
 type DatacenterShow struct {
@@ -58,7 +59,8 @@ type DatacenterDelete struct {
 }
 
 func (*DatacenterList) Execute(_ []string) error {
-	resp, err := AndromedaClient.Datacenters.GetDatacenters(nil)
+	resp, err := AndromedaClient.Datacenters.GetDatacenters(
+		datacenters.NewGetDatacentersParams().WithDatacenterID(DatacenterOptions.DatacenterList.Datacenter))
 	if err != nil {
 		return err
 	}
