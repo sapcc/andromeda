@@ -78,7 +78,7 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 		Name:                 domain.GetFqdn(),
 		Type:                 PROPERTY_TYPE_MAP[domain.GetMode()],
 		Comments:             domain.Id,
-		ScoreAggregationType: "worst",
+		ScoreAggregationType: "best",
 		HandoutMode:          "all-live-ips",
 		FailbackDelay:        0,
 		FailoverDelay:        0,
