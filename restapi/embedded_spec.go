@@ -1252,6 +1252,14 @@ func init() {
           },
           {
             "$ref": "#/parameters/page_reverse"
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "x-nullable": true,
+            "description": "Filter pools by domain ID",
+            "name": "domain_id",
+            "in": "query"
           }
         ],
         "responses": {
@@ -3900,6 +3908,14 @@ func init() {
             "type": "boolean",
             "description": "Sets the page direction.",
             "name": "page_reverse",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "uuid",
+            "x-nullable": true,
+            "description": "Filter pools by domain ID",
+            "name": "domain_id",
             "in": "query"
           }
         ],

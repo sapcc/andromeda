@@ -196,6 +196,13 @@ paths:
         - $ref: '#/parameters/limit'
         - $ref: '#/parameters/sort'
         - $ref: '#/parameters/page_reverse'
+        - in: query
+          name: domain_id
+          required: false
+          type: string
+          format: uuid
+          description: Filter pools by domain ID
+          x-nullable: true
       responses:
         200:
           description: A JSON array of pools

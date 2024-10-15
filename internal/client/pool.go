@@ -31,6 +31,7 @@ var PoolOptions struct {
 }
 
 type PoolList struct {
+	Domain *strfmt.UUID `short:"a" long:"domain" description:"Filter by Domain ID"`
 }
 
 type PoolShow struct {
@@ -52,7 +53,7 @@ type PoolDelete struct {
 }
 
 func (*PoolList) Execute(_ []string) error {
-	resp, err := AndromedaClient.Pools.GetPools(nil)
+	resp, err := AndromedaClient.Pools.GetPools(pools.NewGetPoolsParams().WithDomainID(PoolOptions.PoolList.Domain))
 	if err != nil {
 		return err
 	}
@@ -62,7 +63,7 @@ func (*PoolList) Execute(_ []string) error {
 func (*PoolCreate) Execute(_ []string) error {
 	adminStateUp := !PoolOptions.Disable
 	domains := []strfmt.UUID{}
-	for _, d := range PoolOptions.Domain {
+	for _, d := range PoolOptions.PoolCreate.Domain {
 		domains = append(domains, strfmt.UUID(d))
 	}
 	pool := pools.PostPoolsBody{Pool: &models.Pool{

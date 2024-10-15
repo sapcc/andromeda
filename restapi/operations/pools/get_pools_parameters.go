@@ -47,6 +47,10 @@ type GetPoolsParams struct {
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
+	/*Filter pools by domain ID
+	  In: query
+	*/
+	DomainID *strfmt.UUID
 	/*Sets the page size.
 	  In: query
 	*/
@@ -76,6 +80,11 @@ func (o *GetPoolsParams) BindRequest(r *http.Request, route *middleware.MatchedR
 
 	qs := runtime.Values(r.URL.Query())
 
+	qDomainID, qhkDomainID, _ := qs.GetOK("domain_id")
+	if err := o.bindDomainID(qDomainID, qhkDomainID, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
 	qLimit, qhkLimit, _ := qs.GetOK("limit")
 	if err := o.bindLimit(qLimit, qhkLimit, route.Formats); err != nil {
 		res = append(res, err)
@@ -97,6 +106,43 @@ func (o *GetPoolsParams) BindRequest(r *http.Request, route *middleware.MatchedR
 	}
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+// bindDomainID binds and validates parameter DomainID from query.
+func (o *GetPoolsParams) bindDomainID(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
+
+	// Format: uuid
+	value, err := formats.Parse("uuid", raw)
+	if err != nil {
+		return errors.InvalidType("domain_id", "query", "strfmt.UUID", raw)
+	}
+	o.DomainID = (value.(*strfmt.UUID))
+
+	if err := o.validateDomainID(formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// validateDomainID carries on validations for parameter DomainID
+func (o *GetPoolsParams) validateDomainID(formats strfmt.Registry) error {
+
+	if err := validate.FormatOf("domain_id", "query", "uuid", o.DomainID.String(), formats); err != nil {
+		return err
 	}
 	return nil
 }

@@ -38,8 +38,29 @@ type PoolController struct {
 
 // GetPools GET /pools
 func (c PoolController) GetPools(params pools.GetPoolsParams) middleware.Responder {
-	pagination := db.Pagination(params)
-	rows, err := pagination.Query(c.db, "SELECT * FROM pool", nil)
+	pagination := db.Pagination{
+		HTTPRequest: params.HTTPRequest,
+		Limit:       params.Limit,
+		Marker:      params.Marker,
+		PageReverse: params.PageReverse,
+		Sort:        params.Sort,
+	}
+	filter := make(map[string]any)
+	sql := `SELECT * FROM pool`
+	if params.DomainID != nil {
+		filter = map[string]any{"domain_id": *params.DomainID}
+		sql = `SELECT 
+    		pool.id AS id, 
+    		pool.name AS name, 
+    		pool.provisioning_status AS provisioning_status,
+    		pool.status AS status,
+    		pool.admin_state_up AS admin_state_up,
+    		pool.project_id AS project_id,
+    		pool.created_at AS created_at,
+    		pool.updated_at AS updated_at
+		FROM pool JOIN domain_pool_relation ON pool.id = domain_pool_relation.pool_id`
+	}
+	rows, err := pagination.Query(c.db, sql, filter)
 	if err != nil {
 		if errors.Is(err, db.ErrInvalidMarker) {
 			return pools.NewGetPoolsBadRequest().WithPayload(utils.InvalidMarker)

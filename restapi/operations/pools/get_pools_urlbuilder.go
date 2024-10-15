@@ -30,6 +30,7 @@ import (
 
 // GetPoolsURL generates an URL for the get pools operation
 type GetPoolsURL struct {
+	DomainID    *strfmt.UUID
 	Limit       *int64
 	Marker      *strfmt.UUID
 	PageReverse *bool
@@ -68,6 +69,14 @@ func (o *GetPoolsURL) Build() (*url.URL, error) {
 	_result.Path = golangswaggerpaths.Join(_basePath, _path)
 
 	qs := make(url.Values)
+
+	var domainIDQ string
+	if o.DomainID != nil {
+		domainIDQ = o.DomainID.String()
+	}
+	if domainIDQ != "" {
+		qs.Set("domain_id", domainIDQ)
+	}
 
 	var limitQ string
 	if o.Limit != nil {
