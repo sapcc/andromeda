@@ -24,7 +24,6 @@ import (
 	"github.com/apex/log"
 	"github.com/go-openapi/swag"
 
-	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/driver"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
 	"github.com/sapcc/andromeda/internal/utils"
@@ -35,20 +34,16 @@ func (s *AkamaiAgent) DeleteProperty(domain *rpcmodels.Domain, trafficManagement
 	// Delete
 	log.Infof("DeleteProperty(domain=%s, property=%s)", trafficManagementDomain, domain.GetFqdn())
 
-	property, err := s.gtm.GetProperty(context.Background(), domain.GetFqdn(), config.Global.AkamaiConfig.Domain)
+	request := gtm.DeletePropertyRequest{
+		DomainName:   trafficManagementDomain,
+		PropertyName: domain.GetFqdn(),
+	}
+	ret, err := s.gtm.DeleteProperty(context.Background(), request)
 	if err != nil {
-		log.Warnf("Property '%s' doesn't exist...", domain.GetFqdn())
-		return nil
+		return err
 	}
 
-	ret, err := s.gtm.DeleteProperty(context.Background(), property, trafficManagementDomain)
-	if err != nil {
-		return fmt.Errorf("request %s: %w", PrettyJson(property), err)
-	}
-
-	log.Debugf("Request: %s\nResponse: %s",
-		PrettyJson(property),
-		PrettyJson(ret))
+	log.Debugf("DeleteProperty response: %s", PrettyJson(ret))
 	return nil
 }
 
@@ -82,8 +77,8 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 		HandoutMode:          "all-live-ips",
 		FailbackDelay:        0,
 		FailoverDelay:        0,
-		TrafficTargets:       []*gtm.TrafficTarget{},
-		LivenessTests:        []*gtm.LivenessTest{},
+		TrafficTargets:       []gtm.TrafficTarget{},
+		LivenessTests:        []gtm.LivenessTest{},
 	}
 
 	// Process Members
@@ -126,7 +121,7 @@ MEMBERLOOP:
 			Weight:       50,
 			DatacenterID: datacenterID,
 		}
-		property.TrafficTargets = append(property.TrafficTargets, &trafficTarget)
+		property.TrafficTargets = append(property.TrafficTargets, trafficTarget)
 		provRequests = append(provRequests,
 			driver.GetProvisioningStatusRequest(member.Id, "MEMBER", "ACTIVE"))
 	}
@@ -166,9 +161,9 @@ MEMBERLOOP:
 				} else {
 					livenessTest.TestObject = monitor.GetSend()
 				}
-				livenessTest.HTTPHeaders = []*gtm.HTTPHeader{{Name: "Host", Value: domain.GetFqdn()}}
+				livenessTest.HTTPHeaders = []gtm.HTTPHeader{{Name: "Host", Value: domain.GetFqdn()}}
 				if domainName := monitor.GetDomainName(); domainName != "" {
-					livenessTest.HTTPHeaders = []*gtm.HTTPHeader{{Name: "Host", Value: domainName}}
+					livenessTest.HTTPHeaders = []gtm.HTTPHeader{{Name: "Host", Value: domainName}}
 				}
 				livenessTest.HTTPMethod = swag.String(monitor.GetMethod().String())
 			case rpcmodels.Monitor_TCP:
@@ -181,7 +176,7 @@ MEMBERLOOP:
 					driver.GetProvisioningStatusRequest(monitor.Id, "MONITOR", models.MonitorProvisioningStatusERROR))
 				continue monitorLoop
 			}
-			property.LivenessTests = append(property.LivenessTests, &livenessTest)
+			property.LivenessTests = append(property.LivenessTests, livenessTest)
 		}
 		provRequests = append(provRequests,
 			driver.GetProvisioningStatusRequest(monitor.Id, "MONITOR", models.MonitorProvisioningStatusACTIVE))
@@ -197,7 +192,11 @@ MEMBERLOOP:
 		return provRequests, nil
 	}
 
-	existingProperty, err2 := s.gtm.GetProperty(context.Background(), property.Name, config.Global.AkamaiConfig.Domain)
+	request := gtm.GetPropertyRequest{
+		PropertyName: property.Name,
+		DomainName:   trafficManagementDomain,
+	}
+	existingProperty, err2 := s.gtm.GetProperty(context.Background(), request)
 	if err2 != nil {
 		log.Debugf("Property '%s' doesn't exist, creating...", property.Name)
 	}
@@ -231,7 +230,11 @@ MEMBERLOOP:
 
 	// Update
 	log.Infof("UpdateProperty(domain=%s, property=%s)", trafficManagementDomain, property.Name)
-	ret, err3 := s.gtm.UpdateProperty(context.Background(), &property, trafficManagementDomain)
+	updateRequest := gtm.UpdatePropertyRequest{
+		Property:   &property,
+		DomainName: trafficManagementDomain,
+	}
+	ret, err3 := s.gtm.UpdateProperty(context.Background(), updateRequest)
 	if err3 != nil {
 		return nil, fmt.Errorf("request %s: %w", PrettyJson(property), err3)
 	}

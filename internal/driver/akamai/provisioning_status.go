@@ -20,6 +20,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v9/pkg/gtm"
+
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/driver"
 	"github.com/sapcc/andromeda/internal/rpc/server"
@@ -73,7 +75,8 @@ func (s *AkamaiAgent) CascadeUpdateDomainProvisioningStatus(domain *rpcmodels.Do
 
 func (s *AkamaiAgent) syncProvisioningStatus(domain *rpcmodels.Domain) (string, error) {
 	// Check for running domain's propagation state
-	status, err := s.gtm.GetDomainStatus(context.Background(), config.Global.AkamaiConfig.Domain)
+	request := gtm.GetDomainStatusRequest{DomainName: config.Global.AkamaiConfig.Domain}
+	status, err := s.gtm.GetDomainStatus(context.Background(), request)
 	if err != nil {
 		return "UNKNOWN", err
 	}

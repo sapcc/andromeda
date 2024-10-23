@@ -37,13 +37,15 @@ var MONITOR_LIVENESS_TYPE_MAP = map[rpcmodels.Monitor_MonitorType]string{
 }
 
 func (s *AkamaiAgent) EnsureDomain(domainType string) error {
-	if _, err := s.gtm.GetDomain(context.Background(), config.Global.AkamaiConfig.Domain); err != nil {
+	request := gtm.GetDomainRequest{DomainName: config.Global.AkamaiConfig.Domain}
+	if _, err := s.gtm.GetDomain(context.Background(), request); err != nil {
 		log.Warnf("Akamai Domain %s doesn't exist, creating...", config.Global.AkamaiConfig.Domain)
 		domain := gtm.Domain{
 			Name: config.Global.AkamaiConfig.Domain,
 			Type: domainType,
 		}
-		if _, err := s.gtm.CreateDomain(context.Background(), &domain, nil); err != nil {
+		createRequest := gtm.CreateDomainRequest{Domain: &domain}
+		if _, err = s.gtm.CreateDomain(context.Background(), createRequest); err != nil {
 			return err
 		}
 	}

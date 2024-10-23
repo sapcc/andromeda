@@ -58,7 +58,7 @@ func (s *AkamaiAgent) constructAkamaiGeoMap(geomap *rpcmodels.Geomap) (*gtm.GeoM
 		return nil, err
 	}
 
-	var assignments = make([]*gtm.GeoAssignment, 0)
+	var assignments = make([]gtm.GeoAssignment, 0)
 	for _, dc := range geomap.Assignment {
 		if dc.Datacenter == geomap.DefaultDatacenter {
 			// skip assignments to default datacenter
@@ -70,7 +70,7 @@ func (s *AkamaiAgent) constructAkamaiGeoMap(geomap *rpcmodels.Geomap) (*gtm.GeoM
 			return nil, err
 		}
 
-		assignments = append(assignments, &gtm.GeoAssignment{
+		assignments = append(assignments, gtm.GeoAssignment{
 			DatacenterBase: gtm.DatacenterBase{
 				Nickname:     dc.Datacenter,
 				DatacenterID: datacenterReference,
@@ -142,17 +142,11 @@ func (s *AkamaiAgent) SyncGeomap(geomap *rpcmodels.Geomap, force bool) (*gtm.Geo
 
 	if geomap.ProvisioningStatus == models.GeomapProvisioningStatusPENDINGDELETE {
 		// Run Delete
-		toDelete, err := s.gtm.GetGeoMap(context.Background(), geomap.Id, config.Global.AkamaiConfig.Domain)
-		if err != nil {
-			return nil, err
+		request := gtm.DeleteGeoMapRequest{
+			MapName:    geomap.Id,
+			DomainName: config.Global.AkamaiConfig.Domain,
 		}
-
-		if toDelete == nil {
-			// geomap already deleted
-			return nil, nil
-		}
-
-		_, err = s.gtm.DeleteGeoMap(context.Background(), toDelete, config.Global.AkamaiConfig.Domain)
+		_, err := s.gtm.DeleteGeoMap(context.Background(), request)
 		return nil, err
 	}
 
@@ -161,8 +155,12 @@ func (s *AkamaiAgent) SyncGeomap(geomap *rpcmodels.Geomap, force bool) (*gtm.Geo
 		return nil, err
 	}
 
-	var backendGeoMap *gtm.GeoMap
-	backendGeoMap, err = s.gtm.GetGeoMap(context.Background(), geomap.Id, config.Global.AkamaiConfig.Domain)
+	request := gtm.GetGeoMapRequest{
+		MapName:    geomap.Id,
+		DomainName: config.Global.AkamaiConfig.Domain,
+	}
+	var backendGeoMap *gtm.GetGeoMapResponse
+	backendGeoMap, err = s.gtm.GetGeoMap(context.Background(), request)
 	var gtmErr *gtm.Error
 	if errors.As(err, &gtmErr) && gtmErr.StatusCode != 404 {
 		return nil, err
@@ -179,15 +177,20 @@ func (s *AkamaiAgent) SyncGeomap(geomap *rpcmodels.Geomap, force bool) (*gtm.Geo
 	}
 	if utils.DeepEqualFields(backendGeoMap, referenceGeoMap, fieldsToCompare) {
 		// everything's equal, nothing to do
-		return backendGeoMap, nil
+		// cast backendGeoMap to gtm.GeoMap
+		return (*gtm.GeoMap)(backendGeoMap), nil
 	}
 
 	log.Debugf("SyncGeomap(%s) for domain %s, changes identified",
 		geomap.Id, config.Global.AkamaiConfig.Domain)
 
 	if backendGeoMap == nil {
-		var res *gtm.GeoMapResponse
-		res, err = s.gtm.CreateGeoMap(context.Background(), referenceGeoMap, config.Global.AkamaiConfig.Domain)
+		createRequest := gtm.CreateGeoMapRequest{
+			GeoMap:     referenceGeoMap,
+			DomainName: config.Global.AkamaiConfig.Domain,
+		}
+		var res *gtm.CreateGeoMapResponse
+		res, err = s.gtm.CreateGeoMap(context.Background(), createRequest)
 		if err != nil {
 			log.Errorf("CreateGeomap(%s) for domain %s failed", referenceGeoMap.Name,
 				config.Global.AkamaiConfig.Domain)
@@ -197,7 +200,11 @@ func (s *AkamaiAgent) SyncGeomap(geomap *rpcmodels.Geomap, force bool) (*gtm.Geo
 		return res.Resource, nil
 	}
 
-	_, err = s.gtm.UpdateGeoMap(context.Background(), referenceGeoMap, config.Global.AkamaiConfig.Domain)
+	updateRequest := gtm.UpdateGeoMapRequest{
+		GeoMap:     referenceGeoMap,
+		DomainName: config.Global.AkamaiConfig.Domain,
+	}
+	_, err = s.gtm.UpdateGeoMap(context.Background(), updateRequest)
 	if err != nil {
 		log.Errorf("UpdateGeomap(%s) for domain %s failed", referenceGeoMap.Name,
 			config.Global.AkamaiConfig.Domain)

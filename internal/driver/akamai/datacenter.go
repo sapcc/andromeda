@@ -59,7 +59,8 @@ func (s *AkamaiAgent) GetDatacenterMeta(datacenterUUID string, datacenters []*rp
 	}
 
 	// Refresh datacenter meta id from akamai
-	dcs, err := s.gtm.ListDatacenters(context.Background(), config.Global.AkamaiConfig.Domain)
+	request := gtm.ListDatacentersRequest{DomainName: config.Global.AkamaiConfig.Domain}
+	dcs, err := s.gtm.ListDatacenters(context.Background(), request)
 	if err != nil {
 		return 0, nil
 	}
@@ -153,7 +154,11 @@ func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force boo
 		}
 	}
 	if meta != 0 {
-		if backendDatacenter, err = s.gtm.GetDatacenter(context.Background(), meta, config.Global.AkamaiConfig.Domain); err != nil {
+		request := gtm.GetDatacenterRequest{
+			DatacenterID: meta,
+			DomainName:   config.Global.AkamaiConfig.Domain,
+		}
+		if backendDatacenter, err = s.gtm.GetDatacenter(context.Background(), request); err != nil {
 			// check if datacenter is not found
 			var gtmErr *gtm.Error
 			if errors.As(err, &gtmErr) && gtmErr.StatusCode != 404 {
@@ -170,7 +175,11 @@ func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force boo
 		}
 
 		// run Delete
-		_, err = s.gtm.DeleteDatacenter(context.Background(), backendDatacenter, config.Global.AkamaiConfig.Domain)
+		request := gtm.DeleteDatacenterRequest{
+			DatacenterID: backendDatacenter.DatacenterID,
+			DomainName:   config.Global.AkamaiConfig.Domain,
+		}
+		_, err = s.gtm.DeleteDatacenter(context.Background(), request)
 		return nil, err
 	}
 
@@ -207,7 +216,11 @@ func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force boo
 	if backendDatacenter != nil {
 		// Run Update
 		referenceDatacenter.DatacenterID = backendDatacenter.DatacenterID
-		_, err = s.gtm.UpdateDatacenter(context.Background(), &referenceDatacenter, config.Global.AkamaiConfig.Domain)
+		request := gtm.UpdateDatacenterRequest{
+			Datacenter: &referenceDatacenter,
+			DomainName: config.Global.AkamaiConfig.Domain,
+		}
+		_, err = s.gtm.UpdateDatacenter(context.Background(), request)
 		if err != nil {
 			log.Errorf("UpdateDatacenter(%s) for domain %s failed", referenceDatacenter.Nickname,
 				config.Global.AkamaiConfig.Domain)
@@ -217,8 +230,12 @@ func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force boo
 				config.Global.AkamaiConfig.Domain)
 		}
 	} else {
-		var res *gtm.DatacenterResponse
-		res, err = s.gtm.CreateDatacenter(context.Background(), &referenceDatacenter, config.Global.AkamaiConfig.Domain)
+		var res *gtm.CreateDatacenterResponse
+		request := gtm.CreateDatacenterRequest{
+			Datacenter: &referenceDatacenter,
+			DomainName: config.Global.AkamaiConfig.Domain,
+		}
+		res, err = s.gtm.CreateDatacenter(context.Background(), request)
 		if err != nil {
 			log.Errorf("CreateDatacenter(%s) for domain %s failed", referenceDatacenter.Nickname,
 				config.Global.AkamaiConfig.Domain)
