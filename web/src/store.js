@@ -1,4 +1,4 @@
-import { create } from 'zustand'
+import { createWithEqualityFn as create } from 'zustand/traditional'
 import { createJSONStorage, persist } from "zustand/middleware"
 import { querystring } from "zustand-querystring";
 import { mountStoreDevtool } from 'simple-zustand-devtools';
