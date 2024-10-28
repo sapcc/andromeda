@@ -2,7 +2,7 @@ import React, {useState} from "react"
 
 import styles from "inline:./styles.css"
 import {authStore} from "./store"
-import {AppShell, ContentHeading, AppShellProvider} from "@cloudoperators/juno-ui-components"
+import {AppShell, ContentHeading, AppShellProvider, PageHeader} from "@cloudoperators/juno-ui-components"
 import {QueryCache, QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import AppContent from "./AppContent"
 import {ReactQueryDevtools} from "@tanstack/react-query-devtools";
