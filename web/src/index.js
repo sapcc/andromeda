@@ -1,6 +1,5 @@
 import { createRoot } from "react-dom/client"
 import React from "react"
-import "./styles.css"
 
 var NODE_ENV = process.env.NODE_ENV
 if (NODE_ENV === 'development') {
