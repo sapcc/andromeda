@@ -1,8 +1,7 @@
 import * as esbuild from 'esbuild'
 import { default as pkg } from './package.json' with {type: 'json'}
-import stylePlugin from 'esbuild-style-plugin'
-import tailwindcss from "tailwindcss"
-import autoprefixer from "autoprefixer";
+import { tailwindPlugin } from 'esbuild-plugin-tailwindcss';
+import inlineImportPlugin from 'esbuild-plugin-inline-import';
 import chalk from "chalk";
 import imageInline from "esbuild-plugin-inline-image";
 
@@ -23,7 +22,8 @@ let ctx = await esbuild.context({
     entryPoints: [pkg.source],
     outdir: "public/build",
     plugins: [
-        stylePlugin({postcss: {plugins: [tailwindcss, autoprefixer]}}),
+        inlineImportPlugin({}),
+        tailwindPlugin({}),
         imageInline({limit: 10240, extensions: ["png", "jpg", "jpeg", "gif"]}), // 10Kb
     ],
 })

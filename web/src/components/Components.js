@@ -14,7 +14,6 @@ import {
     TooltipContent,
     TooltipTrigger
 } from "@cloudoperators/juno-ui-components";
-import {FormattedText} from "@cloudoperators/juno-ui-components/build/FormattedText";
 
 export const Error = ({error}) => {
     if (error) {

@@ -8,7 +8,8 @@ import {
     IntroBox,
     Modal,
     Select,
-    SelectOption, Spinner,
+    SelectOption,
+    Spinner,
     Stack,
     TextInput
 } from "@cloudoperators/juno-ui-components"

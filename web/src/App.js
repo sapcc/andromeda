@@ -1,8 +1,8 @@
 import React, {useState} from "react"
 
-import "./styles.css"
+import styles from "inline:./styles.css"
 import {authStore} from "./store"
-import {AppShell, ContentHeading, PortalProvider, StyleProvider} from "@cloudoperators/juno-ui-components"
+import {AppShell, ContentHeading, AppShellProvider} from "@cloudoperators/juno-ui-components"
 import {QueryCache, QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import AppContent from "./AppContent"
 import {ReactQueryDevtools} from "@tanstack/react-query-devtools";
@@ -49,28 +49,31 @@ const App = (props) => {
     })
 
     return (
-        <StyleProvider stylesWrapper="head" theme={theme} key={theme}>
-            <PortalProvider>
-                <QueryClientProvider client={queryClient}>
-                    <AppShell
-                        pageHeader={pageHeader}
-                        embedded={props.embedded === true}
-                    >
-                        <ContentHeading heading="Global Load Balancing as a Service" className="jn-p-2"/>
-                        {auth ? (
-                            <AppContent props={props}/>
-                        ) : (
-                            <LogInModal keystoneEndpoint={props.endpoint}
-                                        overrideEndpoint={props.overrideAndromedaEndpoint}
-                                        loginDomains={props?.loginDomains || []}
-                                        loginProject={props?.loginProject}
-                            />
-                        )}
-                    </AppShell>
-                    <ReactQueryDevtools initialIsOpen={false}/>
-                </QueryClientProvider>
-            </PortalProvider>
-        </StyleProvider>
+        <QueryClientProvider client={queryClient}>
+            <AppShellProvider stylesWrapper="head" theme={theme} key={theme}>
+                {/* load styles inside the shadow dom */}
+                <style>{styles.toString()}</style>
+
+                <AppShell
+                    pageHeader={pageHeader}
+                    embedded={props.embedded === true}
+                >
+
+                    <ContentHeading heading="Global Load Balancing as a Service" className="jn-p-2"/>
+                    {auth ? (
+                        <AppContent props={props}/>
+                    ) : (
+                        <LogInModal keystoneEndpoint={props.endpoint}
+                                    overrideEndpoint={props.overrideAndromedaEndpoint}
+                                    loginDomains={props?.loginDomains || []}
+                                    loginProject={props?.loginProject}
+                        />
+                    )}
+
+                </AppShell>
+            </AppShellProvider>
+            <ReactQueryDevtools initialIsOpen={false}/>
+        </QueryClientProvider>
     )
 }
 
