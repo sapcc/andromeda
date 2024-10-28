@@ -156,7 +156,7 @@ export const HeaderUser = ({ auth, logout, theme, setTheme }) => {
     const sapID = useMemo(() => auth?.user.name || "", [auth])
 
     return (
-        <Stack className="ml-auto" distribution="end" gap="4">
+        <Stack alignment="center" className="ml-auto" distribution="end" gap="4">
             <Tooltip triggerEvent="hover">
                 <TooltipTrigger>
                     <Stack alignment="center">

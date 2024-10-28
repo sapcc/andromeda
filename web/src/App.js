@@ -18,22 +18,12 @@ const App = (props) => {
         queryClient.invalidateQueries().then()
     }
 
-    const pageHeaderStyles = `jn-min-h-[3.25rem] jn-bg-juno-grey-blue-11 jn-sticky jn-top-0 jn-px-6 jn-py-3 jn-z-50`
-    const pageHeaderInnerStyles = `jn-grid jn-grid-cols-[minmax(0,max-content),1fr] jn-gap-3 jn-h-8 jn-w-full jn-overflow-hidden jn-items-center`
-    const headingStyles =  `jn-text-lg jn-text-theme-high jn-cursor-pointer`
     const pageHeader = (
-        <div className={`juno-pageheader theme-dark ${pageHeaderStyles}`} role="banner">
-            <div className={`juno-pageheader-inner ${pageHeaderInnerStyles}`}>
-                <div>
-                    <div className={headingStyles} onClick={() => {window.location.href = '/'}}>
-                        Converged Cloud | Andromeda
-                    </div>
-                </div>
-                {auth && (
-                    <HeaderUser auth={auth} logout={logout} theme={theme} setTheme={setTheme}/>
-                )}
-            </div>
-        </div>
+        <PageHeader heading="Converged Cloud | Andromeda" onClick={() => window.location.href = '/'}>
+            {auth && (
+                <HeaderUser auth={auth} logout={logout} theme={theme} setTheme={setTheme}/>
+            )}
+        </PageHeader>
     )
 
     // Create query client which it can be used from overall in the app
