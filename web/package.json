@@ -14,6 +14,7 @@
     "esbuild": "^0.24.0",
     "esbuild-plugin-inline-image": "^0.0.9",
     "esbuild-plugin-inline-import": "^1.1.0",
+    "lodash-es": "^4.17.21",
     "luxon": "^3.5.0",
     "postcss": "^8.4.47",
     "prop-types": "^15.8.1",
@@ -25,7 +26,7 @@
     "zustand-querystring": "^0.1.0"
   },
   "scripts": {
-    "start": "PORT=$APP_PORT NODE_ENV=development node esbuild.config.mjs --serve --watch",
+    "start": "PORT=$APP_PORT APP_PROPS=$APP_PROPS NODE_ENV=development node esbuild.config.mjs --serve --watch",
     "build": "NODE_ENV=production node esbuild.config.mjs"
   },
   "importmapExtras": {

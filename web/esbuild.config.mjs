@@ -8,6 +8,7 @@ import autoprefixer from "autoprefixer";
 import tailwindcss from "tailwindcss"
 
 const isProduction = process.env.NODE_ENV === "production"
+const appProps = process.env.APP_PROPS || "{}"
 const args = process.argv.slice(2)
 const watch = args.indexOf("--watch") >= 0
 const serve = args.indexOf("--serve") >= 0
@@ -23,6 +24,9 @@ let ctx = await esbuild.context({
     sourcemap: !isProduction,
     entryPoints: [pkg.source],
     outdir: "public/build",
+    define: {
+        "process.env.APP_PROPS": appProps,
+    },
     plugins: [
         inlineImportPlugin({
             transform: async (contents, args) => {

@@ -59,7 +59,7 @@ const GeographicMapListItem = ({geomap, setError}) => {
             <DataGridCell>
                 <ListItemSpinner data={geomap} />
             </DataGridCell>
-            <DataGridCell>{geomap.assignments.length}</DataGridCell>
+            <DataGridCell>{geomap.assignments?.length || 0}</DataGridCell>
             <DataGridCell>{geomap.scope}</DataGridCell>
             <DataGridCell>{geomap.provider}</DataGridCell>
             <DataGridCell>{createdAt}</DataGridCell>
