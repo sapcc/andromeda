@@ -208,7 +208,7 @@ func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force boo
 		"Longitude",
 		"Nickname",
 	}
-	if utils.DeepEqualFields(&referenceDatacenter, backendDatacenter, fieldsToCompare) {
+	if utils.DeepEqualFields(&referenceDatacenter, (*gtm.Datacenter)(backendDatacenter), fieldsToCompare) {
 		// no change
 		return datacenter, nil
 	}

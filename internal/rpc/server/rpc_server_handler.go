@@ -142,14 +142,14 @@ func (u *RPCHandler) GetDatacenters(ctx context.Context, request *SearchRequest)
 func (u *RPCHandler) GetGeomaps(ctx context.Context, request *SearchRequest) (*GeomapsResponse, error) {
 	/*
 		SELECT
-		    id, scope, provider, default_datacenter, provisioning_status
+		    id, default_datacenter, provisioning_status
 		FROM geographic_map
 		WHERE
 		    provider = 'akamai' AND provisioning_status LIKE 'PENDING%'
 	*/
 
 	q := sq.
-		Select("id", "default_datacenter").
+		Select("id", "default_datacenter", "provisioning_status").
 		From("geographic_map").
 		Where("provider = ?", request.Provider)
 

@@ -143,9 +143,10 @@ func DeepEqualFields(x, y interface{}, fieldsToCompare []string) bool {
 	v1 := reflect.ValueOf(x)
 	v2 := reflect.ValueOf(y)
 	if v1.Type() != v2.Type() {
+		log.Errorf("DeepEqualFields: Type mismatch: %s != %s", v1.Type(), v2.Type())
 		return false
 	}
 	ret := deepValueEqualField(v1, v2, fieldsToCompare)
-	log.Debugf("DeepEqualFields: %t", ret)
+	log.Debugf("DeepEqualFields(%s): equal=%t", v1.Type(), ret)
 	return ret
 }

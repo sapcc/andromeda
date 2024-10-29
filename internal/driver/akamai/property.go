@@ -18,6 +18,7 @@ package akamai
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v9/pkg/gtm"
@@ -33,6 +34,18 @@ import (
 func (s *AkamaiAgent) DeleteProperty(domain *rpcmodels.Domain, trafficManagementDomain string) error {
 	// Delete
 	log.Infof("DeleteProperty(domain=%s, property=%s)", trafficManagementDomain, domain.GetFqdn())
+
+	// Check if property exists
+	if _, err := s.gtm.GetProperty(context.Background(), gtm.GetPropertyRequest{
+		DomainName:   trafficManagementDomain,
+		PropertyName: domain.GetFqdn(),
+	}); err != nil {
+		var gtmErr *gtm.Error
+		if errors.As(err, &gtmErr) && gtmErr.StatusCode == 404 {
+			return nil
+		}
+		return err
+	}
 
 	request := gtm.DeletePropertyRequest{
 		DomainName:   trafficManagementDomain,
@@ -224,7 +237,7 @@ MEMBERLOOP:
 		"LivenessTests.TestObjectProtocol",
 		"LivenessTests.HTTPMethod",
 	}
-	if utils.DeepEqualFields(&property, existingProperty, fieldsToCompare) {
+	if utils.DeepEqualFields(&property, (*gtm.Property)(existingProperty), fieldsToCompare) {
 		return provRequests, nil
 	}
 

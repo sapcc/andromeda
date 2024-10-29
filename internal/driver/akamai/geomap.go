@@ -141,6 +141,18 @@ func (s *AkamaiAgent) SyncGeomap(geomap *rpcmodels.Geomap, force bool) (*gtm.Geo
 	log.Debugf("SyncGeomap(%s, force=%t)", geomap.Id, force)
 
 	if geomap.ProvisioningStatus == models.GeomapProvisioningStatusPENDINGDELETE {
+		// Check if geomap exists
+		if _, err := s.gtm.GetGeoMap(context.Background(), gtm.GetGeoMapRequest{
+			MapName:    geomap.Id,
+			DomainName: config.Global.AkamaiConfig.Domain,
+		}); err != nil {
+			var gtmErr *gtm.Error
+			if errors.As(err, &gtmErr) && gtmErr.StatusCode == 404 {
+				return nil, nil
+			}
+			return nil, err
+		}
+
 		// Run Delete
 		request := gtm.DeleteGeoMapRequest{
 			MapName:    geomap.Id,
@@ -175,7 +187,7 @@ func (s *AkamaiAgent) SyncGeomap(geomap *rpcmodels.Geomap, force bool) (*gtm.Geo
 		"Assignments.DatacenterBase",
 		"Assignments.Countries",
 	}
-	if utils.DeepEqualFields(backendGeoMap, referenceGeoMap, fieldsToCompare) {
+	if utils.DeepEqualFields((*gtm.GeoMap)(backendGeoMap), referenceGeoMap, fieldsToCompare) {
 		// everything's equal, nothing to do
 		// cast backendGeoMap to gtm.GeoMap
 		return (*gtm.GeoMap)(backendGeoMap), nil
