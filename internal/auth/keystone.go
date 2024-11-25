@@ -60,7 +60,7 @@ func KeystoneMiddleware(next http.Handler) (http.Handler, error) {
 		IdentityV3: keystoneV3,
 		Cacher:     gopherpolicy.InMemoryCacher(),
 	}
-	if err := tv.LoadPolicyFile(config.Global.ApiSettings.PolicyFile); err != nil {
+	if err := tv.LoadPolicyFile(config.Global.ApiSettings.PolicyFile, nil); err != nil {
 		return nil, err
 	}
 
