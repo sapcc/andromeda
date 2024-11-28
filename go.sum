@@ -324,8 +324,8 @@ github.com/russross/blackfriday/v2 v2.1.0 h1:JIOH55/0cWyOuilr9/qlrm0BSXldqnqwMsf
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/sapcc/go-api-declarations v1.13.0 h1:4ufQUF7rwhLz7kPDVFCkw6CpQ8VeO2clJg4pjwTTpTU=
 github.com/sapcc/go-api-declarations v1.13.0/go.mod h1:83R3hTANhuRXt/pXDby37IJetw8l7DG41s33Tp9NXxI=
-github.com/sapcc/go-bits v0.0.0-20241121042357-07c9cfcafede h1:+hNPr6U11hZ4mePSIXiCPmHqN/XMxBJ7pvMYtE+LthE=
-github.com/sapcc/go-bits v0.0.0-20241121042357-07c9cfcafede/go.mod h1:Fa38gpJczKo2cgyb21f2RkrvqvaFtLXztXyYgTZ7ZVE=
+github.com/sapcc/go-bits v0.0.0-20241128180218-03123d6bae9b h1:VNSYY/wn26woM2RbEex+K+4qx7mtniH5tLjqXzGb+2o=
+github.com/sapcc/go-bits v0.0.0-20241128180218-03123d6bae9b/go.mod h1:Fa38gpJczKo2cgyb21f2RkrvqvaFtLXztXyYgTZ7ZVE=
 github.com/scottdware/go-bigip v0.0.0-20240809002616-deb9b0aff84a h1:Dp0HN76Jl1n0orM9UVB/AnwqJOBWETm1hHBPDVMKWeE=
 github.com/scottdware/go-bigip v0.0.0-20240809002616-deb9b0aff84a/go.mod h1:ElPIUv+P7DTtT71aHpeNomJ4naq2RTvCA8o5gBIru3w=
 github.com/sergi/go-diff v1.0.0/go.mod h1:0CfEIISq7TuYL3j771MWULgwwjU+GofnZX9QAmXWZgo=
