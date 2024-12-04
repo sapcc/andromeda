@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 
@@ -35,32 +34,25 @@ import (
 )
 
 type auditController struct {
-	EventSink    chan<- cadf.Event
-	observerUUID string
+	Auditor audittools.Auditor
 }
 
 func NewAuditController() *auditController {
-	s := make(chan cadf.Event, 20)
-	q := auditController{
-		EventSink:    s,
-		observerUUID: audittools.GenerateUUID(),
-	}
-	rabbitmqQueueName := config.Global.Audit.QueueName
-	transportURL, err := url.Parse(config.Global.Audit.TransportURL)
+	ctx := context.Background()
+	auditor, err := audittools.NewAuditor(ctx, audittools.AuditorOpts{
+		Observer: audittools.Observer{
+			TypeURI: "service/gtm",
+			Name:    "Andromeda",
+			ID:      audittools.GenerateUUID(),
+		},
+		QueueName:     config.Global.Audit.QueueName,
+		ConnectionURL: config.Global.Audit.TransportURL,
+	})
 	if err != nil {
 		panic(err)
 	}
 
-	go audittools.AuditTrail{
-		EventSink: s,
-		OnSuccessfulPublish: func() {
-			log.Debug("Notification sent")
-		},
-		OnFailedPublish: func() {
-			log.Debug("Notification failed")
-		},
-	}.Commit(context.Background(), *transportURL, rabbitmqQueueName)
-	return &q
+	return &auditController{auditor}
 }
 
 // auditResponseWriter is a wrapper of regular ResponseWriter
@@ -110,7 +102,7 @@ func (arw *auditResponseWriter) WriteHeader(code int) {
 		return
 	}
 
-	p := audittools.EventParameters{
+	arw.controller.Auditor.Record(audittools.EventParameters{
 		Time:       time.Now(),
 		Request:    arw.request,
 		User:       user,
@@ -121,11 +113,7 @@ func (arw *auditResponseWriter) WriteHeader(code int) {
 			resource,
 			mr.Params,
 		},
-	}
-	p.Observer.TypeURI = "service/gtm"
-	p.Observer.Name = "Andromeda"
-	p.Observer.ID = arw.controller.observerUUID
-	arw.controller.EventSink <- audittools.NewEvent(p)
+	})
 }
 
 func (ac *auditController) NewAuditResponseWriter(w http.ResponseWriter, r *http.Request) *auditResponseWriter {
