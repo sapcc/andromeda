@@ -6,7 +6,7 @@ RUN make -C /src
 
 ################################################################################
 
-FROM alpine:3.20
+FROM alpine:3.21
 LABEL source_repository="https://github.com/sapcc/andromeda"
 
 RUN apk add --no-cache ca-certificates
