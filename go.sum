@@ -142,6 +142,8 @@ github.com/gophercloud/gophercloud/v2 v2.3.0 h1:5ipI2Mgxee0TwQxqnOIUdTbzL4ZBB8GO
 github.com/gophercloud/gophercloud/v2 v2.3.0/go.mod h1:uJWNpTgJPSl2gyzJqcU/pIAhFUWvIkp8eE8M15n9rs4=
 github.com/gophercloud/utils/v2 v2.0.0-20241209100706-e3a3b7c07d26 h1:N65GYmx5LrMeYdeXcxMESDU+2pDyAOXlFNlHl7siUwM=
 github.com/gophercloud/utils/v2 v2.0.0-20241209100706-e3a3b7c07d26/go.mod h1:7SHUbtoiSYINNKgAVxse+PMhIio05IK7shHy8DVRaN0=
+github.com/gorilla/mux v1.8.1 h1:TuBL49tXwgrFYWhqrNgrUNEY92u81SPhu7sTdzQEiWY=
+github.com/gorilla/mux v1.8.1/go.mod h1:AKf9I4AEqPTmMytcMc0KkNouC66V3BtZ4qD5fmWSiMQ=
 github.com/gorilla/websocket v1.4.0/go.mod h1:E7qHFY5m1UJ88s3WnNqhKjPHQ0heANvMoAMk2YaljkQ=
 github.com/grpc-ecosystem/go-grpc-middleware v1.0.0/go.mod h1:FiyG127CGDf3tlThmgyCl78X/SZQqEOJBCDaAfeWzPs=
 github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0/go.mod h1:8NvIoxWQoOIhqOTXgfV/d3M/q6VIi02HzZEHgUlZvzk=
