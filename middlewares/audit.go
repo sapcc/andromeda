@@ -72,7 +72,7 @@ type AuditResource struct {
 // Render implements the audittools.EventRenderer interface.
 func (a AuditResource) Render() cadf.Resource {
 	id := ""
-	attachments := []cadf.Attachment{}
+	var attachments []cadf.Attachment
 	for _, routeParam := range a.routeParams {
 		attachments = append(attachments, cadf.Attachment{
 			Name:    routeParam.Name,
@@ -97,6 +97,7 @@ func (arw *auditResponseWriter) WriteHeader(code int) {
 	mr := middleware.MatchedRouteFrom(arw.request)
 	resource := strings.Split(policy.RuleFromHTTPRequest(arw.request), ":")[1]
 	user, err := auth.UserForRequest(arw.request)
+	projectID, _ := auth.ProjectScopeForRequest(arw.request)
 	if err != nil {
 		log.Error(err.Error())
 		return
@@ -109,7 +110,7 @@ func (arw *auditResponseWriter) WriteHeader(code int) {
 		ReasonCode: code,
 		Action:     cadf.GetAction(arw.request.Method),
 		Target: AuditResource{
-			user.ProjectScopeUUID(),
+			projectID,
 			resource,
 			mr.Params,
 		},
