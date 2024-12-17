@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"os"
 	"time"
 
 	"github.com/go-openapi/runtime"
@@ -18,7 +19,6 @@ import (
 
 	"github.com/sapcc/andromeda/client"
 	"github.com/sapcc/andromeda/client/administrative"
-	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/models"
 )
 
@@ -26,7 +26,7 @@ type liquidLogic struct {
 	andromedaClient *client.Andromeda
 }
 
-func (l *liquidLogic) Init(ctx context.Context, provider *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) error {
+func (l *liquidLogic) Init(_ context.Context, provider *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) error {
 	l.andromedaClient = client.Default
 	endpointOpts := gophercloud.EndpointOpts{
 		Region: eo.Region,
@@ -51,31 +51,31 @@ func (l *liquidLogic) Init(ctx context.Context, provider *gophercloud.ProviderCl
 	return nil
 }
 
-func (l *liquidLogic) BuildServiceInfo(ctx context.Context) (liquid.ServiceInfo, error) {
+func (l *liquidLogic) BuildServiceInfo(_ context.Context) (liquid.ServiceInfo, error) {
 	return liquid.ServiceInfo{
 		Version: 1,
 		Resources: map[liquid.ResourceName]liquid.ResourceInfo{
-			"datacenter": liquid.ResourceInfo{
+			"datacenter": {
 				HasCapacity: false,
 				HasQuota:    true,
 				Topology:    liquid.FlatResourceTopology,
 			},
-			"domain": liquid.ResourceInfo{
+			"domain": {
 				HasCapacity: false,
 				HasQuota:    true,
 				Topology:    liquid.FlatResourceTopology,
 			},
-			"member": liquid.ResourceInfo{
+			"member": {
 				HasCapacity: false,
 				HasQuota:    true,
 				Topology:    liquid.FlatResourceTopology,
 			},
-			"monitor": liquid.ResourceInfo{
+			"monitor": {
 				HasCapacity: false,
 				HasQuota:    true,
 				Topology:    liquid.FlatResourceTopology,
 			},
-			"pool": liquid.ResourceInfo{
+			"pool": {
 				HasCapacity: false,
 				HasQuota:    true,
 				Topology:    liquid.FlatResourceTopology,
@@ -91,7 +91,7 @@ func (l *liquidLogic) ScanCapacity(ctx context.Context, req liquid.ServiceCapaci
 }
 
 func (l *liquidLogic) ScanUsage(ctx context.Context, projectUUID string, req liquid.ServiceUsageRequest, serviceInfo liquid.ServiceInfo) (liquid.ServiceUsageReport, error) {
-	params := administrative.NewGetQuotasProjectIDParams().WithDefaults()
+	params := administrative.NewGetQuotasProjectIDParams().WithDefaults().WithContext(ctx)
 	params.ProjectID = projectUUID
 	resp, err := l.andromedaClient.Administrative.GetQuotasProjectID(params)
 	if err != nil {
@@ -100,42 +100,42 @@ func (l *liquidLogic) ScanUsage(ctx context.Context, projectUUID string, req liq
 	return liquid.ServiceUsageReport{
 		InfoVersion: 1,
 		Resources: map[liquid.ResourceName]*liquid.ResourceUsageReport{
-			"datacenter": &liquid.ResourceUsageReport{
+			"datacenter": {
 				Quota: resp.Payload.Quota.Datacenter,
 				PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
-					liquid.AvailabilityZoneAny: &liquid.AZResourceUsageReport{Usage: uint64(resp.Payload.Quota.QuotaUsage.InUseDatacenter)},
+					liquid.AvailabilityZoneAny: {Usage: uint64(resp.Payload.Quota.QuotaUsage.InUseDatacenter)},
 				},
 			},
-			"domain": &liquid.ResourceUsageReport{
+			"domain": {
 				Quota: resp.Payload.Quota.Domain,
 				PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
-					liquid.AvailabilityZoneAny: &liquid.AZResourceUsageReport{Usage: uint64(resp.Payload.Quota.QuotaUsage.InUseDomain)},
+					liquid.AvailabilityZoneAny: {Usage: uint64(resp.Payload.Quota.QuotaUsage.InUseDomain)},
 				},
 			},
-			"member": &liquid.ResourceUsageReport{
+			"member": {
 				Quota: resp.Payload.Quota.Member,
 				PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
-					liquid.AvailabilityZoneAny: &liquid.AZResourceUsageReport{Usage: uint64(resp.Payload.Quota.QuotaUsage.InUseMember)},
+					liquid.AvailabilityZoneAny: {Usage: uint64(resp.Payload.Quota.QuotaUsage.InUseMember)},
 				},
 			},
-			"monitor": &liquid.ResourceUsageReport{
+			"monitor": {
 				Quota: resp.Payload.Quota.Monitor,
 				PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
-					liquid.AvailabilityZoneAny: &liquid.AZResourceUsageReport{Usage: uint64(resp.Payload.Quota.QuotaUsage.InUseMonitor)},
+					liquid.AvailabilityZoneAny: {Usage: uint64(resp.Payload.Quota.QuotaUsage.InUseMonitor)},
 				},
 			},
-			"pool": &liquid.ResourceUsageReport{
+			"pool": {
 				Quota: resp.Payload.Quota.Pool,
 				PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
-					liquid.AvailabilityZoneAny: &liquid.AZResourceUsageReport{Usage: uint64(resp.Payload.Quota.QuotaUsage.InUsePool)},
+					liquid.AvailabilityZoneAny: {Usage: uint64(resp.Payload.Quota.QuotaUsage.InUsePool)},
 				},
 			},
 		},
 	}, nil
 }
 
-func (l *liquidLogic) SetQuota(ctx context.Context, projectUUID string, req liquid.ServiceQuotaRequest, serviceInfo liquid.ServiceInfo) error {
-	params := administrative.NewPutQuotasProjectIDParams().WithDefaults()
+func (l *liquidLogic) SetQuota(ctx context.Context, projectUUID string, req liquid.ServiceQuotaRequest, _ liquid.ServiceInfo) error {
+	params := administrative.NewPutQuotasProjectIDParams().WithDefaults().WithContext(ctx)
 	params.ProjectID = projectUUID
 	params.Quota = administrative.PutQuotasProjectIDBody{Quota: &models.Quota{
 		Datacenter: func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["datacenter"].Quota),
@@ -152,25 +152,29 @@ func (l *liquidLogic) SetQuota(ctx context.Context, projectUUID string, req liqu
 }
 
 func main() {
-	config.ParseArgsAndRun("andromeda-liquid-api", "andromeda liquid api",
-		func(c *cli.Context) error {
+	app := &cli.App{
+		Name:  "andromeda-liquid-api",
+		Usage: "andromeda liquid api",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:  "host",
+				Usage: "The IP to listen on",
+				Value: "0.0.0.0",
+			},
+			&cli.IntFlag{
+				Name:  "port",
+				Usage: "Port to listen",
+				Value: 8080,
+			},
+		},
+		Action: func(c *cli.Context) error {
 			ctx := httpext.ContextWithSIGINT(c.Context, 10*time.Second)
 			host := c.String("host")
 			port := c.Int("port")
 			logic := &liquidLogic{}
 			opts := liquidapi.RunOpts{DefaultListenAddress: fmt.Sprintf("%s:%d", host, port)}
-			must.Succeed(liquidapi.Run(ctx, logic, opts))
-			return nil
+			return liquidapi.Run(ctx, logic, opts)
 		},
-		&cli.StringFlag{
-			Name:  "host",
-			Usage: "The IP to listen on",
-			Value: "0.0.0.0",
-		},
-		&cli.IntFlag{
-			Name:  "port",
-			Usage: "Port to listen",
-			Value: 8080,
-		},
-	)
+	}
+	must.Succeed(app.Run(os.Args))
 }
