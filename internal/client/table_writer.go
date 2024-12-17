@@ -22,6 +22,7 @@ import (
 	"sort"
 
 	"github.com/jedib0t/go-pretty/table"
+	"github.com/jedib0t/go-pretty/text"
 )
 
 func formatValue(v reflect.Value) string {
@@ -119,7 +120,7 @@ func addSortedHeader(v reflect.Value) ([]int, error) {
 	return indexes, nil
 }
 
-//WriteTableFromStruct scans a struct and prints content via Table writer
+// WriteTableFromStruct scans a struct and prints content via Table writer
 func WriteTable(data interface{}) error {
 	v := reflect.ValueOf(data)
 
@@ -189,6 +190,9 @@ func WriteTable(data interface{}) error {
 			Options: table.OptionsNoBorders,
 		})
 		Table.Render()
+	case "json":
+		transformer := text.NewJSONTransformer("", "    ")
+		fmt.Println(transformer(data))
 	default:
 		return fmt.Errorf("format option %s is not supported.", opts.Formatters.Format)
 	}
