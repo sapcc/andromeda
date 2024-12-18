@@ -55,27 +55,27 @@ func (l *liquidLogic) BuildServiceInfo(_ context.Context) (liquid.ServiceInfo, e
 	return liquid.ServiceInfo{
 		Version: 1,
 		Resources: map[liquid.ResourceName]liquid.ResourceInfo{
-			"datacenter": {
+			"datacenters": {
 				HasCapacity: false,
 				HasQuota:    true,
 				Topology:    liquid.FlatResourceTopology,
 			},
-			"domain": {
+			"domains": {
 				HasCapacity: false,
 				HasQuota:    true,
 				Topology:    liquid.FlatResourceTopology,
 			},
-			"member": {
+			"members": {
 				HasCapacity: false,
 				HasQuota:    true,
 				Topology:    liquid.FlatResourceTopology,
 			},
-			"monitor": {
+			"monitors": {
 				HasCapacity: false,
 				HasQuota:    true,
 				Topology:    liquid.FlatResourceTopology,
 			},
-			"pool": {
+			"pools": {
 				HasCapacity: false,
 				HasQuota:    true,
 				Topology:    liquid.FlatResourceTopology,
@@ -100,31 +100,31 @@ func (l *liquidLogic) ScanUsage(ctx context.Context, projectUUID string, req liq
 	return liquid.ServiceUsageReport{
 		InfoVersion: 1,
 		Resources: map[liquid.ResourceName]*liquid.ResourceUsageReport{
-			"datacenter": {
+			"datacenters": {
 				Quota: resp.Payload.Quota.Datacenter,
 				PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
 					liquid.AvailabilityZoneAny: {Usage: uint64(resp.Payload.Quota.QuotaUsage.InUseDatacenter)},
 				},
 			},
-			"domain": {
+			"domains": {
 				Quota: resp.Payload.Quota.Domain,
 				PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
 					liquid.AvailabilityZoneAny: {Usage: uint64(resp.Payload.Quota.QuotaUsage.InUseDomain)},
 				},
 			},
-			"member": {
+			"members": {
 				Quota: resp.Payload.Quota.Member,
 				PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
 					liquid.AvailabilityZoneAny: {Usage: uint64(resp.Payload.Quota.QuotaUsage.InUseMember)},
 				},
 			},
-			"monitor": {
+			"monitors": {
 				Quota: resp.Payload.Quota.Monitor,
 				PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
 					liquid.AvailabilityZoneAny: {Usage: uint64(resp.Payload.Quota.QuotaUsage.InUseMonitor)},
 				},
 			},
-			"pool": {
+			"pools": {
 				Quota: resp.Payload.Quota.Pool,
 				PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
 					liquid.AvailabilityZoneAny: {Usage: uint64(resp.Payload.Quota.QuotaUsage.InUsePool)},
@@ -138,11 +138,11 @@ func (l *liquidLogic) SetQuota(ctx context.Context, projectUUID string, req liqu
 	params := administrative.NewPutQuotasProjectIDParams().WithDefaults().WithContext(ctx)
 	params.ProjectID = projectUUID
 	params.Quota = administrative.PutQuotasProjectIDBody{Quota: &models.Quota{
-		Datacenter: func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["datacenter"].Quota),
-		Domain:     func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["domain"].Quota),
-		Member:     func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["member"].Quota),
-		Monitor:    func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["monitor"].Quota),
-		Pool:       func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["pool"].Quota),
+		Datacenter: func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["datacenters"].Quota),
+		Domain:     func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["domains"].Quota),
+		Member:     func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["members"].Quota),
+		Monitor:    func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["monitors"].Quota),
+		Pool:       func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["pools"].Quota),
 	}}
 	_, err := l.andromedaClient.Administrative.PutQuotasProjectID(params)
 	if err != nil {
