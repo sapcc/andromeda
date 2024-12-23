@@ -17,8 +17,10 @@
 package client
 
 import (
+	"errors"
 	"fmt"
 
+	"github.com/apex/log"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
@@ -102,6 +104,9 @@ func (*DomainCreate) Execute(_ []string) error {
 	if err != nil {
 		return err
 	}
+	if err = waitForActiveDomain(resp.Payload.Domain.ID, false); err != nil {
+		return err
+	}
 	return WriteTable(resp.GetPayload().Domain)
 }
 
@@ -123,6 +128,9 @@ func (*DomainDelete) Execute(_ []string) error {
 
 	if _, err := AndromedaClient.Domains.DeleteDomainsDomainID(params); err != nil {
 		return err
+	}
+	if err := waitForActiveDomain(DomainOptions.DomainDelete.Positional.UUID, true); err != nil {
+		log.WithError(err).Error("Failed to wait for domain to be deleted")
 	}
 	return nil
 }
@@ -167,8 +175,36 @@ func (*DomainSet) Execute(_ []string) error {
 	if err != nil {
 		return err
 	}
+	if err = waitForActiveDomain(DomainOptions.DomainSet.Positional.UUID, false); err != nil {
+		log.WithError(err).Error("Failed to wait for domain to be active")
+	}
 	return WriteTable(resp.GetPayload().Domain)
+}
 
+// waitForActiveDomain waits for the domain to be active, or optionally be deleted
+func waitForActiveDomain(id strfmt.UUID, deleted bool) error {
+	// if not waiting, return immediately
+	if !opts.Wait {
+		return nil
+	}
+
+	return RetryWithBackoffMax(func() error {
+		params := domains.NewGetDomainsDomainIDParams().WithDomainID(id)
+		r, err := AndromedaClient.Domains.GetDomainsDomainID(params)
+		if err != nil {
+			var getIDNotFound *domains.GetDomainsDomainIDNotFound
+			if errors.As(err, &getIDNotFound) && deleted {
+				return nil
+			}
+			return err
+		}
+
+		res := r.GetPayload()
+		if deleted || res.Domain.ProvisioningStatus != models.DomainProvisioningStatusACTIVE {
+			return fmt.Errorf("domain %s is not active yet", id)
+		}
+		return nil
+	})
 }
 
 func init() {

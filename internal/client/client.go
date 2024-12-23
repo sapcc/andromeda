@@ -18,6 +18,7 @@ package client
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/url"
 	"os"
@@ -53,6 +54,7 @@ type outputFormatters struct {
 var opts struct {
 	Debug      bool             `long:"debug" description:"Show verbose debug information"`
 	Formatters outputFormatters `group:"Output formatters"`
+	Wait       bool             `long:"wait" description:"Wait for the operation to complete (if supported)"`
 
 	OSEndpoint          string `long:"os-endpoint" env:"OS_ENDPOINT" description:"The endpoint that will always be used"`
 	OSAuthUrl           string `long:"os-auth-url" env:"OS_AUTH_URL" description:"Authentication URL"`
@@ -138,8 +140,9 @@ func SetupClient() {
 
 	if _, err := Parser.Parse(); err != nil {
 		code := 1
-		if fe, ok := err.(*flags.Error); ok {
-			if fe.Type == flags.ErrHelp {
+		var fe *flags.Error
+		if errors.As(err, &fe) {
+			if errors.Is(fe.Type, flags.ErrHelp) {
 				code = 0
 			} else {
 				log.WithError(err).Error("while parsing command line arguments")

@@ -17,6 +17,10 @@
 package client
 
 import (
+	"errors"
+	"fmt"
+
+	"github.com/apex/log"
 	"github.com/go-openapi/strfmt"
 
 	"github.com/sapcc/andromeda/client/pools"
@@ -78,6 +82,9 @@ func (*PoolCreate) Execute(_ []string) error {
 	if err != nil {
 		return err
 	}
+	if err = waitForActivePool(resp.Payload.Pool.ID, false); err != nil {
+		log.WithError(err).Error("Failed to wait for pool to be active")
+	}
 	return WriteTable(resp.GetPayload().Pool)
 }
 
@@ -100,7 +107,36 @@ func (*PoolDelete) Execute(_ []string) error {
 	if _, err := AndromedaClient.Pools.DeletePoolsPoolID(params); err != nil {
 		return err
 	}
+	if err := waitForActivePool(PoolOptions.PoolDelete.Positional.UUID, true); err != nil {
+		log.WithError(err).Error("Failed to wait for pool to be deleted")
+	}
 	return nil
+}
+
+// waitForActivePool waits for the pool to be active, or optionally be deleted
+func waitForActivePool(id strfmt.UUID, deleted bool) error {
+	// if not waiting, return immediately
+	if !opts.Wait {
+		return nil
+	}
+
+	return RetryWithBackoffMax(func() error {
+		params := pools.NewGetPoolsPoolIDParams().WithPoolID(id)
+		r, err := AndromedaClient.Pools.GetPoolsPoolID(params)
+		if err != nil {
+			var getIDNotFound *pools.GetPoolsPoolIDNotFound
+			if errors.As(err, &getIDNotFound) && deleted {
+				return nil
+			}
+			return err
+		}
+
+		res := r.GetPayload()
+		if deleted || res.Pool.ProvisioningStatus != models.PoolProvisioningStatusACTIVE {
+			return fmt.Errorf("pool %s is not active yet", id)
+		}
+		return nil
+	})
 }
 
 func init() {

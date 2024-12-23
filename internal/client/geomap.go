@@ -17,6 +17,10 @@
 package client
 
 import (
+	"errors"
+	"fmt"
+
+	"github.com/apex/log"
 	"github.com/go-openapi/strfmt"
 
 	"github.com/sapcc/andromeda/client/geographic_maps"
@@ -87,6 +91,9 @@ func (*GeomapCreate) Execute(_ []string) error {
 	if err != nil {
 		return err
 	}
+	if err = waitForActiveGeomap(resp.Payload.Geomap.ID, false); err != nil {
+		log.WithError(err).Error("Failed to wait for geomap to be active")
+	}
 	return WriteTable(resp.GetPayload().Geomap)
 }
 
@@ -109,7 +116,36 @@ func (*GeomapDelete) Execute(_ []string) error {
 	if _, err := AndromedaClient.GeographicMaps.DeleteGeomapsGeomapID(params); err != nil {
 		return err
 	}
+	if err := waitForActiveGeomap(GeomapOptions.GeomapDelete.Positional.UUID, true); err != nil {
+		log.WithError(err).Error("Failed to wait for geomap to be deleted")
+	}
 	return nil
+}
+
+// waitForActiveGeomap waits for the geomap to be active, or optionally be deleted
+func waitForActiveGeomap(id strfmt.UUID, deleted bool) error {
+	// if not waiting, return immediately
+	if !opts.Wait {
+		return nil
+	}
+
+	return RetryWithBackoffMax(func() error {
+		params := geographic_maps.NewGetGeomapsGeomapIDParams().WithGeomapID(id)
+		r, err := AndromedaClient.GeographicMaps.GetGeomapsGeomapID(params)
+		if err != nil {
+			var getIDNotFound *geographic_maps.GetGeomapsGeomapIDNotFound
+			if errors.As(err, &getIDNotFound) && deleted {
+				return nil
+			}
+			return err
+		}
+
+		res := r.GetPayload()
+		if deleted || res.Geomap.ProvisioningStatus != models.GeomapProvisioningStatusACTIVE {
+			return fmt.Errorf("geomap %s is not active yet", id)
+		}
+		return nil
+	})
 }
 
 func init() {

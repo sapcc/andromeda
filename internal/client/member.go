@@ -17,8 +17,10 @@
 package client
 
 import (
+	"errors"
 	"fmt"
 
+	"github.com/apex/log"
 	"github.com/go-openapi/strfmt"
 
 	"github.com/sapcc/andromeda/client/members"
@@ -98,6 +100,9 @@ func (*MemberCreate) Execute(_ []string) error {
 	if err != nil {
 		return err
 	}
+	if err = waitForActiveMember(resp.GetPayload().Member.ID, false); err != nil {
+		log.WithError(err).Error("Failed to wait for member to be active")
+	}
 	return WriteTable(resp.GetPayload().Member)
 }
 
@@ -119,6 +124,9 @@ func (*MemberDelete) Execute(_ []string) error {
 
 	if _, err := AndromedaClient.Members.DeleteMembersMemberID(params); err != nil {
 		return err
+	}
+	if err := waitForActiveMember(MemberOptions.MemberDelete.PositionalMemberDelete.UUID, true); err != nil {
+		log.WithError(err).Error("Failed to wait for member to be deleted")
 	}
 	return nil
 }
@@ -150,7 +158,36 @@ func (*MemberSet) Execute(_ []string) error {
 	if err != nil {
 		return err
 	}
+	if err = waitForActiveMember(MemberOptions.MemberSet.PositionalMemberSet.UUID, false); err != nil {
+		log.WithError(err).Error("Failed to wait for member to be active")
+	}
 	return WriteTable(resp.GetPayload().Member)
+}
+
+// waitForActiveMember waits for the member to be active, or optionally be deleted
+func waitForActiveMember(id strfmt.UUID, deleted bool) error {
+	// if not waiting, return immediately
+	if !opts.Wait {
+		return nil
+	}
+
+	return RetryWithBackoffMax(func() error {
+		params := members.NewGetMembersMemberIDParams().WithMemberID(id)
+		r, err := AndromedaClient.Members.GetMembersMemberID(params)
+		if err != nil {
+			var getIDNotFound *members.GetMembersMemberIDNotFound
+			if errors.As(err, &getIDNotFound) && deleted {
+				return nil
+			}
+			return err
+		}
+
+		res := r.GetPayload()
+		if deleted || res.Member.ProvisioningStatus != models.MemberProvisioningStatusACTIVE {
+			return fmt.Errorf("member %s is not active yet", id)
+		}
+		return nil
+	})
 }
 
 func init() {
