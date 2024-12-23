@@ -17,8 +17,10 @@
 package client
 
 import (
+	"errors"
 	"fmt"
 
+	"github.com/apex/log"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
@@ -104,6 +106,9 @@ func (*MonitorCreate) Execute(_ []string) error {
 	if err != nil {
 		return err
 	}
+	if err = waitForActiveMonitor(resp.Payload.Monitor.ID, false); err != nil {
+		log.WithError(err).Error("Failed to wait for monitor to be active")
+	}
 	return WriteTable(resp.GetPayload().Monitor)
 }
 
@@ -125,6 +130,9 @@ func (*MonitorDelete) Execute(_ []string) error {
 
 	if _, err := AndromedaClient.Monitors.DeleteMonitorsMonitorID(params); err != nil {
 		return err
+	}
+	if err := waitForActiveMonitor(MonitorOptions.MonitorDelete.Positional.UUID, true); err != nil {
+		log.WithError(err).Error("Failed to wait for monitor to be deleted")
 	}
 	return nil
 }
@@ -153,7 +161,36 @@ func (*MonitorSet) Execute(_ []string) error {
 	if err != nil {
 		return err
 	}
+	if err = waitForActiveMonitor(MonitorOptions.MonitorSet.Positional.UUID, false); err != nil {
+		log.WithError(err).Error("Failed to wait for monitor to be active")
+	}
 	return WriteTable(resp.GetPayload().Monitor)
+}
+
+// waitForActiveMonitor waits for the monitor to be active, or optionally be deleted
+func waitForActiveMonitor(id strfmt.UUID, deleted bool) error {
+	// if not waiting, return immediately
+	if !opts.Wait {
+		return nil
+	}
+
+	return RetryWithBackoffMax(func() error {
+		params := monitors.NewGetMonitorsMonitorIDParams().WithMonitorID(id)
+		r, err := AndromedaClient.Monitors.GetMonitorsMonitorID(params)
+		if err != nil {
+			var getIDNotFound *monitors.GetMonitorsMonitorIDNotFound
+			if errors.As(err, &getIDNotFound) && deleted {
+				return nil
+			}
+			return err
+		}
+
+		res := r.GetPayload()
+		if deleted || res.Monitor.ProvisioningStatus != models.MonitorProvisioningStatusACTIVE {
+			return fmt.Errorf("monitor %s is not active yet", id)
+		}
+		return nil
+	})
 }
 
 func init() {

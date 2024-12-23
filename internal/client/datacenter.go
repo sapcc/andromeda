@@ -17,6 +17,10 @@
 package client
 
 import (
+	"errors"
+	"fmt"
+
+	"github.com/apex/log"
 	"github.com/go-openapi/strfmt"
 
 	"github.com/sapcc/andromeda/client/datacenters"
@@ -84,6 +88,9 @@ func (*DatacenterCreate) Execute(_ []string) error {
 	if err != nil {
 		return err
 	}
+	if err = waitForActiveDatacenter(resp.Payload.Datacenter.ID, false); err != nil {
+		log.WithError(err).Error("Failed to wait for datacenter to be active")
+	}
 	return WriteTable(resp.GetPayload().Datacenter)
 }
 
@@ -106,7 +113,36 @@ func (*DatacenterDelete) Execute(_ []string) error {
 	if _, err := AndromedaClient.Datacenters.DeleteDatacentersDatacenterID(params); err != nil {
 		return err
 	}
+	if err := waitForActiveDatacenter(DatacenterOptions.DatacenterDelete.Positional.UUID, true); err != nil {
+		log.WithError(err).Error("Failed to wait for datacenter to be deleted")
+	}
 	return nil
+}
+
+// / waitForActiveDatacenter waits for the datacenter to be active, or optionally be deleted
+func waitForActiveDatacenter(id strfmt.UUID, deleted bool) error {
+	// if not waiting, return immediately
+	if !opts.Wait {
+		return nil
+	}
+
+	return RetryWithBackoffMax(func() error {
+		params := datacenters.NewGetDatacentersDatacenterIDParams().WithDatacenterID(id)
+		r, err := AndromedaClient.Datacenters.GetDatacentersDatacenterID(params)
+		if err != nil {
+			var getIDNotFound *datacenters.GetDatacentersDatacenterIDNotFound
+			if errors.As(err, &getIDNotFound) && deleted {
+				return nil
+			}
+			return err
+		}
+
+		res := r.GetPayload()
+		if deleted || res.Datacenter.ProvisioningStatus != models.DatacenterProvisioningStatusACTIVE {
+			return fmt.Errorf("datacenter %s is not active yet", id)
+		}
+		return nil
+	})
 }
 
 func init() {
