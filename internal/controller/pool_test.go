@@ -21,27 +21,41 @@ import (
 	"net/http/httptest"
 
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 
 	"github.com/go-openapi/runtime"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/sapcc/andromeda/models"
 	"github.com/sapcc/andromeda/restapi/operations/pools"
 )
 
-func (t *SuiteTest) createPool() strfmt.UUID {
-	pool := pools.PostPoolsBody{}
-	_ = pool.UnmarshalBinary([]byte(`{ "pool": { "name": "test" } }`))
+func (t *SuiteTest) createPool(domains []strfmt.UUID) strfmt.UUID {
+	pool := pools.PostPoolsBody{
+		Pool: &models.Pool{
+			Name:    swag.String("test"),
+			Domains: domains,
+		},
+	}
 
 	// Write new pool
 	res := t.c.Pools.PostPools(pools.PostPoolsParams{Pool: pool})
 	rr := httptest.NewRecorder()
 	res.WriteResponse(rr, runtime.JSONProducer())
-	assert.Equal(t.T(), rr.Code, http.StatusCreated, rr.Body)
+	assert.Equal(t.T(), http.StatusCreated, rr.Code, rr.Body)
 
 	poolResponse := pools.GetPoolsPoolIDOKBody{}
 	_ = poolResponse.UnmarshalBinary(rr.Body.Bytes())
 	assert.Equal(t.T(), "test", *poolResponse.Pool.Name, rr.Body)
 	return poolResponse.Pool.ID
+}
+
+// cleanupPools deletes all pools from database
+func (t *SuiteTest) cleanupPools() {
+	_, err := t.db.Exec("DELETE FROM pool")
+	if err != nil {
+		t.FailNow(err.Error())
+	}
 }
 
 func (t *SuiteTest) TestPools() {
@@ -52,16 +66,16 @@ func (t *SuiteTest) TestPools() {
 
 	res := pc.GetPoolsPoolID(pools.GetPoolsPoolIDParams{PoolID: "test123"})
 	res.WriteResponse(rr, runtime.JSONProducer())
-	assert.Equal(t.T(), rr.Code, http.StatusNotFound, rr.Body)
+	assert.Equal(t.T(), http.StatusNotFound, rr.Code, rr.Body)
 
 	// Write new pool
-	poolID := t.createPool()
+	poolID := t.createPool(nil)
 
 	// Get all pools
 	res = pc.GetPools(pools.GetPoolsParams{})
 	rr = httptest.NewRecorder()
 	res.WriteResponse(rr, runtime.JSONProducer())
-	assert.Equal(t.T(), rr.Code, http.StatusOK, rr.Body)
+	assert.Equal(t.T(), http.StatusOK, rr.Code, rr.Body)
 
 	poolsResponse := pools.GetPoolsOKBody{}
 	_ = poolsResponse.UnmarshalBinary(rr.Body.Bytes())
@@ -73,10 +87,36 @@ func (t *SuiteTest) TestPools() {
 	res = pc.GetPoolsPoolID(pools.GetPoolsPoolIDParams{PoolID: poolID})
 	rr = httptest.NewRecorder()
 	res.WriteResponse(rr, runtime.JSONProducer())
-	assert.Equal(t.T(), rr.Code, http.StatusOK, rr.Body)
+	assert.Equal(t.T(), http.StatusOK, rr.Code, rr.Body)
 
 	// cleanup pool
 	if _, err := t.db.Exec("DELETE FROM pool"); err != nil {
 		t.FailNow(err.Error())
 	}
+}
+
+func (t *SuiteTest) TestPoolImmutable() {
+	rr := httptest.NewRecorder()
+
+	// Handy alias for controller instance
+	pc := t.c.Pools
+
+	domainID := t.createDomain()
+
+	// Write new pool
+	poolID := t.createPool([]strfmt.UUID{domainID})
+
+	defer t.cleanupPools()
+	defer t.cleanupDomains()
+
+	// Update pool
+	pool := pools.PutPoolsPoolIDBody{
+		Pool: &models.Pool{
+			Name: swag.String("test2"),
+		},
+	}
+	res := pc.PutPoolsPoolID(pools.PutPoolsPoolIDParams{PoolID: poolID, Pool: pool})
+	rr = httptest.NewRecorder()
+	res.WriteResponse(rr, runtime.JSONProducer())
+	assert.Equal(t.T(), http.StatusConflict, rr.Code, rr.Body)
 }

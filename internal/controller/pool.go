@@ -32,6 +32,10 @@ import (
 	"github.com/sapcc/andromeda/restapi/operations/pools"
 )
 
+var (
+	errPoolImmutable = errors.New("pool is immutable")
+)
+
 type PoolController struct {
 	CommonController
 }
@@ -165,7 +169,7 @@ func (c PoolController) GetPoolsPoolID(params pools.GetPoolsPoolIDParams) middle
 func (c PoolController) PutPoolsPoolID(params pools.PutPoolsPoolIDParams) middleware.Responder {
 	//zero-length slice used because we want [] via json encoder, nil encodes null
 	pool := models.Pool{ID: params.PoolID, Members: []strfmt.UUID{}, Domains: []strfmt.UUID{}}
-	if err := PopulatePool(c.db, &pool, []string{"id", "project_id"}, false); err != nil {
+	if err := PopulatePool(c.db, &pool, []string{"id", "project_id"}, true); err != nil {
 		return pools.NewPutPoolsPoolIDNotFound().WithPayload(utils.NotFound)
 	}
 	requestVars := map[string]string{"project_id": *pool.ProjectID}
@@ -174,6 +178,13 @@ func (c PoolController) PutPoolsPoolID(params pools.PutPoolsPoolIDParams) middle
 	}
 
 	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
+		if pool.Domains != nil {
+			// Check if domains are in progress of being updated
+			if isPoolImmutable(&pool, tx) {
+				return errPoolImmutable
+			}
+		}
+
 		// Populate args
 		if params.Pool.Pool.Domains != nil {
 			var existingDomainRefs []strfmt.UUID
@@ -210,6 +221,9 @@ func (c PoolController) PutPoolsPoolID(params pools.PutPoolsPoolIDParams) middle
 
 		return UpdateCascadePool(tx, params.PoolID, "PENDING_UPDATE")
 	}); err != nil {
+		if errors.Is(err, errPoolImmutable) {
+			return pools.NewPutPoolsPoolIDConflict().WithPayload(utils.GetErrorImmutable("pool", "domains"))
+		}
 		panic(err)
 	}
 
@@ -235,6 +249,10 @@ func (c PoolController) DeletePoolsPoolID(params pools.DeletePoolsPoolIDParams) 
 	}
 
 	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
+		if isPoolImmutable(&pool, tx) {
+			return errPoolImmutable
+		}
+
 		if len(pool.Domains) > 0 {
 			return UpdateCascadePool(tx, params.PoolID, "PENDING_DELETE")
 		}
@@ -242,11 +260,45 @@ func (c PoolController) DeletePoolsPoolID(params pools.DeletePoolsPoolIDParams) 
 		_, err := tx.Exec(tx.Rebind(`DELETE FROM pool WHERE id = ?`), params.PoolID)
 		return err
 	}); err != nil {
+		if errors.Is(err, errPoolImmutable) {
+			return pools.NewDeletePoolsPoolIDConflict().WithPayload(
+				utils.GetErrorImmutable("pool", "domains"))
+		}
 		panic(err)
 	}
 
 	_ = PendingSync(c.rpc)
 	return pools.NewDeletePoolsPoolIDNoContent()
+}
+
+// isPoolImmutable checks if a pool is immutable because related domains are being updated/deleted.
+// Should be called with a fully populated pool model instance.
+func isPoolImmutable(pool *models.Pool, tx *sqlx.Tx) bool {
+	// sqlx.In does not support []strfmt.UUID, so we convert to []string
+	var domains = make([]string, 0, len(pool.Domains))
+	for _, domain := range pool.Domains {
+		domains = append(domains, domain.String())
+	}
+
+	// Check if related domains are in progress of being updated/deleted
+	query := `SELECT count(id) FROM domain WHERE provisioning_status != 'ACTIVE' AND id IN (?)`
+	sql, args, err := sqlx.In(query, domains)
+	if err != nil {
+		panic(err)
+	}
+
+	var countNonActive int
+	rows, err := tx.Query(tx.Rebind(sql), args...)
+	if err != nil {
+		panic(err)
+	}
+	for rows.Next() {
+		if err = rows.Scan(&countNonActive); err != nil {
+			panic(err)
+		}
+	}
+
+	return countNonActive > 0
 }
 
 // PopulatePoolMembers populates a pool instance with associated members

@@ -243,7 +243,7 @@ func (c GeoMapController) DeleteGeomapsGeoMapID(params geographic_maps.DeleteGeo
 	return geographic_maps.NewDeleteGeomapsGeomapIDNoContent()
 }
 
-// PopulateDomainPools populates a domain instance with associated pools
+// PopulateGeoMapAssignments populates a domain instance with associated pools
 func PopulateGeoMapAssignments(db *sqlx.DB, geomap *models.Geomap) error {
 	// Get pool_ids associated
 	sql := db.Rebind(`SELECT datacenter, country FROM geographic_map_assignment WHERE geographic_map_id = ?`)

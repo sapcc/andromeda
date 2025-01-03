@@ -59,6 +59,12 @@ func (o *PutDomainsDomainIDReader) ReadResponse(response runtime.ClientResponse,
 			return nil, err
 		}
 		return nil, result
+	case 409:
+		result := NewPutDomainsDomainIDConflict()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	default:
 		result := NewPutDomainsDomainIDDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -264,6 +270,74 @@ func (o *PutDomainsDomainIDNotFound) GetPayload() *models.Error {
 }
 
 func (o *PutDomainsDomainIDNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.Error)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewPutDomainsDomainIDConflict creates a PutDomainsDomainIDConflict with default headers values
+func NewPutDomainsDomainIDConflict() *PutDomainsDomainIDConflict {
+	return &PutDomainsDomainIDConflict{}
+}
+
+/*
+PutDomainsDomainIDConflict describes a response with status code 409, with default header values.
+
+Conflict
+*/
+type PutDomainsDomainIDConflict struct {
+	Payload *models.Error
+}
+
+// IsSuccess returns true when this put domains domain Id conflict response has a 2xx status code
+func (o *PutDomainsDomainIDConflict) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this put domains domain Id conflict response has a 3xx status code
+func (o *PutDomainsDomainIDConflict) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this put domains domain Id conflict response has a 4xx status code
+func (o *PutDomainsDomainIDConflict) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this put domains domain Id conflict response has a 5xx status code
+func (o *PutDomainsDomainIDConflict) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this put domains domain Id conflict response a status code equal to that given
+func (o *PutDomainsDomainIDConflict) IsCode(code int) bool {
+	return code == 409
+}
+
+// Code gets the status code for the put domains domain Id conflict response
+func (o *PutDomainsDomainIDConflict) Code() int {
+	return 409
+}
+
+func (o *PutDomainsDomainIDConflict) Error() string {
+	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdConflict  %+v", 409, o.Payload)
+}
+
+func (o *PutDomainsDomainIDConflict) String() string {
+	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdConflict  %+v", 409, o.Payload)
+}
+
+func (o *PutDomainsDomainIDConflict) GetPayload() *models.Error {
+	return o.Payload
+}
+
+func (o *PutDomainsDomainIDConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.Error)
 

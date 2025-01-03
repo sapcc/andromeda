@@ -117,6 +117,51 @@ func (o *PutPoolsPoolIDNotFound) WriteResponse(rw http.ResponseWriter, producer 
 	}
 }
 
+// PutPoolsPoolIDConflictCode is the HTTP code returned for type PutPoolsPoolIDConflict
+const PutPoolsPoolIDConflictCode int = 409
+
+/*
+PutPoolsPoolIDConflict Conflict
+
+swagger:response putPoolsPoolIdConflict
+*/
+type PutPoolsPoolIDConflict struct {
+
+	/*
+	  In: Body
+	*/
+	Payload *models.Error `json:"body,omitempty"`
+}
+
+// NewPutPoolsPoolIDConflict creates PutPoolsPoolIDConflict with default headers values
+func NewPutPoolsPoolIDConflict() *PutPoolsPoolIDConflict {
+
+	return &PutPoolsPoolIDConflict{}
+}
+
+// WithPayload adds the payload to the put pools pool Id conflict response
+func (o *PutPoolsPoolIDConflict) WithPayload(payload *models.Error) *PutPoolsPoolIDConflict {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the put pools pool Id conflict response
+func (o *PutPoolsPoolIDConflict) SetPayload(payload *models.Error) {
+	o.Payload = payload
+}
+
+// WriteResponse to the client
+func (o *PutPoolsPoolIDConflict) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.WriteHeader(409)
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
+	}
+}
+
 /*
 PutPoolsPoolIDDefault Unexpected Error
 

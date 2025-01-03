@@ -97,6 +97,51 @@ func (o *DeletePoolsPoolIDNotFound) WriteResponse(rw http.ResponseWriter, produc
 	}
 }
 
+// DeletePoolsPoolIDConflictCode is the HTTP code returned for type DeletePoolsPoolIDConflict
+const DeletePoolsPoolIDConflictCode int = 409
+
+/*
+DeletePoolsPoolIDConflict Conflict
+
+swagger:response deletePoolsPoolIdConflict
+*/
+type DeletePoolsPoolIDConflict struct {
+
+	/*
+	  In: Body
+	*/
+	Payload *models.Error `json:"body,omitempty"`
+}
+
+// NewDeletePoolsPoolIDConflict creates DeletePoolsPoolIDConflict with default headers values
+func NewDeletePoolsPoolIDConflict() *DeletePoolsPoolIDConflict {
+
+	return &DeletePoolsPoolIDConflict{}
+}
+
+// WithPayload adds the payload to the delete pools pool Id conflict response
+func (o *DeletePoolsPoolIDConflict) WithPayload(payload *models.Error) *DeletePoolsPoolIDConflict {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the delete pools pool Id conflict response
+func (o *DeletePoolsPoolIDConflict) SetPayload(payload *models.Error) {
+	o.Payload = payload
+}
+
+// WriteResponse to the client
+func (o *DeletePoolsPoolIDConflict) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.WriteHeader(409)
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
+	}
+}
+
 /*
 DeletePoolsPoolIDDefault Unexpected Error
 

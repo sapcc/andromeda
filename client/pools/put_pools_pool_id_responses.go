@@ -53,6 +53,12 @@ func (o *PutPoolsPoolIDReader) ReadResponse(response runtime.ClientResponse, con
 			return nil, err
 		}
 		return nil, result
+	case 409:
+		result := NewPutPoolsPoolIDConflict()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	default:
 		result := NewPutPoolsPoolIDDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -190,6 +196,74 @@ func (o *PutPoolsPoolIDNotFound) GetPayload() *models.Error {
 }
 
 func (o *PutPoolsPoolIDNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.Error)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewPutPoolsPoolIDConflict creates a PutPoolsPoolIDConflict with default headers values
+func NewPutPoolsPoolIDConflict() *PutPoolsPoolIDConflict {
+	return &PutPoolsPoolIDConflict{}
+}
+
+/*
+PutPoolsPoolIDConflict describes a response with status code 409, with default header values.
+
+Conflict
+*/
+type PutPoolsPoolIDConflict struct {
+	Payload *models.Error
+}
+
+// IsSuccess returns true when this put pools pool Id conflict response has a 2xx status code
+func (o *PutPoolsPoolIDConflict) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this put pools pool Id conflict response has a 3xx status code
+func (o *PutPoolsPoolIDConflict) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this put pools pool Id conflict response has a 4xx status code
+func (o *PutPoolsPoolIDConflict) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this put pools pool Id conflict response has a 5xx status code
+func (o *PutPoolsPoolIDConflict) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this put pools pool Id conflict response a status code equal to that given
+func (o *PutPoolsPoolIDConflict) IsCode(code int) bool {
+	return code == 409
+}
+
+// Code gets the status code for the put pools pool Id conflict response
+func (o *PutPoolsPoolIDConflict) Code() int {
+	return 409
+}
+
+func (o *PutPoolsPoolIDConflict) Error() string {
+	return fmt.Sprintf("[PUT /pools/{pool_id}][%d] putPoolsPoolIdConflict  %+v", 409, o.Payload)
+}
+
+func (o *PutPoolsPoolIDConflict) String() string {
+	return fmt.Sprintf("[PUT /pools/{pool_id}][%d] putPoolsPoolIdConflict  %+v", 409, o.Payload)
+}
+
+func (o *PutPoolsPoolIDConflict) GetPayload() *models.Error {
+	return o.Payload
+}
+
+func (o *PutPoolsPoolIDConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.Error)
 

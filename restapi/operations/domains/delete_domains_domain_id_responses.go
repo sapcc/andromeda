@@ -97,6 +97,51 @@ func (o *DeleteDomainsDomainIDNotFound) WriteResponse(rw http.ResponseWriter, pr
 	}
 }
 
+// DeleteDomainsDomainIDConflictCode is the HTTP code returned for type DeleteDomainsDomainIDConflict
+const DeleteDomainsDomainIDConflictCode int = 409
+
+/*
+DeleteDomainsDomainIDConflict Conflict
+
+swagger:response deleteDomainsDomainIdConflict
+*/
+type DeleteDomainsDomainIDConflict struct {
+
+	/*
+	  In: Body
+	*/
+	Payload *models.Error `json:"body,omitempty"`
+}
+
+// NewDeleteDomainsDomainIDConflict creates DeleteDomainsDomainIDConflict with default headers values
+func NewDeleteDomainsDomainIDConflict() *DeleteDomainsDomainIDConflict {
+
+	return &DeleteDomainsDomainIDConflict{}
+}
+
+// WithPayload adds the payload to the delete domains domain Id conflict response
+func (o *DeleteDomainsDomainIDConflict) WithPayload(payload *models.Error) *DeleteDomainsDomainIDConflict {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the delete domains domain Id conflict response
+func (o *DeleteDomainsDomainIDConflict) SetPayload(payload *models.Error) {
+	o.Payload = payload
+}
+
+// WriteResponse to the client
+func (o *DeleteDomainsDomainIDConflict) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.WriteHeader(409)
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
+	}
+}
+
 /*
 DeleteDomainsDomainIDDefault Unexpected Error
 

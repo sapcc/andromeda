@@ -30,7 +30,7 @@ func (t *SuiteTest) TestMembers() {
 	mc := t.c.Members
 	rr := httptest.NewRecorder()
 
-	poolID := t.createPool()
+	poolID := t.createPool(nil)
 	res := mc.GetMembersMemberID(members.GetMembersMemberIDParams{
 		MemberID: "test123",
 	})

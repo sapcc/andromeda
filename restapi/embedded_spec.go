@@ -476,6 +476,12 @@ func init() {
               "$ref": "#/definitions/error"
             }
           },
+          "409": {
+            "description": "Conflict",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
           "default": {
             "description": "Unexpected Error",
             "schema": {
@@ -496,6 +502,12 @@ func init() {
           },
           "404": {
             "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "409": {
+            "description": "Conflict",
             "schema": {
               "$ref": "#/definitions/error"
             }
@@ -1464,6 +1476,12 @@ func init() {
               "$ref": "#/definitions/error"
             }
           },
+          "409": {
+            "description": "Conflict",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
           "default": {
             "description": "Unexpected Error",
             "schema": {
@@ -1484,6 +1502,12 @@ func init() {
           },
           "404": {
             "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "409": {
+            "description": "Conflict",
             "schema": {
               "$ref": "#/definitions/error"
             }
@@ -3121,6 +3145,12 @@ func init() {
               "$ref": "#/definitions/error"
             }
           },
+          "409": {
+            "description": "Conflict",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
           "default": {
             "description": "Unexpected Error",
             "schema": {
@@ -3141,6 +3171,12 @@ func init() {
           },
           "404": {
             "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "409": {
+            "description": "Conflict",
             "schema": {
               "$ref": "#/definitions/error"
             }
@@ -4161,6 +4197,12 @@ func init() {
               "$ref": "#/definitions/error"
             }
           },
+          "409": {
+            "description": "Conflict",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
           "default": {
             "description": "Unexpected Error",
             "schema": {
@@ -4181,6 +4223,12 @@ func init() {
           },
           "404": {
             "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "409": {
+            "description": "Conflict",
             "schema": {
               "$ref": "#/definitions/error"
             }

@@ -34,7 +34,7 @@ func (t *SuiteTest) TestMonitors() {
 	mc := t.c.Monitors
 	rr := httptest.NewRecorder()
 
-	poolID := t.createPool()
+	poolID := t.createPool(nil)
 	res := mc.GetMonitorsMonitorID(monitors.GetMonitorsMonitorIDParams{
 		MonitorID: "test123",
 	})

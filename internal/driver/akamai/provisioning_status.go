@@ -33,6 +33,7 @@ import (
 
 type ProvRequests []*server.ProvisioningStatusRequest_ProvisioningStatus
 
+// CascadeUpdateDomainProvisioningStatus updates the provisioning status of a domain and its related objects
 func (s *AkamaiAgent) CascadeUpdateDomainProvisioningStatus(domain *rpcmodels.Domain, value string) ProvRequests {
 	var provisioningStatusRequests ProvRequests
 

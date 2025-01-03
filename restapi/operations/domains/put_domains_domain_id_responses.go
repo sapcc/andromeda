@@ -162,6 +162,51 @@ func (o *PutDomainsDomainIDNotFound) WriteResponse(rw http.ResponseWriter, produ
 	}
 }
 
+// PutDomainsDomainIDConflictCode is the HTTP code returned for type PutDomainsDomainIDConflict
+const PutDomainsDomainIDConflictCode int = 409
+
+/*
+PutDomainsDomainIDConflict Conflict
+
+swagger:response putDomainsDomainIdConflict
+*/
+type PutDomainsDomainIDConflict struct {
+
+	/*
+	  In: Body
+	*/
+	Payload *models.Error `json:"body,omitempty"`
+}
+
+// NewPutDomainsDomainIDConflict creates PutDomainsDomainIDConflict with default headers values
+func NewPutDomainsDomainIDConflict() *PutDomainsDomainIDConflict {
+
+	return &PutDomainsDomainIDConflict{}
+}
+
+// WithPayload adds the payload to the put domains domain Id conflict response
+func (o *PutDomainsDomainIDConflict) WithPayload(payload *models.Error) *PutDomainsDomainIDConflict {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the put domains domain Id conflict response
+func (o *PutDomainsDomainIDConflict) SetPayload(payload *models.Error) {
+	o.Payload = payload
+}
+
+// WriteResponse to the client
+func (o *PutDomainsDomainIDConflict) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.WriteHeader(409)
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
+	}
+}
+
 /*
 PutDomainsDomainIDDefault Unexpected Error
 

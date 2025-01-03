@@ -63,6 +63,12 @@ func GetErrorPoolHasAlreadyAMonitor(poolID *strfmt.UUID) *models.Error {
 		"invalid value for 'pool_id': Pool '%s' already has a monitor", poolID)}
 }
 
+func GetErrorImmutable(self string, related string) *models.Error {
+	return &models.Error{Code: 409, Message: fmt.Sprintf(
+		"%s is currently immutable due to ongoing operations on related %s", self, related)}
+
+}
+
 type ResourcesNotFoundError struct {
 	Ids      []strfmt.UUID
 	Resource string
