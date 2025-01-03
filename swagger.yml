@@ -170,6 +170,10 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/error'
+        409:
+          description: Conflict
+          schema:
+              $ref: '#/definitions/error'
         default:
           description: Unexpected Error
           schema:
@@ -185,6 +189,10 @@ paths:
           description: Resource successfully deleted.
         404:
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        409:
+          description: Conflict
           schema:
             $ref: '#/definitions/error'
         default:
@@ -332,6 +340,10 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/error'
+        409:
+          description: Conflict
+          schema:
+            $ref: '#/definitions/error'
         default:
           description: Unexpected Error
           schema:
@@ -347,6 +359,10 @@ paths:
           description: Resource successfully deleted.
         404:
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        409:
+          description: Conflict
           schema:
             $ref: '#/definitions/error'
         default:
