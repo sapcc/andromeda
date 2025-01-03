@@ -20,7 +20,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/apex/log"
 	"github.com/go-openapi/strfmt"
 
 	"github.com/sapcc/andromeda/client/pools"
@@ -83,7 +82,7 @@ func (*PoolCreate) Execute(_ []string) error {
 		return err
 	}
 	if err = waitForActivePool(resp.Payload.Pool.ID, false); err != nil {
-		log.WithError(err).Error("Failed to wait for pool to be active")
+		return fmt.Errorf("failed to wait for pool %s to be active", resp.Payload.Pool.ID)
 	}
 	return WriteTable(resp.GetPayload().Pool)
 }
@@ -108,7 +107,7 @@ func (*PoolDelete) Execute(_ []string) error {
 		return err
 	}
 	if err := waitForActivePool(PoolOptions.PoolDelete.Positional.UUID, true); err != nil {
-		log.WithError(err).Error("Failed to wait for pool to be deleted")
+		return fmt.Errorf("failed to wait for pool %s to be deleted", PoolOptions.PoolDelete.Positional.UUID)
 	}
 	return nil
 }

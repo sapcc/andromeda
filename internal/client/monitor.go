@@ -20,7 +20,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/apex/log"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
@@ -107,7 +106,7 @@ func (*MonitorCreate) Execute(_ []string) error {
 		return err
 	}
 	if err = waitForActiveMonitor(resp.Payload.Monitor.ID, false); err != nil {
-		log.WithError(err).Error("Failed to wait for monitor to be active")
+		return fmt.Errorf("failed to wait for monitor %s to be active", resp.Payload.Monitor.ID)
 	}
 	return WriteTable(resp.GetPayload().Monitor)
 }
@@ -132,7 +131,8 @@ func (*MonitorDelete) Execute(_ []string) error {
 		return err
 	}
 	if err := waitForActiveMonitor(MonitorOptions.MonitorDelete.Positional.UUID, true); err != nil {
-		log.WithError(err).Error("Failed to wait for monitor to be deleted")
+		return fmt.Errorf("failed to wait for monitor %s to be deleted",
+			MonitorOptions.MonitorDelete.Positional.UUID)
 	}
 	return nil
 }
@@ -162,7 +162,8 @@ func (*MonitorSet) Execute(_ []string) error {
 		return err
 	}
 	if err = waitForActiveMonitor(MonitorOptions.MonitorSet.Positional.UUID, false); err != nil {
-		log.WithError(err).Error("Failed to wait for monitor to be active")
+		return fmt.Errorf("failed to wait for monitor %s to be active",
+			MonitorOptions.MonitorSet.Positional.UUID)
 	}
 	return WriteTable(resp.GetPayload().Monitor)
 }
