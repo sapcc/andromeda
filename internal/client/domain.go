@@ -20,7 +20,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/apex/log"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
@@ -130,7 +129,7 @@ func (*DomainDelete) Execute(_ []string) error {
 		return err
 	}
 	if err := waitForActiveDomain(DomainOptions.DomainDelete.Positional.UUID, true); err != nil {
-		log.WithError(err).Error("Failed to wait for domain to be deleted")
+		return fmt.Errorf("failed to wait for domain %s to be deleted", DomainOptions.DomainDelete.Positional.UUID)
 	}
 	return nil
 }
@@ -176,7 +175,7 @@ func (*DomainSet) Execute(_ []string) error {
 		return err
 	}
 	if err = waitForActiveDomain(DomainOptions.DomainSet.Positional.UUID, false); err != nil {
-		log.WithError(err).Error("Failed to wait for domain to be active")
+		return fmt.Errorf("failed to wait for domain %s to be active", DomainOptions.DomainSet.Positional.UUID)
 	}
 	return WriteTable(resp.GetPayload().Domain)
 }

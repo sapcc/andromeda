@@ -20,7 +20,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/apex/log"
 	"github.com/go-openapi/strfmt"
 
 	"github.com/sapcc/andromeda/client/datacenters"
@@ -89,7 +88,7 @@ func (*DatacenterCreate) Execute(_ []string) error {
 		return err
 	}
 	if err = waitForActiveDatacenter(resp.Payload.Datacenter.ID, false); err != nil {
-		log.WithError(err).Error("Failed to wait for datacenter to be active")
+		return fmt.Errorf("failed to wait for datacenter %s to be active", resp.Payload.Datacenter.ID)
 	}
 	return WriteTable(resp.GetPayload().Datacenter)
 }
@@ -114,7 +113,8 @@ func (*DatacenterDelete) Execute(_ []string) error {
 		return err
 	}
 	if err := waitForActiveDatacenter(DatacenterOptions.DatacenterDelete.Positional.UUID, true); err != nil {
-		log.WithError(err).Error("Failed to wait for datacenter to be deleted")
+		return fmt.Errorf("failed to wait for datacenter %s to be active",
+			DatacenterOptions.DatacenterDelete.Positional.UUID)
 	}
 	return nil
 }

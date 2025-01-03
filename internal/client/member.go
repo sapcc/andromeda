@@ -20,7 +20,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/apex/log"
 	"github.com/go-openapi/strfmt"
 
 	"github.com/sapcc/andromeda/client/members"
@@ -101,7 +100,7 @@ func (*MemberCreate) Execute(_ []string) error {
 		return err
 	}
 	if err = waitForActiveMember(resp.GetPayload().Member.ID, false); err != nil {
-		log.WithError(err).Error("Failed to wait for member to be active")
+		return fmt.Errorf("failed to wait for member %s to be active", resp.GetPayload().Member.ID)
 	}
 	return WriteTable(resp.GetPayload().Member)
 }
@@ -126,7 +125,8 @@ func (*MemberDelete) Execute(_ []string) error {
 		return err
 	}
 	if err := waitForActiveMember(MemberOptions.MemberDelete.PositionalMemberDelete.UUID, true); err != nil {
-		log.WithError(err).Error("Failed to wait for member to be deleted")
+		return fmt.Errorf("failed to wait for member %s to be deleted",
+			MemberOptions.MemberDelete.PositionalMemberDelete.UUID)
 	}
 	return nil
 }
@@ -159,7 +159,8 @@ func (*MemberSet) Execute(_ []string) error {
 		return err
 	}
 	if err = waitForActiveMember(MemberOptions.MemberSet.PositionalMemberSet.UUID, false); err != nil {
-		log.WithError(err).Error("Failed to wait for member to be active")
+		return fmt.Errorf("failed to wait for member %s to be active",
+			MemberOptions.MemberSet.PositionalMemberSet.UUID)
 	}
 	return WriteTable(resp.GetPayload().Member)
 }

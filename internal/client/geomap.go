@@ -20,7 +20,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/apex/log"
 	"github.com/go-openapi/strfmt"
 
 	"github.com/sapcc/andromeda/client/geographic_maps"
@@ -92,7 +91,7 @@ func (*GeomapCreate) Execute(_ []string) error {
 		return err
 	}
 	if err = waitForActiveGeomap(resp.Payload.Geomap.ID, false); err != nil {
-		log.WithError(err).Error("Failed to wait for geomap to be active")
+		return fmt.Errorf("failed to wait for geomap %s to be active", resp.Payload.Geomap.ID)
 	}
 	return WriteTable(resp.GetPayload().Geomap)
 }
@@ -117,7 +116,8 @@ func (*GeomapDelete) Execute(_ []string) error {
 		return err
 	}
 	if err := waitForActiveGeomap(GeomapOptions.GeomapDelete.Positional.UUID, true); err != nil {
-		log.WithError(err).Error("Failed to wait for geomap to be deleted")
+		return fmt.Errorf("failed to wait for geomap %s to be deleted",
+			GeomapOptions.GeomapDelete.Positional.UUID)
 	}
 	return nil
 }
