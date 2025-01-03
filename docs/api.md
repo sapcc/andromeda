@@ -200,6 +200,7 @@ DELETE /v1/domains/{domain_id}
 |------|--------|-------------|:-----------:|--------|
 | [204](#delete-domains-domain-id-204) | No Content | Resource successfully deleted. |  | [schema](#delete-domains-domain-id-204-schema) |
 | [404](#delete-domains-domain-id-404) | Not Found | Not Found |  | [schema](#delete-domains-domain-id-404-schema) |
+| [409](#delete-domains-domain-id-409) | Conflict | Conflict |  | [schema](#delete-domains-domain-id-409-schema) |
 | [default](#delete-domains-domain-id-default) | | Unexpected Error |  | [schema](#delete-domains-domain-id-default-schema) |
 
 #### Responses
@@ -214,6 +215,15 @@ Status: No Content
 Status: Not Found
 
 ###### <span id="delete-domains-domain-id-404-schema"></span> Schema
+   
+  
+
+[Error](#error)
+
+##### <span id="delete-domains-domain-id-409"></span> 409 - Conflict
+Status: Conflict
+
+###### <span id="delete-domains-domain-id-409-schema"></span> Schema
    
   
 
@@ -380,6 +390,7 @@ DELETE /v1/pools/{pool_id}
 |------|--------|-------------|:-----------:|--------|
 | [204](#delete-pools-pool-id-204) | No Content | Resource successfully deleted. |  | [schema](#delete-pools-pool-id-204-schema) |
 | [404](#delete-pools-pool-id-404) | Not Found | Not Found |  | [schema](#delete-pools-pool-id-404-schema) |
+| [409](#delete-pools-pool-id-409) | Conflict | Conflict |  | [schema](#delete-pools-pool-id-409-schema) |
 | [default](#delete-pools-pool-id-default) | | Unexpected Error |  | [schema](#delete-pools-pool-id-default-schema) |
 
 #### Responses
@@ -394,6 +405,15 @@ Status: No Content
 Status: Not Found
 
 ###### <span id="delete-pools-pool-id-404-schema"></span> Schema
+   
+  
+
+[Error](#error)
+
+##### <span id="delete-pools-pool-id-409"></span> 409 - Conflict
+Status: Conflict
+
+###### <span id="delete-pools-pool-id-409-schema"></span> Schema
    
   
 
@@ -2187,6 +2207,7 @@ PUT /v1/domains/{domain_id}
 | [202](#put-domains-domain-id-202) | Accepted | Updated domain. |  | [schema](#put-domains-domain-id-202-schema) |
 | [400](#put-domains-domain-id-400) | Bad Request | Bad request |  | [schema](#put-domains-domain-id-400-schema) |
 | [404](#put-domains-domain-id-404) | Not Found | Not Found |  | [schema](#put-domains-domain-id-404-schema) |
+| [409](#put-domains-domain-id-409) | Conflict | Conflict |  | [schema](#put-domains-domain-id-409-schema) |
 | [default](#put-domains-domain-id-default) | | Unexpected Error |  | [schema](#put-domains-domain-id-default-schema) |
 
 #### Responses
@@ -2214,6 +2235,15 @@ Status: Bad Request
 Status: Not Found
 
 ###### <span id="put-domains-domain-id-404-schema"></span> Schema
+   
+  
+
+[Error](#error)
+
+##### <span id="put-domains-domain-id-409"></span> 409 - Conflict
+Status: Conflict
+
+###### <span id="put-domains-domain-id-409-schema"></span> Schema
    
   
 
@@ -2554,6 +2584,7 @@ PUT /v1/pools/{pool_id}
 |------|--------|-------------|:-----------:|--------|
 | [202](#put-pools-pool-id-202) | Accepted | Updated pool. |  | [schema](#put-pools-pool-id-202-schema) |
 | [404](#put-pools-pool-id-404) | Not Found | Not Found |  | [schema](#put-pools-pool-id-404-schema) |
+| [409](#put-pools-pool-id-409) | Conflict | Conflict |  | [schema](#put-pools-pool-id-409-schema) |
 | [default](#put-pools-pool-id-default) | | Unexpected Error |  | [schema](#put-pools-pool-id-default-schema) |
 
 #### Responses
@@ -2572,6 +2603,15 @@ Status: Accepted
 Status: Not Found
 
 ###### <span id="put-pools-pool-id-404-schema"></span> Schema
+   
+  
+
+[Error](#error)
+
+##### <span id="put-pools-pool-id-409"></span> 409 - Conflict
+Status: Conflict
+
+###### <span id="put-pools-pool-id-409-schema"></span> Schema
    
   
 
