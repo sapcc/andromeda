@@ -59,12 +59,11 @@ func (t *SuiteTest) cleanupPools() {
 }
 
 func (t *SuiteTest) TestPools() {
-	rr := httptest.NewRecorder()
-
 	// Handy alias for controller instance
 	pc := t.c.Pools
 
 	res := pc.GetPoolsPoolID(pools.GetPoolsPoolIDParams{PoolID: "test123"})
+	rr := httptest.NewRecorder()
 	res.WriteResponse(rr, runtime.JSONProducer())
 	assert.Equal(t.T(), http.StatusNotFound, rr.Code, rr.Body)
 
@@ -96,8 +95,6 @@ func (t *SuiteTest) TestPools() {
 }
 
 func (t *SuiteTest) TestPoolImmutable() {
-	rr := httptest.NewRecorder()
-
 	// Handy alias for controller instance
 	pc := t.c.Pools
 
@@ -116,7 +113,7 @@ func (t *SuiteTest) TestPoolImmutable() {
 		},
 	}
 	res := pc.PutPoolsPoolID(pools.PutPoolsPoolIDParams{PoolID: poolID, Pool: pool})
-	rr = httptest.NewRecorder()
+	rr := httptest.NewRecorder()
 	res.WriteResponse(rr, runtime.JSONProducer())
 	assert.Equal(t.T(), http.StatusConflict, rr.Code, rr.Body)
 }
