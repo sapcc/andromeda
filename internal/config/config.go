@@ -135,6 +135,16 @@ func parseConfigFlags(flags []string) error {
 		log.Info("Sentry is enabled")
 	}
 
+	// Set transport URL from env if not set in config file
+	if Global.Audit.TransportURL == "" {
+		Global.Audit.TransportURL = os.Getenv("AUDIT_TRANSPORT_URL")
+	}
+
+	// Set Database Connection URL from env if not set in config file
+	if Global.Database.Connection == "" {
+		Global.Database.Connection = os.Getenv("DATABASE_CONNECTION")
+	}
+
 	return nil
 }
 
