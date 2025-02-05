@@ -34,6 +34,7 @@ message Datacenter {
   string scope = 10;
   string provider = 11;
   int32 meta = 12;
+  string project_id = 13;
 }
 
 message GeomapAssignment {
