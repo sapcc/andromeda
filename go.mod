@@ -12,7 +12,7 @@ require (
 	github.com/actatum/stormrpc v0.4.2
 	github.com/akamai/AkamaiOPEN-edgegrid-golang/v9 v9.1.0
 	github.com/apex/log v1.9.0
-	github.com/cockroachdb/cockroach-go/v2 v2.3.8
+	github.com/cockroachdb/cockroach-go/v2 v2.4.0
 	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/dlmiddlecote/sqlstats v1.0.2
 	github.com/dre1080/recovr v1.0.3
