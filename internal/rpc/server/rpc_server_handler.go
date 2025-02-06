@@ -25,7 +25,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/apex/log"
 	"github.com/go-openapi/strfmt"
-
 	"github.com/jmoiron/sqlx"
 
 	"github.com/sapcc/andromeda/db"
@@ -110,7 +109,7 @@ func (u *RPCHandler) GetPools(ctx context.Context, request *SearchRequest) (*Poo
 func (u *RPCHandler) GetDatacenters(ctx context.Context, request *SearchRequest) (*DatacentersResponse, error) {
 	q := sq.
 		Select("id", "admin_state_up", "city", "state_or_province", "continent", "country", "latitude",
-			"longitude", "scope", "provisioning_status", "provider", "meta").
+			"longitude", "scope", "provisioning_status", "provider", "meta", "project_id").
 		From("datacenter").
 		Where("provider = ?", request.Provider)
 
