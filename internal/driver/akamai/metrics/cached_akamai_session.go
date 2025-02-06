@@ -172,7 +172,7 @@ func (c *CachedAkamaiSession) getTrafficReport(property string) ([]DataRows, err
 	return trafficReport.DataRows, nil
 }
 
-type DomainSummery struct {
+type DomainSummary struct {
 	Name        string   `json:"name"`
 	Properties  []string `json:"properties"`
 	Datacenters []struct {
@@ -192,13 +192,13 @@ func (c *CachedAkamaiSession) getProperties() ([]string, error) {
 
 	// only refresh if older than 10 min, or never fetched
 	if len(c.lastProperties) == 0 || c.lastPropertiesFetch.Before(time.Now().Add(-10*time.Minute)) {
-		var domainSummery DomainSummery
-		err := c.get(uri, &domainSummery)
+		var domainSummary DomainSummary
+		err := c.get(uri, &domainSummary)
 		if err != nil {
 			return nil, err
 		}
 
-		c.lastProperties = domainSummery.Properties
+		c.lastProperties = domainSummary.Properties
 		c.lastPropertiesFetch = time.Now()
 	}
 
