@@ -11,7 +11,7 @@
     "autoprefixer": "^10.4.20",
     "chalk": "^5.4.0",
     "countries-list": "^3.1.1",
-    "esbuild": "^0.24.1",
+    "esbuild": "^0.25.0",
     "esbuild-plugin-inline-image": "^0.0.9",
     "esbuild-plugin-inline-import": "^1.1.0",
     "lodash-es": "^4.17.21",
