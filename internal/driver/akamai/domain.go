@@ -20,7 +20,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v9/pkg/gtm"
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v10/pkg/gtm"
 	"github.com/apex/log"
 
 	"github.com/sapcc/andromeda/internal/config"
