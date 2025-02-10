@@ -25,8 +25,8 @@ import (
 	"time"
 
 	"github.com/actatum/stormrpc"
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v9/pkg/gtm"
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v9/pkg/session"
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v10/pkg/gtm"
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v10/pkg/session"
 	"github.com/apex/log"
 	lru "github.com/hashicorp/golang-lru/v2"
 	"github.com/nats-io/nats.go"
