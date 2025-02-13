@@ -85,7 +85,7 @@ func (e *Executor) CleanupDeletedDomains(_ context.Context, labels prometheus.La
 	sql := `DELETE FROM
            		domain 
 			WHERE 
-			    provisioning_status = 'DELETED' AND updated_at < (NOW() - INTERVAL '%d SECOND')`
+			    provisioning_status = 'DELETED' AND updated_at < (NOW() - INTERVAL %d SECOND)`
 	res, err := e.DB.Exec(fmt.Sprintf(sql, config.Global.HouseKeeping.DeleteAfter))
 	if err != nil {
 		return err
