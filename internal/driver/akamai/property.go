@@ -201,8 +201,8 @@ MEMBERLOOP:
 	// Pre-Validation
 	if len(property.TrafficTargets) == 0 {
 		// Need traffictargets with datacenters before posting
-		log.Debugf("Skipping Property '%s': No traffic targets", property.Name)
-		return provRequests, nil
+		log.Infof("Skipping/Deleting Property '%s': No traffic targets", property.Name)
+		return provRequests, s.DeleteProperty(domain, trafficManagementDomain)
 	}
 
 	request := gtm.GetPropertyRequest{
