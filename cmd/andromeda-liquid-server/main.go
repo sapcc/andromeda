@@ -14,6 +14,7 @@ import (
 	"github.com/sapcc/go-api-declarations/liquid"
 	"github.com/sapcc/go-bits/httpext"
 	"github.com/sapcc/go-bits/liquidapi"
+	"github.com/sapcc/go-bits/logg"
 	"github.com/sapcc/go-bits/must"
 	"github.com/urfave/cli/v2"
 
@@ -166,8 +167,14 @@ func main() {
 				Usage: "Port to listen",
 				Value: 8080,
 			},
+			&cli.BoolFlag{
+				Name:    "liquid_debug",
+				Usage:   "Enable verbose logging for Liquid HTTP handling",
+				EnvVars: []string{"LIQUID_DEBUG"},
+			},
 		},
 		Action: func(c *cli.Context) error {
+			logg.ShowDebug = c.Bool("liquid_debug")
 			ctx := httpext.ContextWithSIGINT(c.Context, 10*time.Second)
 			host := c.String("host")
 			port := c.Int("port")
