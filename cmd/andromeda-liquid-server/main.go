@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"os"
@@ -25,6 +26,42 @@ import (
 
 type liquidLogic struct {
 	andromedaClient *client.Andromeda
+}
+
+var defaultServiceUsageReport liquid.ServiceUsageReport = liquid.ServiceUsageReport{
+	InfoVersion: 1,
+	Resources: map[liquid.ResourceName]*liquid.ResourceUsageReport{
+		"datacenters": {
+			Quota: func(num uint64) *int64 { i := int64(num); return &i }(0),
+			PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
+				liquid.AvailabilityZoneAny: {Usage: uint64(0)},
+			},
+		},
+		"domains": {
+			Quota: func(num uint64) *int64 { i := int64(num); return &i }(0),
+			PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
+				liquid.AvailabilityZoneAny: {Usage: uint64(0)},
+			},
+		},
+		"members": {
+			Quota: func(num uint64) *int64 { i := int64(num); return &i }(0),
+			PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
+				liquid.AvailabilityZoneAny: {Usage: uint64(0)},
+			},
+		},
+		"monitors": {
+			Quota: func(num uint64) *int64 { i := int64(num); return &i }(0),
+			PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
+				liquid.AvailabilityZoneAny: {Usage: uint64(0)},
+			},
+		},
+		"pools": {
+			Quota: func(num uint64) *int64 { i := int64(num); return &i }(0),
+			PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
+				liquid.AvailabilityZoneAny: {Usage: uint64(0)},
+			},
+		},
+	},
 }
 
 func (l *liquidLogic) Init(_ context.Context, provider *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) error {
@@ -96,6 +133,10 @@ func (l *liquidLogic) ScanUsage(ctx context.Context, projectUUID string, req liq
 	params.ProjectID = projectUUID
 	resp, err := l.andromedaClient.Administrative.GetQuotasProjectID(params)
 	if err != nil {
+		var notFoundErr *administrative.GetQuotasProjectIDNotFound
+		if errors.As(err, &notFoundErr) {
+			return defaultServiceUsageReport, nil
+		}
 		return liquid.ServiceUsageReport{}, err
 	}
 	return liquid.ServiceUsageReport{
