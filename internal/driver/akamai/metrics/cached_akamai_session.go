@@ -23,7 +23,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v9/pkg/session"
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v10/pkg/session"
 	"github.com/apex/log"
 	"github.com/hashicorp/golang-lru/v2/expirable"
 )
