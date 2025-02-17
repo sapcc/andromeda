@@ -5,7 +5,7 @@ import chalk from "chalk";
 import imageInline from "esbuild-plugin-inline-image";
 import postcss from "postcss";
 import autoprefixer from "autoprefixer";
-import tailwindcss from "tailwindcss"
+import tailwindcss from "@tailwindcss/postcss"
 
 const isProduction = process.env.NODE_ENV === "production"
 const appProps = process.env.APP_PROPS || "{}"
