@@ -11,6 +11,7 @@ import (
 	"github.com/go-openapi/runtime"
 	runtimeclient "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 	"github.com/gophercloud/gophercloud/v2"
 	"github.com/sapcc/go-api-declarations/liquid"
 	"github.com/sapcc/go-bits/httpext"
@@ -28,37 +29,37 @@ type liquidLogic struct {
 	andromedaClient *client.Andromeda
 }
 
-var defaultServiceUsageReport liquid.ServiceUsageReport = liquid.ServiceUsageReport{
+var defaultServiceUsageReport = liquid.ServiceUsageReport{
 	InfoVersion: 1,
 	Resources: map[liquid.ResourceName]*liquid.ResourceUsageReport{
 		"datacenters": {
-			Quota: func(num uint64) *int64 { i := int64(num); return &i }(0),
+			Quota: swag.Int64(0),
 			PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
-				liquid.AvailabilityZoneAny: {Usage: uint64(0)},
+				liquid.AvailabilityZoneAny: {Usage: 0},
 			},
 		},
 		"domains": {
-			Quota: func(num uint64) *int64 { i := int64(num); return &i }(0),
+			Quota: swag.Int64(0),
 			PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
-				liquid.AvailabilityZoneAny: {Usage: uint64(0)},
+				liquid.AvailabilityZoneAny: {Usage: 0},
 			},
 		},
 		"members": {
-			Quota: func(num uint64) *int64 { i := int64(num); return &i }(0),
+			Quota: swag.Int64(0),
 			PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
-				liquid.AvailabilityZoneAny: {Usage: uint64(0)},
+				liquid.AvailabilityZoneAny: {Usage: 0},
 			},
 		},
 		"monitors": {
-			Quota: func(num uint64) *int64 { i := int64(num); return &i }(0),
+			Quota: swag.Int64(0),
 			PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
-				liquid.AvailabilityZoneAny: {Usage: uint64(0)},
+				liquid.AvailabilityZoneAny: {Usage: 0},
 			},
 		},
 		"pools": {
-			Quota: func(num uint64) *int64 { i := int64(num); return &i }(0),
+			Quota: swag.Int64(0),
 			PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
-				liquid.AvailabilityZoneAny: {Usage: uint64(0)},
+				liquid.AvailabilityZoneAny: {Usage: 0},
 			},
 		},
 	},
