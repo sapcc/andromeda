@@ -280,6 +280,10 @@ func isPoolImmutable(pool *models.Pool, tx *sqlx.Tx) bool {
 		domains = append(domains, domain.String())
 	}
 
+	if len(domains) == 0 {
+		return false
+	}
+
 	// Check if related domains are in progress of being updated/deleted
 	query := `SELECT count(id) FROM domain WHERE provisioning_status != 'ACTIVE' AND id IN (?)`
 	sql, args, err := sqlx.In(query, domains)
