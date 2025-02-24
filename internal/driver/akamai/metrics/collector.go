@@ -27,8 +27,8 @@ import (
 )
 
 var (
-	fQNameNumReq = prometheus.BuildFQName("", "", "requests_5m")
-	fQNameStatus = prometheus.BuildFQName("", "", "status_5m")
+	fQNameNumReq = prometheus.BuildFQName("andromeda", "akamai", "requests_5m")
+	fQNameStatus = prometheus.BuildFQName("andromeda", "akamai", "status_5m")
 	labels       = []string{"domain", "datacenter_id", "project_id", "target_ip"}
 	descNumReq   = prometheus.NewDesc(fQNameNumReq, "Number of requests/5m per domain", labels, nil)
 	descStatus   = prometheus.NewDesc(fQNameStatus, "Status per domain", labels, nil)
