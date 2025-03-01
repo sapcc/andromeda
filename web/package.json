@@ -24,7 +24,7 @@
     "simple-zustand-devtools": "^1.1.0",
     "tailwindcss": "^4.0.6",
     "zustand": "^5.0.3",
-    "zustand-querystring": "^0.1.0"
+    "zustand-querystring": "^0.2.0"
   },
   "scripts": {
     "start": "PORT=$APP_PORT APP_PROPS=$APP_PROPS NODE_ENV=development node esbuild.config.mjs --serve --watch",
