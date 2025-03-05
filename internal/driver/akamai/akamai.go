@@ -23,9 +23,25 @@ import (
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v10/pkg/edgegrid"
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v10/pkg/session"
 	"github.com/apex/log"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/sapcc/andromeda/internal/config"
 )
+
+var (
+	counter = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "akamai_edgegrid_requests_total",
+			Help: "Total number of Akamai EdgeGrid API requests.",
+		},
+		[]string{"method", "code"},
+	)
+)
+
+func init() {
+	prometheus.MustRegister(counter)
+}
 
 func NewAkamaiSession(akamaiConfig *config.AkamaiConfig) (*session.Session, string) {
 	option := edgegrid.WithEnv(true)
@@ -38,6 +54,9 @@ func NewAkamaiSession(akamaiConfig *config.AkamaiConfig) (*session.Session, stri
 	edgerc := edgegrid.Must(edgegrid.New(option))
 	s := session.Must(session.New(
 		session.WithSigner(edgerc),
+		session.WithClient(&http.Client{
+			Transport: promhttp.InstrumentRoundTripperCounter(counter, http.DefaultTransport),
+		}),
 	))
 
 	var identity struct {
