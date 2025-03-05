@@ -19,13 +19,50 @@ package akamai
 import (
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v10/pkg/edgegrid"
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v10/pkg/session"
 	"github.com/apex/log"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/sapcc/andromeda/internal/config"
 )
+
+var (
+	edgegridAPICalls = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "akamai_edgegrid_api_calls_total",
+			Help: "Total number of Akamai EdgeGrid API calls",
+		},
+		[]string{"method", "status_code"},
+	)
+
+	edgegridErrors = prometheus.NewCounter(
+		prometheus.CounterOpts{
+			Name: "akamai_edgegrid_errors_total",
+			Help: "Total number of Akamai EdgeGrid errors",
+		},
+	)
+)
+
+func init() {
+	prometheus.MustRegister(edgegridAPICalls, edgegridErrors)
+}
+
+func instrumentedRoundTripper(next http.RoundTripper) http.RoundTripper {
+	return promhttp.RoundTripperFunc(func(req *http.Request) (resp *http.Response, err error) {
+		defer func() {
+			if err != nil {
+				edgegridErrors.Inc()
+			}
+		}()
+		resp, err = next.RoundTrip(req)
+		edgegridAPICalls.WithLabelValues(req.Method, strconv.Itoa(resp.StatusCode)).Inc()
+		return resp, err
+	})
+}
 
 func NewAkamaiSession(akamaiConfig *config.AkamaiConfig) (*session.Session, string) {
 	option := edgegrid.WithEnv(true)
@@ -38,6 +75,7 @@ func NewAkamaiSession(akamaiConfig *config.AkamaiConfig) (*session.Session, stri
 	edgerc := edgegrid.Must(edgegrid.New(option))
 	s := session.Must(session.New(
 		session.WithSigner(edgerc),
+		session.WithClient(&http.Client{Transport: instrumentedRoundTripper(http.DefaultTransport)}),
 	))
 
 	var identity struct {
