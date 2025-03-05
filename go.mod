@@ -44,7 +44,7 @@ require (
 	github.com/scottdware/go-bigip v0.0.0-20240809002616-deb9b0aff84a
 	github.com/slok/go-http-metrics v0.13.0
 	github.com/stretchr/testify v1.10.0
-	github.com/urfave/cli/v2 v2.27.5
+	github.com/urfave/cli/v2 v2.27.6
 	github.com/xo/dburl v0.23.4
 	golang.org/x/net v0.36.0
 	google.golang.org/protobuf v1.36.5
