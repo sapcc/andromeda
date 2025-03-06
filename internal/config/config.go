@@ -145,6 +145,13 @@ func parseConfigFlags(flags []string) error {
 		Global.Database.Connection = os.Getenv("DATABASE_CONNECTION")
 	}
 
+	// allow env to override config file
+	prometheusListen := os.Getenv("PROMETHEUS_LISTEN")
+	if prometheusListen != "" {
+		Global.Default.PrometheusListen = prometheusListen
+		log.Debug("Using PROMETHEUS_LISTEN")
+	}
+
 	return nil
 }
 
