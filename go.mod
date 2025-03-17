@@ -17,7 +17,7 @@ require (
 	github.com/dlmiddlecote/sqlstats v1.0.2
 	github.com/dre1080/recovr v1.0.3
 	github.com/getsentry/sentry-go v0.20.0
-	github.com/go-openapi/errors v0.22.0
+	github.com/go-openapi/errors v0.22.1
 	github.com/go-openapi/loads v0.22.0
 	github.com/go-openapi/runtime v0.28.0
 	github.com/go-openapi/spec v0.21.0
