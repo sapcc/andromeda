@@ -13,6 +13,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/gophercloud/gophercloud/v2"
+	"github.com/sapcc/go-api-declarations/bininfo"
 	"github.com/sapcc/go-api-declarations/liquid"
 	"github.com/sapcc/go-bits/httpext"
 	"github.com/sapcc/go-bits/liquidapi"
@@ -224,6 +225,7 @@ func main() {
 			opts := liquidapi.RunOpts{DefaultListenAddress: fmt.Sprintf("%s:%d", host, port)}
 			return liquidapi.Run(ctx, logic, opts)
 		},
+		Version: bininfo.Version(),
 	}
 	must.Succeed(app.Run(os.Args))
 }

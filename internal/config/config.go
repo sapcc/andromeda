@@ -28,6 +28,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	"github.com/gophercloud/utils/v2/openstack/clientconfig"
 	"github.com/mcuadros/go-defaults"
+	"github.com/sapcc/go-api-declarations/bininfo"
 	"github.com/urfave/cli/v2"
 	"gopkg.in/yaml.v3"
 )
@@ -89,6 +90,7 @@ func ParseArgsAndRun(name string, usage string, action cli.ActionFunc, flags ...
 			os.Args = newOsArgs
 			return nil
 		},
+		Version: bininfo.Version(),
 	}
 
 	if err := app.Run(os.Args); err != nil {
