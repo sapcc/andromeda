@@ -18,6 +18,7 @@ package rpc
 
 import (
 	"context"
+	"strings"
 
 	"github.com/actatum/stormrpc"
 	"github.com/actatum/stormrpc/middleware"
@@ -34,10 +35,12 @@ func NewServer(name string, opts ...stormrpc.ServerOption) *stormrpc.Server {
 	opts = append(opts, stormrpc.WithErrorHandler(func(ctx context.Context, err error) {
 		log.WithError(err).Error("RPC Error")
 	}))
+
+	version := strings.TrimLeft(bininfo.VersionOr("-unknown"), "v")
 	srv, err := stormrpc.NewServer(&stormrpc.ServerConfig{
 		NatsURL: config.Global.Default.TransportURL,
 		Name:    name,
-		Version: bininfo.Version(),
+		Version: version[:strings.LastIndex(version, "-")],
 	}, opts...)
 	if err != nil {
 		log.Fatal(err.Error())
