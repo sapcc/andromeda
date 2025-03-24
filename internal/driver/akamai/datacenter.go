@@ -19,6 +19,7 @@ package akamai
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v10/pkg/gtm"
@@ -180,8 +181,10 @@ func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force boo
 			DatacenterID: backendDatacenter.DatacenterID,
 			DomainName:   config.Global.AkamaiConfig.Domain,
 		}
-		_, err = s.gtm.DeleteDatacenter(context.Background(), request)
-		return nil, err
+		if _, err = s.gtm.DeleteDatacenter(context.Background(), request); err != nil {
+			return nil, fmt.Errorf("DeleteDatacenter(%s) failed: %w", datacenter.Id, err)
+		}
+		return nil, nil
 	}
 
 	// consider synced
@@ -209,7 +212,7 @@ func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force boo
 		"Longitude",
 		"Nickname",
 	}
-	if utils.DeepEqualFields(&referenceDatacenter, (*gtm.Datacenter)(backendDatacenter), fieldsToCompare) {
+	if utils.DeepEqualFields(&referenceDatacenter, backendDatacenter, fieldsToCompare) {
 		// no change
 		return datacenter, nil
 	}
