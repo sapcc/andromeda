@@ -93,7 +93,7 @@ func (s *AkamaiAgent) FetchAndSyncDomains(domains []string, force bool) error {
 	}
 	if len(datacenters) > 0 {
 		if err := s.FetchAndSyncDatacenters(datacenters, false); err != nil {
-			return err
+			log.Warnf("FetchAndSyncDomains(%+v) prior FetchAndSyncDatacenters(%+v): %v", domains, datacenters, err)
 		}
 	}
 
