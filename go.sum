@@ -53,8 +53,8 @@ github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f/go.mod h1:E3G3o1h8I7cfc
 github.com/cpuguy83/go-md2man/v2 v2.0.0/go.mod h1:maD7wRr/U5Z6m/iR4s+kqSMx2CaBsrgA7czyZG/E6dU=
 github.com/cpuguy83/go-md2man/v2 v2.0.5 h1:ZtcqGrnekaHpVLArFSe4HK5DoKx1T0rq2DwVB0alcyc=
 github.com/cpuguy83/go-md2man/v2 v2.0.5/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
-github.com/databus23/goslo.policy v0.0.0-20210929125152-81bf2876dbdb h1:8JB2G8t3o1iCL8vCzssUj2Nn2qjqSab2/G3xXhvkpPQ=
-github.com/databus23/goslo.policy v0.0.0-20210929125152-81bf2876dbdb/go.mod h1:tRj172JgwQmUmEqZZJBWzYWFStitMFTtb95NtUnmpkw=
+github.com/databus23/goslo.policy v0.0.0-20250326134918-4afc2c56a903 h1:RiumxYxPww35QeXCGV9NTohc7eGQwlVdz+p3nNHIF28=
+github.com/databus23/goslo.policy v0.0.0-20250326134918-4afc2c56a903/go.mod h1:tRj172JgwQmUmEqZZJBWzYWFStitMFTtb95NtUnmpkw=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -325,10 +325,10 @@ github.com/rs/cors v1.11.1/go.mod h1:XyqrcTp5zjWr1wsJ8PIRZssZ8b/WMcMf71DJnit4EMU
 github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/russross/blackfriday/v2 v2.1.0 h1:JIOH55/0cWyOuilr9/qlrm0BSXldqnqwMsf35Ld67mk=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
-github.com/sapcc/go-api-declarations v1.14.0 h1:L6PrfbAcbjg4fnlkuCzKrbCSAQMaMr2H1TiVLu7hZYU=
-github.com/sapcc/go-api-declarations v1.14.0/go.mod h1:KEYQoknn0gSjhmI19b85YUEZkav9SOu2bC21VeDNlnU=
-github.com/sapcc/go-bits v0.0.0-20250326161143-f8d9c0d68d83 h1:rHyy8LP8rwRU6sPTv+aWrtePwVO7DXDaMtmKvCtrAfQ=
-github.com/sapcc/go-bits v0.0.0-20250326161143-f8d9c0d68d83/go.mod h1:aHyRA5cVj6mYujqg3xqIDyeyeaJihBAnSbyQvUfzfNU=
+github.com/sapcc/go-api-declarations v1.14.2 h1:7ijnfrgGrCzhwpUnBR6QlRaN7x5mX7Ek/7I/Z6sq+/w=
+github.com/sapcc/go-api-declarations v1.14.2/go.mod h1:KEYQoknn0gSjhmI19b85YUEZkav9SOu2bC21VeDNlnU=
+github.com/sapcc/go-bits v0.0.0-20250327084830-778195481ca6 h1:kDsapxCKqEr8pWS+RY/cOrriTjj6XiCR2ubo2qxnf9g=
+github.com/sapcc/go-bits v0.0.0-20250327084830-778195481ca6/go.mod h1:Cpx4J90pbutHzjlDOxqSTUwl96+xZcCJMBOLzjP5lyk=
 github.com/scottdware/go-bigip v0.0.0-20240809002616-deb9b0aff84a h1:Dp0HN76Jl1n0orM9UVB/AnwqJOBWETm1hHBPDVMKWeE=
 github.com/scottdware/go-bigip v0.0.0-20240809002616-deb9b0aff84a/go.mod h1:ElPIUv+P7DTtT71aHpeNomJ4naq2RTvCA8o5gBIru3w=
 github.com/sergi/go-diff v1.0.0/go.mod h1:0CfEIISq7TuYL3j771MWULgwwjU+GofnZX9QAmXWZgo=
