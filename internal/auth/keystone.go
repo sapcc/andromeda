@@ -47,8 +47,12 @@ type contextKey struct {
 // Middleware Keystone token injector, also implements goslo policy checker
 func KeystoneMiddleware(next http.Handler) (http.Handler, error) {
 	authInfo := config.Global.ServiceAuth
-	providerClient, err := clientconfig.AuthenticatedClient(context.Background(), &clientconfig.ClientOpts{
-		AuthInfo: &authInfo})
+	authOpts, err := clientconfig.AuthOptions(&clientconfig.ClientOpts{AuthInfo: &authInfo})
+	if err != nil {
+		return nil, err
+	}
+	authOpts.AllowReauth = true
+	providerClient, err := openstack.AuthenticatedClient(context.Background(), *authOpts)
 	if err != nil {
 		return nil, err
 	}
