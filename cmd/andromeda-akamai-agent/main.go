@@ -17,7 +17,7 @@
 package main
 
 import (
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/driver/akamai"
