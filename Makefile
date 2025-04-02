@@ -65,7 +65,10 @@ swagger: bin/swagger
 	$(SWAGGER) generate client --copyright-file COPYRIGHT.txt
 
 markdown: bin/swagger
-	$(SWAGGER) generate markdown --copyright-file COPYRIGHT.txt --output= docs/api.md
+	$(SWAGGER) generate markdown --copyright-file COPYRIGHT.txt --output docs/api.md
+
+serve-swagger-docs: bin/swagger
+	$(SWAGGER) serve swagger.yml -p 9900
 
 migrate: bin/migrate
 	$(MIGRATE) -path db/migrations -database "cockroachdb://root@localhost:26257/andromeda?sslmode=disable" drop -f

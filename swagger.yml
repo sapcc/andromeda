@@ -1816,9 +1816,9 @@ definitions:
   quota:
     type: object
     properties:
-      domain:
+      domain_akamai:
         type: integer
-        description: The configured domain quota limit. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited.
+        description: The configured domain quota limit for provider Akamai. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited.
         example: 5
         x-nullable: true
       pool:
@@ -1845,9 +1845,9 @@ definitions:
   quota_usage:
     type: object
     properties:
-      in_use_domain:
+      in_use_domain_akamai:
         type: integer
-        description: The current quota usage of domain.
+        description: The current quota usage of domain (provider = Akamai).
         example: 5
         x-omitempty: false
       in_use_pool:
