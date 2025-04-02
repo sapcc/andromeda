@@ -79,10 +79,10 @@ func (qc *quotaController) QuotaHandler(next http.Handler) http.Handler {
 		var quotaAvailable, quotaUsed int
 
 		insert := sq.Insert("quota").
-			Columns("project_id", "domain", "pool", "member", "monitor", "datacenter").
+			Columns("project_id", "domain_akamai", "pool", "member", "monitor", "datacenter").
 			Values(
 				project,
-				config.Global.Quota.DefaultQuotaDomain,
+				config.Global.Quota.DefaultQuotaDomainAkamai,
 				config.Global.Quota.DefaultQuotaPool,
 				config.Global.Quota.DefaultQuotaMember,
 				config.Global.Quota.DefaultQuotaMonitor,

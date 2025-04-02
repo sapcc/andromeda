@@ -29,6 +29,9 @@ import (
 
 type liquidLogic struct {
 	andromedaClient *client.Andromeda
+
+	// See "--gmt-endpoint" CLI flag in main() function (e.g. "http://localhost:8080/v1")
+	GTMEndpoint string
 }
 
 type ReauthTransport struct {
@@ -59,7 +62,7 @@ var defaultServiceUsageReport = liquid.ServiceUsageReport{
 				liquid.AvailabilityZoneAny: {Usage: 0},
 			},
 		},
-		"domains": {
+		"domains_akamai": {
 			Quota: swag.Int64(0),
 			PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
 				liquid.AvailabilityZoneAny: {Usage: 0},
@@ -88,15 +91,19 @@ var defaultServiceUsageReport = liquid.ServiceUsageReport{
 
 func (l *liquidLogic) Init(context context.Context, provider *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) error {
 	l.andromedaClient = client.Default
-	endpointOpts := gophercloud.EndpointOpts{
-		Region: eo.Region,
+	if l.GTMEndpoint == "" {
+		endpointOpts := gophercloud.EndpointOpts{
+			Region: eo.Region,
+		}
+		endpointOpts.ApplyDefaults("gtm")
+		endpoint, err := provider.EndpointLocator(endpointOpts)
+		if err != nil {
+			return err
+		}
+		l.GTMEndpoint = endpoint
 	}
-	endpointOpts.ApplyDefaults("gtm")
-	endpoint, err := provider.EndpointLocator(endpointOpts)
-	if err != nil {
-		return err
-	}
-	uri, err := url.Parse(endpoint)
+	logg.Debug("Using GTM endpoint %s", l.GTMEndpoint)
+	uri, err := url.Parse(l.GTMEndpoint)
 	if err != nil {
 		return err
 	}
@@ -125,7 +132,7 @@ func (l *liquidLogic) BuildServiceInfo(_ context.Context) (liquid.ServiceInfo, e
 				HasQuota:    true,
 				Topology:    liquid.FlatTopology,
 			},
-			"domains": {
+			"domains_akamai": {
 				HasCapacity: false,
 				HasQuota:    true,
 				Topology:    liquid.FlatTopology,
@@ -175,10 +182,10 @@ func (l *liquidLogic) ScanUsage(ctx context.Context, projectUUID string, req liq
 					liquid.AvailabilityZoneAny: {Usage: uint64(resp.Payload.Quota.QuotaUsage.InUseDatacenter)},
 				},
 			},
-			"domains": {
-				Quota: resp.Payload.Quota.Domain,
+			"domains_akamai": {
+				Quota: resp.Payload.Quota.DomainAkamai,
 				PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
-					liquid.AvailabilityZoneAny: {Usage: uint64(resp.Payload.Quota.QuotaUsage.InUseDomain)},
+					liquid.AvailabilityZoneAny: {Usage: uint64(resp.Payload.Quota.QuotaUsage.InUseDomainAkamai)},
 				},
 			},
 			"members": {
@@ -207,11 +214,11 @@ func (l *liquidLogic) SetQuota(ctx context.Context, projectUUID string, req liqu
 	params := administrative.NewPutQuotasProjectIDParams().WithDefaults().WithContext(ctx)
 	params.ProjectID = projectUUID
 	params.Quota = administrative.PutQuotasProjectIDBody{Quota: &models.Quota{
-		Datacenter: func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["datacenters"].Quota),
-		Domain:     func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["domains"].Quota),
-		Member:     func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["members"].Quota),
-		Monitor:    func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["monitors"].Quota),
-		Pool:       func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["pools"].Quota),
+		Datacenter:   func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["datacenters"].Quota),
+		DomainAkamai: func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["domains_akamai"].Quota),
+		Member:       func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["members"].Quota),
+		Monitor:      func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["monitors"].Quota),
+		Pool:         func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["pools"].Quota),
 	}}
 	_, err := l.andromedaClient.Administrative.PutQuotasProjectID(params)
 	if err != nil {
@@ -225,6 +232,11 @@ func main() {
 		Name:  "andromeda-liquid-api",
 		Usage: "andromeda liquid api",
 		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:  "gtm-endpoint",
+				Usage: "The GTM endpoint (useful for local testing against local Andromeda Server)",
+				Value: "",
+			},
 			&cli.StringFlag{
 				Name:  "host",
 				Usage: "The IP to listen on",
@@ -246,7 +258,7 @@ func main() {
 			ctx := httpext.ContextWithSIGINT(c.Context, 10*time.Second)
 			host := c.String("host")
 			port := c.Int("port")
-			logic := &liquidLogic{}
+			logic := &liquidLogic{GTMEndpoint: c.String("gtm-endpoint")}
 			opts := liquidapi.RunOpts{DefaultListenAddress: fmt.Sprintf("%s:%d", host, port)}
 			return liquidapi.Run(ctx, logic, opts)
 		},

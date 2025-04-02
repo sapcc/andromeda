@@ -65,11 +65,11 @@ func (c QuotaController) GetQuotasProjectID(params administrative.GetQuotasProje
 
 	body := administrative.GetQuotasProjectIDOKBody{}
 
-	sql, args, err := sq.Select("domain, pool, member, monitor, datacenter").
+	sql, args, err := sq.Select("domain_akamai, pool, member, monitor, datacenter").
 		Column(sq.Alias(
 			sq.Select("COUNT(id)").From("domain").Where(sq.Eq{"project_id": params.ProjectID}).
 				Where(sq.NotEq{"provisioning_status": "DELETED"}),
-			"in_use_domain")).
+			"in_use_domain_akamai")).
 		Column(sq.Alias(
 			sq.Select("COUNT(id)").From("pool").Where(sq.Eq{"project_id": params.ProjectID}),
 			"in_use_pool")).
@@ -107,11 +107,11 @@ func (c QuotaController) GetQuotasDefaults(params administrative.GetQuotasDefaul
 
 	body := administrative.GetQuotasDefaultsOKBody{
 		Quota: &models.Quota{
-			Datacenter: &config.Global.Quota.DefaultQuotaDatacenter,
-			Domain:     &config.Global.Quota.DefaultQuotaDomain,
-			Member:     &config.Global.Quota.DefaultQuotaMember,
-			Monitor:    &config.Global.Quota.DefaultQuotaMonitor,
-			Pool:       &config.Global.Quota.DefaultQuotaPool,
+			Datacenter:   &config.Global.Quota.DefaultQuotaDatacenter,
+			DomainAkamai: &config.Global.Quota.DefaultQuotaDomainAkamai,
+			Member:       &config.Global.Quota.DefaultQuotaMember,
+			Monitor:      &config.Global.Quota.DefaultQuotaMonitor,
+			Pool:         &config.Global.Quota.DefaultQuotaPool,
 		},
 	}
 	return administrative.NewGetQuotasDefaultsOK().WithPayload(&body)
@@ -134,14 +134,14 @@ func (c QuotaController) PutQuotasProjectID(params administrative.PutQuotasProje
 	if c.db.DriverName() == "mysql" {
 		sql = `
 			INSERT INTO quota SET
-				domain = COALESCE(:domain, %d),
+				domain_akamai = COALESCE(:domain_akamai, %d),
 				pool = COALESCE(:pool, %d),
 				member = COALESCE(:member, %d),
 				monitor = COALESCE(:monitor, %d),
 			    datacenter = COALESCE(:datacenter, %d),
 				project_id = :project_id
 			ON DUPLICATE KEY UPDATE
-				domain = COALESCE(:domain, domain),
+				domain_akamai = COALESCE(:domain_akamai, domain_akamai),
 				pool = COALESCE(:pool, pool),
 				member = COALESCE(:member, member), 
 				monitor = COALESCE(:monitor, monitor),
@@ -151,10 +151,10 @@ func (c QuotaController) PutQuotasProjectID(params administrative.PutQuotasProje
 	} else {
 		sql = `
 			INSERT INTO quota
-				(domain, pool, member, monitor, datacenter, project_id)
+				(domain_akamai, pool, member, monitor, datacenter, project_id)
 			VALUES 
 			    (
-					 COALESCE(:domain, %d),
+					 COALESCE(:domain_akamai, %d),
 					 COALESCE(:pool, %d),
 					 COALESCE(:member, %d),
 					 COALESCE(:monitor, %d),
@@ -162,7 +162,7 @@ func (c QuotaController) PutQuotasProjectID(params administrative.PutQuotasProje
 					 :project_id
 			     )
 			ON CONFLICT (project_id) DO UPDATE SET 
-				domain = COALESCE(:domain, quota.domain),
+				domain_akamai = COALESCE(:domain_akamai, quota.domain_akamai),
 				pool = COALESCE(:pool, quota.pool),
 				member = COALESCE(:member, quota.member), 
 				monitor = COALESCE(:monitor, quota.monitor),
@@ -171,7 +171,7 @@ func (c QuotaController) PutQuotasProjectID(params administrative.PutQuotasProje
 		`
 	}
 	sql = fmt.Sprintf(sql,
-		config.Global.Quota.DefaultQuotaDomain,
+		config.Global.Quota.DefaultQuotaDomainAkamai,
 		config.Global.Quota.DefaultQuotaPool,
 		config.Global.Quota.DefaultQuotaMember,
 		config.Global.Quota.DefaultQuotaMonitor,
