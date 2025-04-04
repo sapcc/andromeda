@@ -35,9 +35,9 @@ type QuotaUsage struct {
 	// Example: 5
 	InUseDatacenter int64 `json:"in_use_datacenter"`
 
-	// The current quota usage of domain.
+	// The current quota usage of domain (provider = Akamai).
 	// Example: 5
-	InUseDomain int64 `json:"in_use_domain"`
+	InUseDomainAkamai int64 `json:"in_use_domain_akamai"`
 
 	// The current quota usage of member.
 	// Example: 5

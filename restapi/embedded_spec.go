@@ -2513,8 +2513,8 @@ func init() {
           "x-nullable": true,
           "example": 5
         },
-        "domain": {
-          "description": "The configured domain quota limit. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited.",
+        "domain_akamai": {
+          "description": "The configured domain quota limit for provider Akamai. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited.",
           "type": "integer",
           "x-nullable": true,
           "example": 5
@@ -2548,8 +2548,8 @@ func init() {
           "x-omitempty": false,
           "example": 5
         },
-        "in_use_domain": {
-          "description": "The current quota usage of domain.",
+        "in_use_domain_akamai": {
+          "description": "The current quota usage of domain (provider = Akamai).",
           "type": "integer",
           "x-omitempty": false,
           "example": 5
@@ -5242,8 +5242,8 @@ func init() {
           "x-nullable": true,
           "example": 5
         },
-        "domain": {
-          "description": "The configured domain quota limit. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited.",
+        "domain_akamai": {
+          "description": "The configured domain quota limit for provider Akamai. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited.",
           "type": "integer",
           "x-nullable": true,
           "example": 5
@@ -5277,8 +5277,8 @@ func init() {
           "x-omitempty": false,
           "example": 5
         },
-        "in_use_domain": {
-          "description": "The current quota usage of domain.",
+        "in_use_domain_akamai": {
+          "description": "The current quota usage of domain (provider = Akamai).",
           "type": "integer",
           "x-omitempty": false,
           "example": 5

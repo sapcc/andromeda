@@ -35,9 +35,9 @@ type Quota struct {
 	// Example: 5
 	Datacenter *int64 `json:"datacenter,omitempty"`
 
-	// The configured domain quota limit. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited.
+	// The configured domain quota limit for provider Akamai. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited.
 	// Example: 5
-	Domain *int64 `json:"domain,omitempty"`
+	DomainAkamai *int64 `json:"domain_akamai,omitempty"`
 
 	// The configured member quota limit. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited.
 	// Example: 5
