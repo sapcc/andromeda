@@ -33,11 +33,11 @@ type Error struct {
 
 	// HTTP Error code
 	// Example: 404
-	Code int64 `json:"code,omitempty"`
+	Code int64 `json:"code,omitempty" db:"code,omitempty"`
 
 	// message
 	// Example: An example error message
-	Message string `json:"message,omitempty"`
+	Message string `json:"message,omitempty" db:"message,omitempty"`
 }
 
 // Validate validates this error

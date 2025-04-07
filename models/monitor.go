@@ -35,80 +35,80 @@ import (
 type Monitor struct {
 
 	// The administrative state of the resource, which is up (true) or down (false). Default is true.
-	AdminStateUp *bool `json:"admin_state_up,omitempty"`
+	AdminStateUp *bool `json:"admin_state_up,omitempty" db:"admin_state_up,omitempty"`
 
 	// The UTC date and timestamp when the resource was created.
 	// Example: 2020-05-11T17:21:34
 	// Read Only: true
 	// Format: date-time
-	CreatedAt strfmt.DateTime `json:"created_at,omitempty"`
+	CreatedAt strfmt.DateTime `json:"created_at,omitempty" db:"created_at,omitempty"`
 
 	// The domain name, which be injected into the HTTP Host Header to the backend server for HTTP health check. Only used for HTTP/S monitors.
 	// Example: example.org
 	// Max Length: 255
 	// Format: hostname
-	DomainName *strfmt.Hostname `json:"domain_name,omitempty"`
+	DomainName *strfmt.Hostname `json:"domain_name,omitempty" db:"domain_name,omitempty"`
 
 	// HTTP method to use for monitor checks. Only used for HTTP/S monitors.
 	// Enum: [GET POST PUT HEAD PATCH DELETE OPTIONS]
-	HTTPMethod *string `json:"http_method,omitempty"`
+	HTTPMethod *string `json:"http_method,omitempty" db:"http_method,omitempty"`
 
 	// The id of the resource.
 	// Read Only: true
 	// Format: uuid
-	ID strfmt.UUID `json:"id,omitempty"`
+	ID strfmt.UUID `json:"id,omitempty" db:"id,omitempty"`
 
 	// The interval, in seconds, between health checks.
 	// Example: 10
 	// Maximum: 86399
 	// Minimum: 10
-	Interval *int64 `json:"interval,omitempty"`
+	Interval *int64 `json:"interval,omitempty" db:"interval,omitempty"`
 
 	// Human-readable name of the resource.
 	// Max Length: 255
-	Name *string `json:"name,omitempty"`
+	Name *string `json:"name,omitempty" db:"name,omitempty"`
 
 	// ID of the pool to check members
 	// Format: uuid
-	PoolID *strfmt.UUID `json:"pool_id,omitempty"`
+	PoolID *strfmt.UUID `json:"pool_id,omitempty" db:"pool_id,omitempty"`
 
 	// The ID of the project owning this resource.
 	// Example: fa84c217f361441986a220edf9b1e337
 	// Max Length: 32
 	// Min Length: 32
-	ProjectID *string `json:"project_id,omitempty"`
+	ProjectID *string `json:"project_id,omitempty" db:"project_id,omitempty"`
 
 	// provisioning status
 	// Read Only: true
 	// Enum: [PENDING_CREATE PENDING_UPDATE PENDING_DELETE ACTIVE ERROR]
-	ProvisioningStatus string `json:"provisioning_status,omitempty"`
+	ProvisioningStatus string `json:"provisioning_status,omitempty" db:"provisioning_status,omitempty"`
 
 	// Specifies the text string that the monitor expects to receive from the target member.
 	// Example: HTTP/1.
 	// Max Length: 255
-	Receive *string `json:"receive,omitempty"`
+	Receive *string `json:"receive,omitempty" db:"receive,omitempty"`
 
 	// Specifies the text string that the monitor sends to the target member. For HTTP/S monitors, this is a GET request and must be a HTTP path, e.g. `/status`.
 	// Example: /stats
 	// Max Length: 255
-	Send *string `json:"send,omitempty"`
+	Send *string `json:"send,omitempty" db:"send,omitempty"`
 
 	// The time in total, in seconds, after which a health check times out.
 	// Example: 30
 	// Maximum: 60
 	// Minimum: 0
-	Timeout *int64 `json:"timeout,omitempty"`
+	Timeout *int64 `json:"timeout,omitempty" db:"timeout,omitempty"`
 
 	// Type of the health check monitor.
 	// Example: HTTP
 	// Enum: [HTTP HTTPS ICMP TCP UDP]
-	Type *string `json:"type,omitempty"`
+	Type *string `json:"type,omitempty" db:"type,omitempty"`
 
 	// The UTC date and timestamp when the resource was created.
 	// Example: 2020-09-09T14:52:15
 	// Read Only: true
 	// Format: date-time
-	UpdatedAt strfmt.DateTime `json:"updated_at,omitempty"`
+	UpdatedAt strfmt.DateTime `json:"updated_at,omitempty" db:"updated_at,omitempty"`
 }
 
 // Validate validates this monitor

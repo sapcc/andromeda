@@ -37,7 +37,7 @@ func (t *SuiteTest) TestQuotas() {
 	assert.Equal(t.T(), rr.Code, http.StatusNotFound)
 
 	quota := administrative.PutQuotasProjectIDBody{}
-	_ = quota.UnmarshalBinary([]byte(`{ "quota": { "domain_akamai": 1234 } }`))
+	_ = quota.UnmarshalBinary([]byte(`{ "quota": { "domain_akamai": 1234, "domain_f5": 2345 } }`))
 
 	// Write new quota
 	res = dc.PutQuotasProjectID(administrative.PutQuotasProjectIDParams{
@@ -57,6 +57,7 @@ func (t *SuiteTest) TestQuotas() {
 	_ = quotasResponse.UnmarshalBinary(rr.Body.Bytes())
 	assert.Equal(t.T(), len(quotasResponse.Quotas), 1, rr.Body)
 	assert.Equal(t.T(), *quotasResponse.Quotas[0].DomainAkamai, int64(1234), rr.Body)
+	assert.Equal(t.T(), *quotasResponse.Quotas[0].DomainF5, int64(2345), rr.Body)
 
 	// Get specific quota
 	res = dc.GetQuotasProjectID(administrative.GetQuotasProjectIDParams{
@@ -78,7 +79,7 @@ func (t *SuiteTest) TestQuotasUpdateSelective() {
 	projectID := "test123"
 
 	quota := administrative.PutQuotasProjectIDBody{}
-	_ = quota.UnmarshalBinary([]byte(`{ "quota": { "domain_akamai": 1234 } }`))
+	_ = quota.UnmarshalBinary([]byte(`{ "quota": { "domain_akamai": 1234, "domain_f5": 2345 } }`))
 
 	// Write new quota
 	res := dc.PutQuotasProjectID(administrative.PutQuotasProjectIDParams{
@@ -87,7 +88,7 @@ func (t *SuiteTest) TestQuotasUpdateSelective() {
 	rr := httptest.NewRecorder()
 	res.WriteResponse(rr, runtime.JSONProducer())
 	assert.Equal(t.T(), http.StatusAccepted, rr.Code)
-	assert.JSONEq(t.T(), `{"quota":{"datacenter":0, "domain_akamai":1234, "member":0, "monitor":0, "pool":0}}`,
+	assert.JSONEq(t.T(), `{"quota":{"datacenter":0, "domain_akamai":1234, "domain_f5":2345, "member":0, "monitor":0, "pool":0}}`,
 		rr.Body.String())
 
 	// Update selective
@@ -99,6 +100,6 @@ func (t *SuiteTest) TestQuotasUpdateSelective() {
 	rr = httptest.NewRecorder()
 	res.WriteResponse(rr, runtime.JSONProducer())
 	assert.Equal(t.T(), http.StatusAccepted, rr.Code)
-	assert.JSONEq(t.T(), `{"quota":{"datacenter":1, "domain_akamai":1234, "member":0, "monitor":0, "pool":0}}`,
+	assert.JSONEq(t.T(), `{"quota":{"datacenter":1, "domain_akamai":1234, "domain_f5":2345, "member":0, "monitor":0, "pool":0}}`,
 		rr.Body.String())
 }

@@ -36,53 +36,53 @@ import (
 type Geomap struct {
 
 	// Country to datacenter assignments.
-	Assignments []*GeomapAssignmentsItems0 `json:"assignments"`
+	Assignments []*GeomapAssignmentsItems0 `json:"assignments" db:"assignments"`
 
 	// The UTC date and timestamp when the resource was created.
 	// Example: 2020-05-11T17:21:34
 	// Read Only: true
 	// Format: date-time
-	CreatedAt strfmt.DateTime `json:"created_at,omitempty"`
+	CreatedAt strfmt.DateTime `json:"created_at,omitempty" db:"created_at,omitempty"`
 
 	// Datacenter ID
 	// Required: true
 	// Format: uuid
-	DefaultDatacenter *strfmt.UUID `json:"default_datacenter"`
+	DefaultDatacenter *strfmt.UUID `json:"default_datacenter" db:"default_datacenter"`
 
 	// The id of the resource.
 	// Read Only: true
 	// Format: uuid
-	ID strfmt.UUID `json:"id,omitempty"`
+	ID strfmt.UUID `json:"id,omitempty" db:"id,omitempty"`
 
 	// Human-readable name of the resource.
 	// Max Length: 255
-	Name *string `json:"name,omitempty"`
+	Name *string `json:"name,omitempty" db:"name,omitempty"`
 
 	// The ID of the project owning this resource.
 	// Example: fa84c217f361441986a220edf9b1e337
 	// Max Length: 32
 	// Min Length: 32
-	ProjectID *string `json:"project_id,omitempty"`
+	ProjectID *string `json:"project_id,omitempty" db:"project_id,omitempty"`
 
 	// Provider driver for the backend solution
 	// Example: akamai
 	// Enum: [akamai f5]
-	Provider string `json:"provider,omitempty"`
+	Provider string `json:"provider,omitempty" db:"provider,omitempty"`
 
 	// provisioning status
 	// Read Only: true
 	// Enum: [PENDING_CREATE PENDING_UPDATE PENDING_DELETE ACTIVE ERROR]
-	ProvisioningStatus string `json:"provisioning_status,omitempty"`
+	ProvisioningStatus string `json:"provisioning_status,omitempty" db:"provisioning_status,omitempty"`
 
 	// Visibility of datacenter between different projects
 	// Enum: [private shared]
-	Scope *string `json:"scope,omitempty"`
+	Scope *string `json:"scope,omitempty" db:"scope,omitempty"`
 
 	// The UTC date and timestamp when the resource was created.
 	// Example: 2020-09-09T14:52:15
 	// Read Only: true
 	// Format: date-time
-	UpdatedAt strfmt.DateTime `json:"updated_at,omitempty"`
+	UpdatedAt strfmt.DateTime `json:"updated_at,omitempty" db:"updated_at,omitempty"`
 }
 
 // Validate validates this geomap
@@ -485,11 +485,11 @@ type GeomapAssignmentsItems0 struct {
 	// ISO 3166 2-Letter Country code.
 	// Max Length: 2
 	// Min Length: 2
-	Country string `json:"country,omitempty"`
+	Country string `json:"country,omitempty" db:"country,omitempty"`
 
 	// Datacenter ID
 	// Format: uuid
-	Datacenter strfmt.UUID `json:"datacenter,omitempty"`
+	Datacenter strfmt.UUID `json:"datacenter,omitempty" db:"datacenter,omitempty"`
 }
 
 // Validate validates this geomap assignments items0

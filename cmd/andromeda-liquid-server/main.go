@@ -68,6 +68,12 @@ var defaultServiceUsageReport = liquid.ServiceUsageReport{
 				liquid.AvailabilityZoneAny: {Usage: 0},
 			},
 		},
+		"domains_f5": {
+			Quota: swag.Int64(0),
+			PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
+				liquid.AvailabilityZoneAny: {Usage: 0},
+			},
+		},
 		"members": {
 			Quota: swag.Int64(0),
 			PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
@@ -137,6 +143,11 @@ func (l *liquidLogic) BuildServiceInfo(_ context.Context) (liquid.ServiceInfo, e
 				HasQuota:    true,
 				Topology:    liquid.FlatTopology,
 			},
+			"domains_f5": {
+				HasCapacity: false,
+				HasQuota:    true,
+				Topology:    liquid.FlatResourceTopology,
+			},
 			"members": {
 				HasCapacity: false,
 				HasQuota:    true,
@@ -188,6 +199,12 @@ func (l *liquidLogic) ScanUsage(ctx context.Context, projectUUID string, req liq
 					liquid.AvailabilityZoneAny: {Usage: uint64(resp.Payload.Quota.QuotaUsage.InUseDomainAkamai)},
 				},
 			},
+			"domains_f5": {
+				Quota: resp.Payload.Quota.DomainF5,
+				PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
+					liquid.AvailabilityZoneAny: {Usage: uint64(resp.Payload.Quota.QuotaUsage.InUseDomainF5)},
+				},
+			},
 			"members": {
 				Quota: resp.Payload.Quota.Member,
 				PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
@@ -216,6 +233,7 @@ func (l *liquidLogic) SetQuota(ctx context.Context, projectUUID string, req liqu
 	params.Quota = administrative.PutQuotasProjectIDBody{Quota: &models.Quota{
 		Datacenter:   func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["datacenters"].Quota),
 		DomainAkamai: func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["domains_akamai"].Quota),
+		DomainF5:     func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["domains_f5"].Quota),
 		Member:       func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["members"].Quota),
 		Monitor:      func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["monitors"].Quota),
 		Pool:         func(num uint64) *int64 { i := int64(num); return &i }(req.Resources["pools"].Quota),
