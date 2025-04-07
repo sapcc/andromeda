@@ -18,6 +18,7 @@ package akamai
 
 import (
 	"context"
+	"net/http"
 	"os"
 	"os/signal"
 	"sync"
@@ -77,6 +78,21 @@ func Sync(ctx context.Context, req stormrpc.Request) stormrpc.Response {
 	return resp
 }
 
+func GetCidrs(ctx context.Context, req stormrpc.Request) stormrpc.Response {
+	cidrBlocksReq, _ := http.NewRequest(http.MethodGet, "/firewall-rules-manager/v1/cidr-blocks", nil)
+	var cidrBlocks []AkamaiCIDRBlock
+	if _, err := (*akamaiAgent.session).Exec(cidrBlocksReq, &cidrBlocks); err != nil {
+		panic(err)
+	}
+
+	resp, err := stormrpc.NewResponse(req.Reply, cidrBlocks)
+	if err != nil {
+		return stormrpc.NewErrorResponse(req.Reply, err)
+	}
+
+	return resp
+}
+
 func ExecuteAkamaiAgent() error {
 	nc, err := nats.Connect(config.Global.Default.TransportURL)
 	if err != nil {
@@ -118,6 +134,7 @@ func ExecuteAkamaiAgent() error {
 
 	srv := rpc.NewServer("andromeda-akamai-agent", stormrpc.WithNatsConn(nc))
 	srv.Handle("andromeda.sync", Sync)
+	srv.Handle("andromeda.get_cidrs.akamai", GetCidrs)
 
 	go func() {
 		_ = srv.Run()
@@ -131,6 +148,19 @@ func ExecuteAkamaiAgent() error {
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
 	// full sync immediately
+
+	r, err := stormrpc.NewRequest("andromeda.get_cidrs", nil)
+	if err != nil {
+		return err
+	}
+
+	resp := client.Do(context.Background(), r)
+	if resp.Err != nil {
+		log.WithError(resp.Err).Error("Failed to get CIDR blocks")
+	} else {
+		print(resp.Data)
+	}
+
 	akamaiAgent.forceSync <- nil
 	<-done
 	log.Info("Shutting down")

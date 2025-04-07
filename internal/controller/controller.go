@@ -38,6 +38,7 @@ type Controller struct {
 	Quotas      QuotaController
 	Sync        SyncController
 	GeoMaps     GeoMapController
+	CidrBlocks  CidrBlocksController
 }
 
 type CommonController struct {
@@ -72,6 +73,7 @@ func New(db *sqlx.DB) *Controller {
 		QuotaController{cc},
 		SyncController{cc},
 		GeoMapController{cc},
+		CidrBlocksController{cc, make(map[string]string)},
 	}
 	return &c
 }

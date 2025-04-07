@@ -85,6 +85,9 @@ func NewAndromedaAPI(spec *loads.Document) *AndromedaAPI {
 		AdministrativeDeleteQuotasProjectIDHandler: administrative.DeleteQuotasProjectIDHandlerFunc(func(params administrative.DeleteQuotasProjectIDParams) middleware.Responder {
 			return middleware.NotImplemented("operation administrative.DeleteQuotasProjectID has not yet been implemented")
 		}),
+		AdministrativeGetCidrBlocksHandler: administrative.GetCidrBlocksHandlerFunc(func(params administrative.GetCidrBlocksParams) middleware.Responder {
+			return middleware.NotImplemented("operation administrative.GetCidrBlocks has not yet been implemented")
+		}),
 		DatacentersGetDatacentersHandler: datacenters.GetDatacentersHandlerFunc(func(params datacenters.GetDatacentersParams) middleware.Responder {
 			return middleware.NotImplemented("operation datacenters.GetDatacenters has not yet been implemented")
 		}),
@@ -225,6 +228,8 @@ type AndromedaAPI struct {
 	PoolsDeletePoolsPoolIDHandler pools.DeletePoolsPoolIDHandler
 	// AdministrativeDeleteQuotasProjectIDHandler sets the operation handler for the delete quotas project ID operation
 	AdministrativeDeleteQuotasProjectIDHandler administrative.DeleteQuotasProjectIDHandler
+	// AdministrativeGetCidrBlocksHandler sets the operation handler for the get cidr blocks operation
+	AdministrativeGetCidrBlocksHandler administrative.GetCidrBlocksHandler
 	// DatacentersGetDatacentersHandler sets the operation handler for the get datacenters operation
 	DatacentersGetDatacentersHandler datacenters.GetDatacentersHandler
 	// DatacentersGetDatacentersDatacenterIDHandler sets the operation handler for the get datacenters datacenter ID operation
@@ -382,6 +387,9 @@ func (o *AndromedaAPI) Validate() error {
 	}
 	if o.AdministrativeDeleteQuotasProjectIDHandler == nil {
 		unregistered = append(unregistered, "administrative.DeleteQuotasProjectIDHandler")
+	}
+	if o.AdministrativeGetCidrBlocksHandler == nil {
+		unregistered = append(unregistered, "administrative.GetCidrBlocksHandler")
 	}
 	if o.DatacentersGetDatacentersHandler == nil {
 		unregistered = append(unregistered, "datacenters.GetDatacentersHandler")
@@ -589,6 +597,10 @@ func (o *AndromedaAPI) initHandlerCache() {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
 	o.handlers["DELETE"]["/quotas/{project_id}"] = administrative.NewDeleteQuotasProjectID(o.context, o.AdministrativeDeleteQuotasProjectIDHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/cidr-blocks"] = administrative.NewGetCidrBlocks(o.context, o.AdministrativeGetCidrBlocksHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

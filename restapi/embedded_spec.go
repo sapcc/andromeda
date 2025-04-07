@@ -46,6 +46,42 @@ func init() {
   },
   "basePath": "/v1",
   "paths": {
+    "/cidr-blocks": {
+      "get": {
+        "tags": [
+          "Administrative"
+        ],
+        "summary": "List CIDR blocks of a service",
+        "parameters": [
+          {
+            "enum": [
+              "akamai",
+              "f5"
+            ],
+            "type": "string",
+            "x-nullable": true,
+            "description": "The provider to filter the CIDR blocks by.",
+            "name": "provider",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A JSON array of CIDR blocks",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "default": {
+            "description": "Unexpected Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        },
+        "x-policy": "andromeda:cidr-blocks:get"
+      }
+    },
     "/datacenters": {
       "get": {
         "tags": [
@@ -2689,6 +2725,42 @@ func init() {
   },
   "basePath": "/v1",
   "paths": {
+    "/cidr-blocks": {
+      "get": {
+        "tags": [
+          "Administrative"
+        ],
+        "summary": "List CIDR blocks of a service",
+        "parameters": [
+          {
+            "enum": [
+              "akamai",
+              "f5"
+            ],
+            "type": "string",
+            "x-nullable": true,
+            "description": "The provider to filter the CIDR blocks by.",
+            "name": "provider",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A JSON array of CIDR blocks",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "default": {
+            "description": "Unexpected Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        },
+        "x-policy": "andromeda:cidr-blocks:get"
+      }
+    },
     "/datacenters": {
       "get": {
         "tags": [
