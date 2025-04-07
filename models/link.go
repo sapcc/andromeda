@@ -36,11 +36,11 @@ type Link struct {
 
 	// href
 	// Format: uri
-	Href strfmt.URI `json:"href,omitempty"`
+	Href strfmt.URI `json:"href,omitempty" db:"href,omitempty"`
 
 	// rel
 	// Enum: [next previous]
-	Rel string `json:"rel,omitempty"`
+	Rel string `json:"rel,omitempty" db:"rel,omitempty"`
 }
 
 // Validate validates this link

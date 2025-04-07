@@ -185,6 +185,7 @@ type ApiSettings struct {
 type Quota struct {
 	Enabled                  bool  `yaml:"enabled" description:"Enable quotas."`
 	DefaultQuotaDomainAkamai int64 `yaml:"domains_akamai" default:"0" description:"Default quota of domain (provider Akamai) per project."`
+	DefaultQuotaDomainF5     int64 `yaml:"domains_f5" default:"0" description:"Default quota of domain (provider F5) per project."`
 	DefaultQuotaPool         int64 `yaml:"pools" default:"0" description:"Default quota of pool per project."`
 	DefaultQuotaMember       int64 `yaml:"members" default:"0" description:"Default quota of member per project."`
 	DefaultQuotaMonitor      int64 `yaml:"monitors" default:"0" description:"Default quota of monitor per project."`

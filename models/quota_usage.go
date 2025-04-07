@@ -33,23 +33,27 @@ type QuotaUsage struct {
 
 	// The current quota usage of datacenter.
 	// Example: 5
-	InUseDatacenter int64 `json:"in_use_datacenter"`
+	InUseDatacenter int64 `json:"in_use_datacenter" db:"in_use_datacenter"`
 
 	// The current quota usage of domain (provider = Akamai).
 	// Example: 5
-	InUseDomainAkamai int64 `json:"in_use_domain_akamai"`
+	InUseDomainAkamai int64 `json:"in_use_domain_akamai" db:"in_use_domain_akamai"`
+
+	// The current quota usage of domain (provider = F5).
+	// Example: 5
+	InUseDomainF5 int64 `json:"in_use_domain_f5" db:"in_use_domain_f5"`
 
 	// The current quota usage of member.
 	// Example: 5
-	InUseMember int64 `json:"in_use_member"`
+	InUseMember int64 `json:"in_use_member" db:"in_use_member"`
 
 	// The current quota usage of monitor.
 	// Example: 5
-	InUseMonitor int64 `json:"in_use_monitor"`
+	InUseMonitor int64 `json:"in_use_monitor" db:"in_use_monitor"`
 
 	// The current quota usage of pool.
 	// Example: 5
-	InUsePool int64 `json:"in_use_pool"`
+	InUsePool int64 `json:"in_use_pool" db:"in_use_pool"`
 }
 
 // Validate validates this quota usage

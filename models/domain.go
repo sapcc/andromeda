@@ -36,74 +36,74 @@ import (
 type Domain struct {
 
 	// The administrative state of the resource, which is up (true) or down (false). Default is true.
-	AdminStateUp *bool `json:"admin_state_up,omitempty"`
+	AdminStateUp *bool `json:"admin_state_up,omitempty" db:"admin_state_up,omitempty"`
 
 	// aliases
-	Aliases []string `json:"aliases"`
+	Aliases []string `json:"aliases" db:"aliases"`
 
 	// If not empty, the backend created a CNAME target to be used for the FQDN.
 	// Example: example.org.production.gtm.com
 	// Read Only: true
 	// Format: hostname
-	CnameTarget *strfmt.Hostname `json:"cname_target,omitempty"`
+	CnameTarget *strfmt.Hostname `json:"cname_target,omitempty" db:"cname_target,omitempty"`
 
 	// The UTC date and timestamp when the resource was created.
 	// Example: 2020-05-11T17:21:34
 	// Read Only: true
 	// Format: date-time
-	CreatedAt strfmt.DateTime `json:"created_at,omitempty"`
+	CreatedAt strfmt.DateTime `json:"created_at,omitempty" db:"created_at,omitempty"`
 
 	// Desired Fully-Qualified Host Name.
 	// Example: example.org
 	// Max Length: 512
 	// Format: hostname
-	Fqdn *strfmt.Hostname `json:"fqdn,omitempty"`
+	Fqdn *strfmt.Hostname `json:"fqdn,omitempty" db:"fqdn,omitempty"`
 
 	// The id of the resource.
 	// Read Only: true
 	// Format: uuid
-	ID strfmt.UUID `json:"id,omitempty"`
+	ID strfmt.UUID `json:"id,omitempty" db:"id,omitempty"`
 
 	// Load balancing method to use for the references pools.
 	// Enum: [WEIGHTED ROUND_ROBIN GEOGRAPHIC AVAILABILITY]
-	Mode *string `json:"mode,omitempty"`
+	Mode *string `json:"mode,omitempty" db:"mode,omitempty"`
 
 	// Human-readable name of the resource.
-	Name *string `json:"name,omitempty"`
+	Name *string `json:"name,omitempty" db:"name,omitempty"`
 
 	// pools
-	Pools []strfmt.UUID `json:"pools"`
+	Pools []strfmt.UUID `json:"pools" db:"pools"`
 
 	// The ID of the project owning this resource.
 	// Example: fa84c217f361441986a220edf9b1e337
 	// Max Length: 32
 	// Min Length: 32
-	ProjectID *string `json:"project_id,omitempty"`
+	ProjectID *string `json:"project_id,omitempty" db:"project_id,omitempty"`
 
 	// Supported provider drivers
 	// Example: akamai
 	// Enum: [akamai f5]
-	Provider *string `json:"provider,omitempty"`
+	Provider *string `json:"provider,omitempty" db:"provider,omitempty"`
 
 	// provisioning status
 	// Read Only: true
 	// Enum: [PENDING_CREATE PENDING_UPDATE PENDING_DELETE ACTIVE ERROR]
-	ProvisioningStatus string `json:"provisioning_status,omitempty"`
+	ProvisioningStatus string `json:"provisioning_status,omitempty" db:"provisioning_status,omitempty"`
 
 	// DNS Record type to use.
 	// Enum: [A AAAA CNAME MX]
-	RecordType *string `json:"record_type,omitempty"`
+	RecordType *string `json:"record_type,omitempty" db:"record_type,omitempty"`
 
 	// status
 	// Read Only: true
 	// Enum: [ONLINE DOWN]
-	Status string `json:"status,omitempty"`
+	Status string `json:"status,omitempty" db:"status,omitempty"`
 
 	// The UTC date and timestamp when the resource was created.
 	// Example: 2020-09-09T14:52:15
 	// Read Only: true
 	// Format: date-time
-	UpdatedAt strfmt.DateTime `json:"updated_at,omitempty"`
+	UpdatedAt strfmt.DateTime `json:"updated_at,omitempty" db:"updated_at,omitempty"`
 }
 
 // Validate validates this domain

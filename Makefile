@@ -61,8 +61,8 @@ bin/%: cmd/%/main.go
 
 swagger: bin/swagger
 	$(SWAGGER) generate server --exclude-main --copyright-file COPYRIGHT.txt
-	$(SWAGGER) generate model --copyright-file COPYRIGHT.txt
 	$(SWAGGER) generate client --copyright-file COPYRIGHT.txt
+	$(SWAGGER) generate model --copyright-file COPYRIGHT.txt --struct-tags db
 
 markdown: bin/swagger
 	$(SWAGGER) generate markdown --copyright-file COPYRIGHT.txt --output docs/api.md

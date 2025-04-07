@@ -2555,6 +2555,12 @@ func init() {
           "x-nullable": true,
           "example": 5
         },
+        "domain_f5": {
+          "description": "The configured domain quota limit for provider F5. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited.",
+          "type": "integer",
+          "x-nullable": true,
+          "example": 5
+        },
         "member": {
           "description": "The configured member quota limit. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited.",
           "type": "integer",
@@ -2586,6 +2592,12 @@ func init() {
         },
         "in_use_domain_akamai": {
           "description": "The current quota usage of domain (provider = Akamai).",
+          "type": "integer",
+          "x-omitempty": false,
+          "example": 5
+        },
+        "in_use_domain_f5": {
+          "description": "The current quota usage of domain (provider = F5).",
           "type": "integer",
           "x-omitempty": false,
           "example": 5
@@ -5320,6 +5332,12 @@ func init() {
           "x-nullable": true,
           "example": 5
         },
+        "domain_f5": {
+          "description": "The configured domain quota limit for provider F5. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited.",
+          "type": "integer",
+          "x-nullable": true,
+          "example": 5
+        },
         "member": {
           "description": "The configured member quota limit. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited.",
           "type": "integer",
@@ -5351,6 +5369,12 @@ func init() {
         },
         "in_use_domain_akamai": {
           "description": "The current quota usage of domain (provider = Akamai).",
+          "type": "integer",
+          "x-omitempty": false,
+          "example": 5
+        },
+        "in_use_domain_f5": {
+          "description": "The current quota usage of domain (provider = F5).",
           "type": "integer",
           "x-omitempty": false,
           "example": 5

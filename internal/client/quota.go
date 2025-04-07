@@ -44,6 +44,7 @@ type QuotaUpdate struct {
 		ProjectID strfmt.UUID `description:"The ID of the project to update"`
 	} `positional-args:"yes" required:"yes"`
 	DomainAkamai *int64 `long:"domain_akamai" description:"Domains (provider Akamai) integer value"`
+	DomainF5     *int64 `long:"domain_f5" description:"Domains (provider F5) integer value"`
 	Datacenter   *int64 `long:"datacenter" description:"Datacenter integer value"`
 	Pool         *int64 `long:"pool" description:"Pool integer value"`
 	Member       *int64 `long:"member" description:"Member integer value"`
@@ -61,9 +62,9 @@ func (*QuotaList) Execute(_ []string) error {
 		return err
 	}
 
-	Table.AppendHeader(table.Row{"Project ID", "DomainsAkamai", "Datacenters", "Pools", "Members", "Monitors"})
+	Table.AppendHeader(table.Row{"Project ID", "DomainsAkamai", "DomainsF5", "Datacenters", "Pools", "Members", "Monitors"})
 	for _, quota := range resp.Payload.Quotas {
-		Table.AppendRow(table.Row{*quota.ProjectID, *quota.DomainAkamai, *quota.Datacenter, *quota.Pool,
+		Table.AppendRow(table.Row{*quota.ProjectID, *quota.DomainAkamai, *quota.DomainF5, *quota.Datacenter, *quota.Pool,
 			*quota.Member, *quota.Monitor})
 	}
 	Table.Render()
@@ -76,13 +77,14 @@ func (*QuotaDefaults) Execute(_ []string) error {
 		return err
 	}
 
-	Table.AppendHeader(table.Row{"DomainsAkamai", "Datacenters", "Pools", "Members", "Monitors"})
+	Table.AppendHeader(table.Row{"DomainsAkamai", "DomainsF5", "Datacenters", "Pools", "Members", "Monitors"})
 	domains_akamai := int(*resp.Payload.Quota.DomainAkamai)
+	domains_f5 := int(*resp.Payload.Quota.DomainF5)
 	datacenters := int(*resp.Payload.Quota.Datacenter)
 	pools := int(*resp.Payload.Quota.Pool)
 	members := int(*resp.Payload.Quota.Member)
 	monitors := int(*resp.Payload.Quota.Monitor)
-	Table.AppendRow(table.Row{domains_akamai, datacenters, pools, members, monitors})
+	Table.AppendRow(table.Row{domains_akamai, domains_f5, datacenters, pools, members, monitors})
 	Table.Render()
 	return nil
 }
@@ -106,6 +108,7 @@ func (*QuotaUpdate) Execute(_ []string) error {
 			Quota: &models.Quota{
 				Datacenter:   QuotaOptions.QuotaUpdate.Datacenter,
 				DomainAkamai: QuotaOptions.QuotaUpdate.DomainAkamai,
+				DomainF5:     QuotaOptions.QuotaUpdate.DomainF5,
 				Member:       QuotaOptions.QuotaUpdate.Member,
 				Monitor:      QuotaOptions.QuotaUpdate.Monitor,
 				Pool:         QuotaOptions.QuotaUpdate.Pool,

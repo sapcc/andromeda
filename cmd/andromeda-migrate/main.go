@@ -27,6 +27,16 @@ func main() {
 	config.ParseArgsAndRun("andromeda-migrate", "database migration tool",
 		func(c *cli.Context) error {
 			dbUrl := config.Global.Database.Connection
+			if c.String("db-url") != "" {
+				dbUrl = c.String("db-url")
+			}
 			return db.Migrate(dbUrl)
-		})
+		},
+		&cli.StringFlag{
+			Name:    "db-url",
+			Usage:   "Database connection URL (overrides value provided in config file)",
+			Value:   "",
+			EnvVars: []string{"DB_URL"},
+		},
+	)
 }

@@ -3004,6 +3004,7 @@ Unexpected Error
 |------|------|---------|:--------:| ------- |-------------|---------|
 | datacenter | integer| `int64` |  | | The configured datacenter quota limit. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited. | `5` |
 | domain_akamai | integer| `int64` |  | | The configured domain quota limit for provider Akamai. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited. | `5` |
+| domain_f5 | integer| `int64` |  | | The configured domain quota limit for provider F5. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited. | `5` |
 | member | integer| `int64` |  | | The configured member quota limit. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited. | `5` |
 | monitor | integer| `int64` |  | | The configured monitor quota limit. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited. | `5` |
 | pool | integer| `int64` |  | | The configured pool quota limit. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited. | `5` |
@@ -3023,6 +3024,7 @@ Unexpected Error
 |------|------|---------|:--------:| ------- |-------------|---------|
 | in_use_datacenter | integer| `int64` |  | | The current quota usage of datacenter. | `5` |
 | in_use_domain_akamai | integer| `int64` |  | | The current quota usage of domain (provider = Akamai). | `5` |
+| in_use_domain_f5 | integer| `int64` |  | | The current quota usage of domain (provider = F5). | `5` |
 | in_use_member | integer| `int64` |  | | The current quota usage of member. | `5` |
 | in_use_monitor | integer| `int64` |  | | The current quota usage of monitor. | `5` |
 | in_use_pool | integer| `int64` |  | | The current quota usage of pool. | `5` |
