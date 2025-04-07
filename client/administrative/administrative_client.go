@@ -44,6 +44,8 @@ type ClientOption func(*runtime.ClientOperation)
 type ClientService interface {
 	DeleteQuotasProjectID(params *DeleteQuotasProjectIDParams, opts ...ClientOption) (*DeleteQuotasProjectIDNoContent, error)
 
+	GetCidrBlocks(params *GetCidrBlocksParams, opts ...ClientOption) (*GetCidrBlocksOK, error)
+
 	GetQuotas(params *GetQuotasParams, opts ...ClientOption) (*GetQuotasOK, error)
 
 	GetQuotasDefaults(params *GetQuotasDefaultsParams, opts ...ClientOption) (*GetQuotasDefaultsOK, error)
@@ -93,6 +95,43 @@ func (a *Client) DeleteQuotasProjectID(params *DeleteQuotasProjectIDParams, opts
 	}
 	// unexpected success response
 	unexpectedSuccess := result.(*DeleteQuotasProjectIDDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+GetCidrBlocks lists c ID r blocks of a service
+*/
+func (a *Client) GetCidrBlocks(params *GetCidrBlocksParams, opts ...ClientOption) (*GetCidrBlocksOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetCidrBlocksParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "GetCidrBlocks",
+		Method:             "GET",
+		PathPattern:        "/cidr-blocks",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetCidrBlocksReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetCidrBlocksOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*GetCidrBlocksDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 

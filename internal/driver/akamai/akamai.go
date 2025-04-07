@@ -92,3 +92,19 @@ func NewAkamaiSession(akamaiConfig *config.AkamaiConfig) (*session.Session, stri
 	}
 	return &s, domainType
 }
+
+type AkamaiCIDRBlock struct {
+	CidrId        int    `json:"cidrId,omitempty"`
+	ServiceId     int    `json:"serviceId,omitempty"`
+	ServiceName   string `json:"serviceName,omitempty"`
+	Description   string `json:"description,omitempty"`
+	Cidr          string `json:"cidr,omitempty"`
+	CidrMask      string `json:"cidrMask,omitempty"`
+	Port          string `json:"port,omitempty"`
+	CreationDate  string `json:"creationDate,omitempty"`
+	EffectiveDate string `json:"effectiveDate,omitempty"`
+	ChangeDate    string `json:"changeDate,omitempty"`
+	MinIp         string `json:"minIp,omitempty"`
+	MaxIp         string `json:"maxIp,omitempty"`
+	LastAction    string `json:"lastAction,omitempty"`
+}

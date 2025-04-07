@@ -1199,6 +1199,32 @@ paths:
           schema:
             $ref: '#/definitions/error'
 
+  /cidr-blocks:
+    get:
+      tags:
+        - Administrative
+      summary: List CIDR blocks of a service
+      x-policy: andromeda:cidr-blocks:get
+      responses:
+        200:
+          description: A JSON array of CIDR blocks
+          schema:
+            type: object
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+      parameters:
+        - in: query
+          name: provider
+          required: false
+          type: string
+          description: The provider to filter the CIDR blocks by.
+          enum:
+            - akamai
+            - f5
+          x-nullable: true
+
 definitions:
   domain:
     type: object

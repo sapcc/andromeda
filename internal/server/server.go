@@ -146,6 +146,7 @@ func ExecuteServer(server *restapi.Server) error {
 	// Administrative
 	api.AdministrativeGetServicesHandler = administrative.GetServicesHandlerFunc(c.Services.GetServices)
 	api.AdministrativePostSyncHandler = administrative.PostSyncHandlerFunc(c.Sync.PostSync)
+	api.AdministrativeGetCidrBlocksHandler = administrative.GetCidrBlocksHandlerFunc(c.CidrBlocks.GetCidrBlocks)
 
 	// Quota Middleware
 	if config.Global.Quota.Enabled {
