@@ -37,7 +37,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/mcuadros/go-defaults v1.2.0
 	github.com/nats-io/nats.go v1.41.0
-	github.com/prometheus/client_golang v1.21.1
+	github.com/prometheus/client_golang v1.22.0
 	github.com/rs/cors v1.11.1
 	github.com/sapcc/go-api-declarations v1.14.0
 	github.com/sapcc/go-bits v0.0.0-20250326161143-f8d9c0d68d83
