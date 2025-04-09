@@ -55,6 +55,7 @@ Administrative API
 | Method  | URI     | Name   | Summary |
 |---------|---------|--------|---------|
 | DELETE | /v1/quotas/{project_id} | [delete quotas project ID](#delete-quotas-project-id) | Reset all Quota of a project |
+| GET | /v1/cidr-blocks | [get cidr blocks](#get-cidr-blocks) | List CIDR blocks of a service |
 | GET | /v1/quotas | [get quotas](#get-quotas) | List Quotas |
 | GET | /v1/quotas/defaults | [get quotas defaults](#get-quotas-defaults) | Show Quota Defaults |
 | GET | /v1/quotas/{project_id} | [get quotas project ID](#get-quotas-project-id) | Show Quota detail |
@@ -468,6 +469,45 @@ Status: Not Found
 Unexpected Error
 
 ###### <span id="delete-quotas-project-id-default-schema"></span> Schema
+
+  
+
+[Error](#error)
+
+### <span id="get-cidr-blocks"></span> List CIDR blocks of a service (*GetCidrBlocks*)
+
+```
+GET /v1/cidr-blocks
+```
+
+#### Parameters
+
+| Name | Source | Type | Go type | Separator | Required | Default | Description |
+|------|--------|------|---------|-----------| :------: |---------|-------------|
+| provider | `query` | string | `string` |  |  |  | The provider to filter the CIDR blocks by. |
+
+#### All responses
+| Code | Status | Description | Has headers | Schema |
+|------|--------|-------------|:-----------:|--------|
+| [200](#get-cidr-blocks-200) | OK | A JSON array of CIDR blocks |  | [schema](#get-cidr-blocks-200-schema) |
+| [default](#get-cidr-blocks-default) | | Unexpected Error |  | [schema](#get-cidr-blocks-default-schema) |
+
+#### Responses
+
+
+##### <span id="get-cidr-blocks-200"></span> 200 - A JSON array of CIDR blocks
+Status: OK
+
+###### <span id="get-cidr-blocks-200-schema"></span> Schema
+   
+  
+
+any
+
+##### <span id="get-cidr-blocks-default"></span> Default Response
+Unexpected Error
+
+###### <span id="get-cidr-blocks-default-schema"></span> Schema
 
   
 
