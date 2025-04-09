@@ -29,7 +29,7 @@ import (
 	"github.com/gophercloud/utils/v2/openstack/clientconfig"
 	"github.com/mcuadros/go-defaults"
 	"github.com/sapcc/go-api-declarations/bininfo"
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 	"gopkg.in/yaml.v3"
 )
 
