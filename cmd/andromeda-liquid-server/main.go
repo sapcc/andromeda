@@ -123,27 +123,27 @@ func (l *liquidLogic) BuildServiceInfo(_ context.Context) (liquid.ServiceInfo, e
 			"datacenters": {
 				HasCapacity: false,
 				HasQuota:    true,
-				Topology:    liquid.FlatResourceTopology,
+				Topology:    liquid.FlatTopology,
 			},
 			"domains": {
 				HasCapacity: false,
 				HasQuota:    true,
-				Topology:    liquid.FlatResourceTopology,
+				Topology:    liquid.FlatTopology,
 			},
 			"members": {
 				HasCapacity: false,
 				HasQuota:    true,
-				Topology:    liquid.FlatResourceTopology,
+				Topology:    liquid.FlatTopology,
 			},
 			"monitors": {
 				HasCapacity: false,
 				HasQuota:    true,
-				Topology:    liquid.FlatResourceTopology,
+				Topology:    liquid.FlatTopology,
 			},
 			"pools": {
 				HasCapacity: false,
 				HasQuota:    true,
-				Topology:    liquid.FlatResourceTopology,
+				Topology:    liquid.FlatTopology,
 			},
 		},
 		Rates:                  map[liquid.RateName]liquid.RateInfo{},
