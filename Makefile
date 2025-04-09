@@ -28,7 +28,7 @@ LDFLAGS= -ldflags="-X 'github.com/sapcc/go-api-declarations/bininfo.buildDate=$(
 
 bin/migrate:
 	go install github.com/golang-migrate/migrate/v4/cmd/migrate@$(MIGRATE_VERSION)
-	test $(GOPATH)/bin != $(PWD)/bin && cp $(GOPATH)/bin/migrate $(PWD)/bin
+	-cp $(GOPATH)/bin/migrate $(PWD)/bin
 
 bin/protoc-gen-go:
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@$(PROTOC_GEN_GO_VERSION) && cp $(GOPATH)/bin/protoc-gen-go $(PWD)/bin
