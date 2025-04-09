@@ -149,18 +149,6 @@ func ExecuteAkamaiAgent() error {
 	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
 	// full sync immediately
 
-	r, err := stormrpc.NewRequest("andromeda.get_cidrs", nil)
-	if err != nil {
-		return err
-	}
-
-	resp := client.Do(context.Background(), r)
-	if resp.Err != nil {
-		log.WithError(resp.Err).Error("Failed to get CIDR blocks")
-	} else {
-		print(resp.Data)
-	}
-
 	akamaiAgent.forceSync <- nil
 	<-done
 	log.Info("Shutting down")
