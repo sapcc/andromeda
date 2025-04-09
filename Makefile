@@ -23,6 +23,7 @@ SWAGGER_VERSION             ?= v0.30.4
 TMP_DIR := $(PWD)/tmp
 
 build-all: $(BIN_DEPS) $(PB_FILES) $(PB_STORM_FILES) $(BIN)
+ci-build-all: $(PB_FILES) $(PB_STORM_FILES) $(BIN)
 
 LDFLAGS= -ldflags="-X 'github.com/sapcc/go-api-declarations/bininfo.buildDate=$(BININFO_BUILD_DATE)' -X 'github.com/sapcc/go-api-declarations/bininfo.commit=$(BININFO_COMMIT_HASH)' -X 'github.com/sapcc/go-api-declarations/bininfo.version=$(BININFO_VERSION)'"
 
