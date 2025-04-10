@@ -27,7 +27,6 @@ import (
 	"github.com/sapcc/andromeda/internal/driver"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
-	"github.com/sapcc/andromeda/internal/utils"
 )
 
 type IPAvailability struct {
@@ -57,7 +56,7 @@ func (s *AkamaiAgent) syncMemberStatus(domain *rpcmodels.Domain) error {
 	memberMap := make(map[string]string)
 	for _, pool := range domain.Pools {
 		for _, member := range pool.Members {
-			memberMap[utils.InetNtoa(member.Address).String()] = member.GetId()
+			memberMap[member.Address] = member.GetId()
 		}
 	}
 

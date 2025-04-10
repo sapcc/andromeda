@@ -51,7 +51,7 @@ type MemberCreate struct {
 		PoolID strfmt.UUID `description:"UUID of the pool"`
 	} `positional-args:"yes" required:"yes"`
 	Name         string      `short:"n" long:"name" description:"Name of the Member"`
-	Address      strfmt.IPv4 `short:"a" long:"address" description:"Address of the Member" required:"true"`
+	Address      string      `short:"a" long:"address" description:"Address of the Member" required:"true"`
 	Port         int64       `short:"p" long:"port" description:"Port of the Member" required:"true"`
 	Disable      bool        `short:"d" long:"disable" description:"Disable Member" optional:"true" optional-value:"false"`
 	DatacenterID strfmt.UUID `short:"i" long:"datacenter" description:"Datacenter ID"`
@@ -67,11 +67,11 @@ type MemberSet struct {
 	PositionalMemberSet struct {
 		UUID strfmt.UUID `description:"UUID of the member"`
 	} `positional-args:"yes" required:"yes"`
-	Name    *string      `short:"n" long:"name" description:"Name of the Member"`
-	Address *strfmt.IPv4 `short:"a" long:"address" description:"Address of the Member"`
-	Port    *int64       `short:"p" long:"port" description:"Port of the Member"`
-	Disable bool         `short:"d" long:"disable" description:"Disable Member"`
-	Enable  bool         `short:"e" long:"enable" description:"Enable Member"`
+	Name    *string `short:"n" long:"name" description:"Name of the Member"`
+	Address *string `short:"a" long:"address" description:"Address of the Member"`
+	Port    *int64  `short:"p" long:"port" description:"Port of the Member"`
+	Disable bool    `short:"d" long:"disable" description:"Disable Member"`
+	Enable  bool    `short:"e" long:"enable" description:"Enable Member"`
 }
 
 func (*MemberList) Execute(_ []string) error {
