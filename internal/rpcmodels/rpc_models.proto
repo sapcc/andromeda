@@ -52,7 +52,7 @@ message Geomap {
 message Member {
   string id = 1;
   bool admin_state_up = 2;
-  fixed32 address = 3;
+  string address = 3;
   uint32 port = 4;
   string datacenter = 5;
   string provisioning_status = 6;

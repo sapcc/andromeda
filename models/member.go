@@ -34,10 +34,9 @@ import (
 // swagger:model member
 type Member struct {
 
-	// Address to use.
+	// Address to use. Can also be a domain name.
 	// Example: 1.2.3.4
-	// Format: ipv4
-	Address *strfmt.IPv4 `json:"address,omitempty"`
+	Address *string `json:"address,omitempty"`
 
 	// The administrative state of the resource, which is up (true) or down (false). Default is true.
 	AdminStateUp *bool `json:"admin_state_up,omitempty"`
@@ -98,10 +97,6 @@ type Member struct {
 func (m *Member) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateAddress(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.validateCreatedAt(formats); err != nil {
 		res = append(res, err)
 	}
@@ -145,18 +140,6 @@ func (m *Member) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
-	return nil
-}
-
-func (m *Member) validateAddress(formats strfmt.Registry) error {
-	if swag.IsZero(m.Address) { // not required
-		return nil
-	}
-
-	if err := validate.FormatOf("address", "body", "ipv4", m.Address.String(), formats); err != nil {
-		return err
-	}
-
 	return nil
 }
 

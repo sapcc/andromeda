@@ -19,7 +19,6 @@ package server
 import (
 	"context"
 	"fmt"
-	"net"
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
@@ -29,7 +28,6 @@ import (
 
 	"github.com/sapcc/andromeda/db"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
-	"github.com/sapcc/andromeda/internal/utils"
 )
 
 type RPCHandler struct {
@@ -74,14 +72,8 @@ func (u *RPCHandler) GetMembers(ctx context.Context, request *SearchRequest) (*M
 	}
 	for rows.Next() {
 		var member rpcmodels.Member
-		var address string
-		if err := rows.Scan(&member.Id, &member.AdminStateUp, &address,
+		if err := rows.Scan(&member.Id, &member.AdminStateUp, &member.Address,
 			&member.Port, &member.ProvisioningStatus); err != nil {
-			return nil, err
-		}
-
-		member.Address, err = utils.InetAton(net.ParseIP(address))
-		if err != nil {
 			return nil, err
 		}
 		response.Response = append(response.Response, &member)
@@ -312,15 +304,9 @@ func populateMembers(u *RPCHandler, poolID string) ([]*rpcmodels.Member, error) 
 	var members []*rpcmodels.Member
 	for rows.Next() {
 		var member rpcmodels.Member
-		var address string
-		if err := rows.Scan(&member.Id, &member.AdminStateUp, &address,
+		if err := rows.Scan(&member.Id, &member.AdminStateUp, &member.Address,
 			&member.Port, &member.Datacenter, &member.ProvisioningStatus); err != nil {
 			log.Error(err.Error())
-			return nil, err
-		}
-
-		member.Address, err = utils.InetAton(net.ParseIP(address))
-		if err != nil {
 			return nil, err
 		}
 

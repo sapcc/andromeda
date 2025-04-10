@@ -2234,9 +2234,8 @@ func init() {
       "type": "object",
       "properties": {
         "address": {
-          "description": "Address to use.",
+          "description": "Address to use. Can also be a domain name.",
           "type": "string",
-          "format": "ipv4",
           "x-nullable": true,
           "example": "1.2.3.4"
         },
@@ -4997,9 +4996,8 @@ func init() {
       "type": "object",
       "properties": {
         "address": {
-          "description": "Address to use.",
+          "description": "Address to use. Can also be a domain name.",
           "type": "string",
-          "format": "ipv4",
           "x-nullable": true,
           "example": "1.2.3.4"
         },
