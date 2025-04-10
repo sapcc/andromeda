@@ -28,7 +28,6 @@ import (
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/driver/f5/as3"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
-	"github.com/sapcc/andromeda/internal/utils"
 )
 
 func (f5 *F5Agent) GetCommonDeclaration() (*as3.Tenant, error) {
@@ -46,7 +45,7 @@ func (f5 *F5Agent) GetCommonDeclaration() (*as3.Tenant, error) {
 
 		virtualServer := as3.GSLBVirtualServer{
 			Name:    "member_" + member.GetId(),
-			Address: utils.InetNtoa(member.Address).String(),
+			Address: member.Address,
 			Port:    member.Port,
 			Enabled: member.AdminStateUp,
 		}
