@@ -146,7 +146,7 @@ func (l *liquidLogic) BuildServiceInfo(_ context.Context) (liquid.ServiceInfo, e
 			"domains_f5": {
 				HasCapacity: false,
 				HasQuota:    true,
-				Topology:    liquid.FlatResourceTopology,
+				Topology:    liquid.FlatTopology,
 			},
 			"members": {
 				HasCapacity: false,
