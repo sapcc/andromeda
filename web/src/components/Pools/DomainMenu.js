@@ -3,7 +3,7 @@ import React from "react";
 import {authStore} from "../../store";
 import {useInfiniteQuery} from "@tanstack/react-query";
 import {fetchAll, nextPageParam} from "../../actions";
-import {Menu, MenuItem} from "@cloudoperators/juno-ui-components";
+import {Button, Icon} from "@cloudoperators/juno-ui-components";
 
 const DomainMenu = ({formState, setFormState, setError}) => {
     const auth = authStore((state) => state.auth)
@@ -36,27 +36,51 @@ const DomainMenu = ({formState, setFormState, setError}) => {
     }
 
     return (
-        <Menu variant="small">
-            {/* Render items: */}
-            {data?.pages.map((group, i) => group.domains.map((domain, index) => (
-                <MenuItem
-                    key={domain.id}
-                    icon={formState.domains.includes(domain.id) ? "checkCircle" : "addCircle"}
-                    label={`${domain.name || domain.id} (${domain.fqdn})`}
-                    onClick={() => toggleDomain(domain.id)}
-                    className={formState.domains.includes(domain.id) ? "jn-text-theme-info" : ""}
+        <div>
+            <table className="table-auto w-full jn-text-left">
+                <thead className="jn-bg-theme-background-lvl-2">
+                    <tr>
+                        <th>Name/ID</th>
+                        <th>FQDN</th>
+                        <th>Mode</th>
+                        <th>Provider</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {data?.pages.map((group, i) => group.domains.map((domain, index) => (
+                    <tr onClick={(e) => {
+                        e.preventDefault();
+                        toggleDomain(domain.id)
+                    }}
+                        className={`cursor-pointer hover:jn-bg-theme-background-lvl-3 hover:jn-text-theme-accent ${formState.domains.includes(domain.id) && "jn-text-theme-accent"}`}
+                    >
+                        <td className="jn-inline-flex">
+                            <Icon
+                                icon={formState.domains.includes(domain.id) ? "checkCircle" : "addCircle"}
+                                className="jn-mr-2"
+                            />
+                            {`${domain.name || domain.id}`}</td>
+                        <td>{domain.fqdn}</td>
+                        <td>{domain.mode}</td>
+                        <td className={"place-self-end"}>{domain.provider}</td>
+                    </tr>
+                )))
+                }
+                < /tbody>
+            </table>
+            {hasNextPage && (
+                <Button
+                    className={"w-full"}
+                    label={isLoading ? "Loading..." :
+                        isFetching ? 'Loading more...'
+                            : hasNextPage
+                                ? 'Load More'
+                                : 'Nothing more to load'}
+                    onClick={hasNextPage ? () => fetchNextPage() : undefined}
+                    icon={hasNextPage ? "expandMore" : "info"}
                 />
-            )))}
-            <MenuItem
-                label={isLoading ? "Loading..." :
-                    isFetching ? 'Loading more...'
-                        : hasNextPage
-                            ? 'Load More'
-                            : 'Nothing more to load'}
-                onClick={hasNextPage ? () => fetchNextPage() : null}
-                icon={hasNextPage ? "expandMore" : "info"}
-            />
-        </Menu>
+            )}
+        </div>
     )
 }
 export default DomainMenu
