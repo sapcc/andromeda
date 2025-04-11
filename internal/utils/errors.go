@@ -53,6 +53,11 @@ func GetQuotaMetResponse(resource string) *models.Error {
 		"Quota has been met for Resource: %s", resource)}
 }
 
+func GetInvalidProviderBoundResourceResponse(resource string) *models.Error {
+	return &models.Error{Code: 403, Message: fmt.Sprintf(
+		"Cannot determine quota: provider missing for resource: %s", resource)}
+}
+
 func GetErrorPoolNotFound(poolID *strfmt.UUID) *models.Error {
 	return &models.Error{Code: 404, Message: fmt.Sprintf(
 		"invalid value for 'pool_id': Pool '%s' not found", poolID)}
