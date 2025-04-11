@@ -3,7 +3,7 @@ import React from "react";
 import {useInfiniteQuery} from "@tanstack/react-query";
 import {fetchAll, nextPageParam} from "../../../actions";
 import {authStore} from "../../../store";
-import {Menu, MenuItem} from "@cloudoperators/juno-ui-components";
+import {Button, Icon} from "@cloudoperators/juno-ui-components";
 
 const DatacenterMenu = ({formState, setFormState, setError}) => {
     const auth = authStore((state) => state.auth)
@@ -22,7 +22,6 @@ const DatacenterMenu = ({formState, setFormState, setError}) => {
     })
 
     const onDatacenterClick = (id) => {
-
         setFormState({
             ...formState,
             datacenter_id: id === formState.datacenter_id ? undefined : id,
@@ -30,19 +29,40 @@ const DatacenterMenu = ({formState, setFormState, setError}) => {
     }
 
     return (
-        <Menu variant="small">
-            {/* Render items: */}
-            {data?.pages.map((group, i) => group.datacenters.map((datacenter, index) => (
-                <MenuItem
-                    key={datacenter.id}
-                    icon={formState.datacenter_id === datacenter.id ? "checkCircle" : "addCircle"}
-                    label={`${datacenter.name || datacenter.id}`}
-                    onClick={(e) => {e.preventDefault(); onDatacenterClick(datacenter.id)}}
-                    className={formState.datacenter_id === datacenter.id ? "jn-text-theme-info" : ""}
-                />
-            )))}
+        <div>
+            <table className="table-auto w-full jn-text-left">
+                <thead className="jn-bg-theme-background-lvl-2">
+                    <tr className="">
+                        <th>Name/ID</th>
+                        <th>Country</th>
+                        <th>City</th>
+                        <th>Provider</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {data?.pages.map((group, i) => group.datacenters.map((datacenter, index) => (
+                    <tr
+                        onClick={(e) => {
+                            e.preventDefault();
+                            onDatacenterClick(datacenter.id)
+                        }}
+                        className={`cursor-pointer hover:jn-bg-theme-background-lvl-3 hover:jn-text-theme-accent ${formState.datacenter_id === datacenter.id && "jn-text-theme-accent"}`}>
+                        <td className={"jn-inline-flex"}>
+                            <Icon
+                                icon={formState.datacenter_id === datacenter.id ? "checkCircle" : "addCircle"}
+                                className={"jn-mr-2"}
+                            />
+                            {`${datacenter.name || datacenter.id}`}</td>
+                        <td>{datacenter.country}</td>
+                        <td>{datacenter.city}</td>
+                        <td className={"place-self-end"}>{datacenter.provider}</td>
+                    </tr>
+                )))}
+                </tbody>
+            </table>
             {hasNextPage && (
-                <MenuItem
+                <Button
+                    className={"w-full"}
                     label={isLoading ? "Loading..." :
                         isFetching ? 'Loading more...'
                             : hasNextPage
@@ -52,7 +72,7 @@ const DatacenterMenu = ({formState, setFormState, setError}) => {
                     icon={hasNextPage ? "expandMore" : "info"}
                 />
             )}
-        </Menu>
+        </div>
     )
 }
 

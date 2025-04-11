@@ -67,22 +67,20 @@ export async function copyTextToClipboard(text) {
     }
 }
 
-export const ListItemSpinner = ({data, onClick, className, maxLength=25}) => {
-    const name = data.name || data.id
+export const ListItemSpinner = ({data, onClick, className, maxLength = 25}) => {
     const [showToast, setToast] = useState(false)
 
     return (
         <Stack alignment="center" className={className} onClick={onClick}>
-            {["ACTIVE", "DELETED", "ERROR"].includes(data.provisioning_status) && <></> || <Spinner variant={variantClass(data.provisioning_status)} size="small"/>}
+            {["ACTIVE", "DELETED", "ERROR"].includes(data.provisioning_status) && <></> ||
+                <Spinner variant={variantClass(data.provisioning_status)} size="small"/>}
             <Stack
                 direction="vertical"
                 className={`${backgroundClass(data.provisioning_status)}`}
             >
-                <div>
-                    {name === data.id && <b>{name}</b> || <small>{data.id} </small>}
-                    {showToast && <Toast text="ID copied to clipboard" className="absolute"/>}
-                    &nbsp;
-                    <Icon size={name === data.id && "16" || "14"} icon="contentCopy" title="Copy" onClick={() => {
+                {data.name && <p>{data.name.substring(0, maxLength)}{data.name.length >= maxLength && "..."}</p> || ""}
+                <div className="jn-flex jn-justify-start">
+                    <Icon size="14" icon="contentCopy" title="Copy" onClick={() => {
                         copyTextToClipboard(data.id).then(() => {
                             setToast(true)
                             setTimeout(function () { //Start the timer
@@ -90,7 +88,8 @@ export const ListItemSpinner = ({data, onClick, className, maxLength=25}) => {
                             }.bind(this), 1000)
                         })
                     }}/>
-                    {name !== data.id && <p>{name.substring(0, maxLength)}{name.length >= maxLength && "..."}</p> || ""}
+                    <small>{data.id.substring(0, maxLength)}{data.id.length >= maxLength && "..."}</small>
+                    {showToast && <Toast text="ID copied to clipboard" className="absolute"/>}
                 </div>
             </Stack>
         </Stack>
@@ -120,12 +119,13 @@ export const ListItemStatus = ({data}) => {
                 case "NO_MONITOR":
                     return (
                         <Tooltip triggerEvent="hover">
-                            <TooltipTrigger><Badge icon="warning" text={data.status} variant="warning" /></TooltipTrigger>
+                            <TooltipTrigger><Badge icon="warning" text={data.status}
+                                                   variant="warning"/></TooltipTrigger>
                             <TooltipContent>Member is handed out, but Monitor failed or doesn't exist</TooltipContent>
                         </Tooltip>
-                        )
+                    )
             }
-            return <Badge text={data.status} variant={variant} icon={icon} />
+            return <Badge text={data.status} variant={variant} icon={icon}/>
         } else {
             return <Badge
                 text={data.provisioning_status}
@@ -139,7 +139,7 @@ export const ListItemStatus = ({data}) => {
             variant={variant}
             text={data.provisioning_status}
             icon={variant}
-            />
+        />
     }
 }
 
@@ -152,7 +152,7 @@ mr-2
 bg-cover 
 `
 
-export const HeaderUser = ({ auth, logout, theme, setTheme }) => {
+export const HeaderUser = ({auth, logout, theme, setTheme}) => {
     const sapID = useMemo(() => auth?.user.name || "", [auth])
 
     return (
@@ -177,7 +177,8 @@ export const HeaderUser = ({ auth, logout, theme, setTheme }) => {
 
             <Stack gap="2">
                 <Button
-                    onClick={() => {setTheme(theme === "theme-light" ? "theme-dark" : "theme-light")
+                    onClick={() => {
+                        setTheme(theme === "theme-light" ? "theme-dark" : "theme-light")
                         console.log(`${theme} => setTheme(${theme === "theme-light" ? "theme-dark" : "theme-light"})`)
                     }}
                     icon="danger"
@@ -217,8 +218,8 @@ export const HeaderUser = ({ auth, logout, theme, setTheme }) => {
 
 export const JsonModal = (data) => {
     return (
-        <Modal size="large" open >
-            <JsonViewer data={data} toolbar />
+        <Modal size="large" open>
+            <JsonViewer data={data} toolbar/>
         </Modal>
     )
 }
