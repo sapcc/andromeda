@@ -1,14 +1,6 @@
 import React, {useMemo, useState} from "react"
 
-import {
-    DataGridCell,
-    DataGridRow,
-    Icon,
-    Stack,
-    ContextMenu,
-    MenuItem,
-    Pill,
-} from "@cloudoperators/juno-ui-components"
+import {DataGridCell, DataGridRow, Icon, Pill, Stack,} from "@cloudoperators/juno-ui-components"
 import {authStore, urlStore} from "../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {deleteItem} from "../../actions"
@@ -66,12 +58,13 @@ const DomainListItem = ({domain, setError}) => {
         <>
             <DataGridRow>
                 <DataGridCell>
-                    <ListItemSpinner data={domain} />
+                    <ListItemSpinner data={domain}/>
                 </DataGridCell>
                 <DataGridCell>
                     <Stack direction="vertical">
                         <p>{domain.fqdn}</p>
-                        {domain.cname_target && <small><a target="_blank" href={"https://"+domain.cname_target}>{domain.cname_target}</a></small>}
+                        {domain.cname_target &&
+                            <small><a target="_blank" href={"https://" + domain.cname_target}>{domain.cname_target}</a></small>}
                     </Stack>
                 </DataGridCell>
                 <DataGridCell>{domain.record_type}</DataGridCell>
@@ -80,33 +73,38 @@ const DomainListItem = ({domain, setError}) => {
                 <DataGridCell>{updatedAt}</DataGridCell>
                 <DataGridCell>
                     <Pill
-                        onClick={() => {if(domain.pools.length) {setDomain(domain.id);  setTab(1); }}}
+                        onClick={() => {
+                            if (domain.pools.length) {
+                                setDomain(domain.id);
+                                setTab(1);
+                            }
+                        }}
                         pillKeyLabel="#"
                         pillValueLabel={domain.pools.length || "0"}
                     />
                 </DataGridCell>
-                <DataGridCell><ListItemStatus data={domain} /></DataGridCell>
+                <DataGridCell><ListItemStatus data={domain}/></DataGridCell>
                 <DataGridCell className="jn-items-end">
                     {/* Use <Stack> to align and space elements: */}
                     <Stack gap="1.5">
                         <Icon
-                            icon="edit"
+                            label="Edit"
                             size="18"
-                            className="leading-none self-center"
+                            icon="edit"
                             onClick={handleEditDomainClick}
                         />
-                        <ContextMenu>
-                            <MenuItem
-                                icon="deleteForever"
-                                label="Delete"
-                                onClick={handleDeleteDomainClick}
-                            />
-                            <MenuItem
-                                icon="info"
-                                label="JSON"
-                                onClick={() => setShowJson(!showJson)}
-                            />
-                        </ContextMenu>
+                        <Icon
+                            label="Delete"
+                            size="18"
+                            icon="deleteForever"
+                            onClick={handleDeleteDomainClick}
+                        />
+                        <Icon
+                            label="JSON"
+                            size="18"
+                            icon="info"
+                            onClick={() => setShowJson(!showJson)}
+                        />
                     </Stack>
                 </DataGridCell>
             </DataGridRow>

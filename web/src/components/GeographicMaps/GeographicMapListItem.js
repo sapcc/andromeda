@@ -1,5 +1,11 @@
 import React, {useMemo, useState} from "react"
-import {DataGridCell, DataGridRow, Icon, Stack, ContextMenu, MenuItem} from "@cloudoperators/juno-ui-components"
+import {
+    DataGridCell,
+    DataGridRow,
+    Icon,
+    Stack,
+    PopupMenu
+} from "@cloudoperators/juno-ui-components"
 import {authStore, urlStore} from "../../store"
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {deleteItem} from "../../actions"
@@ -72,7 +78,7 @@ const GeographicMapListItem = ({geomap, setError}) => {
                     {geomap.project_id === auth?.project?.id && (
                         <>
                             <Icon
-                                icon="openInNew"
+                                icon="info"
                                 size="18"
                                 className="leading-none self-center"
                                 onClick={handleShowGeographicMapClick}
@@ -83,18 +89,20 @@ const GeographicMapListItem = ({geomap, setError}) => {
                                 className="leading-none self-center"
                                 onClick={handleEditGeographicMapClick}
                             />*/}
-                            <ContextMenu>
-                                <MenuItem
-                                    icon="deleteForever"
-                                    label="Delete"
-                                    onClick={handleDeleteGeographicMapClick}
-                                />
-                                <MenuItem
-                                    icon="info"
-                                    label="JSON"
-                                    onClick={() => setShowJson(!showJson)}
-                                />
-                            </ContextMenu>
+                            <PopupMenu>
+                                <PopupMenu.Menu>
+                                    <PopupMenu.Item className="jn-text-theme-accent"
+                                        icon="deleteForever"
+                                        label="Delete"
+                                        onClick={handleDeleteGeographicMapClick}
+                                        />
+                                    <PopupMenu.Item className="jn-text-theme-accent"
+                                        icon="info"
+                                        label="JSON"
+                                        onClick={() => setShowJson(!showJson)}
+                                        />
+                                </PopupMenu.Menu>
+                            </PopupMenu>
                         </>
                     )}
                 </Stack>
