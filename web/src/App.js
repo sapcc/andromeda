@@ -13,6 +13,17 @@ const App = (props) => {
     const [theme, setTheme] = useState(props.theme)
     const [auth, setAuth] = authStore((state) => [state.auth, state.setAuth])
 
+    React.useEffect(() => {
+        if (props?.disableAuth) {
+            setAuth({
+                endpoint: props.overrideAndromedaEndpoint,
+                token: "",
+                user: {name: "undefined"},
+                project: {domain: {name: "undefined"}, name: "undefined"}
+            })
+        }
+    }, [props])
+
     const logout = () => {
         setAuth(undefined)
         queryClient.invalidateQueries().then()

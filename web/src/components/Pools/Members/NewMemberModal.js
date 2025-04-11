@@ -84,7 +84,7 @@ const NewMemberModal = () => {
                     onChange={handleChange}
                 />
                 <TextInput
-                    label="IP address"
+                    label="Address (IP/Domain Name)"
                     name="address"
                     value={formState.address}
                     onChange={handleChange}

@@ -1651,8 +1651,7 @@ definitions:
         x-nullabe: true
       address:
         type: string
-        format: ipv4
-        description: Address to use.
+        description: Address to use. Can also be a domain name.
         example: 1.2.3.4
         x-nullable: true
       pool_id:
