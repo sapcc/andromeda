@@ -47,8 +47,14 @@ func ExecuteAkamaiReports() error {
 		return err
 	}
 
-	// Register prometheus exporter
+	// Create a cached Akamai session
+	cachedSession := NewCachedAkamaiSession(*session, config.Global.AkamaiConfig.Domain)
+
+	// Register prometheus exporters
 	prometheus.MustRegister(NewAndromedaAkamaiCollector(*session, client, config.Global.AkamaiConfig.Domain))
+	
+	// Register the total DNS requests collector
+	prometheus.MustRegister(NewTotalDNSRequestsCollector(cachedSession, config.Global.AkamaiConfig.Domain))
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
