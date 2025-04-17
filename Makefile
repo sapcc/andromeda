@@ -27,7 +27,7 @@ ci-build-all: $(PB_FILES) $(PB_STORM_FILES) $(BIN)
 
 # Specific target for building the Akamai DNS requests CLI tool
 build-akamai-dns-requests:
-	go build $(LDFLAGS) -o bin/andromeda-akamai-total-dns-requests cmd/andromeda-akamai-total-dns-requests/main.go
+	go build $(LDFLAGS) -o build/andromeda-akamai-total-dns-requests cmd/andromeda-akamai-total-dns-requests/main.go
 
 LDFLAGS= -ldflags="-X 'github.com/sapcc/go-api-declarations/bininfo.buildDate=$(BININFO_BUILD_DATE)' -X 'github.com/sapcc/go-api-declarations/bininfo.commit=$(BININFO_COMMIT_HASH)' -X 'github.com/sapcc/go-api-declarations/bininfo.version=$(BININFO_VERSION)'"
 
