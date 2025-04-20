@@ -9,7 +9,7 @@ require (
 	github.com/Boostport/migration/driver/mysql v1.1.2
 	github.com/Boostport/migration/driver/postgres v1.1.3
 	github.com/Masterminds/squirrel v1.5.4
-	github.com/actatum/stormrpc v0.4.2
+	github.com/actatum/stormrpc v0.4.3
 	github.com/akamai/AkamaiOPEN-edgegrid-golang/v10 v10.1.0
 	github.com/apex/log v1.9.0
 	github.com/cockroachdb/cockroach-go/v2 v2.4.0
@@ -121,6 +121,6 @@ require (
 	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/term v0.31.0 // indirect
 	golang.org/x/text v0.24.0 // indirect
-	golang.org/x/time v0.6.0 // indirect
+	golang.org/x/time v0.11.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 )
