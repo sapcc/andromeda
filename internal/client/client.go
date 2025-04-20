@@ -83,6 +83,7 @@ func SetupClient() {
 				ProjectName:       opts.OSProjectName,
 				ProjectDomainName: opts.OSProjectDomainName,
 				UserDomainName:    opts.OSUserDomainName,
+				AllowReauth:       true,
 			},
 		})
 		if err != nil {
