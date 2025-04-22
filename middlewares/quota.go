@@ -107,7 +107,7 @@ func (qc *quotaController) QuotaHandler(next http.Handler) http.Handler {
 
 		if slices.Contains(providerBoundResourceQuotas, resource) {
 			log.Debugf("Resource quota for '%s' is bound to provider", resource)
-			provider, err = providerFromHTTPRequest(resource, r)
+			provider, err = providerFromHTTPRequest(resource, w, r)
 			if err != nil {
 				middleware.
 					Error(401, utils.GetInvalidProviderBoundResourceResponse(resource), utils.JSONHeader).
@@ -198,12 +198,12 @@ func (qc *quotaController) QuotaHandler(next http.Handler) http.Handler {
 	})
 }
 
-func providerFromHTTPRequest(resource string, r *http.Request) (string, error) {
+func providerFromHTTPRequest(resource string, w http.ResponseWriter, r *http.Request) (string, error) {
 	resourceReq, err := newResourceRequest(resource)
 	if err != nil {
 		return "", err
 	}
-	bodyBytes, err := io.ReadAll(r.Body)
+	bodyBytes, err := io.ReadAll(http.MaxBytesReader(w, r.Body, 1<<20)) // 1MB
 	if err != nil {
 		return "", err
 	}
