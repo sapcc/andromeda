@@ -13,8 +13,8 @@ github.com/DATA-DOG/go-sqlmock v1.5.0/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q
 github.com/Masterminds/squirrel v1.5.4 h1:uUcX/aBc8O7Fg9kaISIUsHXdKuqehiXAMQTYX8afzqM=
 github.com/Masterminds/squirrel v1.5.4/go.mod h1:NNaOrjSoIDfDA40n7sr2tPNZRfjzjA400rg+riTZj10=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
-github.com/actatum/stormrpc v0.4.3 h1:DINMovQnKsnMxPtxC7n1r4AKW+otMW3fxbbTYAdXxpk=
-github.com/actatum/stormrpc v0.4.3/go.mod h1:rXIp+2kMlpr9DwERRfVLW42uJmewlS+Tna4xLXatm/4=
+github.com/actatum/stormrpc v0.5.0 h1:Xl2sJ9XFO6LtnFWFY2RmmUF+Iba5ul3UnmJKrxkeV14=
+github.com/actatum/stormrpc v0.5.0/go.mod h1:Wrt7stX0Gn7gCW9XxhGzSaehAKUGpC76uYnUedtvJpo=
 github.com/akamai/AkamaiOPEN-edgegrid-golang/v10 v10.1.0 h1:puGswCf+1faEX0dKXjew9sacs7wN8N4TMJFwIx6EE48=
 github.com/akamai/AkamaiOPEN-edgegrid-golang/v10 v10.1.0/go.mod h1:x8+fcnZ8/9+Q6DF+6LXcgWWa8Ni/YFOuXAgyvcuCjbs=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
