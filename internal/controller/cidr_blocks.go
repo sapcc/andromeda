@@ -17,6 +17,7 @@
 package controller
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/actatum/stormrpc"
@@ -27,9 +28,11 @@ import (
 	"github.com/sapcc/andromeda/restapi/operations/administrative"
 )
 
+type cidrBlocks []map[string]any
+
 type CidrBlocksController struct {
 	CommonController
-	cache map[string]string
+	cache map[string]cidrBlocks
 }
 
 // GetCidrBlocks GET /cidr-blocks
@@ -44,7 +47,7 @@ func (c CidrBlocksController) GetCidrBlocks(params administrative.GetCidrBlocksP
 	}
 
 	// Check if the CIDR blocks are already cached
-	var res string
+	var res cidrBlocks
 	var ok bool
 	if res, ok = c.cache[provider]; !ok {
 		subject := fmt.Sprintf("andromeda.get_cidrs.%s", provider)
@@ -58,7 +61,10 @@ func (c CidrBlocksController) GetCidrBlocks(params administrative.GetCidrBlocksP
 			panic(resp.Err)
 		}
 
-		c.cache[provider] = string(resp.Data)
+		if err = json.Unmarshal(resp.Data, &res); err != nil {
+			panic(err)
+		}
+		c.cache[provider] = res
 	}
 	return administrative.NewGetCidrBlocksOK().WithPayload(res)
 }

@@ -73,7 +73,7 @@ func New(db *sqlx.DB) *Controller {
 		QuotaController{cc},
 		SyncController{cc},
 		GeoMapController{cc},
-		CidrBlocksController{cc, make(map[string]string)},
+		CidrBlocksController{cc, make(map[string]cidrBlocks)},
 	}
 	return &c
 }
