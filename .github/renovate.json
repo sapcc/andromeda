@@ -4,7 +4,8 @@
     "config:recommended"
   ],
   "assignees": [
-    "notandy"
+    "notandy",
+    "ronchi-oss"
   ],
   "packageRules": [
     {
@@ -19,7 +20,6 @@
     {
       "matchPackageNames": [
         "github.com/getsentry/sentry-go",
-        "go-micro.dev/v4"
       ],
       "enabled": false
     }
