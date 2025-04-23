@@ -18,6 +18,7 @@ package metrics
 
 import (
 	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/apex/log"
@@ -119,16 +120,28 @@ func (c *TotalDNSRequestsCollector) collectPropertyMetrics(ch chan<- prometheus.
 // GetTotalDNSRequests retrieves DNS request data programmatically (for CLI or API use)
 func GetTotalDNSRequests(session *CachedAkamaiSession, domain string, property string, startTime, endTime time.Time) (map[string]interface{}, error) {
 	// Here we'll implement functionality similar to the Python version's get_total_dns_requests
-	datarows, err := session.getTrafficReport(property)
+	
+	// Build the URL for direct API access to get data for the specific time range
+	path := fmt.Sprintf("/gtm-api/v1/reports/traffic/domains/%s/properties/%s", domain, property)
+	params := url.Values{}
+	params.Add("start", startTime.UTC().Format(time.RFC3339))
+	params.Add("end", endTime.UTC().Format(time.RFC3339))
+	uri := fmt.Sprintf("%s?%s", path, params.Encode())
+	
+	log.Infof("Fetching traffic report with custom time range: %s", uri)
+	
+	// Make the direct API request
+	var trafficReport TrafficReport
+	err := session.get(uri, &trafficReport)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get traffic report: %v", err)
 	}
-
+	
 	totalRequests := 0
 	datacenterRequests := make(map[string]map[string]interface{})
 
 	// Process all data rows
-	for _, dataRow := range datarows {
+	for _, dataRow := range trafficReport.DataRows {
 		for _, datacenter := range dataRow.Datacenters {
 			dcName := datacenter.Nickname
 			requests := datacenter.Requests

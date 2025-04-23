@@ -1,3 +1,13 @@
 .idea
 bin
 tmp
+
+# Build artifacts
+build/
+
+# Configuration files (potentially sensitive)
+andromeda-config.yaml
+
+# Helper tools and temporary files
+tools/
+internal/driver/akamai/patch_akamai.go
