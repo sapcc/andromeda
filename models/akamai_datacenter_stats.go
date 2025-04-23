@@ -26,48 +26,36 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// QuotaUsage quota usage
+// AkamaiDatacenterStats akamai datacenter stats
 //
-// swagger:model quota_usage
-type QuotaUsage struct {
+// swagger:model akamai_datacenter_stats
+type AkamaiDatacenterStats struct {
 
-	// The current quota usage of datacenter.
-	// Example: 5
-	InUseDatacenter int64 `json:"in_use_datacenter"`
+	// ID of the datacenter
+	DatacenterID string `json:"datacenter_id,omitempty"`
 
-	// The current quota usage of domain (provider = Akamai).
-	// Example: 5
-	InUseDomainAkamai int64 `json:"in_use_domain_akamai"`
+	// Percentage of total requests handled by this datacenter
+	Percentage float32 `json:"percentage,omitempty"`
 
-	// The current quota usage of domain (provider = F5).
-	// Example: 5
-	InUseDomainF5 int64 `json:"in_use_domain_f5"`
+	// Total number of DNS requests to this datacenter
+	TotalRequests int64 `json:"total_requests,omitempty"`
 
-	// The current quota usage of member.
-	// Example: 5
-	InUseMember int64 `json:"in_use_member"`
-
-	// The current quota usage of monitor.
-	// Example: 5
-	InUseMonitor int64 `json:"in_use_monitor"`
-
-	// The current quota usage of pool.
-	// Example: 5
-	InUsePool int64 `json:"in_use_pool"`
+	// Name of the traffic target
+	TrafficTarget string `json:"traffic_target,omitempty"`
 }
 
-// Validate validates this quota usage
-func (m *QuotaUsage) Validate(formats strfmt.Registry) error {
+// Validate validates this akamai datacenter stats
+func (m *AkamaiDatacenterStats) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validates this quota usage based on context it is used
-func (m *QuotaUsage) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validates this akamai datacenter stats based on context it is used
+func (m *AkamaiDatacenterStats) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (m *QuotaUsage) MarshalBinary() ([]byte, error) {
+func (m *AkamaiDatacenterStats) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -75,8 +63,8 @@ func (m *QuotaUsage) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *QuotaUsage) UnmarshalBinary(b []byte) error {
-	var res QuotaUsage
+func (m *AkamaiDatacenterStats) UnmarshalBinary(b []byte) error {
+	var res AkamaiDatacenterStats
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

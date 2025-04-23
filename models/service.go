@@ -36,35 +36,35 @@ type Service struct {
 	// The UTC date and timestamp when had the last heartbeat.
 	// Example: 2020-05-11 17:21:34
 	// Format: date-time
-	Heartbeat strfmt.DateTime `json:"heartbeat,omitempty" db:"heartbeat,omitempty"`
+	Heartbeat strfmt.DateTime `json:"heartbeat,omitempty"`
 
 	// Hostname of the computer the service is running.
 	// Example: example.host
 	// Format: hostname
-	Host strfmt.Hostname `json:"host,omitempty" db:"host,omitempty"`
+	Host strfmt.Hostname `json:"host,omitempty"`
 
 	// ID of the RPC service.
 	// Example: andromeda-agent-fbb49979-03f5-4a97-a334-1fd2c9f61e7e
-	ID string `json:"id,omitempty" db:"id,omitempty"`
+	ID string `json:"id,omitempty"`
 
 	// metadata
-	Metadata interface{} `json:"metadata,omitempty" db:"metadata,omitempty"`
+	Metadata interface{} `json:"metadata,omitempty"`
 
 	// Provider this service supports.
 	// Example: akamai
-	Provider string `json:"provider,omitempty" db:"provider,omitempty"`
+	Provider string `json:"provider,omitempty"`
 
 	// RPC Endpoint Address.
 	// Example: _INBOX.VEfFxcAzZQ9iM9vwGH49It
-	RPCAddress string `json:"rpc_address,omitempty" db:"rpc_address,omitempty"`
+	RPCAddress string `json:"rpc_address,omitempty"`
 
 	// Type of service.
 	// Example: healthcheck
-	Type string `json:"type,omitempty" db:"type,omitempty"`
+	Type string `json:"type,omitempty"`
 
 	// Version of the service.
 	// Example: 1.2.3
-	Version string `json:"version,omitempty" db:"version,omitempty"`
+	Version string `json:"version,omitempty"`
 }
 
 // Validate validates this service

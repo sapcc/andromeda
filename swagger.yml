@@ -1225,6 +1225,52 @@ paths:
             - f5
           x-nullable: true
 
+  /metrics/akamai/total-dns-requests:
+    get:
+      tags:
+        - Metrics
+      summary: Get total DNS requests for an Akamai GTM property
+      x-policy: andromeda:metrics:get
+      parameters:
+        - in: query
+          name: domain
+          required: false
+          type: string
+          description: "GTM domain name (default: andromeda.akadns.net)"
+          x-nullable: true
+        - in: query
+          name: property
+          required: true
+          type: string
+          description: GTM property ID
+        - in: query
+          name: start
+          required: false
+          type: string
+          format: date-time
+          description: "Start date in ISO format (default: 2 days before end date)"
+          x-nullable: true
+        - in: query
+          name: end
+          required: false
+          type: string
+          format: date-time
+          description: "End date in ISO format (default: 15 minutes ago)"
+          x-nullable: true
+      responses:
+        200:
+          description: Total DNS requests data
+          schema:
+            $ref: '#/definitions/akamai_total_dns_result'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/error'
+
 definitions:
   domain:
     type: object
@@ -1904,6 +1950,49 @@ definitions:
           - next
           - previous
 
+  akamai_total_dns_result:
+    type: object
+    properties:
+      property:
+        type: string
+        description: The GTM property ID
+      start_date:
+        type: string
+        format: date-time
+        description: Start date of the data range
+      end_date:
+        type: string
+        format: date-time
+        description: End date of the data range
+      total_requests:
+        type: integer
+        description: Total number of DNS requests in the period
+      datacenters:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/akamai_datacenter_stats'
+      error:
+        type: string
+        description: Error message if any occurred
+        x-nullable: true
+
+  akamai_datacenter_stats:
+    type: object
+    properties:
+      datacenter_id:
+        type: string
+        description: ID of the datacenter
+      traffic_target:
+        type: string
+        description: Name of the traffic target
+      total_requests:
+        type: integer
+        description: Total number of DNS requests to this datacenter
+      percentage:
+        type: number
+        format: float
+        description: Percentage of total requests handled by this datacenter
+
 tags:
   - name: Domains
     description: Domains are the highest level of entities defining DNS endpoints to be load balanced.
@@ -1917,3 +2006,5 @@ tags:
     description: Monitors are health checks that influce load balancing decisions.
   - name: Administrative
     description: Administrative API
+  - name: Metrics
+    description: Metrics API endpoints for various providers

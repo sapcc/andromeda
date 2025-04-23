@@ -38,6 +38,7 @@ import (
 	"github.com/sapcc/andromeda/restapi/operations/domains"
 	"github.com/sapcc/andromeda/restapi/operations/geographic_maps"
 	"github.com/sapcc/andromeda/restapi/operations/members"
+	"github.com/sapcc/andromeda/restapi/operations/metrics"
 	"github.com/sapcc/andromeda/restapi/operations/monitors"
 	"github.com/sapcc/andromeda/restapi/operations/pools"
 )
@@ -111,6 +112,9 @@ func NewAndromedaAPI(spec *loads.Document) *AndromedaAPI {
 		}),
 		MembersGetMembersMemberIDHandler: members.GetMembersMemberIDHandlerFunc(func(params members.GetMembersMemberIDParams) middleware.Responder {
 			return middleware.NotImplemented("operation members.GetMembersMemberID has not yet been implemented")
+		}),
+		MetricsGetMetricsAkamaiTotalDNSRequestsHandler: metrics.GetMetricsAkamaiTotalDNSRequestsHandlerFunc(func(params metrics.GetMetricsAkamaiTotalDNSRequestsParams) middleware.Responder {
+			return middleware.NotImplemented("operation metrics.GetMetricsAkamaiTotalDNSRequests has not yet been implemented")
 		}),
 		MonitorsGetMonitorsHandler: monitors.GetMonitorsHandlerFunc(func(params monitors.GetMonitorsParams) middleware.Responder {
 			return middleware.NotImplemented("operation monitors.GetMonitors has not yet been implemented")
@@ -246,6 +250,8 @@ type AndromedaAPI struct {
 	MembersGetMembersHandler members.GetMembersHandler
 	// MembersGetMembersMemberIDHandler sets the operation handler for the get members member ID operation
 	MembersGetMembersMemberIDHandler members.GetMembersMemberIDHandler
+	// MetricsGetMetricsAkamaiTotalDNSRequestsHandler sets the operation handler for the get metrics akamai total DNS requests operation
+	MetricsGetMetricsAkamaiTotalDNSRequestsHandler metrics.GetMetricsAkamaiTotalDNSRequestsHandler
 	// MonitorsGetMonitorsHandler sets the operation handler for the get monitors operation
 	MonitorsGetMonitorsHandler monitors.GetMonitorsHandler
 	// MonitorsGetMonitorsMonitorIDHandler sets the operation handler for the get monitors monitor ID operation
@@ -414,6 +420,9 @@ func (o *AndromedaAPI) Validate() error {
 	}
 	if o.MembersGetMembersMemberIDHandler == nil {
 		unregistered = append(unregistered, "members.GetMembersMemberIDHandler")
+	}
+	if o.MetricsGetMetricsAkamaiTotalDNSRequestsHandler == nil {
+		unregistered = append(unregistered, "metrics.GetMetricsAkamaiTotalDNSRequestsHandler")
 	}
 	if o.MonitorsGetMonitorsHandler == nil {
 		unregistered = append(unregistered, "monitors.GetMonitorsHandler")
@@ -633,6 +642,10 @@ func (o *AndromedaAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/members/{member_id}"] = members.NewGetMembersMemberID(o.context, o.MembersGetMembersMemberIDHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/metrics/akamai/total-dns-requests"] = metrics.NewGetMetricsAkamaiTotalDNSRequests(o.context, o.MetricsGetMetricsAkamaiTotalDNSRequestsHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

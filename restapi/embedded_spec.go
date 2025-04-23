@@ -1068,6 +1068,67 @@ func init() {
         }
       ]
     },
+    "/metrics/akamai/total-dns-requests": {
+      "get": {
+        "tags": [
+          "Metrics"
+        ],
+        "summary": "Get total DNS requests for an Akamai GTM property",
+        "parameters": [
+          {
+            "type": "string",
+            "x-nullable": true,
+            "description": "GTM domain name (default: andromeda.akadns.net)",
+            "name": "domain",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "GTM property ID",
+            "name": "property",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "date-time",
+            "x-nullable": true,
+            "description": "Start date in ISO format (default: 2 days before end date)",
+            "name": "start",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "date-time",
+            "x-nullable": true,
+            "description": "End date in ISO format (default: 15 minutes ago)",
+            "name": "end",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total DNS requests data",
+            "schema": {
+              "$ref": "#/definitions/akamai_total_dns_result"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "default": {
+            "description": "Unexpected Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        },
+        "x-policy": "andromeda:metrics:get"
+      }
+    },
     "/monitors": {
       "get": {
         "tags": [
@@ -1847,6 +1908,62 @@ func init() {
     }
   },
   "definitions": {
+    "akamai_datacenter_stats": {
+      "type": "object",
+      "properties": {
+        "datacenter_id": {
+          "description": "ID of the datacenter",
+          "type": "string"
+        },
+        "percentage": {
+          "description": "Percentage of total requests handled by this datacenter",
+          "type": "number",
+          "format": "float"
+        },
+        "total_requests": {
+          "description": "Total number of DNS requests to this datacenter",
+          "type": "integer"
+        },
+        "traffic_target": {
+          "description": "Name of the traffic target",
+          "type": "string"
+        }
+      }
+    },
+    "akamai_total_dns_result": {
+      "type": "object",
+      "properties": {
+        "datacenters": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/akamai_datacenter_stats"
+          }
+        },
+        "end_date": {
+          "description": "End date of the data range",
+          "type": "string",
+          "format": "date-time"
+        },
+        "error": {
+          "description": "Error message if any occurred",
+          "type": "string",
+          "x-nullable": true
+        },
+        "property": {
+          "description": "The GTM property ID",
+          "type": "string"
+        },
+        "start_date": {
+          "description": "Start date of the data range",
+          "type": "string",
+          "format": "date-time"
+        },
+        "total_requests": {
+          "description": "Total number of DNS requests in the period",
+          "type": "integer"
+        }
+      }
+    },
     "datacenter": {
       "type": "object",
       "properties": {
@@ -2718,6 +2835,10 @@ func init() {
     {
       "description": "Administrative API",
       "name": "Administrative"
+    },
+    {
+      "description": "Metrics API endpoints for various providers",
+      "name": "Metrics"
     }
   ]
 }`))
@@ -3810,6 +3931,67 @@ func init() {
         }
       ]
     },
+    "/metrics/akamai/total-dns-requests": {
+      "get": {
+        "tags": [
+          "Metrics"
+        ],
+        "summary": "Get total DNS requests for an Akamai GTM property",
+        "parameters": [
+          {
+            "type": "string",
+            "x-nullable": true,
+            "description": "GTM domain name (default: andromeda.akadns.net)",
+            "name": "domain",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "GTM property ID",
+            "name": "property",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "date-time",
+            "x-nullable": true,
+            "description": "Start date in ISO format (default: 2 days before end date)",
+            "name": "start",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "date-time",
+            "x-nullable": true,
+            "description": "End date in ISO format (default: 15 minutes ago)",
+            "name": "end",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Total DNS requests data",
+            "schema": {
+              "$ref": "#/definitions/akamai_total_dns_result"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "default": {
+            "description": "Unexpected Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        },
+        "x-policy": "andromeda:metrics:get"
+      }
+    },
     "/monitors": {
       "get": {
         "tags": [
@@ -4634,6 +4816,62 @@ func init() {
           }
         }
       ]
+    },
+    "akamai_datacenter_stats": {
+      "type": "object",
+      "properties": {
+        "datacenter_id": {
+          "description": "ID of the datacenter",
+          "type": "string"
+        },
+        "percentage": {
+          "description": "Percentage of total requests handled by this datacenter",
+          "type": "number",
+          "format": "float"
+        },
+        "total_requests": {
+          "description": "Total number of DNS requests to this datacenter",
+          "type": "integer"
+        },
+        "traffic_target": {
+          "description": "Name of the traffic target",
+          "type": "string"
+        }
+      }
+    },
+    "akamai_total_dns_result": {
+      "type": "object",
+      "properties": {
+        "datacenters": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/akamai_datacenter_stats"
+          }
+        },
+        "end_date": {
+          "description": "End date of the data range",
+          "type": "string",
+          "format": "date-time"
+        },
+        "error": {
+          "description": "Error message if any occurred",
+          "type": "string",
+          "x-nullable": true
+        },
+        "property": {
+          "description": "The GTM property ID",
+          "type": "string"
+        },
+        "start_date": {
+          "description": "Start date of the data range",
+          "type": "string",
+          "format": "date-time"
+        },
+        "total_requests": {
+          "description": "Total number of DNS requests in the period",
+          "type": "integer"
+        }
+      }
     },
     "datacenter": {
       "type": "object",
@@ -5494,6 +5732,10 @@ func init() {
     {
       "description": "Administrative API",
       "name": "Administrative"
+    },
+    {
+      "description": "Metrics API endpoints for various providers",
+      "name": "Metrics"
     }
   ]
 }`))

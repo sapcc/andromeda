@@ -36,55 +36,55 @@ import (
 type Pool struct {
 
 	// The administrative state of the resource, which is up (true) or down (false). Default is true.
-	AdminStateUp *bool `json:"admin_state_up,omitempty" db:"admin_state_up,omitempty"`
+	AdminStateUp *bool `json:"admin_state_up,omitempty"`
 
 	// The UTC date and timestamp when the resource was created.
 	// Example: 2020-05-11 17:21:34
 	// Read Only: true
 	// Format: date-time
-	CreatedAt strfmt.DateTime `json:"created_at,omitempty" db:"created_at,omitempty"`
+	CreatedAt strfmt.DateTime `json:"created_at,omitempty"`
 
 	// Array of domains assigned to this pool
-	Domains []strfmt.UUID `json:"domains" db:"domains"`
+	Domains []strfmt.UUID `json:"domains"`
 
 	// The id of the resource.
 	// Read Only: true
 	// Format: uuid
-	ID strfmt.UUID `json:"id,omitempty" db:"id,omitempty"`
+	ID strfmt.UUID `json:"id,omitempty"`
 
 	// Array of member ids that this pool uses for load balancing.
 	// Read Only: true
-	Members []strfmt.UUID `json:"members" db:"members"`
+	Members []strfmt.UUID `json:"members"`
 
 	// Array of monitor ids that this pool uses health checks.
 	// Read Only: true
-	Monitors []strfmt.UUID `json:"monitors" db:"monitors"`
+	Monitors []strfmt.UUID `json:"monitors"`
 
 	// Human-readable name of the resource.
 	// Max Length: 255
-	Name *string `json:"name,omitempty" db:"name,omitempty"`
+	Name *string `json:"name,omitempty"`
 
 	// The ID of the project owning this resource.
 	// Example: fa84c217f361441986a220edf9b1e337
 	// Max Length: 32
 	// Min Length: 32
-	ProjectID *string `json:"project_id,omitempty" db:"project_id,omitempty"`
+	ProjectID *string `json:"project_id,omitempty"`
 
 	// provisioning status
 	// Read Only: true
 	// Enum: [PENDING_CREATE PENDING_UPDATE PENDING_DELETE ACTIVE ERROR]
-	ProvisioningStatus string `json:"provisioning_status,omitempty" db:"provisioning_status,omitempty"`
+	ProvisioningStatus string `json:"provisioning_status,omitempty"`
 
 	// status
 	// Read Only: true
 	// Enum: [ONLINE DOWN]
-	Status string `json:"status,omitempty" db:"status,omitempty"`
+	Status string `json:"status,omitempty"`
 
 	// The UTC date and timestamp when the resource was created.
 	// Example: 2020-09-09 14:52:15
 	// Read Only: true
 	// Format: date-time
-	UpdatedAt strfmt.DateTime `json:"updated_at,omitempty" db:"updated_at,omitempty"`
+	UpdatedAt strfmt.DateTime `json:"updated_at,omitempty"`
 }
 
 // Validate validates this pool

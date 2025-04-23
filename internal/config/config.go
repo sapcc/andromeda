@@ -167,6 +167,7 @@ type Andromeda struct {
 	AkamaiConfig AkamaiConfig          `yaml:"akamai"`
 	Audit        Audit                 `yaml:"audit_middleware_notifications"`
 	HouseKeeping HouseKeeping          `yaml:"house_keeping"`
+	Metrics      Metrics               `yaml:"metrics"`
 }
 
 type ApiSettings struct {
@@ -231,6 +232,17 @@ type Audit struct {
 type HouseKeeping struct {
 	Enabled     bool  `yaml:"enabled" description:"Enables house keeping."`
 	DeleteAfter int64 `yaml:"delete_after" default:"600" description:"Minimum seconds elapsed after cleanup of a deleted domain."`
+}
+
+type Metrics struct {
+	Akamai AkamaiMetricsConfig `yaml:"akamai"`
+}
+
+type AkamaiMetricsConfig struct {
+	ClientToken  string `yaml:"client_token" description:"Akamai client token for API authentication"`
+	ClientSecret string `yaml:"client_secret" description:"Akamai client secret for API authentication"`
+	AccessToken  string `yaml:"access_token" description:"Akamai access token for API authentication"`
+	Host         string `yaml:"host" description:"Akamai API host"`
 }
 
 func GetApiBaseUrl(r *http.Request) string {

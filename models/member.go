@@ -36,61 +36,61 @@ type Member struct {
 
 	// Address to use. Can also be a domain name.
 	// Example: 1.2.3.4
-	Address *string `json:"address,omitempty" db:"address,omitempty"`
+	Address *string `json:"address,omitempty"`
 
 	// The administrative state of the resource, which is up (true) or down (false). Default is true.
-	AdminStateUp *bool `json:"admin_state_up,omitempty" db:"admin_state_up,omitempty"`
+	AdminStateUp *bool `json:"admin_state_up,omitempty"`
 
 	// The UTC date and timestamp when the resource was created.
 	// Example: 2020-05-11T17:21:34
 	// Read Only: true
 	// Format: date-time
-	CreatedAt strfmt.DateTime `json:"created_at,omitempty" db:"created_at,omitempty"`
+	CreatedAt strfmt.DateTime `json:"created_at,omitempty"`
 
 	// Datacenter assigned for this member.
 	// Format: uuid
-	DatacenterID *strfmt.UUID `json:"datacenter_id,omitempty" db:"datacenter_id,omitempty"`
+	DatacenterID *strfmt.UUID `json:"datacenter_id,omitempty"`
 
 	// The id of the resource.
 	// Read Only: true
 	// Format: uuid
-	ID strfmt.UUID `json:"id,omitempty" db:"id,omitempty"`
+	ID strfmt.UUID `json:"id,omitempty"`
 
 	// Human-readable name of the resource.
 	// Max Length: 255
-	Name *string `json:"name,omitempty" db:"name,omitempty"`
+	Name *string `json:"name,omitempty"`
 
 	// pool id.
 	// Format: uuid
-	PoolID *strfmt.UUID `json:"pool_id,omitempty" db:"pool_id,omitempty"`
+	PoolID *strfmt.UUID `json:"pool_id,omitempty"`
 
 	// Port to use for monitor checks.
 	// Example: 80
 	// Maximum: 65535
 	// Minimum: 0
-	Port *int64 `json:"port,omitempty" db:"port,omitempty"`
+	Port *int64 `json:"port,omitempty"`
 
 	// The ID of the project owning this resource.
 	// Example: fa84c217f361441986a220edf9b1e337
 	// Max Length: 32
 	// Min Length: 32
-	ProjectID *string `json:"project_id,omitempty" db:"project_id,omitempty"`
+	ProjectID *string `json:"project_id,omitempty"`
 
 	// provisioning status
 	// Read Only: true
 	// Enum: [PENDING_CREATE PENDING_UPDATE PENDING_DELETE ACTIVE ERROR]
-	ProvisioningStatus string `json:"provisioning_status,omitempty" db:"provisioning_status,omitempty"`
+	ProvisioningStatus string `json:"provisioning_status,omitempty"`
 
 	// status
 	// Read Only: true
 	// Enum: [ONLINE NO_MONITOR OFFLINE]
-	Status string `json:"status,omitempty" db:"status,omitempty"`
+	Status string `json:"status,omitempty"`
 
 	// The UTC date and timestamp when the resource was created.
 	// Example: 2020-09-09T14:52:15
 	// Read Only: true
 	// Format: date-time
-	UpdatedAt strfmt.DateTime `json:"updated_at,omitempty" db:"updated_at,omitempty"`
+	UpdatedAt strfmt.DateTime `json:"updated_at,omitempty"`
 }
 
 // Validate validates this member

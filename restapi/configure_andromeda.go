@@ -36,7 +36,9 @@ import (
 	"github.com/sapcc/andromeda/internal/auth"
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/middlewares"
+	"github.com/sapcc/andromeda/restapi/handlers"
 	"github.com/sapcc/andromeda/restapi/operations"
+	metrics_ops "github.com/sapcc/andromeda/restapi/operations/metrics"
 )
 
 //go:generate swagger generate server --target ../../andromeda --name Andromeda --spec ../swagger.yml --principal interface{} --exclude-main
@@ -55,6 +57,12 @@ func configureAPI(api *operations.AndromedaAPI) http.Handler {
 
 	api.JSONConsumer = runtime.JSONConsumer()
 	api.JSONProducer = runtime.JSONProducer()
+
+	// Register the Akamai metrics handler
+	api.MetricsGetMetricsAkamaiTotalDNSRequestsHandler = metrics_ops.GetMetricsAkamaiTotalDNSRequestsHandlerFunc(
+		handlers.GetMetricsAkamaiTotalDNSRequests,
+	)
+
 	api.PreServerShutdown = func() {}
 	api.ServerShutdown = func() {
 		sentry.Flush(5 * time.Second)
