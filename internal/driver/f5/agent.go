@@ -245,9 +245,9 @@ func postDeclaration(v interface{}) error {
 
 	for _, result := range response.Results {
 		if result.Code != 200 {
-			return fmt.Errorf("Failed post! %s", result.Message)
+			return fmt.Errorf("failed post! %s", result.Message)
 		} else {
-			log.Infof("Succeeded: %s", result.Tenant)
+			log.Infof("succeeded: %s", result.Tenant)
 		}
 	}
 

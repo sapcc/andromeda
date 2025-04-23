@@ -220,11 +220,11 @@ func (c MemberController) DeleteMembersMemberID(params members.DeleteMembersMemb
 		sql := tx.Rebind(`UPDATE member SET provisioning_status = 'PENDING_DELETE', updated_at = NOW() WHERE id = ?`)
 		res := tx.MustExec(sql, params.MemberID)
 		if deleted, _ := res.RowsAffected(); deleted != 1 {
-			return EmptyResultError
+			return ErrEmptyResult
 		}
 		return UpdateCascadePool(tx, *member.PoolID, "PENDING_UPDATE")
 	}); err != nil {
-		if errors.Is(err, EmptyResultError) {
+		if errors.Is(err, ErrEmptyResult) {
 			return members.NewDeleteMembersMemberIDNotFound().WithPayload(utils.NotFound)
 		}
 		panic(err)

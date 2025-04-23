@@ -67,11 +67,7 @@ func ParseArgsAndRun(name string, usage string, action cli.ActionFunc, flags ...
 			// because micro wants to parse them and fails miserably
 			i := 0
 			newOsArgs := []string{}
-			for {
-				if i >= len(os.Args) {
-					break
-				}
-
+			for i < len(os.Args) {
 				reaped := false
 
 				for _, flagName := range c.FlagNames() {

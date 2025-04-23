@@ -33,7 +33,7 @@ import (
 	"github.com/sapcc/andromeda/models"
 )
 
-var datacenterNotFound = errors.New("datacenter/GetDatacenterMeta: datacenter not found")
+var errDatacenterNotFound = errors.New("datacenter/GetDatacenterMeta: datacenter not found")
 
 // GetDatacenterMeta return the meta id for a given datacenter uuid
 func (s *AkamaiAgent) GetDatacenterMeta(datacenterUUID string, datacenters []*rpcmodels.Datacenter) (int, error) {
@@ -72,7 +72,7 @@ func (s *AkamaiAgent) GetDatacenterMeta(datacenterUUID string, datacenters []*rp
 		}
 	}
 	if meta == 0 {
-		return 0, datacenterNotFound
+		return 0, errDatacenterNotFound
 	}
 
 	// try syncing meta id with andromeda database
@@ -151,7 +151,7 @@ func (s *AkamaiAgent) SyncDatacenter(datacenter *rpcmodels.Datacenter, force boo
 
 	if meta == 0 {
 		meta, err = s.GetDatacenterMeta(datacenter.Id, nil)
-		if err != nil && !errors.Is(err, datacenterNotFound) {
+		if err != nil && !errors.Is(err, errDatacenterNotFound) {
 			return nil, err
 		}
 	}
