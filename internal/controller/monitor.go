@@ -221,11 +221,11 @@ func (c MonitorController) DeleteMonitorsMonitorID(params monitors.DeleteMonitor
 		sql := tx.Rebind(`UPDATE monitor SET provisioning_status = 'PENDING_DELETE', updated_at = NOW() WHERE id = ?`)
 		res := c.db.MustExec(sql, params.MonitorID)
 		if deleted, _ := res.RowsAffected(); deleted != 1 {
-			return EmptyResultError
+			return ErrEmptyResult
 		}
 		return UpdateCascadePool(tx, *monitor.PoolID, "PENDING_UPDATE")
 	}); err != nil {
-		if errors.Is(err, EmptyResultError) {
+		if errors.Is(err, ErrEmptyResult) {
 			return monitors.NewDeleteMonitorsMonitorIDNotFound().WithPayload(utils.NotFound)
 		}
 		panic(err)

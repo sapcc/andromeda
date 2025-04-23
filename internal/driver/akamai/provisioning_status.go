@@ -94,7 +94,7 @@ func (s *AkamaiAgent) syncProvisioningStatus(domain *rpcmodels.Domain) (string, 
 			return status.PropagationStatus, nil
 		}
 
-		return status.PropagationStatus, fmt.Errorf("Domain %s failed syncing: %s", domain.Id, status.Message)
+		return status.PropagationStatus, fmt.Errorf("domain %s failed syncing: %s", domain.Id, status.Message)
 	case "COMPLETE":
 		if domain == nil {
 			log.Info("Akamai Backend: configuration change completed")

@@ -19,5 +19,5 @@ package controller
 import "errors"
 
 var (
-	EmptyResultError = errors.New("Empty Result")
+	ErrEmptyResult = errors.New("empty result")
 )

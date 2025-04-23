@@ -194,7 +194,7 @@ func WriteTable(data interface{}) error {
 		transformer := text.NewJSONTransformer("", "    ")
 		fmt.Println(transformer(data))
 	default:
-		return fmt.Errorf("format option %s is not supported.", opts.Formatters.Format)
+		return fmt.Errorf("format option %s is not supported", opts.Formatters.Format)
 	}
 
 	return nil

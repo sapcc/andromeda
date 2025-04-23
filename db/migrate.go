@@ -38,21 +38,21 @@ func Migrate(dbUrl string) error {
 	}
 	var driver migration.Driver
 
-	if u.Driver == "mysql" {
+	switch u.Driver {
+	case "mysql":
 		// Create driver
 		driver, err = mysql.New(u.DSN)
 		embedSource.Dir = "migrations/mysql"
 		if err != nil {
 			return err
 		}
-
-	} else if u.Driver == "postgres" {
+	case "postgres":
 		driver, err = postgres.New(u.DSN)
 		embedSource.Dir = "migrations/postgresql"
 		if err != nil {
 			return err
 		}
-	} else {
+	default:
 		return fmt.Errorf("database driver not supported: %s", u.Driver)
 	}
 
@@ -76,21 +76,21 @@ func Rollback(dbUrl string) error {
 	}
 	var driver migration.Driver
 
-	if u.Driver == "mysql" {
+	switch u.Driver {
+	case "mysql":
 		// Create driver
 		driver, err = mysql.New(u.DSN)
 		embedSource.Dir = "migrations/mysql"
 		if err != nil {
 			return err
 		}
-
-	} else if u.Driver == "postgres" {
+	case "postgres":
 		driver, err = postgres.New(u.DSN)
 		embedSource.Dir = "migrations/postgresql"
 		if err != nil {
 			return err
 		}
-	} else {
+	default:
 		return fmt.Errorf("database driver not supported: %s", u.Driver)
 	}
 

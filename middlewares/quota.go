@@ -207,7 +207,10 @@ func providerFromHTTPRequest(resource string, w http.ResponseWriter, r *http.Req
 	if err != nil {
 		return "", err
 	}
-	r.Body.Close()
+	err = r.Body.Close()
+	if err != nil {
+		return "", err
+	}
 	r.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 	if err = json.NewDecoder(bytes.NewReader(bodyBytes)).Decode(&resourceReq); err != nil {
 		return "", err

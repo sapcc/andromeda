@@ -46,7 +46,7 @@ func (s *AkamaiAgent) GetGeomap(geomapID string) (*rpcmodels.Geomap, error) {
 
 	res := response.GetResponse()
 	if len(res) != 1 {
-		return nil, fmt.Errorf("Failed fetching geomap '%s': len(res) = %d != 1", geomapID,
+		return nil, fmt.Errorf("failed fetching geomap '%s': len(res) = %d != 1", geomapID,
 			len(res))
 	}
 	return res[0], nil
