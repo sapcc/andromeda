@@ -81,10 +81,10 @@ func (c *TotalDNSRequestsCollector) collectPropertyMetrics(ch chan<- prometheus.
 
 	// Use maps to accumulate totals by datacenter
 	datacenterTotals := make(map[string]struct {
-		ID           string
-		Name         string
+		ID            string
+		Name          string
 		TrafficTarget string
-		Requests     int
+		Requests      int
 	})
 
 	// Process all data rows to accumulate totals by datacenter
@@ -92,12 +92,12 @@ func (c *TotalDNSRequestsCollector) collectPropertyMetrics(ch chan<- prometheus.
 		for _, datacenter := range dataRow.Datacenters {
 			key := fmt.Sprintf("%s-%s", property, datacenter.Nickname)
 			entry := datacenterTotals[key]
-			
+
 			entry.ID = datacenter.Nickname
 			entry.Name = datacenter.Nickname
 			entry.TrafficTarget = datacenter.TrafficTargetName
 			entry.Requests += datacenter.Requests
-			
+
 			datacenterTotals[key] = entry
 		}
 	}
@@ -119,24 +119,22 @@ func (c *TotalDNSRequestsCollector) collectPropertyMetrics(ch chan<- prometheus.
 
 // GetTotalDNSRequests retrieves DNS request data programmatically (for CLI or API use)
 func GetTotalDNSRequests(session *CachedAkamaiSession, domain string, property string, startTime, endTime time.Time) (map[string]interface{}, error) {
-	// Here we'll implement functionality similar to the Python version's get_total_dns_requests
-	
 	// Build the URL for direct API access to get data for the specific time range
 	path := fmt.Sprintf("/gtm-api/v1/reports/traffic/domains/%s/properties/%s", domain, property)
 	params := url.Values{}
 	params.Add("start", startTime.UTC().Format(time.RFC3339))
 	params.Add("end", endTime.UTC().Format(time.RFC3339))
 	uri := fmt.Sprintf("%s?%s", path, params.Encode())
-	
+
 	log.Infof("Fetching traffic report with custom time range: %s", uri)
-	
+
 	// Make the direct API request
 	var trafficReport TrafficReport
 	err := session.get(uri, &trafficReport)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get traffic report: %v", err)
 	}
-	
+
 	totalRequests := 0
 	datacenterRequests := make(map[string]map[string]interface{})
 
@@ -184,4 +182,4 @@ func GetTotalDNSRequests(session *CachedAkamaiSession, domain string, property s
 	}
 
 	return result, nil
-} 
+}
