@@ -14,6 +14,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/gophercloud/gophercloud/v2"
 	"github.com/majewsky/gg/option"
+	"github.com/majewsky/gg/options"
 	"github.com/sapcc/go-api-declarations/bininfo"
 	"github.com/sapcc/go-api-declarations/liquid"
 	"github.com/sapcc/go-bits/httpext"
@@ -188,37 +189,37 @@ func (l *liquidLogic) ScanUsage(ctx context.Context, projectUUID string, req liq
 		InfoVersion: 1,
 		Resources: map[liquid.ResourceName]*liquid.ResourceUsageReport{
 			"datacenters": {
-				Quota: option.Some(*resp.Payload.Quota.Datacenter),
+				Quota: options.FromPointer(resp.Payload.Quota.Datacenter),
 				PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
 					liquid.AvailabilityZoneAny: {Usage: uint64(resp.Payload.Quota.QuotaUsage.InUseDatacenter)},
 				},
 			},
 			"domains_akamai": {
-				Quota: option.Some(*resp.Payload.Quota.DomainAkamai),
+				Quota: options.FromPointer(resp.Payload.Quota.DomainAkamai),
 				PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
 					liquid.AvailabilityZoneAny: {Usage: uint64(resp.Payload.Quota.QuotaUsage.InUseDomainAkamai)},
 				},
 			},
 			"domains_f5": {
-				Quota: option.Some(*resp.Payload.Quota.DomainF5),
+				Quota: options.FromPointer(resp.Payload.Quota.DomainF5),
 				PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
 					liquid.AvailabilityZoneAny: {Usage: uint64(resp.Payload.Quota.QuotaUsage.InUseDomainF5)},
 				},
 			},
 			"members": {
-				Quota: option.Some(*resp.Payload.Quota.Member),
+				Quota: options.FromPointer(resp.Payload.Quota.Member),
 				PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
 					liquid.AvailabilityZoneAny: {Usage: uint64(resp.Payload.Quota.QuotaUsage.InUseMember)},
 				},
 			},
 			"monitors": {
-				Quota: option.Some(*resp.Payload.Quota.Monitor),
+				Quota: options.FromPointer(resp.Payload.Quota.Monitor),
 				PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
 					liquid.AvailabilityZoneAny: {Usage: uint64(resp.Payload.Quota.QuotaUsage.InUseMonitor)},
 				},
 			},
 			"pools": {
-				Quota: option.Some(*resp.Payload.Quota.Pool),
+				Quota: options.FromPointer(resp.Payload.Quota.Pool),
 				PerAZ: map[liquid.AvailabilityZone]*liquid.AZResourceUsageReport{
 					liquid.AvailabilityZoneAny: {Usage: uint64(resp.Payload.Quota.QuotaUsage.InUsePool)},
 				},
