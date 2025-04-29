@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Copyright 2025 SAP SE or an SAP affiliate company
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import React from "react"
 import { render } from "@testing-library/react"
 // support shadow dom queries

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Copyright 2025 SAP SE or an SAP affiliate company
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import React, {useMemo} from "react"
 
 import {Badge, Panel} from "@cloudoperators/juno-ui-components"

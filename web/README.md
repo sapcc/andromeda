@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2025 SAP SE or an SAP affiliate company
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
 # Andromeda Web GUI
 
 This is the [Juno](https://github.com/sapcc/juno) based Web GUI. 
