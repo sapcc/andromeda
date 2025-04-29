@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Copyright 2025 SAP SE or an SAP affiliate company
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import {createRoot} from "react-dom/client"
 import React from "react"
 import _ from "lodash-es"

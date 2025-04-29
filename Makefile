@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: Copyright 2025 SAP SE or an SAP affiliate company
+#
+# SPDX-License-Identifier: Apache-2.0
+
 .PHONY: build-all clean swagger migrate
 PROTOC_FILES = $(shell find . -type f -name '*.proto')
 PB_FILES = $(patsubst %.proto, %.pb.go, $(PROTOC_FILES))
@@ -69,6 +73,17 @@ markdown: bin/swagger
 
 serve-swagger-docs: bin/swagger
 	$(SWAGGER) serve swagger.yml -p 9900
+
+reuse:
+	$(info ************  Requires reuse cli to be installed ************)
+	reuse annotate \
+		--copyright-prefix="spdx-string" \
+		--copyright="SAP SE or an SAP affiliate company" \
+		--license=Apache-2.0 \
+		--recursive \
+		--skip-unrecognised \
+		--skip-existing \
+		$(PWD)
 
 migrate: bin/migrate
 	$(MIGRATE) -path db/migrations -database "cockroachdb://root@localhost:26257/andromeda?sslmode=disable" drop -f
