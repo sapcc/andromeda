@@ -1,0 +1,197 @@
+/*
+ *   Copyright 2025 SAP SE
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
+package client
+
+import (
+	"encoding/csv"
+	"encoding/json"
+	"fmt"
+	"os"
+	"path/filepath"
+	"time"
+
+	"github.com/apex/log"
+	"github.com/jedib0t/go-pretty/table"
+
+	"github.com/sapcc/andromeda/internal/config"
+	"github.com/sapcc/andromeda/internal/driver/akamai"
+	"github.com/sapcc/andromeda/internal/driver/akamai/metrics"
+)
+
+var MetricsOptions struct {
+	MetricsAkamaiDNSRequests `command:"akamai-dns-requests" description:"Get Akamai GTM total DNS requests"`
+}
+
+type MetricsAkamaiDNSRequests struct {
+	Domain   string `short:"d" long:"domain" description:"GTM domain name" default:"andromeda.akadns.net"`
+	Property string `short:"p" long:"property" required:"true" description:"GTM property ID"`
+	Start    string `short:"s" long:"start" description:"Start date in ISO format (default: 2 days before end date)"`
+	End      string `short:"e" long:"end" description:"End date in ISO format (default: 15 minutes ago)"`
+	Output   string `short:"o" long:"output" description:"Output format (json, csv, table)" default:"table" choice:"json" choice:"csv" choice:"table"`
+	Edgerc   string `long:"edgerc" description:"Path to .edgerc file for Akamai authentication" default:""`
+}
+
+func (m MetricsAkamaiDNSRequests) Execute(_ []string) error {
+	// Set up default dates if not provided
+	var endTime time.Time
+	var startTime time.Time
+	var err error
+
+	if m.End != "" {
+		endTime, err = time.Parse(time.RFC3339, m.End)
+		if err != nil {
+			return fmt.Errorf("invalid end time format, use RFC3339: %w", err)
+		}
+	} else {
+		endTime = time.Now().Add(-15 * time.Minute) // Default end time: 15 minutes ago
+	}
+
+	if m.Start != "" {
+		startTime, err = time.Parse(time.RFC3339, m.Start)
+		if err != nil {
+			return fmt.Errorf("invalid start time format, use RFC3339: %w", err)
+		}
+	} else {
+		startTime = endTime.Add(-48 * time.Hour) // Default start time: 2 days before end time
+	}
+
+	// Initialize Akamai configuration
+	akamaiConfig := config.AkamaiConfig{
+		ContractId: "BYPASS_CHECK_VALUE", // Bypass contract check
+	}
+
+	// Check for .edgerc file
+	edgercPath := m.Edgerc
+	if edgercPath == "" {
+		// Try common locations
+		homeDir, err := os.UserHomeDir()
+		if err == nil {
+			candidates := []string{
+				".edgerc",                         // Current directory
+				filepath.Join(homeDir, ".edgerc"), // Home directory
+				"/Users/I516965/Documents/WORK/CC/tasks/solution-engineering/andromeda-metrics/.edgerc", // Path from config
+			}
+
+			for _, path := range candidates {
+				if _, err := os.Stat(path); err == nil {
+					edgercPath = path
+					break
+				}
+			}
+		}
+	}
+
+	if edgercPath != "" {
+		akamaiConfig.EdgeRC = edgercPath
+		log.Infof("Using Akamai credentials from: %s", edgercPath)
+	} else {
+		// Fallback to environment variables
+		return fmt.Errorf("No .edgerc file found and environment variables not supported yet. Please provide a path to .edgerc file with --edgerc")
+	}
+
+	// Set domain from parameter or default
+	akamaiConfig.Domain = m.Domain
+
+	// Initialize Akamai session using patched version
+	session, domainType := akamai.NewAkamaiSessionPatched(&akamaiConfig)
+	log.Infof("Connected to Akamai API with domain type: %s", domainType)
+
+	// Create cached session
+	cachedSession := metrics.NewCachedAkamaiSession(*session, m.Domain)
+
+	// Get the data
+	log.Infof("Fetching total DNS requests for %s from %s to %s",
+		m.Property, startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
+
+	result, err := metrics.GetTotalDNSRequests(cachedSession, m.Domain, m.Property, startTime, endTime)
+	if err != nil {
+		return fmt.Errorf("failed to get total DNS requests: %w", err)
+	}
+
+	// Output the data in the requested format
+	switch m.Output {
+	case "json":
+		jsonBytes, err := json.MarshalIndent(result, "", "  ")
+		if err != nil {
+			return fmt.Errorf("failed to marshal JSON: %w", err)
+		}
+		fmt.Println(string(jsonBytes))
+
+	case "csv":
+		// Create CSV writer
+		w := csv.NewWriter(os.Stdout)
+		defer w.Flush()
+
+		// Write header for property info
+		w.Write([]string{"Property", "Start Date", "End Date", "Total Requests"})
+		w.Write([]string{
+			result["property"].(string),
+			result["start_date"].(string),
+			result["end_date"].(string),
+			fmt.Sprintf("%d", result["total_requests"].(int)),
+		})
+		w.Write([]string{}) // Empty row for separation
+
+		// Write header for datacenter info
+		w.Write([]string{"Datacenter", "Datacenter ID", "Traffic Target", "Requests", "Percentage"})
+
+		// Write datacenter data
+		datacenters := result["datacenters"].(map[string]map[string]interface{})
+		for dcName, dcData := range datacenters {
+			w.Write([]string{
+				dcName,
+				dcData["datacenter_id"].(string),
+				dcData["traffic_target"].(string),
+				fmt.Sprintf("%d", dcData["total_requests"].(int)),
+				fmt.Sprintf("%.2f%%", dcData["percentage"].(float64)*100),
+			})
+		}
+
+	default: // table format
+		// Print summary information
+		fmt.Printf("Total DNS Requests for Property: %s\n", result["property"])
+		fmt.Printf("Time Range: %s to %s\n", result["start_date"], result["end_date"])
+		fmt.Printf("Total Requests: %d\n\n", result["total_requests"])
+
+		// Set up table for datacenters
+		t := table.NewWriter()
+		t.SetOutputMirror(os.Stdout)
+		t.AppendHeader(table.Row{"Datacenter", "Datacenter ID", "Traffic Target", "Requests", "Percentage"})
+
+		// Add data rows
+		datacenters := result["datacenters"].(map[string]map[string]interface{})
+		for dcName, dcData := range datacenters {
+			t.AppendRow(table.Row{
+				dcName,
+				dcData["datacenter_id"].(string),
+				dcData["traffic_target"].(string),
+				dcData["total_requests"].(int),
+				fmt.Sprintf("%.2f%%", dcData["percentage"].(float64)*100),
+			})
+		}
+		t.Render()
+	}
+
+	return nil
+}
+
+func init() {
+	_, err := Parser.AddCommand("metrics", "Metrics", "Metrics Commands.", &MetricsOptions)
+	if err != nil {
+		panic(err)
+	}
+}
