@@ -42,11 +42,8 @@ func (c *AkamaiMetricsController) GetTotalDNSRequests(params metrics_ops.GetMetr
 	})
 	logger.Info("Getting total DNS requests for Akamai GTM property")
 
-	// Set default domain if not provided
+	// Set hardcoded domain name (not exposed as a parameter)
 	domain := "andromeda.akadns.net"
-	if params.Domain != nil {
-		domain = *params.Domain
-	}
 
 	// Set default time range if not provided
 	endTime := time.Now().Add(-15 * time.Minute)

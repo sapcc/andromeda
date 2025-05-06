@@ -1233,12 +1233,6 @@ paths:
       x-policy: andromeda:metrics:get
       parameters:
         - in: query
-          name: domain
-          required: false
-          type: string
-          description: "GTM domain name (default: andromeda.akadns.net)"
-          x-nullable: true
-        - in: query
           name: property
           required: true
           type: string
