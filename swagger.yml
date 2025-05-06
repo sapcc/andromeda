@@ -1233,10 +1233,11 @@ paths:
       x-policy: andromeda:metrics:get
       parameters:
         - in: query
-          name: property
+          name: domain_id
           required: true
           type: string
-          description: GTM property ID
+          format: uuid
+          description: Domain UUID to get metrics for
         - in: query
           name: start
           required: false

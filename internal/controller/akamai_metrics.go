@@ -38,12 +38,47 @@ type AkamaiMetricsController struct {
 // GetTotalDNSRequests handles requests to retrieve total DNS requests for an Akamai GTM property
 func (c *AkamaiMetricsController) GetTotalDNSRequests(params metrics_ops.GetMetricsAkamaiTotalDNSRequestsParams) middleware.Responder {
 	logger := log.WithFields(log.Fields{
-		"property": params.Property,
+		"domain_id": params.DomainID,
 	})
-	logger.Info("Getting total DNS requests for Akamai GTM property")
+	logger.Info("Getting total DNS requests for domain")
+
+	// Look up the domain to get the property name
+	var domain models.Domain
+	query := "SELECT * FROM domains WHERE id = $1"
+	err := c.db.Get(&domain, query, params.DomainID)
+	if err != nil {
+		logger.WithError(err).Error("Failed to find domain")
+		errMsg := "Failed to find domain: " + err.Error()
+		return metrics_ops.NewGetMetricsAkamaiTotalDNSRequestsDefault(404).WithPayload(&models.Error{
+			Message: errMsg,
+			Code:    404,
+		})
+	}
+
+	// Check if domain has a provider set and it's Akamai
+	if domain.Provider == nil || *domain.Provider != "akamai" {
+		errMsg := "Domain is not using Akamai provider"
+		return metrics_ops.NewGetMetricsAkamaiTotalDNSRequestsBadRequest().WithPayload(&models.Error{
+			Message: errMsg,
+			Code:    400,
+		})
+	}
+
+	// Property name is the FQDN in Akamai GTM
+	if domain.Fqdn == nil || *domain.Fqdn == "" {
+		errMsg := "Domain does not have a FQDN set"
+		return metrics_ops.NewGetMetricsAkamaiTotalDNSRequestsBadRequest().WithPayload(&models.Error{
+			Message: errMsg,
+			Code:    400,
+		})
+	}
+
+	// The property name is the FQDN in Akamai GTM
+	// Convert from hostname type to string
+	propertyName := domain.Fqdn.String()
 
 	// Set hardcoded domain name (not exposed as a parameter)
-	domain := "andromeda.akadns.net"
+	akamaiDomain := "andromeda.akadns.net"
 
 	// Set default time range if not provided
 	endTime := time.Now().Add(-15 * time.Minute)
@@ -59,12 +94,12 @@ func (c *AkamaiMetricsController) GetTotalDNSRequests(params metrics_ops.GetMetr
 	startDateTime := strfmt.DateTime(startTime)
 
 	// Get RPC client
-	_, err := rpc.GetRPCClient()
+	_, err = rpc.GetRPCClient()
 	if err != nil {
 		logger.WithError(err).Error("Failed to get RPC client")
 		errMsg := "Failed to get RPC client: " + err.Error()
 		return metrics_ops.NewGetMetricsAkamaiTotalDNSRequestsOK().WithPayload(&models.AkamaiTotalDNSResult{
-			Property:  params.Property,
+			Property:  propertyName,
 			StartDate: startDateTime,
 			EndDate:   endDateTime,
 			Error:     &errMsg,
@@ -76,8 +111,8 @@ func (c *AkamaiMetricsController) GetTotalDNSRequests(params metrics_ops.GetMetr
 
 	// Prepare the request to the RPC service
 	rpcRequest := &server.AkamaiTotalDNSRequestsRequest{
-		Domain:    domain,
-		Property:  params.Property,
+		Domain:    akamaiDomain,
+		Property:  propertyName,
 		StartTime: startTime.Format(time.RFC3339),
 		EndTime:   endTime.Format(time.RFC3339),
 	}
@@ -88,7 +123,7 @@ func (c *AkamaiMetricsController) GetTotalDNSRequests(params metrics_ops.GetMetr
 		logger.WithError(err).Error("RPC call failed")
 		errMsg := "RPC call failed: " + err.Error()
 		return metrics_ops.NewGetMetricsAkamaiTotalDNSRequestsOK().WithPayload(&models.AkamaiTotalDNSResult{
-			Property:  params.Property,
+			Property:  propertyName,
 			StartDate: startDateTime,
 			EndDate:   endDateTime,
 			Error:     &errMsg,
@@ -100,7 +135,7 @@ func (c *AkamaiMetricsController) GetTotalDNSRequests(params metrics_ops.GetMetr
 		logger.Error("Error in RPC response: " + resp.Error)
 		errMsg := resp.Error
 		return metrics_ops.NewGetMetricsAkamaiTotalDNSRequestsOK().WithPayload(&models.AkamaiTotalDNSResult{
-			Property:  params.Property,
+			Property:  propertyName,
 			StartDate: startDateTime,
 			EndDate:   endDateTime,
 			Error:     &errMsg,
@@ -119,7 +154,7 @@ func (c *AkamaiMetricsController) GetTotalDNSRequests(params metrics_ops.GetMetr
 	}
 
 	return metrics_ops.NewGetMetricsAkamaiTotalDNSRequestsOK().WithPayload(&models.AkamaiTotalDNSResult{
-		Property:      params.Property,
+		Property:      propertyName,
 		StartDate:     startDateTime,
 		EndDate:       endDateTime,
 		TotalRequests: resp.TotalRequests,
