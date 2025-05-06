@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Copyright 2025 SAP SE or an SAP affiliate company
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import React, {useMemo, useState} from "react";
 
 import {
@@ -143,14 +147,6 @@ export const ListItemStatus = ({data}) => {
     }
 }
 
-const avatarCss = `
-h-8
-w-8
-bg-theme-background-lvl-2
-rounded-full
-mr-2
-bg-cover 
-`
 
 export const HeaderUser = ({auth, logout, theme, setTheme}) => {
     const sapID = useMemo(() => auth?.user.name || "", [auth])
@@ -159,14 +155,9 @@ export const HeaderUser = ({auth, logout, theme, setTheme}) => {
         <Stack alignment="center" className="ml-auto" distribution="end" gap="4">
             <Tooltip triggerEvent="hover">
                 <TooltipTrigger>
-                    <Stack alignment="center">
-                        <div
-                            style={{
-                                background: `url(https://avatars.wdf.sap.corp/avatar/${sapID}?size=24x24) no-repeat`,
-                                backgroundSize: `cover`,
-                            }}
-                            className={avatarCss}
-                        />
+                    <Stack gap="2" alignment="center">
+                        <img className="w-[30px] jn-rounded jn-justify-center bg-theme-background-lvl-2 bg-cover mr-2"
+                             src={`https://avatars.wdf.sap.corp/avatar/${sapID}`} alt={sapID}/>
                         {<span>{sapID}</span>}
                     </Stack>
                 </TooltipTrigger>

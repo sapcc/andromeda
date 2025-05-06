@@ -1,3 +1,7 @@
+# Copyright 2025 SAP SE or an SAP affiliate company
+#
+# SPDX-License-Identifier: Apache-2.0
+
 name: golangci-lint
 on:
   push:
@@ -20,7 +24,7 @@ jobs:
         with:
           go-version-file: 'go.mod'
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v8
         with:
           # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
           version: latest

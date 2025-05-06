@@ -1,7 +1,18 @@
+# SPDX-FileCopyrightText: Copyright 2025 SAP SE or an SAP affiliate company
+#
+# SPDX-License-Identifier: Apache-2.0
+
 consumes:
 - application/json
 info:
-  description: Platform agnostic GSLB frontend
+  description: |-
+    Platform agnostic GSLB frontend
+
+    ```
+    # SPDX-FileCopyrightText: Copyright 2025 SAP SE or an SAP affiliate company
+    #
+    # SPDX-License-Identifier: Apache-2.0
+    ```
   title: Andromeda
   version: 1.1.1
 produces:

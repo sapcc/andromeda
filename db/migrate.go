@@ -1,18 +1,6 @@
-/*
- *   Copyright 2021 SAP SE
- *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- */
+// SPDX-FileCopyrightText: Copyright 2025 SAP SE or an SAP affiliate company
+//
+// SPDX-License-Identifier: Apache-2.0
 
 package db
 
@@ -38,21 +26,21 @@ func Migrate(dbUrl string) error {
 	}
 	var driver migration.Driver
 
-	if u.Driver == "mysql" {
+	switch u.Driver {
+	case "mysql":
 		// Create driver
 		driver, err = mysql.New(u.DSN)
 		embedSource.Dir = "migrations/mysql"
 		if err != nil {
 			return err
 		}
-
-	} else if u.Driver == "postgres" {
+	case "postgres":
 		driver, err = postgres.New(u.DSN)
 		embedSource.Dir = "migrations/postgresql"
 		if err != nil {
 			return err
 		}
-	} else {
+	default:
 		return fmt.Errorf("database driver not supported: %s", u.Driver)
 	}
 
@@ -76,21 +64,21 @@ func Rollback(dbUrl string) error {
 	}
 	var driver migration.Driver
 
-	if u.Driver == "mysql" {
+	switch u.Driver {
+	case "mysql":
 		// Create driver
 		driver, err = mysql.New(u.DSN)
 		embedSource.Dir = "migrations/mysql"
 		if err != nil {
 			return err
 		}
-
-	} else if u.Driver == "postgres" {
+	case "postgres":
 		driver, err = postgres.New(u.DSN)
 		embedSource.Dir = "migrations/postgresql"
 		if err != nil {
 			return err
 		}
-	} else {
+	default:
 		return fmt.Errorf("database driver not supported: %s", u.Driver)
 	}
 

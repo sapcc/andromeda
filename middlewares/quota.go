@@ -1,23 +1,16 @@
-/*
- *   Copyright 2021 SAP SE
- *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- */
+// SPDX-FileCopyrightText: Copyright 2025 SAP SE or an SAP affiliate company
+//
+// SPDX-License-Identifier: Apache-2.0
 
 package middlewares
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
+	"slices"
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
@@ -32,12 +25,47 @@ import (
 	"github.com/sapcc/andromeda/internal/utils"
 )
 
-type quotaController struct {
-	db *sqlx.DB
+var (
+	// resource types that do not map directly to a `quota` table column
+	// due to their quota being bound to a provider
+	providerBoundResourceQuotas = []string{"domain"}
+)
+
+type (
+	errMissingProvider struct{ Resource string }
+	errUnknownResource struct{ Resource string }
+
+	providerBoundResourceRequest interface {
+		GetResource() resource
+	}
+
+	newDomainRequest struct {
+		Resource resource `json:"domain"`
+	}
+
+	resource struct {
+		Provider string `json:"provider"`
+	}
+
+	quotaController struct {
+		db *sqlx.DB
+	}
+)
+
+func (r *newDomainRequest) GetResource() resource {
+	return r.Resource
 }
 
 func NewQuotaController(db *sqlx.DB) *quotaController {
 	return &quotaController{db: db}
+}
+
+func (e *errMissingProvider) Error() string {
+	return fmt.Sprintf("request body for '%s' contains empty 'provider' field when non-empty 'provider' field required", e.Resource)
+}
+
+func (e *errUnknownResource) Error() string {
+	return fmt.Sprintf("unknown resource '%s'", e.Resource)
 }
 
 // QuotaHandler provides the quota enforcement.
@@ -58,6 +86,23 @@ func (qc *quotaController) QuotaHandler(next http.Handler) http.Handler {
 		if action != "post" {
 			next.ServeHTTP(w, r)
 			return
+		}
+
+		var (
+			provider string
+			err      error
+		)
+
+		if slices.Contains(providerBoundResourceQuotas, resource) {
+			log.Debugf("Resource quota for '%s' is bound to provider", resource)
+			provider, err = providerFromHTTPRequest(resource, w, r)
+			if err != nil {
+				middleware.
+					Error(401, utils.GetInvalidProviderBoundResourceResponse(resource), utils.JSONHeader).
+					WriteResponse(w, runtime.JSONProducer())
+				return
+			}
+			log.Debugf("Provider read from request body: %s", provider)
 		}
 
 		// Get project scope
@@ -111,7 +156,11 @@ func (qc *quotaController) QuotaHandler(next http.Handler) http.Handler {
 			Where(sq.Eq{"project_id": project}).
 			Where(sq.NotEq{"provisioning_status": "DELETED"})
 
-		query := sq.Select(resource).
+		if provider != "" {
+			subquery = subquery.Where(sq.Eq{"provider": provider})
+		}
+
+		query := sq.Select(quotaTableColumnForResource(resource, provider)).
 			Column(sq.Alias(subquery, "quota_usage")).
 			From("quota").
 			Where(sq.Eq{"project_id": project})
@@ -125,7 +174,7 @@ func (qc *quotaController) QuotaHandler(next http.Handler) http.Handler {
 			panic(err)
 		}
 
-		log.Debugf("Quota %s of project %s is %d of %d", resource, project, quotaUsed, quotaAvailable)
+		log.Debugf("Quota %s of project %s is %d of %d", quotaTableColumnForResource(resource, provider), project, quotaUsed, quotaAvailable)
 		if quotaAvailable-quotaUsed < 1 {
 			middleware.
 				Error(403, utils.GetQuotaMetResponse(resource), utils.JSONHeader).
@@ -135,4 +184,42 @@ func (qc *quotaController) QuotaHandler(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+func providerFromHTTPRequest(resource string, w http.ResponseWriter, r *http.Request) (string, error) {
+	resourceReq, err := newResourceRequest(resource)
+	if err != nil {
+		return "", err
+	}
+	bodyBytes, err := io.ReadAll(http.MaxBytesReader(w, r.Body, 1<<20)) // 1MB
+	if err != nil {
+		return "", err
+	}
+	err = r.Body.Close()
+	if err != nil {
+		return "", err
+	}
+	r.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+	if err = json.NewDecoder(bytes.NewReader(bodyBytes)).Decode(&resourceReq); err != nil {
+		return "", err
+	}
+	provider := resourceReq.GetResource().Provider
+	if provider == "" {
+		return "", &errMissingProvider{resource}
+	}
+	return provider, nil
+}
+
+func newResourceRequest(resource string) (providerBoundResourceRequest, error) {
+	if resource == "domain" {
+		return &newDomainRequest{}, nil
+	}
+	return nil, &errUnknownResource{resource}
+}
+
+func quotaTableColumnForResource(resource string, provider string) string {
+	if slices.Contains(providerBoundResourceQuotas, resource) {
+		return fmt.Sprintf("%s_%s", resource, provider)
+	}
+	return resource
 }

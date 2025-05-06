@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Copyright 2025 SAP SE or an SAP affiliate company
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import * as esbuild from 'esbuild'
 import { default as pkg } from './package.json' with {type: 'json'}
 import inlineImportPlugin from 'esbuild-plugin-inline-import';
