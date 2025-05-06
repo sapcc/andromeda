@@ -29,16 +29,17 @@ import (
 )
 
 type Controller struct {
-	Domains     DomainController
-	Pools       PoolController
-	Datacenters DatacenterController
-	Members     MemberController
-	Monitors    MonitorController
-	Services    ServiceController
-	Quotas      QuotaController
-	Sync        SyncController
-	GeoMaps     GeoMapController
-	CidrBlocks  CidrBlocksController
+	Domains       DomainController
+	Pools         PoolController
+	Datacenters   DatacenterController
+	Members       MemberController
+	Monitors      MonitorController
+	Services      ServiceController
+	Quotas        QuotaController
+	Sync          SyncController
+	GeoMaps       GeoMapController
+	CidrBlocks    CidrBlocksController
+	AkamaiMetrics AkamaiMetricsController
 }
 
 type CommonController struct {
@@ -74,6 +75,7 @@ func New(db *sqlx.DB) *Controller {
 		SyncController{cc},
 		GeoMapController{cc},
 		CidrBlocksController{cc, make(map[string]string)},
+		AkamaiMetricsController{cc},
 	}
 	return &c
 }

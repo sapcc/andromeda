@@ -12,6 +12,7 @@ service RPCServer {
   rpc GetMembers(SearchRequest) returns (MembersResponse);
   rpc GetGeomaps(SearchRequest) returns (GeomapsResponse);
   rpc UpdateDatacenterMeta(DatacenterMetaRequest) returns (Datacenter);
+  rpc GetAkamaiTotalDNSRequests(AkamaiTotalDNSRequestsRequest) returns (AkamaiTotalDNSRequestsResponse);
 }
 
 message SearchRequest {
@@ -102,4 +103,30 @@ message StatusResult {
 message DatacenterMetaRequest {
   string id = 1;
   int32 meta = 2;
+}
+
+// New message for Akamai DNS metrics request
+message AkamaiTotalDNSRequestsRequest {
+  string domain = 1;
+  string property = 2;
+  string start_time = 3;
+  string end_time = 4;
+}
+
+// New message for Akamai DNS metrics response
+message AkamaiTotalDNSRequestsResponse {
+  string property = 1;
+  string start_date = 2;
+  string end_date = 3;
+  int64 total_requests = 4;
+  map<string, AkamaiDatacenterStats> datacenters = 5;
+  string error = 6;
+}
+
+// Stats for a specific datacenter
+message AkamaiDatacenterStats {
+  string datacenter_id = 1;
+  string traffic_target = 2;
+  int64 total_requests = 3;
+  float percentage = 4;
 }

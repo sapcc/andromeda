@@ -47,6 +47,7 @@ import (
 	"github.com/sapcc/andromeda/restapi/operations/domains"
 	"github.com/sapcc/andromeda/restapi/operations/geographic_maps"
 	"github.com/sapcc/andromeda/restapi/operations/members"
+	metrics_ops "github.com/sapcc/andromeda/restapi/operations/metrics"
 	"github.com/sapcc/andromeda/restapi/operations/monitors"
 	"github.com/sapcc/andromeda/restapi/operations/pools"
 )
@@ -142,6 +143,9 @@ func ExecuteServer(server *restapi.Server) error {
 	api.MonitorsGetMonitorsMonitorIDHandler = monitors.GetMonitorsMonitorIDHandlerFunc(c.Monitors.GetMonitorsMonitorID)
 	api.MonitorsPutMonitorsMonitorIDHandler = monitors.PutMonitorsMonitorIDHandlerFunc(c.Monitors.PutMonitorsMonitorID)
 	api.MonitorsDeleteMonitorsMonitorIDHandler = monitors.DeleteMonitorsMonitorIDHandlerFunc(c.Monitors.DeleteMonitorsMonitorID)
+
+	// Akamai Metrics
+	api.MetricsGetMetricsAkamaiTotalDNSRequestsHandler = metrics_ops.GetMetricsAkamaiTotalDNSRequestsHandlerFunc(c.AkamaiMetrics.GetTotalDNSRequests)
 
 	// Administrative
 	api.AdministrativeGetServicesHandler = administrative.GetServicesHandlerFunc(c.Services.GetServices)
