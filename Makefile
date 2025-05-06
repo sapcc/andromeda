@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: Copyright 2025 SAP SE or an SAP affiliate company
+#
+# SPDX-License-Identifier: Apache-2.0
+
 .PHONY: build-all clean swagger migrate build-akamai-dns-requests
 PROTOC_FILES = $(shell find . -type f -name '*.proto')
 PB_FILES = $(patsubst %.proto, %.pb.go, $(PROTOC_FILES))
