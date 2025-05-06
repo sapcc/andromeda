@@ -32,16 +32,16 @@ import (
 type AkamaiDatacenterStats struct {
 
 	// ID of the datacenter
-	DatacenterID string `json:"datacenter_id,omitempty"`
+	DatacenterID string `json:"datacenter_id,omitempty" db:"datacenter_id,omitempty"`
 
 	// Percentage of total requests handled by this datacenter
-	Percentage float32 `json:"percentage,omitempty"`
+	Percentage float32 `json:"percentage,omitempty" db:"percentage,omitempty"`
 
 	// Total number of DNS requests to this datacenter
-	TotalRequests int64 `json:"total_requests,omitempty"`
+	TotalRequests int64 `json:"total_requests,omitempty" db:"total_requests,omitempty"`
 
 	// Name of the traffic target
-	TrafficTarget string `json:"traffic_target,omitempty"`
+	TrafficTarget string `json:"traffic_target,omitempty" db:"traffic_target,omitempty"`
 }
 
 // Validate validates this akamai datacenter stats

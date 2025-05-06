@@ -35,80 +35,80 @@ import (
 type Datacenter struct {
 
 	// The administrative state of the resource, which is up (true) or down (false). Default is true.
-	AdminStateUp *bool `json:"admin_state_up,omitempty"`
+	AdminStateUp *bool `json:"admin_state_up,omitempty" db:"admin_state_up,omitempty"`
 
 	// city
 	// Example: Berlin
 	// Max Length: 255
-	City *string `json:"city"`
+	City *string `json:"city" db:"city"`
 
 	// continent
 	// Example: EU
 	// Max Length: 255
-	Continent *string `json:"continent"`
+	Continent *string `json:"continent" db:"continent"`
 
 	// country
 	// Example: DE
 	// Max Length: 2
-	Country *string `json:"country"`
+	Country *string `json:"country" db:"country"`
 
 	// The UTC date and timestamp when the resource was created.
 	// Example: 2020-05-11T17:21:34
 	// Read Only: true
 	// Format: date-time
-	CreatedAt strfmt.DateTime `json:"created_at,omitempty"`
+	CreatedAt strfmt.DateTime `json:"created_at,omitempty" db:"created_at,omitempty"`
 
 	// The id of the resource.
 	// Read Only: true
 	// Format: uuid
-	ID strfmt.UUID `json:"id,omitempty"`
+	ID strfmt.UUID `json:"id,omitempty" db:"id,omitempty"`
 
 	// latitude
 	// Example: 52.526055
-	Latitude *float64 `json:"latitude"`
+	Latitude *float64 `json:"latitude" db:"latitude"`
 
 	// longitude
 	// Example: 13.403454
-	Longitude *float64 `json:"longitude"`
+	Longitude *float64 `json:"longitude" db:"longitude"`
 
 	// meta
 	// Read Only: true
-	Meta int64 `json:"meta,omitempty"`
+	Meta int64 `json:"meta,omitempty" db:"meta,omitempty"`
 
 	// Human-readable name of the resource.
 	// Max Length: 255
-	Name *string `json:"name,omitempty"`
+	Name *string `json:"name,omitempty" db:"name,omitempty"`
 
 	// The ID of the project owning this resource.
 	// Example: fa84c217f361441986a220edf9b1e337
 	// Max Length: 32
 	// Min Length: 32
-	ProjectID *string `json:"project_id,omitempty"`
+	ProjectID *string `json:"project_id,omitempty" db:"project_id,omitempty"`
 
 	// Provider driver for the backend solution
 	// Example: akamai
 	// Enum: [akamai f5]
-	Provider string `json:"provider,omitempty"`
+	Provider string `json:"provider,omitempty" db:"provider,omitempty"`
 
 	// provisioning status
 	// Read Only: true
 	// Enum: [PENDING_CREATE PENDING_UPDATE PENDING_DELETE ACTIVE ERROR]
-	ProvisioningStatus string `json:"provisioning_status,omitempty"`
+	ProvisioningStatus string `json:"provisioning_status,omitempty" db:"provisioning_status,omitempty"`
 
 	// Visibility of datacenter between different projects
 	// Enum: [private shared]
-	Scope *string `json:"scope,omitempty"`
+	Scope *string `json:"scope,omitempty" db:"scope,omitempty"`
 
 	// state or province
 	// Example: Berlin
 	// Max Length: 255
-	StateOrProvince *string `json:"state_or_province"`
+	StateOrProvince *string `json:"state_or_province" db:"state_or_province"`
 
 	// The UTC date and timestamp when the resource was created.
 	// Example: 2020-09-09T14:52:15
 	// Read Only: true
 	// Format: date-time
-	UpdatedAt strfmt.DateTime `json:"updated_at,omitempty"`
+	UpdatedAt strfmt.DateTime `json:"updated_at,omitempty" db:"updated_at,omitempty"`
 }
 
 // Validate validates this datacenter

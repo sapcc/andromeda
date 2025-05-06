@@ -34,24 +34,24 @@ import (
 type AkamaiTotalDNSResult struct {
 
 	// datacenters
-	Datacenters map[string]AkamaiDatacenterStats `json:"datacenters,omitempty"`
+	Datacenters map[string]AkamaiDatacenterStats `json:"datacenters,omitempty" db:"datacenters,omitempty"`
 
 	// End date of the data range
 	// Format: date-time
-	EndDate strfmt.DateTime `json:"end_date,omitempty"`
+	EndDate strfmt.DateTime `json:"end_date,omitempty" db:"end_date,omitempty"`
 
 	// Error message if any occurred
-	Error *string `json:"error,omitempty"`
+	Error *string `json:"error,omitempty" db:"error,omitempty"`
 
 	// The GTM property ID
-	Property string `json:"property,omitempty"`
+	Property string `json:"property,omitempty" db:"property,omitempty"`
 
 	// Start date of the data range
 	// Format: date-time
-	StartDate strfmt.DateTime `json:"start_date,omitempty"`
+	StartDate strfmt.DateTime `json:"start_date,omitempty" db:"start_date,omitempty"`
 
 	// Total number of DNS requests in the period
-	TotalRequests int64 `json:"total_requests,omitempty"`
+	TotalRequests int64 `json:"total_requests,omitempty" db:"total_requests,omitempty"`
 }
 
 // Validate validates this akamai total dns result

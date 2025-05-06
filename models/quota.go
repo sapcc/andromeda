@@ -33,27 +33,27 @@ type Quota struct {
 
 	// The configured datacenter quota limit. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited.
 	// Example: 5
-	Datacenter *int64 `json:"datacenter,omitempty"`
+	Datacenter *int64 `json:"datacenter,omitempty" db:"datacenter,omitempty"`
 
 	// The configured domain quota limit for provider Akamai. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited.
 	// Example: 5
-	DomainAkamai *int64 `json:"domain_akamai,omitempty"`
+	DomainAkamai *int64 `json:"domain_akamai,omitempty" db:"domain_akamai,omitempty"`
 
 	// The configured domain quota limit for provider F5. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited.
 	// Example: 5
-	DomainF5 *int64 `json:"domain_f5,omitempty"`
+	DomainF5 *int64 `json:"domain_f5,omitempty" db:"domain_f5,omitempty"`
 
 	// The configured member quota limit. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited.
 	// Example: 5
-	Member *int64 `json:"member,omitempty"`
+	Member *int64 `json:"member,omitempty" db:"member,omitempty"`
 
 	// The configured monitor quota limit. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited.
 	// Example: 5
-	Monitor *int64 `json:"monitor,omitempty"`
+	Monitor *int64 `json:"monitor,omitempty" db:"monitor,omitempty"`
 
 	// The configured pool quota limit. A setting of null means it is using the deployment default quota. A setting of -1 means unlimited.
 	// Example: 5
-	Pool *int64 `json:"pool,omitempty"`
+	Pool *int64 `json:"pool,omitempty" db:"pool,omitempty"`
 }
 
 // Validate validates this quota
