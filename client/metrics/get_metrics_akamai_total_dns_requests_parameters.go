@@ -75,11 +75,13 @@ GetMetricsAkamaiTotalDNSRequestsParams contains all the parameters to send to th
 */
 type GetMetricsAkamaiTotalDNSRequestsParams struct {
 
-	/* Domain.
+	/* DomainID.
 
-	   GTM domain name (default: andromeda.akadns.net)
+	   Domain UUID to get metrics for
+
+	   Format: uuid
 	*/
-	Domain *string
+	DomainID strfmt.UUID
 
 	/* End.
 
@@ -88,12 +90,6 @@ type GetMetricsAkamaiTotalDNSRequestsParams struct {
 	   Format: date-time
 	*/
 	End *strfmt.DateTime
-
-	/* Property.
-
-	   GTM property ID
-	*/
-	Property string
 
 	/* Start.
 
@@ -156,15 +152,15 @@ func (o *GetMetricsAkamaiTotalDNSRequestsParams) SetHTTPClient(client *http.Clie
 	o.HTTPClient = client
 }
 
-// WithDomain adds the domain to the get metrics akamai total DNS requests params
-func (o *GetMetricsAkamaiTotalDNSRequestsParams) WithDomain(domain *string) *GetMetricsAkamaiTotalDNSRequestsParams {
-	o.SetDomain(domain)
+// WithDomainID adds the domainID to the get metrics akamai total DNS requests params
+func (o *GetMetricsAkamaiTotalDNSRequestsParams) WithDomainID(domainID strfmt.UUID) *GetMetricsAkamaiTotalDNSRequestsParams {
+	o.SetDomainID(domainID)
 	return o
 }
 
-// SetDomain adds the domain to the get metrics akamai total DNS requests params
-func (o *GetMetricsAkamaiTotalDNSRequestsParams) SetDomain(domain *string) {
-	o.Domain = domain
+// SetDomainID adds the domainId to the get metrics akamai total DNS requests params
+func (o *GetMetricsAkamaiTotalDNSRequestsParams) SetDomainID(domainID strfmt.UUID) {
+	o.DomainID = domainID
 }
 
 // WithEnd adds the end to the get metrics akamai total DNS requests params
@@ -176,17 +172,6 @@ func (o *GetMetricsAkamaiTotalDNSRequestsParams) WithEnd(end *strfmt.DateTime) *
 // SetEnd adds the end to the get metrics akamai total DNS requests params
 func (o *GetMetricsAkamaiTotalDNSRequestsParams) SetEnd(end *strfmt.DateTime) {
 	o.End = end
-}
-
-// WithProperty adds the property to the get metrics akamai total DNS requests params
-func (o *GetMetricsAkamaiTotalDNSRequestsParams) WithProperty(property string) *GetMetricsAkamaiTotalDNSRequestsParams {
-	o.SetProperty(property)
-	return o
-}
-
-// SetProperty adds the property to the get metrics akamai total DNS requests params
-func (o *GetMetricsAkamaiTotalDNSRequestsParams) SetProperty(property string) {
-	o.Property = property
 }
 
 // WithStart adds the start to the get metrics akamai total DNS requests params
@@ -208,20 +193,13 @@ func (o *GetMetricsAkamaiTotalDNSRequestsParams) WriteToRequest(r runtime.Client
 	}
 	var res []error
 
-	if o.Domain != nil {
+	// query param domain_id
+	qrDomainID := o.DomainID
+	qDomainID := qrDomainID.String()
+	if qDomainID != "" {
 
-		// query param domain
-		var qrDomain string
-
-		if o.Domain != nil {
-			qrDomain = *o.Domain
-		}
-		qDomain := qrDomain
-		if qDomain != "" {
-
-			if err := r.SetQueryParam("domain", qDomain); err != nil {
-				return err
-			}
+		if err := r.SetQueryParam("domain_id", qDomainID); err != nil {
+			return err
 		}
 	}
 
@@ -239,16 +217,6 @@ func (o *GetMetricsAkamaiTotalDNSRequestsParams) WriteToRequest(r runtime.Client
 			if err := r.SetQueryParam("end", qEnd); err != nil {
 				return err
 			}
-		}
-	}
-
-	// query param property
-	qrProperty := o.Property
-	qProperty := qrProperty
-	if qProperty != "" {
-
-		if err := r.SetQueryParam("property", qProperty); err != nil {
-			return err
 		}
 	}
 

@@ -1077,15 +1077,9 @@ func init() {
         "parameters": [
           {
             "type": "string",
-            "x-nullable": true,
-            "description": "GTM domain name (default: andromeda.akadns.net)",
-            "name": "domain",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "description": "GTM property ID",
-            "name": "property",
+            "format": "uuid",
+            "description": "Domain UUID to get metrics for",
+            "name": "domain_id",
             "in": "query",
             "required": true
           },
@@ -3940,15 +3934,9 @@ func init() {
         "parameters": [
           {
             "type": "string",
-            "x-nullable": true,
-            "description": "GTM domain name (default: andromeda.akadns.net)",
-            "name": "domain",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "description": "GTM property ID",
-            "name": "property",
+            "format": "uuid",
+            "description": "Domain UUID to get metrics for",
+            "name": "domain_id",
             "in": "query",
             "required": true
           },

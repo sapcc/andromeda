@@ -29,9 +29,8 @@ import (
 
 // GetMetricsAkamaiTotalDNSRequestsURL generates an URL for the get metrics akamai total DNS requests operation
 type GetMetricsAkamaiTotalDNSRequestsURL struct {
-	Domain   *string
+	DomainID strfmt.UUID
 	End      *strfmt.DateTime
-	Property string
 	Start    *strfmt.DateTime
 
 	_basePath string
@@ -68,12 +67,9 @@ func (o *GetMetricsAkamaiTotalDNSRequestsURL) Build() (*url.URL, error) {
 
 	qs := make(url.Values)
 
-	var domainQ string
-	if o.Domain != nil {
-		domainQ = *o.Domain
-	}
-	if domainQ != "" {
-		qs.Set("domain", domainQ)
+	domainIDQ := o.DomainID.String()
+	if domainIDQ != "" {
+		qs.Set("domain_id", domainIDQ)
 	}
 
 	var endQ string
@@ -82,11 +78,6 @@ func (o *GetMetricsAkamaiTotalDNSRequestsURL) Build() (*url.URL, error) {
 	}
 	if endQ != "" {
 		qs.Set("end", endQ)
-	}
-
-	propertyQ := o.Property
-	if propertyQ != "" {
-		qs.Set("property", propertyQ)
 	}
 
 	var startQ string
