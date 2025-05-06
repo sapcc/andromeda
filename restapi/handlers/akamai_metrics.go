@@ -1,15 +1,15 @@
 package handlers
 
 import (
+	"context"
 	"time"
 
 	"github.com/apex/log"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/sapcc/andromeda/internal/config"
-	"github.com/sapcc/andromeda/internal/driver/akamai"
-	"github.com/sapcc/andromeda/internal/driver/akamai/metrics"
+	"github.com/sapcc/andromeda/internal/rpc"
+	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/models"
 	metrics_ops "github.com/sapcc/andromeda/restapi/operations/metrics"
 )
@@ -48,27 +48,11 @@ func GetMetricsAkamaiTotalDNSRequests(params metrics_ops.GetMetricsAkamaiTotalDN
 	}
 	startDateTime := strfmt.DateTime(startTime)
 
-	// Make sure contract_id is set to bypass the check if needed
-	if config.Global.AkamaiConfig.ContractId == "" {
-		config.Global.AkamaiConfig.ContractId = "BYPASS_CHECK_VALUE"
-		logger.Info("Setting ContractId to BYPASS_CHECK_VALUE to skip contract check")
-	}
-
-	// Initialize Akamai session using patched version
-	session, domainType := akamai.NewAkamaiSessionPatched(&config.Global.AkamaiConfig)
-	logger.Infof("Connected to Akamai API with domain type: %s", domainType)
-
-	// Create cached session
-	cachedSession := metrics.NewCachedAkamaiSession(*session, domain)
-
-	// Get the data
-	logger.Infof("Fetching total DNS requests for %s from %s to %s",
-		params.Property, startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
-
-	result, err := metrics.GetTotalDNSRequests(cachedSession, domain, params.Property, startTime, endTime)
+	// Get RPC client
+	_, err := rpc.GetRPCClient()
 	if err != nil {
-		logger.WithError(err).Error("Failed to get total DNS requests")
-		errMsg := "Failed to get total DNS requests: " + err.Error()
+		logger.WithError(err).Error("Failed to get RPC client")
+		errMsg := "Failed to get RPC client: " + err.Error()
 		return metrics_ops.NewGetMetricsAkamaiTotalDNSRequestsOK().WithPayload(&models.AkamaiTotalDNSResult{
 			Property:  params.Property,
 			StartDate: startDateTime,
@@ -77,18 +61,50 @@ func GetMetricsAkamaiTotalDNSRequests(params metrics_ops.GetMetricsAkamaiTotalDN
 		})
 	}
 
-	// Extract data from result
-	totalRequests := int64(result["total_requests"].(int))
-	datacenters := result["datacenters"].(map[string]map[string]interface{})
+	// Create RPC handler directly since we can't use the generated client (which doesn't have the method yet)
+	handler := &server.RPCHandler{}
+
+	// Prepare the request to the RPC service
+	rpcRequest := &server.AkamaiTotalDNSRequestsRequest{
+		Domain:    domain,
+		Property:  params.Property,
+		StartTime: startTime.Format(time.RFC3339),
+		EndTime:   endTime.Format(time.RFC3339),
+	}
+
+	// Call the RPC method directly
+	resp, err := handler.GetAkamaiTotalDNSRequests(context.Background(), rpcRequest)
+	if err != nil {
+		logger.WithError(err).Error("RPC call failed")
+		errMsg := "RPC call failed: " + err.Error()
+		return metrics_ops.NewGetMetricsAkamaiTotalDNSRequestsOK().WithPayload(&models.AkamaiTotalDNSResult{
+			Property:  params.Property,
+			StartDate: startDateTime,
+			EndDate:   endDateTime,
+			Error:     &errMsg,
+		})
+	}
+
+	// Check for errors in the response
+	if resp.Error != "" {
+		logger.Error("Error in RPC response: " + resp.Error)
+		errMsg := resp.Error
+		return metrics_ops.NewGetMetricsAkamaiTotalDNSRequestsOK().WithPayload(&models.AkamaiTotalDNSResult{
+			Property:  params.Property,
+			StartDate: startDateTime,
+			EndDate:   endDateTime,
+			Error:     &errMsg,
+		})
+	}
 
 	// Convert datacenter stats to model
 	datacentersMap := make(map[string]models.AkamaiDatacenterStats)
-	for dcID, dcData := range datacenters {
+	for dcID, dcData := range resp.Datacenters {
 		datacentersMap[dcID] = models.AkamaiDatacenterStats{
-			DatacenterID:  dcData["datacenter_id"].(string),
-			TrafficTarget: dcData["traffic_target"].(string),
-			TotalRequests: int64(dcData["total_requests"].(int)),
-			Percentage:    float32(dcData["percentage"].(float64)),
+			DatacenterID:  dcData.DatacenterId,
+			TrafficTarget: dcData.TrafficTarget,
+			TotalRequests: dcData.TotalRequests,
+			Percentage:    float32(dcData.Percentage),
 		}
 	}
 
@@ -96,7 +112,7 @@ func GetMetricsAkamaiTotalDNSRequests(params metrics_ops.GetMetricsAkamaiTotalDN
 		Property:      params.Property,
 		StartDate:     startDateTime,
 		EndDate:       endDateTime,
-		TotalRequests: totalRequests,
+		TotalRequests: resp.TotalRequests,
 		Datacenters:   datacentersMap,
 	})
 }
