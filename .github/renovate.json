@@ -19,7 +19,7 @@
     },
     {
       "matchPackageNames": [
-        "github.com/getsentry/sentry-go",
+        "github.com/getsentry/sentry-go"
       ],
       "enabled": false
     }
