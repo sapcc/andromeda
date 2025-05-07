@@ -1,5 +1,8 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Schedule Friday until noon",
+  "schedule": ["* 0-12 * * 5"],
+  "timezone": "Europe/Berlin",
   "extends": [
     "config:recommended"
   ],
@@ -19,7 +22,7 @@
     },
     {
       "matchPackageNames": [
-        "github.com/getsentry/sentry-go",
+        "github.com/getsentry/sentry-go"
       ],
       "enabled": false
     }
