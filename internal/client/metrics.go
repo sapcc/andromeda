@@ -25,111 +25,76 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"path/filepath"
 	"time"
 
-	"github.com/apex/log"
+	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 	"github.com/jedib0t/go-pretty/table"
 
-	"github.com/sapcc/andromeda/internal/config"
-	"github.com/sapcc/andromeda/internal/driver/akamai"
-	"github.com/sapcc/andromeda/internal/driver/akamai/metrics"
+	"github.com/sapcc/andromeda/client/metrics"
+	"github.com/sapcc/andromeda/models"
 )
 
 var MetricsOptions struct {
-	MetricsAkamaiDNSRequests `command:"akamai-dns-requests" description:"Get Akamai GTM total DNS requests"`
+	MetricsAkamaiDNSRequests `command:"akamai-dns-requests" description:"Get Akamai GTM total DNS requests via Andromeda API"`
 }
 
 type MetricsAkamaiDNSRequests struct {
-	Domain   string `short:"d" long:"domain" description:"GTM domain name" default:"andromeda.akadns.net"`
-	Property string `short:"p" long:"property" required:"true" description:"GTM property ID"`
-	Start    string `short:"s" long:"start" description:"Start date in ISO format (default: 2 days before end date)"`
-	End      string `short:"e" long:"end" description:"End date in ISO format (default: 15 minutes ago)"`
-	Output   string `short:"o" long:"output" description:"Output format (json, csv, table)" default:"table" choice:"json" choice:"csv" choice:"table"`
-	Edgerc   string `long:"edgerc" description:"Path to .edgerc file for Akamai authentication" default:""`
+	DomainID strfmt.UUID `long:"domain-id" required:"true" description:"Andromeda Domain UUID"`
+	Start    string      `short:"s" long:"start" description:"Start date/time in RFC3339 format (e.g., 2025-05-01T00:00:00Z)"`
+	End      string      `short:"e" long:"end" description:"End date/time in RFC3339 format (e.g., 2025-05-10T15:00:00Z)"`
+	Output   string      `short:"o" long:"output" description:"Output format (json, csv, table)" default:"table" choice:"json" choice:"csv" choice:"table"`
 }
 
-func (m MetricsAkamaiDNSRequests) Execute(_ []string) error {
-	// Set up default dates if not provided
-	var endTime time.Time
-	var startTime time.Time
-	var err error
+func (m *MetricsAkamaiDNSRequests) Execute(_ []string) error {
+	params := metrics.NewGetMetricsAkamaiTotalDNSRequestsParams()
+	params.SetDomainID(m.DomainID)
 
-	if m.End != "" {
-		endTime, err = time.Parse(time.RFC3339, m.End)
-		if err != nil {
-			return fmt.Errorf("invalid end time format, use RFC3339: %w", err)
-		}
-	} else {
-		endTime = time.Now().Add(-15 * time.Minute) // Default end time: 15 minutes ago
-	}
-
+	// Parse and set Start time
 	if m.Start != "" {
-		startTime, err = time.Parse(time.RFC3339, m.Start)
+		startTime, err := time.Parse(time.RFC3339, m.Start)
 		if err != nil {
-			return fmt.Errorf("invalid start time format, use RFC3339: %w", err)
+			return fmt.Errorf("invalid start time format, use RFC3339 (e.g., 2025-05-01T00:00:00Z): %w", err)
 		}
-	} else {
-		startTime = endTime.Add(-48 * time.Hour) // Default start time: 2 days before end time
+		startDateTime := strfmt.DateTime(startTime)
+		params.SetStart(&startDateTime)
 	}
 
-	// Initialize Akamai configuration
-	akamaiConfig := config.AkamaiConfig{
-		ContractId: "BYPASS_CHECK_VALUE", // Bypass contract check
+	// Parse and set End time
+	if m.End != "" {
+		endTime, err := time.Parse(time.RFC3339, m.End)
+		if err != nil {
+			return fmt.Errorf("invalid end time format, use RFC3339 (e.g., 2025-05-10T15:00:00Z): %w", err)
+		}
+		endDateTime := strfmt.DateTime(endTime)
+		params.SetEnd(&endDateTime)
 	}
 
-	// Check for .edgerc file
-	edgercPath := m.Edgerc
-	if edgercPath == "" {
-		// Try common locations
-		homeDir, err := os.UserHomeDir()
-		if err == nil {
-			candidates := []string{
-				".edgerc",                         // Current directory
-				filepath.Join(homeDir, ".edgerc"), // Home directory
-				"/Users/I516965/Documents/WORK/CC/tasks/solution-engineering/andromeda-metrics/.edgerc", // Path from config
-			}
-
-			for _, path := range candidates {
-				if _, err := os.Stat(path); err == nil {
-					edgercPath = path
-					break
+	// Call the Andromeda API
+	resp, err := AndromedaClient.Metrics.GetMetricsAkamaiTotalDNSRequests(params)
+	if err != nil {
+		// Try to parse the error response for more details
+		apiError, ok := err.(*runtime.APIError)
+		if ok {
+			errorPayload, ok := apiError.Response.(runtime.ClientResponse)
+			if ok && errorPayload.Code() >= 400 {
+				// Attempt to read the error model from the response body
+				andromedaError := &models.Error{}
+				if readErr := json.NewDecoder(errorPayload.Body()).Decode(andromedaError); readErr == nil && andromedaError.Message != "" {
+					return fmt.Errorf("API error: %s (code: %d)", andromedaError.Message, errorPayload.Code())
 				}
 			}
+			// Fallback to default error message
+			return fmt.Errorf("failed to get Akamai DNS metrics from API: %w", err)
 		}
-	}
-
-	if edgercPath != "" {
-		akamaiConfig.EdgeRC = edgercPath
-		log.Infof("Using Akamai credentials from: %s", edgercPath)
-	} else {
-		// Fallback to environment variables
-		return fmt.Errorf("No .edgerc file found and environment variables not supported yet. Please provide a path to .edgerc file with --edgerc")
-	}
-
-	// Set domain from parameter or default
-	akamaiConfig.Domain = m.Domain
-
-	// Initialize Akamai session using patched version
-	session, domainType := akamai.NewAkamaiSessionPatched(&akamaiConfig)
-	log.Infof("Connected to Akamai API with domain type: %s", domainType)
-
-	// Create cached session
-	cachedSession := metrics.NewCachedAkamaiSession(*session, m.Domain)
-
-	// Get the data
-	log.Infof("Fetching total DNS requests for %s from %s to %s",
-		m.Property, startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
-
-	result, err := metrics.GetTotalDNSRequests(cachedSession, m.Domain, m.Property, startTime, endTime)
-	if err != nil {
-		return fmt.Errorf("failed to get total DNS requests: %w", err)
+		// Handle non-API errors
+		return fmt.Errorf("failed to get Akamai DNS metrics: %w", err)
 	}
 
 	// Output the data in the requested format
 	switch m.Output {
 	case "json":
-		jsonBytes, err := json.MarshalIndent(result, "", "  ")
+		jsonBytes, err := json.MarshalIndent(resp.Payload, "", "  ")
 		if err != nil {
 			return fmt.Errorf("failed to marshal JSON: %w", err)
 		}
@@ -143,10 +108,10 @@ func (m MetricsAkamaiDNSRequests) Execute(_ []string) error {
 		// Write header for property info
 		w.Write([]string{"Property", "Start Date", "End Date", "Total Requests"})
 		w.Write([]string{
-			result["property"].(string),
-			result["start_date"].(string),
-			result["end_date"].(string),
-			fmt.Sprintf("%d", result["total_requests"].(int)),
+			resp.Payload.Property,
+			resp.Payload.StartDate.String(),
+			resp.Payload.EndDate.String(),
+			fmt.Sprintf("%d", resp.Payload.TotalRequests),
 		})
 		w.Write([]string{}) // Empty row for separation
 
@@ -154,22 +119,21 @@ func (m MetricsAkamaiDNSRequests) Execute(_ []string) error {
 		w.Write([]string{"Datacenter", "Datacenter ID", "Traffic Target", "Requests", "Percentage"})
 
 		// Write datacenter data
-		datacenters := result["datacenters"].(map[string]map[string]interface{})
-		for dcName, dcData := range datacenters {
+		for dcName, dcData := range resp.Payload.Datacenters {
 			w.Write([]string{
 				dcName,
-				dcData["datacenter_id"].(string),
-				dcData["traffic_target"].(string),
-				fmt.Sprintf("%d", dcData["total_requests"].(int)),
-				fmt.Sprintf("%.2f%%", dcData["percentage"].(float64)*100),
+				dcData.DatacenterID,
+				dcData.TrafficTarget,
+				fmt.Sprintf("%d", dcData.TotalRequests),
+				fmt.Sprintf("%.2f%%", float64(dcData.Percentage)*100),
 			})
 		}
 
 	default: // table format
 		// Print summary information
-		fmt.Printf("Total DNS Requests for Property: %s\n", result["property"])
-		fmt.Printf("Time Range: %s to %s\n", result["start_date"], result["end_date"])
-		fmt.Printf("Total Requests: %d\n\n", result["total_requests"])
+		fmt.Printf("Total DNS Requests for Property: %s\n", resp.Payload.Property)
+		fmt.Printf("Time Range: %s to %s\n", resp.Payload.StartDate.String(), resp.Payload.EndDate.String())
+		fmt.Printf("Total Requests: %d\n\n", resp.Payload.TotalRequests)
 
 		// Set up table for datacenters
 		t := table.NewWriter()
@@ -177,14 +141,13 @@ func (m MetricsAkamaiDNSRequests) Execute(_ []string) error {
 		t.AppendHeader(table.Row{"Datacenter", "Datacenter ID", "Traffic Target", "Requests", "Percentage"})
 
 		// Add data rows
-		datacenters := result["datacenters"].(map[string]map[string]interface{})
-		for dcName, dcData := range datacenters {
+		for dcName, dcData := range resp.Payload.Datacenters {
 			t.AppendRow(table.Row{
 				dcName,
-				dcData["datacenter_id"].(string),
-				dcData["traffic_target"].(string),
-				dcData["total_requests"].(int),
-				fmt.Sprintf("%.2f%%", dcData["percentage"].(float64)*100),
+				dcData.DatacenterID,
+				dcData.TrafficTarget,
+				dcData.TotalRequests,
+				fmt.Sprintf("%.2f%%", float64(dcData.Percentage)*100),
 			})
 		}
 		t.Render()
