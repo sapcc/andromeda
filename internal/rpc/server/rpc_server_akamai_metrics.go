@@ -22,13 +22,14 @@ package server
 
 import (
 	"context"
-	"encoding/json"
+	"fmt"
+	"net/http"
+	"net/url"
 	"os"
-	"os/exec"
-	"path/filepath"
-	"strings"
 	"time"
 
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v10/pkg/edgegrid"
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v10/pkg/session"
 	"github.com/apex/log"
 
 	"github.com/sapcc/andromeda/internal/config"
@@ -58,6 +59,56 @@ type AkamaiTotalDNSRequestsResponse struct {
 	TotalRequests int64                             `protobuf:"varint,4,opt,name=total_requests,json=totalRequests,proto3" json:"total_requests,omitempty"`
 	Datacenters   map[string]*AkamaiDatacenterStats `protobuf:"bytes,5,rep,name=datacenters,proto3" json:"datacenters,omitempty"`
 	Error         string                            `protobuf:"bytes,6,opt,name=error,proto3" json:"error,omitempty"`
+}
+
+// DataRows represents a data row in the Akamai traffic report
+type DataRows struct {
+	Timestamp   time.Time `json:"timestamp"`
+	Datacenters []struct {
+		Nickname          string `json:"nickname"`
+		TrafficTargetName string `json:"trafficTargetName"`
+		Requests          int    `json:"requests"`
+		Status            string `json:"status"`
+	} `json:"datacenters"`
+}
+
+// TrafficReport represents the Akamai traffic report
+type TrafficReport struct {
+	Metadata struct {
+		Domain   string    `json:"domain"`
+		Property string    `json:"property"`
+		Start    time.Time `json:"start"`
+		End      time.Time `json:"end"`
+		Interval string    `json:"interval"`
+		Uri      string    `json:"uri"`
+	} `json:"metadata"`
+	DataRows []DataRows `json:"dataRows"`
+	Links    []struct {
+		Rel  string `json:"rel"`
+		Href string `json:"href"`
+	} `json:"links"`
+}
+
+// createAkamaiSession creates a new session with the Akamai API
+func createAkamaiSession(akamaiConfig *config.AkamaiConfig) (*session.Session, error) {
+	option := edgegrid.WithEnv(true)
+	if env := os.Getenv("AKAMAI_EDGE_RC"); env != "" {
+		option = edgegrid.WithFile(env)
+	} else if akamaiConfig.EdgeRC != "" {
+		option = edgegrid.WithFile(akamaiConfig.EdgeRC)
+	}
+
+	edgerc, err := edgegrid.New(option)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create EdgeGrid credentials: %w", err)
+	}
+
+	s, err := session.New(session.WithSigner(edgerc))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create session: %w", err)
+	}
+
+	return &s, nil
 }
 
 // GetAkamaiTotalDNSRequests implements the RPC method for retrieving Akamai total DNS requests
@@ -104,105 +155,108 @@ func (u *RPCHandler) GetAkamaiTotalDNSRequests(ctx context.Context, req *AkamaiT
 		startTime = endTime.Add(-48 * time.Hour)
 	}
 
-	// Check for .edgerc file
-	edgercPath := config.Global.AkamaiConfig.EdgeRC
-	if edgercPath == "" {
-		// Try common locations
-		homeDir, err := os.UserHomeDir()
-		if err == nil {
-			candidates := []string{
-				".edgerc",                         // Current directory
-				filepath.Join(homeDir, ".edgerc"), // Home directory
-			}
-
-			for _, path := range candidates {
-				if _, err := os.Stat(path); err == nil {
-					edgercPath = path
-					break
-				}
-			}
-		}
-	}
-
-	if edgercPath == "" {
+	// Get Akamai configuration
+	akamaiConfig := config.Global.AkamaiConfig
+	if akamaiConfig.EdgeRC == "" {
 		return &AkamaiTotalDNSRequestsResponse{
 			Property: req.Property,
-			Error:    "No .edgerc file found for Akamai authentication",
+			Error:    "No EdgeRC configuration found for Akamai authentication",
 		}, nil
 	}
 
-	// Use the CLI tool to avoid import cycles
-	cmdPath, err := exec.LookPath("./build/andromeda-akamai-total-dns-requests")
+	// Initialize Akamai session
+	logger.Info("Initializing Akamai session")
+	session, err := createAkamaiSession(&akamaiConfig)
 	if err != nil {
-		// Try to find it in the current directory
-		if _, err := os.Stat("./build/andromeda-akamai-total-dns-requests"); err == nil {
-			cmdPath = "./build/andromeda-akamai-total-dns-requests"
-		} else {
-			return &AkamaiTotalDNSRequestsResponse{
-				Property: req.Property,
-				Error:    "Could not find andromeda-akamai-total-dns-requests tool: " + err.Error(),
-			}, nil
+		logger.WithError(err).Error("Failed to create Akamai session")
+		return &AkamaiTotalDNSRequestsResponse{
+			Property: req.Property,
+			Error:    "Failed to create Akamai session: " + err.Error(),
+		}, nil
+	}
+
+	// Build the URL for direct API access to get data for the specific time range
+	path := fmt.Sprintf("/gtm-api/v1/reports/traffic/domains/%s/properties/%s", domain, req.Property)
+	params := url.Values{}
+	params.Add("start", startTime.UTC().Format(time.RFC3339))
+	params.Add("end", endTime.UTC().Format(time.RFC3339))
+	uri := fmt.Sprintf("%s?%s", path, params.Encode())
+
+	logger.Infof("Fetching traffic report: %s", uri)
+
+	// Make the API request directly
+	var trafficReport TrafficReport
+	httpReq, err := http.NewRequest(http.MethodGet, uri, nil)
+	if err != nil {
+		logger.WithError(err).Error("Failed to create request")
+		return &AkamaiTotalDNSRequestsResponse{
+			Property:  req.Property,
+			StartDate: startTime.Format(time.RFC3339),
+			EndDate:   endTime.Format(time.RFC3339),
+			Error:     "Failed to create request: " + err.Error(),
+		}, nil
+	}
+
+	resp, err := (*session).Exec(httpReq, &trafficReport)
+	if err != nil {
+		logger.WithError(err).Error("Failed to execute request")
+		return &AkamaiTotalDNSRequestsResponse{
+			Property:  req.Property,
+			StartDate: startTime.Format(time.RFC3339),
+			EndDate:   endTime.Format(time.RFC3339),
+			Error:     "Failed to get traffic report: " + err.Error(),
+		}, nil
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		logger.WithField("status", resp.Status).Error("Unexpected status code")
+		return &AkamaiTotalDNSRequestsResponse{
+			Property:  req.Property,
+			StartDate: startTime.Format(time.RFC3339),
+			EndDate:   endTime.Format(time.RFC3339),
+			Error:     fmt.Sprintf("Failed to get traffic report: unexpected status %d", resp.StatusCode),
+		}, nil
+	}
+
+	// Process the traffic report data
+	totalRequests := 0
+	datacentersMap := make(map[string]*AkamaiDatacenterStats)
+
+	// Process all data rows
+	for _, dataRow := range trafficReport.DataRows {
+		for _, datacenter := range dataRow.Datacenters {
+			dcName := datacenter.Nickname
+			requests := datacenter.Requests
+
+			// Update total requests count
+			totalRequests += requests
+
+			// Update datacenter-specific counts
+			if _, exists := datacentersMap[dcName]; !exists {
+				datacentersMap[dcName] = &AkamaiDatacenterStats{
+					DatacenterId:  dcName,
+					TrafficTarget: datacenter.TrafficTargetName,
+					TotalRequests: 0,
+				}
+			}
+			datacentersMap[dcName].TotalRequests += int64(requests)
 		}
 	}
 
-	// Prepare CLI arguments
-	args := []string{
-		"--domain", domain,
-		"--property", req.Property,
-		"--start", startTime.Format(time.RFC3339),
-		"--end", endTime.Format(time.RFC3339),
-		"--output", "json",
-		"--edgerc", edgercPath,
-	}
-
-	logger.Infof("Executing: %s %s", cmdPath, strings.Join(args, " "))
-
-	// Run the CLI tool
-	cmd := exec.Command(cmdPath, args...)
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		logger.WithError(err).Error("Failed to execute CLI tool")
-		return &AkamaiTotalDNSRequestsResponse{
-			Property:  req.Property,
-			StartDate: startTime.Format(time.RFC3339),
-			EndDate:   endTime.Format(time.RFC3339),
-			Error:     "Failed to execute CLI tool: " + err.Error() + " - Output: " + string(output),
-		}, nil
-	}
-
-	// Parse the JSON output
-	var result map[string]interface{}
-	if err := json.Unmarshal(output, &result); err != nil {
-		logger.WithError(err).Error("Failed to parse CLI output")
-		return &AkamaiTotalDNSRequestsResponse{
-			Property:  req.Property,
-			StartDate: startTime.Format(time.RFC3339),
-			EndDate:   endTime.Format(time.RFC3339),
-			Error:     "Failed to parse CLI output: " + err.Error() + " - Output: " + string(output),
-		}, nil
-	}
-
-	// Extract data from result
-	totalRequests := int64(result["total_requests"].(float64))
-	datacenters := result["datacenters"].(map[string]interface{})
-
-	// Convert datacenter stats to model
-	datacentersMap := make(map[string]*AkamaiDatacenterStats)
-	for dcID, dcData := range datacenters {
-		dcMap := dcData.(map[string]interface{})
-		datacentersMap[dcID] = &AkamaiDatacenterStats{
-			DatacenterId:  dcMap["datacenter_id"].(string),
-			TrafficTarget: dcMap["traffic_target"].(string),
-			TotalRequests: int64(dcMap["total_requests"].(float64)),
-			Percentage:    float32(dcMap["percentage"].(float64)),
+	// Calculate percentages for each datacenter
+	if totalRequests > 0 {
+		for dcName, dcData := range datacentersMap {
+			percentage := float32(dcData.TotalRequests) / float32(totalRequests)
+			dcData.Percentage = percentage
+			datacentersMap[dcName] = dcData
 		}
 	}
 
 	return &AkamaiTotalDNSRequestsResponse{
 		Property:      req.Property,
-		StartDate:     result["start_date"].(string),
-		EndDate:       result["end_date"].(string),
-		TotalRequests: totalRequests,
+		StartDate:     startTime.Format(time.RFC3339),
+		EndDate:       endTime.Format(time.RFC3339),
+		TotalRequests: int64(totalRequests),
 		Datacenters:   datacentersMap,
 	}, nil
 }

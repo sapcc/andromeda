@@ -63,7 +63,7 @@ func New(db *sqlx.DB) *Controller {
 		SyncController{cc},
 		GeoMapController{cc},
 		CidrBlocksController{cc, make(map[string]cidrBlocks)},
-    AkamaiMetricsController{cc},
+		AkamaiMetricsController{cc},
 	}
 	return &c
 }

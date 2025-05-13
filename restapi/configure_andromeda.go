@@ -46,13 +46,6 @@ func configureAPI(api *operations.AndromedaAPI) http.Handler {
 	api.JSONConsumer = runtime.JSONConsumer()
 	api.JSONProducer = runtime.JSONProducer()
 
-	// Register the Akamai metrics handler
-	// Temporarily keeping the handler version while we transition to the controller pattern
-	// Now handled by the controller in server.go
-	/*api.MetricsGetMetricsAkamaiTotalDNSRequestsHandler = metrics_ops.GetMetricsAkamaiTotalDNSRequestsHandlerFunc(
-		handlers.GetMetricsAkamaiTotalDNSRequests,
-	)*/
-
 	api.PreServerShutdown = func() {}
 	api.ServerShutdown = func() {
 		sentry.Flush(5 * time.Second)

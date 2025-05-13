@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-.PHONY: build-all clean swagger migrate build-akamai-dns-requests
+.PHONY: build-all clean swagger migrate
 PROTOC_FILES = $(shell find . -type f -name '*.proto')
 PB_FILES = $(patsubst %.proto, %.pb.go, $(PROTOC_FILES))
 PB_STORM_FILES = $(patsubst %.proto, %.pb.storm.go, $(PROTOC_FILES))
@@ -28,10 +28,6 @@ TMP_DIR := $(PWD)/tmp
 
 build-all: $(BIN_DEPS) $(PB_FILES) $(PB_STORM_FILES) $(BIN)
 ci-build-all: $(PB_FILES) $(PB_STORM_FILES) $(BIN)
-
-# Specific target for building the Akamai DNS requests CLI tool
-build-akamai-dns-requests:
-	go build $(LDFLAGS) -o build/andromeda-akamai-total-dns-requests cmd/andromeda-akamai-total-dns-requests/main.go
 
 LDFLAGS= -ldflags="-X 'github.com/sapcc/go-api-declarations/bininfo.buildDate=$(BININFO_BUILD_DATE)' -X 'github.com/sapcc/go-api-declarations/bininfo.commit=$(BININFO_COMMIT_HASH)' -X 'github.com/sapcc/go-api-declarations/bininfo.version=$(BININFO_VERSION)'"
 

@@ -8,67 +8,37 @@ SPDX-License-Identifier: Apache-2.0
 
 ## Akamai DNS Requests
 
-The `metrics akamai-dns-requests` command is used to retrieve and display DNS request metrics from Akamai GTM properties.
+The `metrics akamai-dns-requests` command is used to retrieve and display DNS request metrics from Akamai GTM properties for a specific domain.
 
 ### Usage
 
 ```
-m31ctl metrics akamai-dns-requests --property PROPERTY_NAME [--domain DOMAIN_NAME] 
-  [--start START_TIME] [--end END_TIME] [--output FORMAT] [--edgerc EDGERC_PATH]
+m31ctl metrics akamai-dns-requests --domain-id DOMAIN_UUID [--start START_TIME] 
+  [--end END_TIME] [--output FORMAT]
 ```
 
 ### Arguments
 
-- `--property, -p` - Name of the GTM property to analyze (required)
-- `--domain, -d` - Name of the GTM domain (default: andromeda.akadns.net)
-- `--start, -s` - Start date in RFC3339 format (default: 2 days before end date)
-- `--end, -e` - End date in RFC3339 format (default: 15 minutes ago)
+- `--domain-id` - Andromeda Domain UUID (required)
+- `--start, -s` - Start date/time in RFC3339 format (e.g., 2025-05-01T00:00:00Z)
+- `--end, -e` - End date/time in RFC3339 format (e.g., 2025-05-10T15:00:00Z)
 - `--output, -o` - Output format: json, csv, or table (default: table)
-- `--edgerc` - Path to .edgerc file for Akamai authentication (optional, will look in common locations by default)
-
-### Authentication
-
-This command requires an Akamai .edgerc file for authentication. By default, it will look for this file in:
-
-1. Current directory (.edgerc)
-2. User's home directory (~/.edgerc)
-3. Default location from configuration
-
-You can also specify a custom location using the `--edgerc` flag:
-
-```bash
-m31ctl metrics akamai-dns-requests --property PROPERTY --edgerc /path/to/.edgerc
-```
-
-The .edgerc file should contain your Akamai API credentials in this format:
-
-```
-[default]
-client_token = your-client-token
-client_secret = your-client-secret
-access_token = your-access-token
-host = your-akamai-host
-```
 
 ### Examples
 
 ```bash
-# Get total DNS requests for a property with default settings
-m31ctl metrics akamai-dns-requests --property andromeda-mena.ccee.sapcloud.io
+# Get total DNS requests for a domain with default settings
+m31ctl metrics akamai-dns-requests --domain-id 12345678-1234-1234-1234-123456789012
 
 # Get total DNS requests with a specific date range
-m31ctl metrics akamai-dns-requests --property andromeda-mena.ccee.sapcloud.io \
+m31ctl metrics akamai-dns-requests --domain-id 12345678-1234-1234-1234-123456789012 \
   --start 2025-03-17T00:00:00Z --end 2025-03-19T00:00:00Z
 
 # Get total DNS requests in JSON format
-m31ctl metrics akamai-dns-requests --property andromeda-mena.ccee.sapcloud.io --output json
+m31ctl metrics akamai-dns-requests --domain-id 12345678-1234-1234-1234-123456789012 --output json
 
 # Get total DNS requests in CSV format
-m31ctl metrics akamai-dns-requests --property andromeda-mena.ccee.sapcloud.io --output csv
-
-# Get total DNS requests with a specific .edgerc file
-m31ctl metrics akamai-dns-requests --property andromeda-mena.ccee.sapcloud.io \
-  --edgerc /path/to/custom/.edgerc
+m31ctl metrics akamai-dns-requests --domain-id 12345678-1234-1234-1234-123456789012 --output csv
 ```
 
 ### Output Examples
@@ -76,7 +46,7 @@ m31ctl metrics akamai-dns-requests --property andromeda-mena.ccee.sapcloud.io \
 #### Table Format (default)
 
 ```
-Total DNS Requests for Property: andromeda-mena.ccee.sapcloud.io
+Total DNS Requests for Domain: 12345678-1234-1234-1234-123456789012
 Time Range: 2025-03-17T00:00:00Z to 2025-03-19T00:00:00Z
 Total Requests: 16503
 
