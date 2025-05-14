@@ -48,7 +48,7 @@ func (c *AkamaiMetricsController) GetTotalDNSRequests(params metrics_ops.GetMetr
 
 	// Look up the domain to get the property name
 	var domain models.Domain
-	query := "SELECT * FROM domains WHERE id = $1"
+	query := "SELECT * FROM domain WHERE id = ?"
 	err := c.db.Get(&domain, query, params.DomainID)
 	if err != nil {
 		logger.WithError(err).Error("Failed to find domain")
