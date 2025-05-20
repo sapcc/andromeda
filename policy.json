@@ -52,5 +52,7 @@
   "andromeda:quota:get_all": "rule:context_is_viewer",
   "andromeda:quota:get_one": "rule:context_is_viewer",
   "andromeda:quota:put": "rule:context_is_admin",
-  "andromeda:quota:delete": "rule:context_is_admin"
+  "andromeda:quota:delete": "rule:context_is_admin",
+
+  "andromeda:metrics:akamai:get": "rule:context_is_viewer"
 }
