@@ -52,6 +52,10 @@ func New(db *sqlx.DB) *Controller {
 		nc:  nc,
 		rpc: rpcClient,
 	}
+
+	metricsController := AkamaiMetricsController{cc, nil}
+	metricsController.Init()
+
 	c := Controller{
 		DomainController{cc},
 		PoolController{cc},
@@ -63,7 +67,7 @@ func New(db *sqlx.DB) *Controller {
 		SyncController{cc},
 		GeoMapController{cc},
 		CidrBlocksController{cc, make(map[string]cidrBlocks)},
-		AkamaiMetricsController{cc},
+		metricsController,
 	}
 	return &c
 }
