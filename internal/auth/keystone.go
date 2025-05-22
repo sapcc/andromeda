@@ -59,8 +59,10 @@ func KeystoneMiddleware(next http.Handler) (http.Handler, error) {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		t := tv.CheckToken(r)
 		if t.Err != nil {
+			// NOTE: This is usually caused by the client token expiring, so this must be
+			// a 401 response to trigger client-side token refresh logic e.g. in clients using Gophercloud.
 			middleware.
-				Error(403, utils.Unauthorized(t.Err), utils.JSONHeader).
+				Error(http.StatusUnauthorized, utils.Unauthorized(t.Err), utils.JSONHeader).
 				WriteResponse(w, runtime.JSONProducer())
 			return
 		}

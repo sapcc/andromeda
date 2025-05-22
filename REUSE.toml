@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright 2025 SAP SE or an SAP affiliate company
+# SPDX-FileCopyrightText: Copyright 2022-2025 SAP SE or an SAP affiliate company and andromeda contributors
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -19,5 +19,5 @@ path = [
     "web/**",
 ]
 precedence = "aggregate"
-SPDX-FileCopyrightText = "2025 SAP SE or an SAP affiliate company"
+SPDX-FileCopyrightText = "2022-2025 SAP SE or an SAP affiliate company and andromeda contributors"
 SPDX-License-Identifier = "Apache-2.0"
