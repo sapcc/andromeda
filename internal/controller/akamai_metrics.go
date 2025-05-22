@@ -122,9 +122,10 @@ func (c AkamaiMetricsController) GetTotalDNSRequests(ctx context.Context, params
 	}
 
 	log.WithFields(log.Fields{
-		"property_name":  result.PropertyName,
-		"total_requests": result.TotalRequests,
-		"datacenters":    len(result.Datacenters),
+		"property_name":      result.PropertyName,
+		"requested_property": getStringParam(params.PropertyName),
+		"total_requests":     result.TotalRequests,
+		"datacenters":        len(result.Datacenters),
 	}).Debug("Successfully retrieved DNS metrics")
 
 	return &result, nil
