@@ -119,6 +119,14 @@ Administrative API
   
 
 
+###  metrics
+
+| Method  | URI     | Name   | Summary |
+|---------|---------|--------|---------|
+| GET | /v1/metrics/akamai/total-dns-requests | [get metrics akamai total DNS requests](#get-metrics-akamai-total-dns-requests) | Get total DNS requests for Akamai GTM properties |
+  
+
+
 ###  monitors
 
 | Method  | URI     | Name   | Summary |
@@ -1065,6 +1073,86 @@ Unexpected Error
 | Name | Type | Go type | Required | Default | Description | Example |
 |------|------|---------|:--------:| ------- |-------------|---------|
 | member | [Member](#member)| `models.Member` |  | |  |  |
+
+
+
+### <span id="get-metrics-akamai-total-dns-requests"></span> Get total DNS requests for Akamai GTM properties (*GetMetricsAkamaiTotalDNSRequests*)
+
+```
+GET /v1/metrics/akamai/total-dns-requests
+```
+
+Retrieve DNS request metrics for Akamai Global Traffic Management (GTM) properties
+
+#### Parameters
+
+| Name | Source | Type | Go type | Separator | Required | Default | Description |
+|------|--------|------|---------|-----------| :------: |---------|-------------|
+| project_id | `query` | string | `string` |  |  |  | Filter metrics by project ID |
+| property_name | `query` | string | `string` |  |  |  | Filter metrics by Akamai GTM property name |
+| time_range | `query` | string | `string` |  |  | `"last_hour"` | Time range for metrics data |
+
+#### All responses
+| Code | Status | Description | Has headers | Schema |
+|------|--------|-------------|:-----------:|--------|
+| [200](#get-metrics-akamai-total-dns-requests-200) | OK | A JSON object containing DNS request metrics |  | [schema](#get-metrics-akamai-total-dns-requests-200-schema) |
+| [400](#get-metrics-akamai-total-dns-requests-400) | Bad Request | Bad request |  | [schema](#get-metrics-akamai-total-dns-requests-400-schema) |
+| [404](#get-metrics-akamai-total-dns-requests-404) | Not Found | Not Found |  | [schema](#get-metrics-akamai-total-dns-requests-404-schema) |
+| [default](#get-metrics-akamai-total-dns-requests-default) | | Unexpected Error |  | [schema](#get-metrics-akamai-total-dns-requests-default-schema) |
+
+#### Responses
+
+
+##### <span id="get-metrics-akamai-total-dns-requests-200"></span> 200 - A JSON object containing DNS request metrics
+Status: OK
+
+###### <span id="get-metrics-akamai-total-dns-requests-200-schema"></span> Schema
+   
+  
+
+[GetMetricsAkamaiTotalDNSRequestsOKBody](#get-metrics-akamai-total-dns-requests-o-k-body)
+
+##### <span id="get-metrics-akamai-total-dns-requests-400"></span> 400 - Bad request
+Status: Bad Request
+
+###### <span id="get-metrics-akamai-total-dns-requests-400-schema"></span> Schema
+   
+  
+
+[Error](#error)
+
+##### <span id="get-metrics-akamai-total-dns-requests-404"></span> 404 - Not Found
+Status: Not Found
+
+###### <span id="get-metrics-akamai-total-dns-requests-404-schema"></span> Schema
+   
+  
+
+[Error](#error)
+
+##### <span id="get-metrics-akamai-total-dns-requests-default"></span> Default Response
+Unexpected Error
+
+###### <span id="get-metrics-akamai-total-dns-requests-default-schema"></span> Schema
+
+  
+
+[Error](#error)
+
+###### Inlined models
+
+**<span id="get-metrics-akamai-total-dns-requests-o-k-body"></span> GetMetricsAkamaiTotalDNSRequestsOKBody**
+
+
+  
+
+
+
+**Properties**
+
+| Name | Type | Go type | Required | Default | Description | Example |
+|------|------|---------|:--------:| ------- |-------------|---------|
+| total_dns_requests | [AkamaiTotalDNSRequests](#akamai-total-dns-requests)| `models.AkamaiTotalDNSRequests` |  | |  |  |
 
 
 
@@ -2777,6 +2865,46 @@ Unexpected Error
 
 
 ## Models
+
+### <span id="akamai-total-dns-requests"></span> akamai_total_dns_requests
+
+
+  
+
+
+
+**Properties**
+
+| Name | Type | Go type | Required | Default | Description | Example |
+|------|------|---------|:--------:| ------- |-------------|---------|
+| datacenters | [][AkamaiTotalDNSRequestsDatacentersItems0](#akamai-total-dns-requests-datacenters-items0)| `[]*AkamaiTotalDNSRequestsDatacentersItems0` |  | |  |  |
+| property_name | string| `string` |  | | Name of the Akamai GTM property |  |
+| time_range | string| `string` |  | | Time range for the metrics data |  |
+| total_requests | integer| `int64` |  | | Total number of DNS requests for the property |  |
+
+
+
+#### Inlined models
+
+**<span id="akamai-total-dns-requests-datacenters-items0"></span> AkamaiTotalDNSRequestsDatacentersItems0**
+
+
+  
+
+
+
+**Properties**
+
+| Name | Type | Go type | Required | Default | Description | Example |
+|------|------|---------|:--------:| ------- |-------------|---------|
+| datacenter_id | string| `string` |  | | ID of the datacenter |  |
+| datacenter_nickname | string| `string` |  | | Nickname of the datacenter |  |
+| percentage | float (formatted number)| `float32` |  | | Percentage of total requests for this datacenter |  |
+| requests | integer| `int64` |  | | Number of requests for this datacenter |  |
+| status | string| `string` |  | | Status of the datacenter |  |
+| target_ip | string| `string` |  | | Target IP address for the datacenter |  |
+
+
 
 ### <span id="datacenter"></span> datacenter
 
