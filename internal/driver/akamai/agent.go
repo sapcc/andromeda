@@ -299,11 +299,8 @@ func Sync(ctx context.Context, req stormrpc.Request) stormrpc.Response {
 }
 
 func GetCidrs(ctx context.Context, req stormrpc.Request) stormrpc.Response {
-	// Local type declaration for AkamaiCIDRBlock
-	type AkamaiCIDRBlock map[string]any
-
 	cidrBlocksReq, _ := http.NewRequest(http.MethodGet, "/firewall-rules-manager/v1/cidr-blocks", nil)
-	var cidrBlocks []AkamaiCIDRBlock
+	var cidrBlocks []map[string]any
 	if _, err := (*akamaiAgent.session).Exec(cidrBlocksReq, &cidrBlocks); err != nil {
 		panic(err)
 	}
