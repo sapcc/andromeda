@@ -192,15 +192,3 @@ func (c *CachedAkamaiSession) getProperties() ([]string, error) {
 
 	return c.lastProperties, nil
 }
-
-// GetProperties returns a list of GTM properties for the domain
-// This is an exported method that calls the unexported getProperties method
-func (c *CachedAkamaiSession) GetProperties() ([]string, error) {
-	return c.getProperties()
-}
-
-// GetTrafficReport returns traffic data for a specific GTM property
-// This is an exported method that calls the unexported getTrafficReport method
-func (c *CachedAkamaiSession) GetTrafficReport(property string) ([]DataRows, error) {
-	return c.getTrafficReport(property)
-}
