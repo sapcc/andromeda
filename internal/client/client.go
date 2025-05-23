@@ -7,9 +7,12 @@ package client
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"os"
+	"os/exec"
+	"strings"
 
 	"github.com/apex/log"
 	"github.com/go-openapi/runtime"
@@ -52,6 +55,7 @@ var opts struct {
 	OSProjectName       string `long:"os-project-name" env:"OS_PROJECT_NAME" description:"Project name to scope to"`
 	OSRegionName        string `long:"os-region-name" env:"OS_REGION_NAME" description:"Authentication region name"`
 	OSUserDomainName    string `long:"os-user-domain-name" env:"OS_USER_DOMAIN_NAME" description:"User's domain name"`
+	OSPwCmd             string `long:"os-pw-cmd" env:"OS_PW_CMD" description:"Derive user's password from command"`
 }
 
 func SetupClient() {
@@ -60,6 +64,16 @@ func SetupClient() {
 	Parser.CommandHandler = func(command flags.Commander, args []string) error {
 		if command == nil {
 			return nil
+		}
+
+		if opts.OSPwCmd != "" && opts.OSPassword == "" {
+			// run external command to get password
+			cmd := exec.Command("sh", "-c", opts.OSPwCmd)
+			out, err := cmd.Output()
+			if err != nil {
+				return fmt.Errorf("%s: %s", err.Error(), err.(*exec.ExitError).Stderr)
+			}
+			opts.OSPassword = strings.TrimSuffix(string(out), "\n")
 		}
 
 		ao, err := clientconfig.AuthOptions(&clientconfig.ClientOpts{
