@@ -13,13 +13,15 @@ import (
 	"errors"
 	"net/url"
 	golangswaggerpaths "path"
+
+	"github.com/go-openapi/strfmt"
 )
 
 // GetMetricsAkamaiTotalDNSRequestsURL generates an URL for the get metrics akamai total DNS requests operation
 type GetMetricsAkamaiTotalDNSRequestsURL struct {
-	ProjectID    *string
-	PropertyName *string
-	TimeRange    *string
+	DomainID  *strfmt.UUID
+	ProjectID *string
+	TimeRange *string
 
 	_basePath string
 	// avoid unkeyed usage
@@ -55,20 +57,20 @@ func (o *GetMetricsAkamaiTotalDNSRequestsURL) Build() (*url.URL, error) {
 
 	qs := make(url.Values)
 
+	var domainIDQ string
+	if o.DomainID != nil {
+		domainIDQ = o.DomainID.String()
+	}
+	if domainIDQ != "" {
+		qs.Set("domain_id", domainIDQ)
+	}
+
 	var projectIDQ string
 	if o.ProjectID != nil {
 		projectIDQ = *o.ProjectID
 	}
 	if projectIDQ != "" {
 		qs.Set("project_id", projectIDQ)
-	}
-
-	var propertyNameQ string
-	if o.PropertyName != nil {
-		propertyNameQ = *o.PropertyName
-	}
-	if propertyNameQ != "" {
-		qs.Set("property_name", propertyNameQ)
 	}
 
 	var timeRangeQ string

@@ -43,14 +43,14 @@ type GetMetricsAkamaiTotalDNSRequestsParams struct {
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
+	/*Filter metrics by domain ID
+	  In: query
+	*/
+	DomainID *strfmt.UUID
 	/*Filter metrics by project ID
 	  In: query
 	*/
 	ProjectID *string
-	/*Filter metrics by Akamai GTM property name
-	  In: query
-	*/
-	PropertyName *string
 	/*Time range for metrics data
 	  In: query
 	  Default: "last_hour"
@@ -69,13 +69,13 @@ func (o *GetMetricsAkamaiTotalDNSRequestsParams) BindRequest(r *http.Request, ro
 
 	qs := runtime.Values(r.URL.Query())
 
-	qProjectID, qhkProjectID, _ := qs.GetOK("project_id")
-	if err := o.bindProjectID(qProjectID, qhkProjectID, route.Formats); err != nil {
+	qDomainID, qhkDomainID, _ := qs.GetOK("domain_id")
+	if err := o.bindDomainID(qDomainID, qhkDomainID, route.Formats); err != nil {
 		res = append(res, err)
 	}
 
-	qPropertyName, qhkPropertyName, _ := qs.GetOK("property_name")
-	if err := o.bindPropertyName(qPropertyName, qhkPropertyName, route.Formats); err != nil {
+	qProjectID, qhkProjectID, _ := qs.GetOK("project_id")
+	if err := o.bindProjectID(qProjectID, qhkProjectID, route.Formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -85,6 +85,43 @@ func (o *GetMetricsAkamaiTotalDNSRequestsParams) BindRequest(r *http.Request, ro
 	}
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+// bindDomainID binds and validates parameter DomainID from query.
+func (o *GetMetricsAkamaiTotalDNSRequestsParams) bindDomainID(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
+
+	// Format: uuid
+	value, err := formats.Parse("uuid", raw)
+	if err != nil {
+		return errors.InvalidType("domain_id", "query", "strfmt.UUID", raw)
+	}
+	o.DomainID = (value.(*strfmt.UUID))
+
+	if err := o.validateDomainID(formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// validateDomainID carries on validations for parameter DomainID
+func (o *GetMetricsAkamaiTotalDNSRequestsParams) validateDomainID(formats strfmt.Registry) error {
+
+	if err := validate.FormatOf("domain_id", "query", "uuid", o.DomainID.String(), formats); err != nil {
+		return err
 	}
 	return nil
 }
@@ -103,24 +140,6 @@ func (o *GetMetricsAkamaiTotalDNSRequestsParams) bindProjectID(rawData []string,
 		return nil
 	}
 	o.ProjectID = &raw
-
-	return nil
-}
-
-// bindPropertyName binds and validates parameter PropertyName from query.
-func (o *GetMetricsAkamaiTotalDNSRequestsParams) bindPropertyName(rawData []string, hasKey bool, formats strfmt.Registry) error {
-	var raw string
-	if len(rawData) > 0 {
-		raw = rawData[len(rawData)-1]
-	}
-
-	// Required: false
-	// AllowEmptyValue: false
-
-	if raw == "" { // empty values pass all other validations
-		return nil
-	}
-	o.PropertyName = &raw
 
 	return nil
 }
