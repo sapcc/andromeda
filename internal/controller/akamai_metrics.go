@@ -15,6 +15,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	lru "github.com/hashicorp/golang-lru/v2"
 
+	"github.com/sapcc/andromeda/internal/auth"
 	"github.com/sapcc/andromeda/models"
 	apiMetrics "github.com/sapcc/andromeda/restapi/operations/metrics"
 )
@@ -55,26 +56,40 @@ func (c AkamaiMetricsController) GetTotalDNSRequests(ctx context.Context, params
 	}
 
 	// SECURITY: Validate domain access permissions
+	var authenticatedProjectID string
 	if params.DomainID != nil && *params.DomainID != "" {
-		// Validate that the domain exists and is accessible
-		// This will be validated again in the Akamai agent, but we do a preliminary check here
 		domainID := getUUIDParam(params.DomainID)
 
-		// Check if domain exists in database and belongs to the correct project
-		// Note: Project validation happens at the Keystone middleware level
-		var domainExists bool
-		sql := c.db.Rebind(`SELECT EXISTS(SELECT 1 FROM domain WHERE id = ? AND provider = 'akamai')`)
-		if err := c.db.Get(&domainExists, sql, domainID); err != nil {
-			log.WithError(err).WithField("domain_id", domainID).Error("Failed to validate domain existence")
-			return nil, fmt.Errorf("failed to validate domain: %w", err)
+		// Get domain with project_id to validate ownership
+		var domain struct {
+			ID        string `db:"id"`
+			ProjectID string `db:"project_id"`
+			Provider  string `db:"provider"`
 		}
 
-		if !domainExists {
-			log.WithField("domain_id", domainID).Warn("Domain not found or not an Akamai domain")
+		sql := c.db.Rebind(`SELECT id, project_id, provider FROM domain WHERE id = ? AND provider = 'akamai'`)
+		if err := c.db.Get(&domain, sql, domainID); err != nil {
+			log.WithError(err).WithField("domain_id", domainID).Error("Failed to retrieve domain")
 			return nil, fmt.Errorf("domain not found or not an Akamai domain")
 		}
 
-		log.WithField("domain_id", domainID).Debug("Domain validation passed")
+		// SECURITY FIX: Validate that the requesting user has access to the domain's project
+		requestVars := map[string]string{"project_id": domain.ProjectID}
+		if _, err := auth.Authenticate(params.HTTPRequest, requestVars); err != nil {
+			log.WithError(err).WithFields(log.Fields{
+				"domain_id":         domainID,
+				"domain_project_id": domain.ProjectID,
+			}).Warn("Access denied: user cannot access domain from different project")
+			return nil, fmt.Errorf("access denied: domain not found or not accessible")
+		}
+
+		// Store authenticated project ID for use in RPC call
+		authenticatedProjectID = domain.ProjectID
+
+		log.WithFields(log.Fields{
+			"domain_id":         domainID,
+			"domain_project_id": domain.ProjectID,
+		}).Debug("Domain access validation passed")
 	} else {
 		// Domain ID is required for security
 		return nil, fmt.Errorf("domain_id parameter is required")
@@ -83,7 +98,7 @@ func (c AkamaiMetricsController) GetTotalDNSRequests(ctx context.Context, params
 	// Create cache key based on parameters
 	cacheKey := fmt.Sprintf("dns_metrics:%s:%s:%s",
 		getUUIDParam(params.DomainID),
-		getStringParam(params.ProjectID),
+		authenticatedProjectID,
 		timeRange)
 
 	// Check cache first
@@ -118,7 +133,7 @@ func (c AkamaiMetricsController) GetTotalDNSRequests(ctx context.Context, params
 
 	rpcParams := dnsMetricsRequest{
 		DomainID:  domainIDStr,
-		ProjectID: params.ProjectID,
+		ProjectID: &authenticatedProjectID,
 		TimeRange: &timeRange,
 	}
 
