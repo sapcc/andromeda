@@ -4,14 +4,14 @@ SPDX-FileCopyrightText: Copyright 2022-2025 SAP SE or an SAP affiliate company a
 SPDX-License-Identifier: Apache-2.0
 -->
 
-# andromeda
+# andromeda GSLBaaS
 Platform agnostic GSLB frontend with OpenStack-like API
 
 Andromeda is a OpenStack like REST API Fronted for Global Loadbalancing as a Service (GLbaaS). It can support multiple backends, called provider.
 Features:
 * Multi-tenant capable
-* keystone authentication
-* OpenStack policy files
+* OpenStack keystone authentication
+* OpenStack policy support
 * Prometheus metrics
 * Rate limiting
 * OpenStack like Quota API
@@ -20,7 +20,8 @@ Features:
   * MariaDB (Warning, MySQL/Percona is **not** supported)
   * CockroachDB
 
-Currently it supports following provider:
+Currently it supports following GSLB provider:
+
 * F5 BigIP DNS
 * Akamai
 
@@ -30,19 +31,25 @@ API Documentation: https://sapcc.github.io/andromeda/
 Andromeda provides a reference CLI client called `m31ctl` that uses the REST API of Andromeda.
 
 ## Running Requirements
-* go 1.19
+* go 1.24
 * NATS
 * SQL Database (PostgreSQL/MariaDB/CockroachDB)
 
-### Optional development requirements (needed to re-create meta sources)
-* swagger https://github.com/go-swagger/go-swagger/blob/master/docs/install.md
-* protoc https://grpc.io/docs/protoc-installation/
-* protoc-gen-go https://github.com/golang/protobuf
-* protoc-gen-micro v3 https://github.com/asim/go-micro/tree/v3/cmd/protoc-gen-micro
+### Build requirements
+* GNU Make
 
-## Build
-* Build `andromeda` and `m31ctl`: `$ make`
+Not required, will be installed by Makefile:
+
+* [migrate](https://github.com/golang-migrate/migrate)
+* [swagger](https://github.com/go-swagger/go-swagger/blob/master/docs/install.md)
+* [protoc](https://grpc.io/docs/protoc-installation/)
+* [protoc-gen-go](https://github.com/golang/protobuf)
+* [protoc-gen-stormrpc](https://github.com/actatum/stormrpc/tree/main/cmd/protoc-gen-stormrpc)
+
+## Build target
+* Build: `$ make`
 * Rebuild swagger metafiles: `$ make swagger`
+* Cleanup: `$ clean`
 
 ## Example Architecture
 
