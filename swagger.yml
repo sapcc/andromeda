@@ -1246,11 +1246,10 @@ paths:
       parameters:
         - in: query
           name: domain_id
-          required: false
+          required: true
           type: string
           format: uuid
           description: Filter metrics by domain ID
-          x-nullable: true
         - in: query
           name: project_id
           required: false

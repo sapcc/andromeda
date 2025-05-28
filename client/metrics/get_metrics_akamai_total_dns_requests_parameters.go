@@ -71,7 +71,7 @@ type GetMetricsAkamaiTotalDNSRequestsParams struct {
 
 	   Format: uuid
 	*/
-	DomainID *strfmt.UUID
+	DomainID strfmt.UUID
 
 	/* ProjectID.
 
@@ -152,13 +152,13 @@ func (o *GetMetricsAkamaiTotalDNSRequestsParams) SetHTTPClient(client *http.Clie
 }
 
 // WithDomainID adds the domainID to the get metrics akamai total DNS requests params
-func (o *GetMetricsAkamaiTotalDNSRequestsParams) WithDomainID(domainID *strfmt.UUID) *GetMetricsAkamaiTotalDNSRequestsParams {
+func (o *GetMetricsAkamaiTotalDNSRequestsParams) WithDomainID(domainID strfmt.UUID) *GetMetricsAkamaiTotalDNSRequestsParams {
 	o.SetDomainID(domainID)
 	return o
 }
 
 // SetDomainID adds the domainId to the get metrics akamai total DNS requests params
-func (o *GetMetricsAkamaiTotalDNSRequestsParams) SetDomainID(domainID *strfmt.UUID) {
+func (o *GetMetricsAkamaiTotalDNSRequestsParams) SetDomainID(domainID strfmt.UUID) {
 	o.DomainID = domainID
 }
 
@@ -192,20 +192,13 @@ func (o *GetMetricsAkamaiTotalDNSRequestsParams) WriteToRequest(r runtime.Client
 	}
 	var res []error
 
-	if o.DomainID != nil {
+	// query param domain_id
+	qrDomainID := o.DomainID
+	qDomainID := qrDomainID.String()
+	if qDomainID != "" {
 
-		// query param domain_id
-		var qrDomainID strfmt.UUID
-
-		if o.DomainID != nil {
-			qrDomainID = *o.DomainID
-		}
-		qDomainID := qrDomainID.String()
-		if qDomainID != "" {
-
-			if err := r.SetQueryParam("domain_id", qDomainID); err != nil {
-				return err
-			}
+		if err := r.SetQueryParam("domain_id", qDomainID); err != nil {
+			return err
 		}
 	}
 

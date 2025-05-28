@@ -19,7 +19,7 @@ import (
 
 // GetMetricsAkamaiTotalDNSRequestsURL generates an URL for the get metrics akamai total DNS requests operation
 type GetMetricsAkamaiTotalDNSRequestsURL struct {
-	DomainID  *strfmt.UUID
+	DomainID  strfmt.UUID
 	ProjectID *string
 	TimeRange *string
 
@@ -57,10 +57,7 @@ func (o *GetMetricsAkamaiTotalDNSRequestsURL) Build() (*url.URL, error) {
 
 	qs := make(url.Values)
 
-	var domainIDQ string
-	if o.DomainID != nil {
-		domainIDQ = o.DomainID.String()
-	}
+	domainIDQ := o.DomainID.String()
 	if domainIDQ != "" {
 		qs.Set("domain_id", domainIDQ)
 	}

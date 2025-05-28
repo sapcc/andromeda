@@ -7,15 +7,20 @@ package controller
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
-	"github.com/actatum/stormrpc"
 	"github.com/apex/log"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 	lru "github.com/hashicorp/golang-lru/v2"
 
 	"github.com/sapcc/andromeda/internal/auth"
+	"github.com/sapcc/andromeda/internal/config"
+	"github.com/sapcc/andromeda/internal/rpc/agent"
+	"github.com/sapcc/andromeda/internal/rpcmodels"
+	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/models"
 	apiMetrics "github.com/sapcc/andromeda/restapi/operations/metrics"
 )
@@ -39,190 +44,105 @@ func (c *AkamaiMetricsController) Init() {
 	}
 }
 
-// Helper function to convert *strfmt.UUID to string
-func getUUIDParam(param *strfmt.UUID) string {
-	if param == nil {
-		return ""
-	}
-	return string(*param)
-}
-
-// GetTotalDNSRequests retrieves total DNS request metrics for Akamai GTM properties
-func (c AkamaiMetricsController) GetTotalDNSRequests(ctx context.Context, params apiMetrics.GetMetricsAkamaiTotalDNSRequestsParams) (*models.AkamaiTotalDNSRequests, error) {
-	// Set default time range if not specified
-	timeRange := "last_hour"
-	if params.TimeRange != nil {
-		timeRange = *params.TimeRange
+// GetMetricsAkamaiTotalDNSRequestsHandler handles the GET /metrics/akamai/total-dns-requests endpoint
+func (c AkamaiMetricsController) GetMetricsAkamaiTotalDNSRequestsHandler(params apiMetrics.GetMetricsAkamaiTotalDNSRequestsParams) middleware.Responder {
+	projectID, err := auth.Authenticate(params.HTTPRequest, nil)
+	if err != nil {
+		return apiMetrics.NewGetMetricsAkamaiTotalDNSRequestsDefault(403).WithPayload(utils.PolicyForbidden)
+	} else if projectID == "" && params.ProjectID != nil {
+		projectID = *params.ProjectID
 	}
 
-	// SECURITY: Validate domain access permissions
-	var authenticatedProjectID string
-	if params.DomainID != nil && *params.DomainID != "" {
-		domainID := getUUIDParam(params.DomainID)
+	domain := models.Domain{ID: params.DomainID, Pools: []strfmt.UUID{}}
+	{
+		// Resolve domain object to option FQDN as it's the property name in Akamai
 
-		// Get domain with project_id to validate ownership
-		var domain struct {
-			ID        string `db:"id"`
-			ProjectID string `db:"project_id"`
-			Provider  string `db:"provider"`
+		// resolve domain
+		if err := PopulateDomain(c.db, &domain, []string{"*"}); err != nil {
+			return apiMetrics.NewGetMetricsAkamaiTotalDNSRequestsDefault(404).WithPayload(utils.NotFound)
 		}
 
-		sql := c.db.Rebind(`SELECT id, project_id, provider FROM domain WHERE id = ? AND provider = 'akamai'`)
-		if err := c.db.Get(&domain, sql, domainID); err != nil {
-			log.WithError(err).WithField("domain_id", domainID).Error("Failed to retrieve domain")
-			return nil, fmt.Errorf("domain not found or not an Akamai domain")
-		}
-
-		// SECURITY FIX: Validate that the requesting user has access to the domain's project
-		requestVars := map[string]string{"project_id": domain.ProjectID}
+		// This validates the domain's project ID against the user's scoped project ID
+		requestVars := map[string]string{"project_id": *domain.ProjectID}
 		if _, err := auth.Authenticate(params.HTTPRequest, requestVars); err != nil {
-			log.WithError(err).WithFields(log.Fields{
-				"domain_id":         domainID,
-				"domain_project_id": domain.ProjectID,
-			}).Warn("Access denied: user cannot access domain from different project")
-			return nil, fmt.Errorf("access denied: domain not found or not accessible")
+			return apiMetrics.NewGetMetricsAkamaiTotalDNSRequestsDefault(403).WithPayload(utils.PolicyForbidden)
 		}
+	}
 
-		// Store authenticated project ID for use in RPC call
-		authenticatedProjectID = domain.ProjectID
-
-		log.WithFields(log.Fields{
-			"domain_id":         domainID,
-			"domain_project_id": domain.ProjectID,
-		}).Debug("Domain access validation passed")
-	} else {
-		// Domain ID is required for security
-		return nil, fmt.Errorf("domain_id parameter is required")
+	// Set default time range if not specified
+	if params.TimeRange == nil {
+		params.TimeRange = swag.String("last_hour")
 	}
 
 	// Create cache key based on parameters
-	cacheKey := fmt.Sprintf("dns_metrics:%s:%s:%s",
-		getUUIDParam(params.DomainID),
-		authenticatedProjectID,
-		timeRange)
+	cacheKey := fmt.Sprintf("dns_metrics:%s:%s:%v",
+		params.DomainID,
+		projectID)
 
 	// Check cache first
 	if c.metricsCache != nil {
 		if cachedResult, found := c.metricsCache.Get(cacheKey); found {
 			log.WithField("cache_key", cacheKey).Debug("Cache hit for DNS metrics")
-			return cachedResult, nil
+			return apiMetrics.NewGetMetricsAkamaiTotalDNSRequestsOK().WithPayload(
+				&apiMetrics.GetMetricsAkamaiTotalDNSRequestsOKBody{
+					TotalDNSRequests: cachedResult,
+				})
 		}
 	}
 
 	requestFields := log.Fields{
-		"domain_id":  getUUIDParam(params.DomainID),
-		"project_id": getStringParam(params.ProjectID),
-		"time_range": timeRange,
+		"domain_id":  params.DomainID,
+		"project_id": projectID,
 	}
-
 	log.WithFields(requestFields).Debug("Fetching DNS metrics via RPC")
 
-	// Prepare RPC request parameters
-	type dnsMetricsRequest struct {
-		DomainID  *string `json:"domain_id,omitempty"`
-		ProjectID *string `json:"project_id,omitempty"`
-		TimeRange *string `json:"time_range,omitempty"`
-	}
-
-	// Convert UUID to string for RPC
-	var domainIDStr *string
-	if params.DomainID != nil {
-		idStr := getUUIDParam(params.DomainID)
-		domainIDStr = &idStr
-	}
-
-	rpcParams := dnsMetricsRequest{
-		DomainID:  domainIDStr,
-		ProjectID: &authenticatedProjectID,
-		TimeRange: &timeRange,
+	timeRange := rpcmodels.GetDNSMetricsRequest_TimeRangeValue_value[strings.ToUpper(*params.TimeRange)]
+	req := &rpcmodels.GetDNSMetricsRequest{
+		Domain:    config.Global.AkamaiConfig.Domain,
+		Property:  domain.Fqdn.String(),
+		TimeRange: rpcmodels.GetDNSMetricsRequest_TimeRangeValue(timeRange),
 	}
 
 	// Create RPC request
-	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	ctx, cancel := context.WithTimeout(params.HTTPRequest.Context(), 30*time.Second)
 	defer cancel()
 
-	rpcReq, err := stormrpc.NewRequest("andromeda.get_dns_metrics.akamai", rpcParams)
+	client := agent.NewRPCAgentClient(c.rpc)
+	akamaiDNSMetrics, err := client.GetDNSMetricsAkamai(ctx, req)
 	if err != nil {
-		log.WithError(err).WithFields(requestFields).Error("Failed to create RPC request")
-		return nil, fmt.Errorf("error creating RPC request: %w", err)
+		log.WithError(err).WithFields(requestFields).Error("Failed to fetch DNS metrics via RPC")
+		return apiMetrics.
+			NewGetMetricsAkamaiTotalDNSRequestsDefault(408).
+			WithPayload(utils.TryAgainLater)
 	}
 
-	// Send RPC request to Akamai agent
-	rpcResp := c.rpc.Do(ctx, rpcReq)
-	if rpcResp.Err != nil {
-		log.WithError(rpcResp.Err).WithFields(requestFields).Error("RPC request to Akamai agent failed")
-		return nil, fmt.Errorf("error from Akamai agent: %w", rpcResp.Err)
+	datacenters := make([]*models.AkamaiTotalDNSRequestsDatacentersItems0, len(akamaiDNSMetrics.Datacenters))
+	for i, dc := range akamaiDNSMetrics.Datacenters {
+		datacenters[i] = &models.AkamaiTotalDNSRequestsDatacentersItems0{
+			DatacenterID:       dc.GetDatacenterId(),
+			DatacenterNickname: dc.GetDatacenterId(),
+			Percentage:         dc.GetPercentage(),
+			Requests:           dc.GetRequests(),
+			Status:             dc.GetStatus(),
+			TargetIP:           dc.GetTargetIp(),
+		}
 	}
 
-	// Parse RPC response
-	var result models.AkamaiTotalDNSRequests
-	if err := rpcResp.Decode(&result); err != nil {
-		log.WithError(err).WithFields(requestFields).Error("Failed to decode RPC response")
-		return nil, fmt.Errorf("error decoding RPC response: %w", err)
-	}
-
-	// Validate the response
-	if result.PropertyName == "" {
-		log.WithFields(requestFields).Warn("RPC returned empty property name")
-		return nil, fmt.Errorf("no domains found matching the criteria")
-	}
-
-	if result.TotalRequests == 0 && len(result.Datacenters) == 0 {
-		log.WithFields(requestFields).Warn("RPC returned no DNS metrics data")
-		return nil, fmt.Errorf("no DNS metrics data available for the specified criteria")
+	result := &models.AkamaiTotalDNSRequests{
+		Datacenters:   datacenters,
+		PropertyName:  domain.Fqdn.String(),
+		TimeRange:     *params.TimeRange,
+		TotalRequests: akamaiDNSMetrics.GetTotalRequests(),
 	}
 
 	// Cache the result
 	if c.metricsCache != nil {
-		c.metricsCache.Add(cacheKey, &result)
+		c.metricsCache.Add(cacheKey, result)
 		log.WithField("cache_key", cacheKey).Debug("Cached DNS metrics result")
-	}
-
-	log.WithFields(log.Fields{
-		"property_name":    result.PropertyName,
-		"requested_domain": getUUIDParam(params.DomainID),
-		"total_requests":   result.TotalRequests,
-		"datacenters":      len(result.Datacenters),
-	}).Debug("Successfully retrieved DNS metrics")
-
-	return &result, nil
-}
-
-// GetMetricsAkamaiTotalDNSRequestsHandler handles the GET /metrics/akamai/total-dns-requests endpoint
-func (c AkamaiMetricsController) GetMetricsAkamaiTotalDNSRequestsHandler(params apiMetrics.GetMetricsAkamaiTotalDNSRequestsParams) middleware.Responder {
-	result, err := c.GetTotalDNSRequests(params.HTTPRequest.Context(), params)
-	if err != nil {
-		log.WithError(err).WithFields(log.Fields{
-			"domain_id":  getUUIDParam(params.DomainID),
-			"project_id": getStringParam(params.ProjectID),
-			"time_range": getStringParamWithDefault(params.TimeRange, "last_hour"),
-		}).Error("Failed to get DNS metrics")
-
-		return apiMetrics.NewGetMetricsAkamaiTotalDNSRequestsBadRequest().WithPayload(
-			&models.Error{
-				Message: err.Error(),
-				Code:    400,
-			})
 	}
 
 	return apiMetrics.NewGetMetricsAkamaiTotalDNSRequestsOK().WithPayload(
 		&apiMetrics.GetMetricsAkamaiTotalDNSRequestsOKBody{
 			TotalDNSRequests: result,
 		})
-}
-
-// Helper function to get string value from pointer or empty string
-func getStringParam(s *string) string {
-	if s == nil {
-		return ""
-	}
-	return *s
-}
-
-// Helper function to get string value from pointer or default value
-func getStringParamWithDefault(s *string, defaultValue string) string {
-	if s == nil {
-		return defaultValue
-	}
-	return *s
 }

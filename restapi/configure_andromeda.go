@@ -13,7 +13,6 @@ import (
 
 	"github.com/apex/log"
 	"github.com/didip/tollbooth"
-	"github.com/dre1080/recovr"
 	"github.com/getsentry/sentry-go"
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/go-openapi/errors"
@@ -121,5 +120,5 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
 		}), handler)
 	}
 
-	return recovr.New()(handler)
+	return middlewares.Recovr(handler)
 }

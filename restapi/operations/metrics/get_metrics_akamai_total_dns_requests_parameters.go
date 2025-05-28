@@ -44,9 +44,10 @@ type GetMetricsAkamaiTotalDNSRequestsParams struct {
 	HTTPRequest *http.Request `json:"-"`
 
 	/*Filter metrics by domain ID
+	  Required: true
 	  In: query
 	*/
-	DomainID *strfmt.UUID
+	DomainID strfmt.UUID
 	/*Filter metrics by project ID
 	  In: query
 	*/
@@ -91,16 +92,19 @@ func (o *GetMetricsAkamaiTotalDNSRequestsParams) BindRequest(r *http.Request, ro
 
 // bindDomainID binds and validates parameter DomainID from query.
 func (o *GetMetricsAkamaiTotalDNSRequestsParams) bindDomainID(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	if !hasKey {
+		return errors.Required("domain_id", "query", rawData)
+	}
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
 	}
 
-	// Required: false
+	// Required: true
 	// AllowEmptyValue: false
 
-	if raw == "" { // empty values pass all other validations
-		return nil
+	if err := validate.RequiredString("domain_id", "query", raw); err != nil {
+		return err
 	}
 
 	// Format: uuid
@@ -108,7 +112,7 @@ func (o *GetMetricsAkamaiTotalDNSRequestsParams) bindDomainID(rawData []string, 
 	if err != nil {
 		return errors.InvalidType("domain_id", "query", "strfmt.UUID", raw)
 	}
-	o.DomainID = (value.(*strfmt.UUID))
+	o.DomainID = *(value.(*strfmt.UUID))
 
 	if err := o.validateDomainID(formats); err != nil {
 		return err

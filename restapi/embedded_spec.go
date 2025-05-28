@@ -1069,10 +1069,10 @@ func init() {
           {
             "type": "string",
             "format": "uuid",
-            "x-nullable": true,
             "description": "Filter metrics by domain ID",
             "name": "domain_id",
-            "in": "query"
+            "in": "query",
+            "required": true
           },
           {
             "type": "string",
@@ -3931,10 +3931,10 @@ func init() {
           {
             "type": "string",
             "format": "uuid",
-            "x-nullable": true,
             "description": "Filter metrics by domain ID",
             "name": "domain_id",
-            "in": "query"
+            "in": "query",
+            "required": true
           },
           {
             "type": "string",

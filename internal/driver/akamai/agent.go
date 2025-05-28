@@ -6,15 +6,10 @@ package akamai
 
 import (
 	"context"
-	dbsql "database/sql"
-	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
-	"net/url"
 	"os"
 	"os/signal"
-	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -31,6 +26,7 @@ import (
 
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/rpc"
+	"github.com/sapcc/andromeda/internal/rpc/agent"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/models"
@@ -84,323 +80,6 @@ func NewDomainLookupService() (*DomainLookupService, error) {
 	db.MapperFunc(strcase.ToSnake)
 
 	return &DomainLookupService{db: db}, nil
-}
-
-// LookupDomainProperty looks up domain information and validates access
-func (d *DomainLookupService) LookupDomainProperty(domainID, projectID string) (*DomainInfo, error) {
-	var domain DomainInfo
-
-	// SQL query to get domain information and validate project access
-	sql := d.db.Rebind(`
-		SELECT id, fqdn, provider, project_id, provisioning_status
-		FROM domain 
-		WHERE id = ? AND provider = 'akamai'
-	`)
-
-	err := d.db.Get(&domain, sql, domainID)
-	if err != nil {
-		if errors.Is(err, dbsql.ErrNoRows) {
-			return nil, fmt.Errorf("domain not found or not an Akamai domain")
-		}
-		return nil, fmt.Errorf("database error: %w", err)
-	}
-
-	// SECURITY: Validate project access if project_id is provided
-	if projectID != "" && domain.ProjectID != projectID {
-		return nil, fmt.Errorf("access denied: domain belongs to different project")
-	}
-
-	// Ensure domain is active
-	if domain.ProvisioningStatus != "ACTIVE" {
-		return nil, fmt.Errorf("domain is not active (status: %s)", domain.ProvisioningStatus)
-	}
-
-	return &domain, nil
-}
-
-// DomainInfo represents domain information from the database
-type DomainInfo struct {
-	ID                 string `db:"id"`
-	FQDN               string `db:"fqdn"`
-	Provider           string `db:"provider"`
-	ProjectID          string `db:"project_id"`
-	ProvisioningStatus string `db:"provisioning_status"`
-}
-
-// Initialize domain lookup service when agent starts
-var domainLookupService *DomainLookupService
-
-// getDNSMetricsData retrieves DNS metrics
-func getDNSMetricsData(ctx context.Context, session *session.Session, domain string, domainID, projectID, timeRange *string) (*models.AkamaiTotalDNSRequests, error) {
-	// Set default time range if not specified
-	timeRangeValue := "last_hour"
-	if timeRange != nil {
-		timeRangeValue = *timeRange
-	}
-
-	// SECURITY: Proper domain lookup and access validation
-	var propertyName string
-	if domainID != nil && *domainID != "" {
-		// Initialize domain lookup service if not already done
-		if domainLookupService == nil {
-			var err error
-			domainLookupService, err = NewDomainLookupService()
-			if err != nil {
-				return nil, fmt.Errorf("failed to initialize domain lookup service: %w", err)
-			}
-		}
-
-		// Look up domain information and validate access
-		var projectIDStr string
-		if projectID != nil {
-			projectIDStr = *projectID
-		}
-
-		domainInfo, err := domainLookupService.LookupDomainProperty(*domainID, projectIDStr)
-		if err != nil {
-			return nil, fmt.Errorf("domain lookup failed: %w", err)
-		}
-
-		// Use the FQDN from the database as the property name
-		propertyName = domainInfo.FQDN
-
-		log.WithFields(log.Fields{
-			"domain_id":     *domainID,
-			"project_id":    domainInfo.ProjectID,
-			"property_name": propertyName,
-		}).Info("Successfully resolved domain to property name")
-	} else {
-		// No domain ID specified - this should not happen in production
-		return nil, fmt.Errorf("domain_id parameter is required for security reasons")
-	}
-
-	// First, we need to get the list of properties
-	// Create a request to get the domain list
-	// SECURITY FIX: URL encode the domain parameter to prevent injection
-	encodedDomain := url.PathEscape(domain)
-	domainListURI := fmt.Sprintf("/gtm-api/v1/reports/domain-list/%s", encodedDomain)
-	domainListReq, err := http.NewRequest(http.MethodGet, domainListURI, nil)
-	if err != nil {
-		return nil, fmt.Errorf("error creating domain list request: %w", err)
-	}
-
-	// Define the domain summary struct to unmarshal response
-	var domainSummary struct {
-		Name       string   `json:"name"`
-		Properties []string `json:"properties"`
-	}
-
-	// Execute the domain list request
-	_, err = (*session).Exec(domainListReq, &domainSummary)
-	if err != nil {
-		return nil, fmt.Errorf("error fetching domain list: %w", err)
-	}
-
-	// Get the properties from the response
-	properties := domainSummary.Properties
-
-	// If we have a specific property name from domain lookup, filter for it
-	if propertyName != "" {
-		var filteredProperties []string
-		for _, prop := range properties {
-			if prop == propertyName {
-				filteredProperties = append(filteredProperties, prop)
-				break
-			}
-		}
-
-		// If exact match not found, try partial match
-		if len(filteredProperties) == 0 {
-			for _, prop := range properties {
-				if strings.Contains(prop, propertyName) {
-					filteredProperties = append(filteredProperties, prop)
-				}
-			}
-		}
-
-		if len(filteredProperties) > 0 {
-			properties = filteredProperties
-		} else {
-			log.WithField("property_name", propertyName).Info("No property found matching the provided name")
-		}
-	}
-
-	// Filter properties by project ID if specified
-	// Note: This would require a domain lookup to match project ID to properties
-	// For initial implementation, we're just logging this info
-	if projectID != nil && *projectID != "" {
-		log.WithField("project_id", *projectID).Info("Project ID filtering requested but not yet implemented")
-	}
-
-	// If no properties found, return empty result
-	if len(properties) == 0 {
-		return nil, fmt.Errorf("no Akamai GTM properties found matching the criteria")
-	}
-
-	// Use first property for initial implementation
-	property := properties[0]
-
-	// Now get the traffic report for the property
-	// First, get the properties window to determine the time range
-	windowURI := "/gtm-api/v1/reports/traffic/properties-window"
-	windowReq, err := http.NewRequest(http.MethodGet, windowURI, nil)
-	if err != nil {
-		return nil, fmt.Errorf("error creating properties window request: %w", err)
-	}
-
-	// Define the properties window struct
-	var propertiesWindow struct {
-		Start time.Time `json:"start"`
-		End   time.Time `json:"end"`
-	}
-
-	// Execute the properties window request
-	_, err = (*session).Exec(windowReq, &propertiesWindow)
-	if err != nil {
-		return nil, fmt.Errorf("error fetching properties window: %w", err)
-	}
-
-	// Calculate start and end times based on the time range
-	end := propertiesWindow.End
-
-	// Use the last 30 minutes by default
-	start := end.Add(-30 * time.Minute)
-
-	// Create request for the traffic report
-	// SECURITY FIX: URL encode both domain and property parameters to prevent injection
-	encodedProperty := url.PathEscape(property)
-	trafficURI := fmt.Sprintf("/gtm-api/v1/reports/traffic/domains/%s/properties/%s", encodedDomain, encodedProperty)
-	params := fmt.Sprintf("?start=%s&end=%s", start.UTC().Format(time.RFC3339), end.UTC().Format(time.RFC3339))
-	trafficURI += params
-
-	trafficReq, err := http.NewRequest(http.MethodGet, trafficURI, nil)
-	if err != nil {
-		return nil, fmt.Errorf("error creating traffic report request: %w", err)
-	}
-
-	// Define traffic report struct
-	var trafficReport struct {
-		DataRows []struct {
-			Timestamp   time.Time `json:"timestamp"`
-			Datacenters []struct {
-				Nickname          string `json:"nickname"`
-				TrafficTargetName string `json:"trafficTargetName"`
-				Requests          int    `json:"requests"`
-				Status            string `json:"status"`
-			} `json:"datacenters"`
-		} `json:"dataRows"`
-	}
-
-	// Execute the traffic report request
-	_, err = (*session).Exec(trafficReq, &trafficReport)
-	if err != nil {
-		return nil, fmt.Errorf("error fetching traffic report: %w", err)
-	}
-
-	// Build response
-	totalRequests := int64(0)
-	datacenters := []*models.AkamaiTotalDNSRequestsDatacentersItems0{}
-
-	// Keep track of datacenters we've already processed
-	processedDatacenters := make(map[string]int)
-
-	// Process traffic data
-	for _, dataRow := range trafficReport.DataRows {
-		for _, dc := range dataRow.Datacenters {
-			totalRequests += int64(dc.Requests)
-
-			// Check if we've already processed this datacenter
-			if idx, exists := processedDatacenters[dc.Nickname]; exists {
-				// Update existing datacenter
-				datacenters[idx].Requests += int64(dc.Requests)
-				continue
-			}
-
-			// Add datacenter to response
-			datacenter := &models.AkamaiTotalDNSRequestsDatacentersItems0{
-				DatacenterID:       dc.Nickname,
-				DatacenterNickname: dc.Nickname,
-				Requests:           int64(dc.Requests),
-				Status:             dc.Status,
-			}
-
-			// Extract target IP from traffic target name
-			if strings.Contains(dc.TrafficTargetName, " - ") {
-				parts := strings.Split(dc.TrafficTargetName, " - ")
-				if len(parts) > 1 {
-					datacenter.TargetIP = parts[1]
-				}
-			}
-
-			// Store the index of this datacenter in our map
-			processedDatacenters[dc.Nickname] = len(datacenters)
-			datacenters = append(datacenters, datacenter)
-		}
-	}
-
-	// Calculate percentages
-	if totalRequests > 0 {
-		for _, dc := range datacenters {
-			// Explicitly convert to float32 to match the model type
-			dc.Percentage = float32(float64(dc.Requests) / float64(totalRequests) * 100)
-		}
-	}
-
-	// Log the metrics data for debugging
-	debugLog := log.WithFields(log.Fields{
-		"akamai_property":   property,
-		"resolved_property": propertyName,
-		"domain_id":         getStringFromPointer(domainID),
-		"total_requests":    totalRequests,
-	})
-	if len(datacenters) > 0 {
-		jsonData, _ := json.MarshalIndent(datacenters, "", "  ")
-		debugLog = debugLog.WithField("datacenters", string(jsonData))
-	}
-	debugLog.Debug("DNS metrics data")
-
-	return &models.AkamaiTotalDNSRequests{
-		PropertyName:  propertyName, // Use the actual property name resolved from domain_id
-		TimeRange:     timeRangeValue,
-		TotalRequests: totalRequests,
-		Datacenters:   datacenters,
-	}, nil
-}
-
-// Helper function to safely get string from string pointer
-func getStringFromPointer(ptr *string) string {
-	if ptr == nil {
-		return ""
-	}
-	return *ptr
-}
-
-// GetTotalDNSRequests handles RPC requests for DNS metrics data
-func GetTotalDNSRequests(ctx context.Context, req stormrpc.Request) stormrpc.Response {
-	type dnsMetricsRequest struct {
-		DomainID  *string `json:"domain_id,omitempty"`
-		ProjectID *string `json:"project_id,omitempty"`
-		TimeRange *string `json:"time_range,omitempty"`
-	}
-
-	var params dnsMetricsRequest
-	if err := req.Decode(&params); err != nil {
-		return stormrpc.NewErrorResponse(req.Reply, err)
-	}
-
-	// Get metrics data using our helper function
-	dnsMetrics, err := getDNSMetricsData(ctx, akamaiAgent.session, config.Global.AkamaiConfig.Domain,
-		params.DomainID, params.ProjectID, params.TimeRange)
-	if err != nil {
-		return stormrpc.NewErrorResponse(req.Reply, err)
-	}
-
-	resp, err := stormrpc.NewResponse(req.Reply, dnsMetrics)
-	if err != nil {
-		return stormrpc.NewErrorResponse(req.Reply, err)
-	}
-
-	return resp
 }
 
 func Sync(ctx context.Context, req stormrpc.Request) stormrpc.Response {
@@ -474,9 +153,11 @@ func ExecuteAkamaiAgent() error {
 	}
 
 	srv := rpc.NewServer("andromeda-akamai-agent", stormrpc.WithNatsConn(nc))
+	svc := &RPCHandler{s}
+	agent.RegisterRPCAgentServer(srv, svc)
+
 	srv.Handle("andromeda.sync", Sync)
 	srv.Handle("andromeda.get_cidrs.akamai", GetCidrs)
-	srv.Handle("andromeda.get_dns_metrics.akamai", GetTotalDNSRequests)
 
 	go func() {
 		_ = srv.Run()
