@@ -6,9 +6,12 @@ package akamai
 
 import (
 	"context"
+	dbsql "database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"strings"
@@ -21,7 +24,10 @@ import (
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v10/pkg/session"
 	"github.com/apex/log"
 	lru "github.com/hashicorp/golang-lru/v2"
+	"github.com/iancoleman/strcase"
+	"github.com/jmoiron/sqlx"
 	"github.com/nats-io/nats.go"
+	"github.com/xo/dburl"
 
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/rpc"
@@ -53,17 +59,126 @@ type AkamaiAgent struct {
 
 var akamaiAgent *AkamaiAgent
 
+// DomainLookupService handles domain database operations for the Akamai agent
+type DomainLookupService struct {
+	db *sqlx.DB
+}
+
+// NewDomainLookupService creates a new domain lookup service
+func NewDomainLookupService() (*DomainLookupService, error) {
+	// Parse database connection from config
+	u, err := dburl.Parse(config.Global.Database.Connection)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing database URL: %w", err)
+	}
+	if u.Driver == "postgres" {
+		u.Driver = "pgx"
+	}
+
+	db, err := sqlx.Connect(u.Driver, u.DSN)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to database: %w", err)
+	}
+
+	// Set mapper function for snake_case
+	db.MapperFunc(strcase.ToSnake)
+
+	return &DomainLookupService{db: db}, nil
+}
+
+// LookupDomainProperty looks up domain information and validates access
+func (d *DomainLookupService) LookupDomainProperty(domainID, projectID string) (*DomainInfo, error) {
+	var domain DomainInfo
+
+	// SQL query to get domain information and validate project access
+	sql := d.db.Rebind(`
+		SELECT id, fqdn, provider, project_id, provisioning_status
+		FROM domain 
+		WHERE id = ? AND provider = 'akamai'
+	`)
+
+	err := d.db.Get(&domain, sql, domainID)
+	if err != nil {
+		if errors.Is(err, dbsql.ErrNoRows) {
+			return nil, fmt.Errorf("domain not found or not an Akamai domain")
+		}
+		return nil, fmt.Errorf("database error: %w", err)
+	}
+
+	// SECURITY: Validate project access if project_id is provided
+	if projectID != "" && domain.ProjectID != projectID {
+		return nil, fmt.Errorf("access denied: domain belongs to different project")
+	}
+
+	// Ensure domain is active
+	if domain.ProvisioningStatus != "ACTIVE" {
+		return nil, fmt.Errorf("domain is not active (status: %s)", domain.ProvisioningStatus)
+	}
+
+	return &domain, nil
+}
+
+// DomainInfo represents domain information from the database
+type DomainInfo struct {
+	ID                 string `db:"id"`
+	FQDN               string `db:"fqdn"`
+	Provider           string `db:"provider"`
+	ProjectID          string `db:"project_id"`
+	ProvisioningStatus string `db:"provisioning_status"`
+}
+
+// Initialize domain lookup service when agent starts
+var domainLookupService *DomainLookupService
+
 // getDNSMetricsData retrieves DNS metrics
-func getDNSMetricsData(ctx context.Context, session *session.Session, domain string, propertyName, projectID, timeRange *string) (*models.AkamaiTotalDNSRequests, error) {
+func getDNSMetricsData(ctx context.Context, session *session.Session, domain string, domainID, projectID, timeRange *string) (*models.AkamaiTotalDNSRequests, error) {
 	// Set default time range if not specified
 	timeRangeValue := "last_hour"
 	if timeRange != nil {
 		timeRangeValue = *timeRange
 	}
 
+	// SECURITY: Proper domain lookup and access validation
+	var propertyName string
+	if domainID != nil && *domainID != "" {
+		// Initialize domain lookup service if not already done
+		if domainLookupService == nil {
+			var err error
+			domainLookupService, err = NewDomainLookupService()
+			if err != nil {
+				return nil, fmt.Errorf("failed to initialize domain lookup service: %w", err)
+			}
+		}
+
+		// Look up domain information and validate access
+		var projectIDStr string
+		if projectID != nil {
+			projectIDStr = *projectID
+		}
+
+		domainInfo, err := domainLookupService.LookupDomainProperty(*domainID, projectIDStr)
+		if err != nil {
+			return nil, fmt.Errorf("domain lookup failed: %w", err)
+		}
+
+		// Use the FQDN from the database as the property name
+		propertyName = domainInfo.FQDN
+
+		log.WithFields(log.Fields{
+			"domain_id":     *domainID,
+			"project_id":    domainInfo.ProjectID,
+			"property_name": propertyName,
+		}).Info("Successfully resolved domain to property name")
+	} else {
+		// No domain ID specified - this should not happen in production
+		return nil, fmt.Errorf("domain_id parameter is required for security reasons")
+	}
+
 	// First, we need to get the list of properties
 	// Create a request to get the domain list
-	domainListURI := fmt.Sprintf("/gtm-api/v1/reports/domain-list/%s", domain)
+	// SECURITY FIX: URL encode the domain parameter to prevent injection
+	encodedDomain := url.PathEscape(domain)
+	domainListURI := fmt.Sprintf("/gtm-api/v1/reports/domain-list/%s", encodedDomain)
 	domainListReq, err := http.NewRequest(http.MethodGet, domainListURI, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating domain list request: %w", err)
@@ -84,11 +199,11 @@ func getDNSMetricsData(ctx context.Context, session *session.Session, domain str
 	// Get the properties from the response
 	properties := domainSummary.Properties
 
-	// Filter properties by name if specified
-	if propertyName != nil && *propertyName != "" {
+	// If we have a specific property name from domain lookup, filter for it
+	if propertyName != "" {
 		var filteredProperties []string
 		for _, prop := range properties {
-			if prop == *propertyName {
+			if prop == propertyName {
 				filteredProperties = append(filteredProperties, prop)
 				break
 			}
@@ -97,7 +212,7 @@ func getDNSMetricsData(ctx context.Context, session *session.Session, domain str
 		// If exact match not found, try partial match
 		if len(filteredProperties) == 0 {
 			for _, prop := range properties {
-				if strings.Contains(prop, *propertyName) {
+				if strings.Contains(prop, propertyName) {
 					filteredProperties = append(filteredProperties, prop)
 				}
 			}
@@ -106,7 +221,7 @@ func getDNSMetricsData(ctx context.Context, session *session.Session, domain str
 		if len(filteredProperties) > 0 {
 			properties = filteredProperties
 		} else {
-			log.WithField("property_name", *propertyName).Info("No property found matching the provided name")
+			log.WithField("property_name", propertyName).Info("No property found matching the provided name")
 		}
 	}
 
@@ -124,12 +239,6 @@ func getDNSMetricsData(ctx context.Context, session *session.Session, domain str
 
 	// Use first property for initial implementation
 	property := properties[0]
-
-	// Store the requested property name for later use
-	requestedProperty := property
-	if propertyName != nil && *propertyName != "" {
-		requestedProperty = *propertyName
-	}
 
 	// Now get the traffic report for the property
 	// First, get the properties window to determine the time range
@@ -158,7 +267,9 @@ func getDNSMetricsData(ctx context.Context, session *session.Session, domain str
 	start := end.Add(-30 * time.Minute)
 
 	// Create request for the traffic report
-	trafficURI := fmt.Sprintf("/gtm-api/v1/reports/traffic/domains/%s/properties/%s", domain, property)
+	// SECURITY FIX: URL encode both domain and property parameters to prevent injection
+	encodedProperty := url.PathEscape(property)
+	trafficURI := fmt.Sprintf("/gtm-api/v1/reports/traffic/domains/%s/properties/%s", encodedDomain, encodedProperty)
 	params := fmt.Sprintf("?start=%s&end=%s", start.UTC().Format(time.RFC3339), end.UTC().Format(time.RFC3339))
 	trafficURI += params
 
@@ -237,8 +348,10 @@ func getDNSMetricsData(ctx context.Context, session *session.Session, domain str
 
 	// Log the metrics data for debugging
 	debugLog := log.WithFields(log.Fields{
-		"actual_property":    property,
-		"requested_property": requestedProperty,
+		"akamai_property":   property,
+		"resolved_property": propertyName,
+		"domain_id":         getStringFromPointer(domainID),
+		"total_requests":    totalRequests,
 	})
 	if len(datacenters) > 0 {
 		jsonData, _ := json.MarshalIndent(datacenters, "", "  ")
@@ -247,19 +360,27 @@ func getDNSMetricsData(ctx context.Context, session *session.Session, domain str
 	debugLog.Debug("DNS metrics data")
 
 	return &models.AkamaiTotalDNSRequests{
-		PropertyName:  requestedProperty, // Use the property name requested by the client
+		PropertyName:  propertyName, // Use the actual property name resolved from domain_id
 		TimeRange:     timeRangeValue,
 		TotalRequests: totalRequests,
 		Datacenters:   datacenters,
 	}, nil
 }
 
+// Helper function to safely get string from string pointer
+func getStringFromPointer(ptr *string) string {
+	if ptr == nil {
+		return ""
+	}
+	return *ptr
+}
+
 // GetTotalDNSRequests handles RPC requests for DNS metrics data
 func GetTotalDNSRequests(ctx context.Context, req stormrpc.Request) stormrpc.Response {
 	type dnsMetricsRequest struct {
-		PropertyName *string `json:"property_name,omitempty"`
-		ProjectID    *string `json:"project_id,omitempty"`
-		TimeRange    *string `json:"time_range,omitempty"`
+		DomainID  *string `json:"domain_id,omitempty"`
+		ProjectID *string `json:"project_id,omitempty"`
+		TimeRange *string `json:"time_range,omitempty"`
 	}
 
 	var params dnsMetricsRequest
@@ -269,7 +390,7 @@ func GetTotalDNSRequests(ctx context.Context, req stormrpc.Request) stormrpc.Res
 
 	// Get metrics data using our helper function
 	dnsMetrics, err := getDNSMetricsData(ctx, akamaiAgent.session, config.Global.AkamaiConfig.Domain,
-		params.PropertyName, params.ProjectID, params.TimeRange)
+		params.DomainID, params.ProjectID, params.TimeRange)
 	if err != nil {
 		return stormrpc.NewErrorResponse(req.Reply, err)
 	}

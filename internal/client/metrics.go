@@ -7,6 +7,7 @@ package client
 import (
 	"fmt"
 
+	"github.com/go-openapi/strfmt"
 	"github.com/sapcc/andromeda/client/metrics"
 )
 
@@ -16,9 +17,9 @@ var MetricsOptions struct {
 }
 
 type MetricsAkamaiDNS struct {
-	PropertyName string `short:"p" long:"property-name" description:"Filter by Akamai GTM property name"`
-	ProjectID    string `short:"i" long:"project-id" description:"Filter by project ID"`
-	TimeRange    string `short:"t" long:"time-range" description:"Time range for metrics data" default:"last_hour" choice:"last_hour" choice:"last_day" choice:"last_week"`
+	DomainID  string `short:"d" long:"domain-id" description:"Domain ID to get metrics for"`
+	ProjectID string `short:"i" long:"project-id" description:"Filter by project ID"`
+	TimeRange string `short:"t" long:"time-range" description:"Time range for metrics data" default:"last_hour" choice:"last_hour" choice:"last_day" choice:"last_week"`
 }
 
 // Execute the metrics command
@@ -27,8 +28,9 @@ func (*MetricsAkamaiDNS) Execute(_ []string) error {
 	params := metrics.NewGetMetricsAkamaiTotalDNSRequestsParams()
 
 	// Set request parameters if provided
-	if MetricsOptions.MetricsAkamaiDNS.PropertyName != "" {
-		params.PropertyName = &MetricsOptions.MetricsAkamaiDNS.PropertyName
+	if MetricsOptions.MetricsAkamaiDNS.DomainID != "" {
+		domainUUID := strfmt.UUID(MetricsOptions.MetricsAkamaiDNS.DomainID)
+		params.DomainID = &domainUUID
 	}
 	if MetricsOptions.MetricsAkamaiDNS.ProjectID != "" {
 		params.ProjectID = &MetricsOptions.MetricsAkamaiDNS.ProjectID

@@ -1068,9 +1068,10 @@ func init() {
         "parameters": [
           {
             "type": "string",
+            "format": "uuid",
             "x-nullable": true,
-            "description": "Filter metrics by Akamai GTM property name",
-            "name": "property_name",
+            "description": "Filter metrics by domain ID",
+            "name": "domain_id",
             "in": "query"
           },
           {
@@ -3929,9 +3930,10 @@ func init() {
         "parameters": [
           {
             "type": "string",
+            "format": "uuid",
             "x-nullable": true,
-            "description": "Filter metrics by Akamai GTM property name",
-            "name": "property_name",
+            "description": "Filter metrics by domain ID",
+            "name": "domain_id",
             "in": "query"
           },
           {
