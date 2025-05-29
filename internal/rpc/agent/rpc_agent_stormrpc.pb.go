@@ -11,8 +11,8 @@ import (
 
 // RPCAgentClient is the client API for RPCAgent service.
 type RPCAgentClient interface {
-	// GetDNSMetrics retrieves the total DNS metrics for a given project and timeframe.
-	GetDNSMetricsAkamai(ctx context.Context, in *rpcmodels.GetDNSMetricsRequest, opts ...stormrpc.CallOption) (*rpcmodels.GetDNSMetricsResponse, error)
+	// Sync synchronizes the agent with the Andromeda backend.
+	Sync(ctx context.Context, in *rpcmodels.SyncRequest, opts ...stormrpc.CallOption) (*rpcmodels.SyncResponse, error)
 }
 
 type rPCAgentClient struct {
@@ -23,9 +23,9 @@ func NewRPCAgentClient(c *stormrpc.Client) RPCAgentClient {
 	return &rPCAgentClient{c}
 }
 
-func (c *rPCAgentClient) GetDNSMetricsAkamai(ctx context.Context, in *rpcmodels.GetDNSMetricsRequest, opts ...stormrpc.CallOption) (*rpcmodels.GetDNSMetricsResponse, error) {
-	var out rpcmodels.GetDNSMetricsResponse
-	r, err := stormrpc.NewRequest("rpc.RPCAgent.GetDNSMetricsAkamai", in, stormrpc.WithEncodeProto())
+func (c *rPCAgentClient) Sync(ctx context.Context, in *rpcmodels.SyncRequest, opts ...stormrpc.CallOption) (*rpcmodels.SyncResponse, error) {
+	var out rpcmodels.SyncResponse
+	r, err := stormrpc.NewRequest("rpc.RPCAgent.Sync", in, stormrpc.WithEncodeProto())
 	if err != nil {
 		return nil, err
 	}
@@ -44,8 +44,8 @@ func (c *rPCAgentClient) GetDNSMetricsAkamai(ctx context.Context, in *rpcmodels.
 
 // RPCAgentServer is the server API for RPCAgent service.
 type RPCAgentServer interface {
-	// GetDNSMetrics retrieves the total DNS metrics for a given project and timeframe.
-	GetDNSMetricsAkamai(context.Context, *rpcmodels.GetDNSMetricsRequest) (*rpcmodels.GetDNSMetricsResponse, error)
+	// Sync synchronizes the agent with the Andromeda backend.
+	Sync(context.Context, *rpcmodels.SyncRequest) (*rpcmodels.SyncResponse, error)
 }
 
 func RegisterRPCAgentServer(s *stormrpc.Server, srv RPCAgentServer) {
@@ -55,19 +55,19 @@ func RegisterRPCAgentServer(s *stormrpc.Server, srv RPCAgentServer) {
 	}
 }
 
-type _RPCAgent_GetDNSMetricsAkamai_Handler struct {
+type _RPCAgent_Sync_Handler struct {
 	route string
 	svc   interface{}
 }
 
-func (h *_RPCAgent_GetDNSMetricsAkamai_Handler) HandlerFunc() stormrpc.HandlerFunc {
+func (h *_RPCAgent_Sync_Handler) HandlerFunc() stormrpc.HandlerFunc {
 	return func(ctx context.Context, r stormrpc.Request) stormrpc.Response {
-		var in rpcmodels.GetDNSMetricsRequest
+		var in rpcmodels.SyncRequest
 		if err := r.Decode(&in); err != nil {
 			return stormrpc.NewErrorResponse(r.Reply, fmt.Errorf("error decoding request"))
 		}
 
-		out, err := h.svc.(RPCAgentServer).GetDNSMetricsAkamai(ctx, &in)
+		out, err := h.svc.(RPCAgentServer).Sync(ctx, &in)
 		if err != nil {
 			return stormrpc.NewErrorResponse(r.Reply, err)
 		}
@@ -80,15 +80,15 @@ func (h *_RPCAgent_GetDNSMetricsAkamai_Handler) HandlerFunc() stormrpc.HandlerFu
 		return resp
 	}
 }
-func (h *_RPCAgent_GetDNSMetricsAkamai_Handler) Route() string {
+func (h *_RPCAgent_Sync_Handler) Route() string {
 	return h.route
 }
-func (h *_RPCAgent_GetDNSMetricsAkamai_Handler) SetService(svc interface{}) {
+func (h *_RPCAgent_Sync_Handler) SetService(svc interface{}) {
 	h.svc = svc
 }
 
 var rPCAgentHandlers = []handler{
-	&_RPCAgent_GetDNSMetricsAkamai_Handler{route: "rpc.RPCAgent.GetDNSMetricsAkamai"},
+	&_RPCAgent_Sync_Handler{route: "rpc.RPCAgent.Sync"},
 }
 
 type handler interface {

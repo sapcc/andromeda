@@ -94,6 +94,35 @@ message Monitor {
   string domain_name = 11;
 }
 
+message SyncRequest {
+  repeated string domain_id = 1;
+}
+
+message SyncResponse {
+}
+
+message GetCidrsRequest {
+}
+
+message GetCidrsResponse {
+  message Cidr {
+    int32 cidrId = 1;
+    int32 serviceId = 2;
+    string serviceName = 3;
+    string cidr = 4;
+    string cidrMask = 5;
+    string port = 6;
+    string creationDate = 7;
+    string effectiveDate = 8;
+    string changeDate = 9;
+    string minIp = 10;
+    string maxIp = 11;
+    string lastAction = 12;
+  }
+
+  repeated Cidr cidrs = 1;
+}
+
 message GetDNSMetricsRequest {
   enum TimeRangeValue {
     LAST_HOUR = 0;

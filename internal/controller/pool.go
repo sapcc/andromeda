@@ -134,7 +134,7 @@ func (c PoolController) PostPools(params pools.PostPoolsParams) middleware.Respo
 		panic(err)
 	}
 
-	_ = PendingSync(c.rpc)
+	_ = c.PendingSync()
 	return pools.NewPostPoolsCreated().WithPayload(&pools.PostPoolsCreatedBody{Pool: pool})
 }
 
@@ -220,7 +220,7 @@ func (c PoolController) PutPoolsPoolID(params pools.PutPoolsPoolIDParams) middle
 		panic(err)
 	}
 
-	_ = PendingSync(c.rpc)
+	_ = c.PendingSync()
 	return pools.NewPutPoolsPoolIDAccepted().WithPayload(&pools.PutPoolsPoolIDAcceptedBody{Pool: &pool})
 }
 
@@ -255,7 +255,7 @@ func (c PoolController) DeletePoolsPoolID(params pools.DeletePoolsPoolIDParams) 
 		panic(err)
 	}
 
-	_ = PendingSync(c.rpc)
+	_ = c.PendingSync()
 	return pools.NewDeletePoolsPoolIDNoContent()
 }
 

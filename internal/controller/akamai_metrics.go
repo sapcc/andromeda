@@ -18,7 +18,7 @@ import (
 
 	"github.com/sapcc/andromeda/internal/auth"
 	"github.com/sapcc/andromeda/internal/config"
-	"github.com/sapcc/andromeda/internal/rpc/agent"
+	"github.com/sapcc/andromeda/internal/rpc/agent/akamai"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
 	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/models"
@@ -32,15 +32,19 @@ type AkamaiMetricsController struct {
 	metricsCache *lru.Cache[string, *models.AkamaiTotalDNSRequests]
 }
 
-// Init initializes the controller with cache
-func (c *AkamaiMetricsController) Init() {
+// NewAkamaiMetricsController initializes the controller with cache
+func NewAkamaiMetricsController(cc CommonController) AkamaiMetricsController {
 	// Create a cache with 100 entries max
 	cache, err := lru.New[string, *models.AkamaiTotalDNSRequests](100)
 	if err != nil {
 		log.WithError(err).Warn("Failed to create metrics cache, continuing without caching")
 	} else {
-		c.metricsCache = cache
 		log.Info("Initialized metrics cache for DNS requests")
+	}
+
+	return AkamaiMetricsController{
+		CommonController: cc,
+		metricsCache:     cache,
 	}
 }
 
@@ -107,7 +111,7 @@ func (c AkamaiMetricsController) GetMetricsAkamaiTotalDNSRequestsHandler(params 
 	ctx, cancel := context.WithTimeout(params.HTTPRequest.Context(), 30*time.Second)
 	defer cancel()
 
-	client := agent.NewRPCAgentClient(c.rpc)
+	client := akamai.NewRPCAgentAkamaiClient(c.rpc)
 	akamaiDNSMetrics, err := client.GetDNSMetricsAkamai(ctx, req)
 	if err != nil {
 		log.WithError(err).WithFields(requestFields).Error("Failed to fetch DNS metrics via RPC")

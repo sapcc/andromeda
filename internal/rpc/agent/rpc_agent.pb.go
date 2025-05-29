@@ -29,17 +29,17 @@ var File_internal_rpc_agent_rpc_agent_proto protoreflect.FileDescriptor
 
 const file_internal_rpc_agent_rpc_agent_proto_rawDesc = "" +
 	"\n" +
-	"\"internal/rpc/agent/rpc_agent.proto\x1a#internal/rpcmodels/rpc_models.proto2P\n" +
-	"\bRPCAgent\x12D\n" +
-	"\x13GetDNSMetricsAkamai\x12\x15.GetDNSMetricsRequest\x1a\x16.GetDNSMetricsResponseB/Z-github.com/sapcc/andromeda/internal/rpc/agentb\x06proto3"
+	"\"internal/rpc/agent/rpc_agent.proto\x1a#internal/rpcmodels/rpc_models.proto2/\n" +
+	"\bRPCAgent\x12#\n" +
+	"\x04Sync\x12\f.SyncRequest\x1a\r.SyncResponseB/Z-github.com/sapcc/andromeda/internal/rpc/agentb\x06proto3"
 
 var file_internal_rpc_agent_rpc_agent_proto_goTypes = []any{
-	(*rpcmodels.GetDNSMetricsRequest)(nil),  // 0: GetDNSMetricsRequest
-	(*rpcmodels.GetDNSMetricsResponse)(nil), // 1: GetDNSMetricsResponse
+	(*rpcmodels.SyncRequest)(nil),  // 0: SyncRequest
+	(*rpcmodels.SyncResponse)(nil), // 1: SyncResponse
 }
 var file_internal_rpc_agent_rpc_agent_proto_depIdxs = []int32{
-	0, // 0: RPCAgent.GetDNSMetricsAkamai:input_type -> GetDNSMetricsRequest
-	1, // 1: RPCAgent.GetDNSMetricsAkamai:output_type -> GetDNSMetricsResponse
+	0, // 0: RPCAgent.Sync:input_type -> SyncRequest
+	1, // 1: RPCAgent.Sync:output_type -> SyncResponse
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name

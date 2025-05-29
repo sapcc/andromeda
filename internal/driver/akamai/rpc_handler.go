@@ -25,14 +25,37 @@ import (
 	"strings"
 	"time"
 
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v10/pkg/session"
 	"github.com/apex/log"
 
 	"github.com/sapcc/andromeda/internal/rpcmodels"
 )
 
-type RPCHandler struct {
-	session *session.Session
+type RPCHandlerAkamai struct {
+	agent *AkamaiAgent
+}
+
+// Sync is a method that handles synchronization requests for Akamai domains.
+func (h *RPCHandlerAkamai) Sync(ctx context.Context, request *rpcmodels.SyncRequest) (*rpcmodels.SyncResponse, error) {
+	domainIDs := request.GetDomainId()
+	log.WithField("domainIDs", domainIDs).Info("[Sync] Syncing domains")
+
+	h.agent.forceSync <- domainIDs
+	return &rpcmodels.SyncResponse{}, nil
+}
+
+// GetCidrs retrieves CIDR blocks from Akamai's Firewall Rules Manager API.
+func (h *RPCHandlerAkamai) GetCidrs(ctx context.Context, request *rpcmodels.GetCidrsRequest) (*rpcmodels.GetCidrsResponse, error) {
+	var cidrBlocks *rpcmodels.GetCidrsResponse
+
+	cidrBlocksReq, _ := http.NewRequest(http.MethodGet, "/firewall-rules-manager/v1/cidr-blocks", nil)
+	if ret, err := (*h.agent.session).Exec(cidrBlocksReq, cidrBlocks); err != nil {
+		log.
+			WithError(err).
+			WithField("body", ret.Body).
+			Error("Error fetching CIDR blocks")
+		return nil, err
+	}
+	return cidrBlocks, nil
 }
 
 // DomainInfo represents domain information from the database
@@ -44,8 +67,8 @@ type DomainInfo struct {
 	ProvisioningStatus string `db:"provisioning_status"`
 }
 
-// getDNSMetricsData retrieves DNS metrics
-func (h *RPCHandler) GetDNSMetricsAkamai(ctx context.Context, req *rpcmodels.GetDNSMetricsRequest) (*rpcmodels.GetDNSMetricsResponse, error) {
+// GetDNSMetricsAkamai retrieves DNS metrics
+func (h *RPCHandlerAkamai) GetDNSMetricsAkamai(ctx context.Context, req *rpcmodels.GetDNSMetricsRequest) (*rpcmodels.GetDNSMetricsResponse, error) {
 	// Now get the traffic report for the property
 	// First, get the properties window to determine the time range
 	windowURI := "/gtm-api/v1/reports/traffic/properties-window"
@@ -61,7 +84,7 @@ func (h *RPCHandler) GetDNSMetricsAkamai(ctx context.Context, req *rpcmodels.Get
 	}
 
 	// Execute the properties window request
-	_, err = (*h.session).Exec(windowReq, &propertiesWindow)
+	_, err = (*h.agent.session).Exec(windowReq, &propertiesWindow)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching properties window: %w", err)
 	}
@@ -103,7 +126,7 @@ func (h *RPCHandler) GetDNSMetricsAkamai(ctx context.Context, req *rpcmodels.Get
 	}
 
 	// Execute the traffic report request
-	_, err = (*h.session).Exec(trafficReq, &trafficReport)
+	_, err = (*h.agent.session).Exec(trafficReq, &trafficReport)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching traffic report: %w", err)
 	}
@@ -172,12 +195,4 @@ func (h *RPCHandler) GetDNSMetricsAkamai(ctx context.Context, req *rpcmodels.Get
 		Datacenters:   datacenters,
 		TotalRequests: totalRequests,
 	}, nil
-}
-
-// Helper function to safely get string from string pointer
-func getStringFromPointer(ptr *string) string {
-	if ptr == nil {
-		return ""
-	}
-	return *ptr
 }
