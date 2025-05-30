@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"net/url"
 	"os"
 	"time"
@@ -36,6 +37,25 @@ type liquidLogic struct {
 
 	// See "--gmt-endpoint" CLI flag in main() function (e.g. "http://localhost:8080/v1")
 	GTMEndpoint string
+}
+
+type ReauthTransport struct {
+	transport http.RoundTripper
+	context   context.Context
+	provider  *gophercloud.ProviderClient
+}
+
+func (rt *ReauthTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	resp, err := rt.transport.RoundTrip(req)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode == http.StatusUnauthorized {
+		if err := rt.provider.Reauthenticate(rt.context, rt.provider.Token()); err != nil {
+			logg.Error("ReauthTransport failed to reauthenticate: %s", err)
+		}
+	}
+	return resp, nil
 }
 
 var defaultServiceUsageReport = liquid.ServiceUsageReport{
@@ -80,7 +100,7 @@ var defaultServiceUsageReport = liquid.ServiceUsageReport{
 	},
 }
 
-func (l *liquidLogic) Init(_ context.Context, provider *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) error {
+func (l *liquidLogic) Init(context context.Context, provider *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) error {
 	l.andromedaClient = client.Default
 	if l.GTMEndpoint == "" {
 		endpointOpts := gophercloud.EndpointOpts{
@@ -98,7 +118,12 @@ func (l *liquidLogic) Init(_ context.Context, provider *gophercloud.ProviderClie
 	if err != nil {
 		return err
 	}
-	rt := runtimeclient.New(uri.Host, uri.Path, []string{uri.Scheme})
+	rt := runtimeclient.NewWithClient(
+		uri.Host, uri.Path, []string{uri.Scheme},
+		&http.Client{
+			Transport: &ReauthTransport{http.DefaultTransport, context, provider},
+		},
+	)
 	rt.DefaultAuthentication = runtime.ClientAuthInfoWriterFunc(func(req runtime.ClientRequest, reg strfmt.Registry) error {
 		if err := req.SetHeaderParam("X-Auth-Token", provider.Token()); err != nil {
 			return err
