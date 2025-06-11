@@ -110,7 +110,7 @@ func (c AkamaiMetricsController) GetTotalDNSRequests(ctx context.Context, params
 		return nil, fmt.Errorf("no properties found matching the criteria")
 	}
 
-	if result.TotalRequests == 0 && len(result.Datacenters) == 0 {
+	if result.TotalRequests == 0 && (result.Datacenters == nil || len(result.Datacenters) == 0) {
 		log.WithFields(requestFields).Warn("RPC returned no DNS metrics data")
 		return nil, fmt.Errorf("no DNS metrics data available for the specified criteria")
 	}
