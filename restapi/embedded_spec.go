@@ -30,7 +30,7 @@ func init() {
   ],
   "swagger": "2.0",
   "info": {
-    "description": "Platform agnostic GSLB frontend\n\n` + "`" + `` + "`" + `` + "`" + `\n# SPDX-FileCopyrightText: Copyright 2025 SAP SE or an SAP affiliate company\n#\n# SPDX-License-Identifier: Apache-2.0\n` + "`" + `` + "`" + `` + "`" + `",
+    "description": "Platform agnostic GSLB frontend",
     "title": "Andromeda",
     "version": "1.1.1"
   },
@@ -1058,75 +1058,6 @@ func init() {
         }
       ]
     },
-    "/metrics/akamai/total-dns-requests": {
-      "get": {
-        "description": "Retrieve DNS request metrics for Akamai Global Traffic Management (GTM) properties",
-        "tags": [
-          "Metrics"
-        ],
-        "summary": "Get total DNS requests for Akamai GTM properties",
-        "parameters": [
-          {
-            "type": "string",
-            "x-nullable": true,
-            "description": "Filter metrics by Akamai GTM property name",
-            "name": "property_name",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "x-nullable": true,
-            "description": "Filter metrics by project ID",
-            "name": "project_id",
-            "in": "query"
-          },
-          {
-            "enum": [
-              "last_hour",
-              "last_day",
-              "last_week"
-            ],
-            "type": "string",
-            "default": "last_hour",
-            "description": "Time range for metrics data",
-            "name": "time_range",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A JSON object containing DNS request metrics",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "total_dns_requests": {
-                  "$ref": "#/definitions/akamai_total_dns_requests"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          },
-          "default": {
-            "description": "Unexpected Error",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          }
-        },
-        "x-policy": "andromeda:metrics:akamai:get"
-      }
-    },
     "/monitors": {
       "get": {
         "tags": [
@@ -1906,56 +1837,6 @@ func init() {
     }
   },
   "definitions": {
-    "akamai_total_dns_requests": {
-      "type": "object",
-      "properties": {
-        "datacenters": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "datacenter_id": {
-                "description": "ID of the datacenter",
-                "type": "string"
-              },
-              "datacenter_nickname": {
-                "description": "Nickname of the datacenter",
-                "type": "string"
-              },
-              "percentage": {
-                "description": "Percentage of total requests for this datacenter",
-                "type": "number",
-                "format": "float"
-              },
-              "requests": {
-                "description": "Number of requests for this datacenter",
-                "type": "integer"
-              },
-              "status": {
-                "description": "Status of the datacenter",
-                "type": "string"
-              },
-              "target_ip": {
-                "description": "Target IP address for the datacenter",
-                "type": "string"
-              }
-            }
-          }
-        },
-        "property_name": {
-          "description": "Name of the Akamai GTM property",
-          "type": "string"
-        },
-        "time_range": {
-          "description": "Time range for the metrics data",
-          "type": "string"
-        },
-        "total_requests": {
-          "description": "Total number of DNS requests for the property",
-          "type": "integer"
-        }
-      }
-    },
     "datacenter": {
       "type": "object",
       "properties": {
@@ -2839,7 +2720,7 @@ func init() {
   ],
   "swagger": "2.0",
   "info": {
-    "description": "Platform agnostic GSLB frontend\n\n` + "`" + `` + "`" + `` + "`" + `\n# SPDX-FileCopyrightText: Copyright 2025 SAP SE or an SAP affiliate company\n#\n# SPDX-License-Identifier: Apache-2.0\n` + "`" + `` + "`" + `` + "`" + `",
+    "description": "Platform agnostic GSLB frontend",
     "title": "Andromeda",
     "version": "1.1.1"
   },
@@ -3919,75 +3800,6 @@ func init() {
         }
       ]
     },
-    "/metrics/akamai/total-dns-requests": {
-      "get": {
-        "description": "Retrieve DNS request metrics for Akamai Global Traffic Management (GTM) properties",
-        "tags": [
-          "Metrics"
-        ],
-        "summary": "Get total DNS requests for Akamai GTM properties",
-        "parameters": [
-          {
-            "type": "string",
-            "x-nullable": true,
-            "description": "Filter metrics by Akamai GTM property name",
-            "name": "property_name",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "x-nullable": true,
-            "description": "Filter metrics by project ID",
-            "name": "project_id",
-            "in": "query"
-          },
-          {
-            "enum": [
-              "last_hour",
-              "last_day",
-              "last_week"
-            ],
-            "type": "string",
-            "default": "last_hour",
-            "description": "Time range for metrics data",
-            "name": "time_range",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A JSON object containing DNS request metrics",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "total_dns_requests": {
-                  "$ref": "#/definitions/akamai_total_dns_requests"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          },
-          "default": {
-            "description": "Unexpected Error",
-            "schema": {
-              "$ref": "#/definitions/error"
-            }
-          }
-        },
-        "x-policy": "andromeda:metrics:akamai:get"
-      }
-    },
     "/monitors": {
       "get": {
         "tags": [
@@ -4777,36 +4589,6 @@ func init() {
     }
   },
   "definitions": {
-    "AkamaiTotalDNSRequestsDatacentersItems0": {
-      "type": "object",
-      "properties": {
-        "datacenter_id": {
-          "description": "ID of the datacenter",
-          "type": "string"
-        },
-        "datacenter_nickname": {
-          "description": "Nickname of the datacenter",
-          "type": "string"
-        },
-        "percentage": {
-          "description": "Percentage of total requests for this datacenter",
-          "type": "number",
-          "format": "float"
-        },
-        "requests": {
-          "description": "Number of requests for this datacenter",
-          "type": "integer"
-        },
-        "status": {
-          "description": "Status of the datacenter",
-          "type": "string"
-        },
-        "target_ip": {
-          "description": "Target IP address for the datacenter",
-          "type": "string"
-        }
-      }
-    },
     "GeomapAssignmentsItems0": {
       "description": "Assignment.",
       "type": "object",
@@ -4842,29 +4624,6 @@ func init() {
           }
         }
       ]
-    },
-    "akamai_total_dns_requests": {
-      "type": "object",
-      "properties": {
-        "datacenters": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/AkamaiTotalDNSRequestsDatacentersItems0"
-          }
-        },
-        "property_name": {
-          "description": "Name of the Akamai GTM property",
-          "type": "string"
-        },
-        "time_range": {
-          "description": "Time range for the metrics data",
-          "type": "string"
-        },
-        "total_requests": {
-          "description": "Total number of DNS requests for the property",
-          "type": "integer"
-        }
-      }
     },
     "datacenter": {
       "type": "object",
