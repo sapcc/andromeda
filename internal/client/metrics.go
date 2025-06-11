@@ -15,45 +15,6 @@ import (
 	"github.com/sapcc/andromeda/models"
 )
 
-// CLI command options
-var MetricsOptions struct {
-	MetricsAkamaiDNS `command:"akamai-dns-requests" description:"Get Akamai GTM DNS request metrics"`
-}
-
-type MetricsAkamaiDNS struct {
-	PropertyName string `short:"p" long:"property-name" description:"Filter by Akamai GTM property name"`
-	ProjectID    string `short:"i" long:"project-id" description:"Filter by project ID"`
-	TimeRange    string `short:"t" long:"time-range" description:"Time range for metrics data" default:"last_hour" choice:"last_hour" choice:"last_day" choice:"last_week"`
-}
-
-// Execute the metrics command
-func (*MetricsAkamaiDNS) Execute(_ []string) error {
-	// Create metrics client
-	client, err := NewMetricsClient()
-	if err != nil {
-		return fmt.Errorf("failed to create metrics client: %w", err)
-	}
-
-	var propName, projID, timeRange *string
-	if MetricsOptions.MetricsAkamaiDNS.PropertyName != "" {
-		propName = &MetricsOptions.MetricsAkamaiDNS.PropertyName
-	}
-	if MetricsOptions.MetricsAkamaiDNS.ProjectID != "" {
-		projID = &MetricsOptions.MetricsAkamaiDNS.ProjectID
-	}
-	if MetricsOptions.MetricsAkamaiDNS.TimeRange != "" {
-		timeRange = &MetricsOptions.MetricsAkamaiDNS.TimeRange
-	}
-
-	result, err := client.GetAkamaiTotalDNSRequests(context.Background(), propName, projID, timeRange)
-	if err != nil {
-		return fmt.Errorf("failed to get DNS metrics: %w", err)
-	}
-
-	// Write result to table
-	return WriteTable(result)
-}
-
 // MetricsClient provides access to metrics-related functionality
 type MetricsClient struct {
 	rpc *stormrpc.Client
@@ -110,12 +71,4 @@ func (c *MetricsClient) GetAkamaiTotalDNSRequests(ctx context.Context, propertyN
 	}
 
 	return &result, nil
-}
-
-// Initialize the command
-func init() {
-	_, err := Parser.AddCommand("metrics", "Metrics", "Metrics Commands.", &MetricsOptions)
-	if err != nil {
-		panic(err)
-	}
 }
