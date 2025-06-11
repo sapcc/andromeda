@@ -81,7 +81,8 @@ func (c AkamaiMetricsController) GetMetricsAkamaiTotalDNSRequestsHandler(params 
 	// Create cache key based on parameters
 	cacheKey := fmt.Sprintf("dns_metrics:%s:%s:%v",
 		params.DomainID,
-		projectID)
+		projectID,
+		params.TimeRange)
 
 	// Check cache first
 	if c.metricsCache != nil {
