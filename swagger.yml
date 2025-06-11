@@ -1245,11 +1245,11 @@ paths:
       x-policy: andromeda:metrics:akamai:get
       parameters:
         - in: query
-          name: property_name
-          required: false
+          name: domain_id
+          required: true
           type: string
-          description: Filter metrics by Akamai GTM property name
-          x-nullable: true
+          format: uuid
+          description: Filter metrics by domain ID
         - in: query
           name: project_id
           required: false

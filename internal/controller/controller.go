@@ -14,6 +14,8 @@ import (
 	"github.com/nats-io/nats.go"
 
 	"github.com/sapcc/andromeda/internal/config"
+	"github.com/sapcc/andromeda/internal/rpc/agent"
+	"github.com/sapcc/andromeda/internal/rpcmodels"
 )
 
 type Controller struct {
@@ -31,9 +33,10 @@ type Controller struct {
 }
 
 type CommonController struct {
-	db  *sqlx.DB
-	nc  *nats.Conn
-	rpc *stormrpc.Client
+	db    *sqlx.DB
+	nc    *nats.Conn
+	rpc   *stormrpc.Client
+	agent agent.RPCAgentClient
 }
 
 func New(db *sqlx.DB) *Controller {
@@ -48,13 +51,11 @@ func New(db *sqlx.DB) *Controller {
 	}
 
 	cc := CommonController{
-		db:  db,
-		nc:  nc,
-		rpc: rpcClient,
+		db:    db,
+		nc:    nc,
+		rpc:   rpcClient,
+		agent: agent.NewRPCAgentClient(rpcClient),
 	}
-
-	metricsController := AkamaiMetricsController{cc, nil}
-	metricsController.Init()
 
 	c := Controller{
 		DomainController{cc},
@@ -66,25 +67,15 @@ func New(db *sqlx.DB) *Controller {
 		QuotaController{cc},
 		SyncController{cc},
 		GeoMapController{cc},
-		CidrBlocksController{cc, make(map[string]cidrBlocks)},
-		metricsController,
+		NewCidrBlocksController(cc),
+		NewAkamaiMetricsController(cc),
 	}
 	return &c
 }
 
-func PendingSync(client *stormrpc.Client) error {
-	if client == nil {
-		return nil
-	}
-
+func (cc CommonController) PendingSync() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-
-	r, err := stormrpc.NewRequest("andromeda.sync", []string{})
-	if err != nil {
-		return err
-	}
-
-	resp := client.Do(ctx, r)
-	return resp.Err
+	_, err := cc.agent.Sync(ctx, &rpcmodels.SyncRequest{})
+	return err
 }
