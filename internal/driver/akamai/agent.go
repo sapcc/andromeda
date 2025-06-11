@@ -125,12 +125,6 @@ func getDNSMetricsData(ctx context.Context, session *session.Session, domain str
 	// Use first property for initial implementation
 	property := properties[0]
 
-	// Store the requested property name for later use
-	requestedProperty := property
-	if propertyName != nil && *propertyName != "" {
-		requestedProperty = *propertyName
-	}
-
 	// Now get the traffic report for the property
 	// First, get the properties window to determine the time range
 	windowURI := "/gtm-api/v1/reports/traffic/properties-window"
@@ -236,10 +230,7 @@ func getDNSMetricsData(ctx context.Context, session *session.Session, domain str
 	}
 
 	// Log the metrics data for debugging
-	debugLog := log.WithFields(log.Fields{
-		"actual_property":    property,
-		"requested_property": requestedProperty,
-	})
+	debugLog := log.WithField("property", property)
 	if len(datacenters) > 0 {
 		jsonData, _ := json.MarshalIndent(datacenters, "", "  ")
 		debugLog = debugLog.WithField("datacenters", string(jsonData))
@@ -247,7 +238,7 @@ func getDNSMetricsData(ctx context.Context, session *session.Session, domain str
 	debugLog.Debug("DNS metrics data")
 
 	return &models.AkamaiTotalDNSRequests{
-		PropertyName:  requestedProperty, // Use the property name requested by the client
+		PropertyName:  property,
 		TimeRange:     timeRangeValue,
 		TotalRequests: totalRequests,
 		Datacenters:   datacenters,
