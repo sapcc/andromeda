@@ -120,10 +120,11 @@ func TestRPCHandlerAkamai_DatacenterAggregation(t *testing.T) {
 	dc1Found := false
 	dc2Found := false
 	for _, dc := range datacenters {
-		if dc.DatacenterId == "dc1" {
+		switch dc.DatacenterId {
+		case "dc1":
 			assert.Equal(t, int64(350), dc.Requests, "dc1 should have aggregated requests (100+200+50)")
 			dc1Found = true
-		} else if dc.DatacenterId == "dc2" {
+		case "dc2":
 			assert.Equal(t, int64(150), dc.Requests, "dc2 should have correct requests")
 			dc2Found = true
 		}
