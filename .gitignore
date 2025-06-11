@@ -5,4 +5,7 @@
 .idea
 bin
 tmp
-
+.edgerc
+total_dns_requests.py
+akamai_client.py
+.vscode/settings.json
