@@ -7,13 +7,13 @@ package controller
 import (
 	"context"
 	"fmt"
-	"time"
+	"strings"
 
-	"github.com/actatum/stormrpc"
-	"github.com/apex/log"
 	"github.com/go-openapi/runtime/middleware"
-	lru "github.com/hashicorp/golang-lru/v2"
 
+	"github.com/sapcc/andromeda/internal/config"
+	"github.com/sapcc/andromeda/internal/driver/akamai"
+	akamaiMetrics "github.com/sapcc/andromeda/internal/driver/akamai/metrics"
 	"github.com/sapcc/andromeda/models"
 	apiMetrics "github.com/sapcc/andromeda/restapi/operations/metrics"
 )
@@ -21,150 +21,112 @@ import (
 // AkamaiMetricsController handles the metrics operations for Akamai
 type AkamaiMetricsController struct {
 	CommonController
-	// Cache for DNS metrics to improve performance
-	metricsCache *lru.Cache[string, *models.AkamaiTotalDNSRequests]
-}
-
-// Init initializes the controller with cache
-func (c *AkamaiMetricsController) Init() {
-	// Create a cache with 100 entries max
-	cache, err := lru.New[string, *models.AkamaiTotalDNSRequests](100)
-	if err != nil {
-		log.WithError(err).Warn("Failed to create metrics cache, continuing without caching")
-	} else {
-		c.metricsCache = cache
-		log.Info("Initialized metrics cache for DNS requests")
-	}
 }
 
 // GetTotalDNSRequests retrieves total DNS request metrics for Akamai GTM properties
 func (c AkamaiMetricsController) GetTotalDNSRequests(ctx context.Context, params apiMetrics.GetMetricsAkamaiTotalDNSRequestsParams) (*models.AkamaiTotalDNSRequests, error) {
+	// Create a session with Akamai
+	session, _ := akamai.NewAkamaiSession(&config.Global.AkamaiConfig)
+
 	// Set default time range if not specified
 	timeRange := "last_hour"
 	if params.TimeRange != nil {
 		timeRange = *params.TimeRange
 	}
 
-	// Create cache key based on parameters
-	cacheKey := fmt.Sprintf("dns_metrics:%s:%s:%s",
-		getStringParam(params.PropertyName),
-		getStringParam(params.ProjectID),
-		timeRange)
+	// Create cached session for metrics
+	cachedSession := akamaiMetrics.NewCachedAkamaiSession(*session, config.Global.AkamaiConfig.Domain)
 
-	// Check cache first
-	if c.metricsCache != nil {
-		if cachedResult, found := c.metricsCache.Get(cacheKey); found {
-			log.WithField("cache_key", cacheKey).Debug("Cache hit for DNS metrics")
-			return cachedResult, nil
+	// Get properties
+	properties, err := cachedSession.GetProperties()
+	if err != nil {
+		return nil, fmt.Errorf("error fetching Akamai properties: %w", err)
+	}
+
+	// Filter properties by name if specified
+	if params.PropertyName != nil && *params.PropertyName != "" {
+		var filteredProperties []string
+		for _, prop := range properties {
+			if strings.Contains(prop, *params.PropertyName) {
+				filteredProperties = append(filteredProperties, prop)
+			}
+		}
+		if len(filteredProperties) > 0 {
+			properties = filteredProperties
 		}
 	}
 
-	requestFields := log.Fields{
-		"property_name": getStringParam(params.PropertyName),
-		"project_id":    getStringParam(params.ProjectID),
-		"time_range":    timeRange,
+	// If no properties found, return empty result
+	if len(properties) == 0 {
+		return nil, fmt.Errorf("no Akamai GTM properties found matching the criteria")
 	}
 
-	log.WithFields(requestFields).Debug("Fetching DNS metrics via RPC")
+	// Use first property for initial implementation
+	property := properties[0]
 
-	// Prepare RPC request parameters
-	type dnsMetricsRequest struct {
-		PropertyName *string `json:"property_name,omitempty"`
-		ProjectID    *string `json:"project_id,omitempty"`
-		TimeRange    *string `json:"time_range,omitempty"`
-	}
-
-	rpcParams := dnsMetricsRequest{
-		PropertyName: params.PropertyName,
-		ProjectID:    params.ProjectID,
-		TimeRange:    &timeRange,
-	}
-
-	// Create RPC request
-	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
-	defer cancel()
-
-	rpcReq, err := stormrpc.NewRequest("andromeda.get_dns_metrics.akamai", rpcParams)
+	// Get traffic report for the property
+	trafficData, err := cachedSession.GetTrafficReport(property)
 	if err != nil {
-		log.WithError(err).WithFields(requestFields).Error("Failed to create RPC request")
-		return nil, fmt.Errorf("error creating RPC request: %w", err)
+		return nil, fmt.Errorf("error fetching traffic data: %w", err)
 	}
 
-	// Send RPC request to Akamai agent
-	rpcResp := c.rpc.Do(ctx, rpcReq)
-	if rpcResp.Err != nil {
-		log.WithError(rpcResp.Err).WithFields(requestFields).Error("RPC request to Akamai agent failed")
-		return nil, fmt.Errorf("error from Akamai agent: %w", rpcResp.Err)
+	// Build response
+	totalRequests := int64(0)
+	datacenters := []*models.AkamaiTotalDNSRequestsDatacentersItems0{}
+
+	// Process traffic data
+	for _, dataRow := range trafficData {
+		for _, dc := range dataRow.Datacenters {
+			totalRequests += int64(dc.Requests)
+
+			// Add datacenter to response
+			datacenter := &models.AkamaiTotalDNSRequestsDatacentersItems0{
+				DatacenterID:       dc.Nickname,
+				DatacenterNickname: dc.Nickname,
+				Requests:           int64(dc.Requests),
+				Status:             dc.Status,
+			}
+
+			// Extract target IP from traffic target name
+			if strings.Contains(dc.TrafficTargetName, " - ") {
+				parts := strings.Split(dc.TrafficTargetName, " - ")
+				if len(parts) > 1 {
+					datacenter.TargetIP = parts[1]
+				}
+			}
+
+			datacenters = append(datacenters, datacenter)
+		}
 	}
 
-	// Parse RPC response
-	var result models.AkamaiTotalDNSRequests
-	if err := rpcResp.Decode(&result); err != nil {
-		log.WithError(err).WithFields(requestFields).Error("Failed to decode RPC response")
-		return nil, fmt.Errorf("error decoding RPC response: %w", err)
+	// Calculate percentages
+	if totalRequests > 0 {
+		for _, dc := range datacenters {
+			// Explicitly convert to float32 to match the model type
+			dc.Percentage = float32(float64(dc.Requests) / float64(totalRequests) * 100)
+		}
 	}
 
-	// Validate the response
-	if result.PropertyName == "" {
-		log.WithFields(requestFields).Warn("RPC returned empty property name")
-		return nil, fmt.Errorf("no properties found matching the criteria")
-	}
-
-	if result.TotalRequests == 0 && (result.Datacenters == nil || len(result.Datacenters) == 0) {
-		log.WithFields(requestFields).Warn("RPC returned no DNS metrics data")
-		return nil, fmt.Errorf("no DNS metrics data available for the specified criteria")
-	}
-
-	// Cache the result
-	if c.metricsCache != nil {
-		c.metricsCache.Add(cacheKey, &result)
-		log.WithField("cache_key", cacheKey).Debug("Cached DNS metrics result")
-	}
-
-	log.WithFields(log.Fields{
-		"property_name":  result.PropertyName,
-		"total_requests": result.TotalRequests,
-		"datacenters":    len(result.Datacenters),
-	}).Debug("Successfully retrieved DNS metrics")
-
-	return &result, nil
+	return &models.AkamaiTotalDNSRequests{
+		PropertyName:  property,
+		TimeRange:     timeRange,
+		TotalRequests: totalRequests,
+		Datacenters:   datacenters,
+	}, nil
 }
 
 // GetMetricsAkamaiTotalDNSRequestsHandler handles the GET /metrics/akamai/total-dns-requests endpoint
 func (c AkamaiMetricsController) GetMetricsAkamaiTotalDNSRequestsHandler(params apiMetrics.GetMetricsAkamaiTotalDNSRequestsParams) middleware.Responder {
 	result, err := c.GetTotalDNSRequests(params.HTTPRequest.Context(), params)
 	if err != nil {
-		log.WithError(err).WithFields(log.Fields{
-			"property_name": getStringParam(params.PropertyName),
-			"project_id":    getStringParam(params.ProjectID),
-			"time_range":    getStringParamWithDefault(params.TimeRange, "last_hour"),
-		}).Error("Failed to get DNS metrics")
-
 		return apiMetrics.NewGetMetricsAkamaiTotalDNSRequestsBadRequest().WithPayload(
 			&models.Error{
 				Message: err.Error(),
 				Code:    400,
 			})
 	}
-
 	return apiMetrics.NewGetMetricsAkamaiTotalDNSRequestsOK().WithPayload(
 		&apiMetrics.GetMetricsAkamaiTotalDNSRequestsOKBody{
 			TotalDNSRequests: result,
 		})
-}
-
-// Helper function to get string value from pointer or empty string
-func getStringParam(s *string) string {
-	if s == nil {
-		return ""
-	}
-	return *s
-}
-
-// Helper function to get string value from pointer or default value
-func getStringParamWithDefault(s *string, defaultValue string) string {
-	if s == nil {
-		return defaultValue
-	}
-	return *s
 }
