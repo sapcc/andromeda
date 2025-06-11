@@ -147,9 +147,10 @@ func getDNSMetricsData(ctx context.Context, session *session.Session, domain str
 
 	// Calculate start and end times based on the time range
 	end := propertiesWindow.End
+	var start time.Time
 
 	// Use the last 30 minutes by default
-	start := end.Add(-30 * time.Minute)
+	start = end.Add(-30 * time.Minute)
 
 	// Create request for the traffic report
 	trafficURI := fmt.Sprintf("/gtm-api/v1/reports/traffic/domains/%s/properties/%s", domain, property)
