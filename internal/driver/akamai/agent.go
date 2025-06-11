@@ -6,12 +6,9 @@ package akamai
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
-	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -53,227 +50,6 @@ type AkamaiAgent struct {
 
 var akamaiAgent *AkamaiAgent
 
-// getDNSMetricsData retrieves DNS metrics
-func getDNSMetricsData(ctx context.Context, session *session.Session, domain string, propertyName, projectID, timeRange *string) (*models.AkamaiTotalDNSRequests, error) {
-	// Set default time range if not specified
-	timeRangeValue := "last_hour"
-	if timeRange != nil {
-		timeRangeValue = *timeRange
-	}
-
-	// First, we need to get the list of properties
-	// Create a request to get the domain list
-	domainListURI := fmt.Sprintf("/gtm-api/v1/reports/domain-list/%s", domain)
-	domainListReq, err := http.NewRequest(http.MethodGet, domainListURI, nil)
-	if err != nil {
-		return nil, fmt.Errorf("error creating domain list request: %w", err)
-	}
-
-	// Define the domain summary struct to unmarshal response
-	var domainSummary struct {
-		Name       string   `json:"name"`
-		Properties []string `json:"properties"`
-	}
-
-	// Execute the domain list request
-	_, err = (*session).Exec(domainListReq, &domainSummary)
-	if err != nil {
-		return nil, fmt.Errorf("error fetching domain list: %w", err)
-	}
-
-	// Get the properties from the response
-	properties := domainSummary.Properties
-
-	// Filter properties by name if specified
-	if propertyName != nil && *propertyName != "" {
-		var filteredProperties []string
-		for _, prop := range properties {
-			if prop == *propertyName {
-				filteredProperties = append(filteredProperties, prop)
-				break
-			}
-		}
-
-		// If exact match not found, try partial match
-		if len(filteredProperties) == 0 {
-			for _, prop := range properties {
-				if strings.Contains(prop, *propertyName) {
-					filteredProperties = append(filteredProperties, prop)
-				}
-			}
-		}
-
-		if len(filteredProperties) > 0 {
-			properties = filteredProperties
-		} else {
-			log.WithField("property_name", *propertyName).Info("No property found matching the provided name")
-		}
-	}
-
-	// Filter properties by project ID if specified
-	// Note: This would require a domain lookup to match project ID to properties
-	// For initial implementation, we're just logging this info
-	if projectID != nil && *projectID != "" {
-		log.WithField("project_id", *projectID).Info("Project ID filtering requested but not yet implemented")
-	}
-
-	// If no properties found, return empty result
-	if len(properties) == 0 {
-		return nil, fmt.Errorf("no Akamai GTM properties found matching the criteria")
-	}
-
-	// Use first property for initial implementation
-	property := properties[0]
-
-	// Now get the traffic report for the property
-	// First, get the properties window to determine the time range
-	windowURI := "/gtm-api/v1/reports/traffic/properties-window"
-	windowReq, err := http.NewRequest(http.MethodGet, windowURI, nil)
-	if err != nil {
-		return nil, fmt.Errorf("error creating properties window request: %w", err)
-	}
-
-	// Define the properties window struct
-	var propertiesWindow struct {
-		Start time.Time `json:"start"`
-		End   time.Time `json:"end"`
-	}
-
-	// Execute the properties window request
-	_, err = (*session).Exec(windowReq, &propertiesWindow)
-	if err != nil {
-		return nil, fmt.Errorf("error fetching properties window: %w", err)
-	}
-
-	// Calculate start and end times based on the time range
-	end := propertiesWindow.End
-	var start time.Time
-
-	// Use the last 30 minutes by default
-	start = end.Add(-30 * time.Minute)
-
-	// Create request for the traffic report
-	trafficURI := fmt.Sprintf("/gtm-api/v1/reports/traffic/domains/%s/properties/%s", domain, property)
-	params := fmt.Sprintf("?start=%s&end=%s", start.UTC().Format(time.RFC3339), end.UTC().Format(time.RFC3339))
-	trafficURI += params
-
-	trafficReq, err := http.NewRequest(http.MethodGet, trafficURI, nil)
-	if err != nil {
-		return nil, fmt.Errorf("error creating traffic report request: %w", err)
-	}
-
-	// Define traffic report struct
-	var trafficReport struct {
-		DataRows []struct {
-			Timestamp   time.Time `json:"timestamp"`
-			Datacenters []struct {
-				Nickname          string `json:"nickname"`
-				TrafficTargetName string `json:"trafficTargetName"`
-				Requests          int    `json:"requests"`
-				Status            string `json:"status"`
-			} `json:"datacenters"`
-		} `json:"dataRows"`
-	}
-
-	// Execute the traffic report request
-	_, err = (*session).Exec(trafficReq, &trafficReport)
-	if err != nil {
-		return nil, fmt.Errorf("error fetching traffic report: %w", err)
-	}
-
-	// Build response
-	totalRequests := int64(0)
-	datacenters := []*models.AkamaiTotalDNSRequestsDatacentersItems0{}
-
-	// Keep track of datacenters we've already processed
-	processedDatacenters := make(map[string]int)
-
-	// Process traffic data
-	for _, dataRow := range trafficReport.DataRows {
-		for _, dc := range dataRow.Datacenters {
-			totalRequests += int64(dc.Requests)
-
-			// Check if we've already processed this datacenter
-			if idx, exists := processedDatacenters[dc.Nickname]; exists {
-				// Update existing datacenter
-				datacenters[idx].Requests += int64(dc.Requests)
-				continue
-			}
-
-			// Add datacenter to response
-			datacenter := &models.AkamaiTotalDNSRequestsDatacentersItems0{
-				DatacenterID:       dc.Nickname,
-				DatacenterNickname: dc.Nickname,
-				Requests:           int64(dc.Requests),
-				Status:             dc.Status,
-			}
-
-			// Extract target IP from traffic target name
-			if strings.Contains(dc.TrafficTargetName, " - ") {
-				parts := strings.Split(dc.TrafficTargetName, " - ")
-				if len(parts) > 1 {
-					datacenter.TargetIP = parts[1]
-				}
-			}
-
-			// Store the index of this datacenter in our map
-			processedDatacenters[dc.Nickname] = len(datacenters)
-			datacenters = append(datacenters, datacenter)
-		}
-	}
-
-	// Calculate percentages
-	if totalRequests > 0 {
-		for _, dc := range datacenters {
-			// Explicitly convert to float32 to match the model type
-			dc.Percentage = float32(float64(dc.Requests) / float64(totalRequests) * 100)
-		}
-	}
-
-	// Log the metrics data for debugging
-	debugLog := log.WithField("property", property)
-	if len(datacenters) > 0 {
-		jsonData, _ := json.MarshalIndent(datacenters, "", "  ")
-		debugLog = debugLog.WithField("datacenters", string(jsonData))
-	}
-	debugLog.Debug("DNS metrics data")
-
-	return &models.AkamaiTotalDNSRequests{
-		PropertyName:  property,
-		TimeRange:     timeRangeValue,
-		TotalRequests: totalRequests,
-		Datacenters:   datacenters,
-	}, nil
-}
-
-// GetTotalDNSRequests handles RPC requests for DNS metrics data
-func GetTotalDNSRequests(ctx context.Context, req stormrpc.Request) stormrpc.Response {
-	type dnsMetricsRequest struct {
-		PropertyName *string `json:"property_name,omitempty"`
-		ProjectID    *string `json:"project_id,omitempty"`
-		TimeRange    *string `json:"time_range,omitempty"`
-	}
-
-	var params dnsMetricsRequest
-	if err := req.Decode(&params); err != nil {
-		return stormrpc.NewErrorResponse(req.Reply, err)
-	}
-
-	// Get metrics data using our helper function
-	dnsMetrics, err := getDNSMetricsData(ctx, akamaiAgent.session, config.Global.AkamaiConfig.Domain,
-		params.PropertyName, params.ProjectID, params.TimeRange)
-	if err != nil {
-		return stormrpc.NewErrorResponse(req.Reply, err)
-	}
-
-	resp, err := stormrpc.NewResponse(req.Reply, dnsMetrics)
-	if err != nil {
-		return stormrpc.NewErrorResponse(req.Reply, err)
-	}
-
-	return resp
-}
-
 func Sync(ctx context.Context, req stormrpc.Request) stormrpc.Response {
 	var domainIDs []string
 	if err := req.Decode(&domainIDs); err != nil {
@@ -291,9 +67,6 @@ func Sync(ctx context.Context, req stormrpc.Request) stormrpc.Response {
 }
 
 func GetCidrs(ctx context.Context, req stormrpc.Request) stormrpc.Response {
-	// Local type declaration for AkamaiCIDRBlock
-	type AkamaiCIDRBlock map[string]any
-
 	cidrBlocksReq, _ := http.NewRequest(http.MethodGet, "/firewall-rules-manager/v1/cidr-blocks", nil)
 	var cidrBlocks []AkamaiCIDRBlock
 	if _, err := (*akamaiAgent.session).Exec(cidrBlocksReq, &cidrBlocks); err != nil {
@@ -350,7 +123,6 @@ func ExecuteAkamaiAgent() error {
 	srv := rpc.NewServer("andromeda-akamai-agent", stormrpc.WithNatsConn(nc))
 	srv.Handle("andromeda.sync", Sync)
 	srv.Handle("andromeda.get_cidrs.akamai", GetCidrs)
-	srv.Handle("andromeda.get_dns_metrics.akamai", GetTotalDNSRequests)
 
 	go func() {
 		_ = srv.Run()
