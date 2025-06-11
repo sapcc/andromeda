@@ -27,7 +27,6 @@ type Controller struct {
 	Sync        SyncController
 	GeoMaps     GeoMapController
 	CidrBlocks  CidrBlocksController
-	Metrics     AkamaiMetricsController
 }
 
 type CommonController struct {
@@ -63,7 +62,6 @@ func New(db *sqlx.DB) *Controller {
 		SyncController{cc},
 		GeoMapController{cc},
 		CidrBlocksController{cc, make(map[string]cidrBlocks)},
-		AkamaiMetricsController{cc},
 	}
 	return &c
 }

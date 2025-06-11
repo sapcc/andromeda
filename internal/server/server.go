@@ -35,7 +35,6 @@ import (
 	"github.com/sapcc/andromeda/restapi/operations/domains"
 	"github.com/sapcc/andromeda/restapi/operations/geographic_maps"
 	"github.com/sapcc/andromeda/restapi/operations/members"
-	"github.com/sapcc/andromeda/restapi/operations/metrics"
 	"github.com/sapcc/andromeda/restapi/operations/monitors"
 	"github.com/sapcc/andromeda/restapi/operations/pools"
 )
@@ -124,9 +123,6 @@ func ExecuteServer(server *restapi.Server) error {
 	api.GeographicMapsGetGeomapsGeomapIDHandler = geographic_maps.GetGeomapsGeomapIDHandlerFunc(c.GeoMaps.GetGeomapsGeoMapID)
 	api.GeographicMapsPutGeomapsGeomapIDHandler = geographic_maps.PutGeomapsGeomapIDHandlerFunc(c.GeoMaps.PutGeomapsGeoMapID)
 	api.GeographicMapsDeleteGeomapsGeomapIDHandler = geographic_maps.DeleteGeomapsGeomapIDHandlerFunc(c.GeoMaps.DeleteGeomapsGeoMapID)
-
-	// Metrics
-	api.MetricsGetMetricsAkamaiTotalDNSRequestsHandler = metrics.GetMetricsAkamaiTotalDNSRequestsHandlerFunc(c.Metrics.GetMetricsAkamaiTotalDNSRequestsHandler)
 
 	// Monitors
 	api.MonitorsGetMonitorsHandler = monitors.GetMonitorsHandlerFunc(c.Monitors.GetMonitors)
