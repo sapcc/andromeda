@@ -1236,54 +1236,6 @@ paths:
             - f5
           x-nullable: true
 
-  /metrics/akamai/total-dns-requests:
-    get:
-      tags:
-        - Metrics
-      summary: Get total DNS requests for Akamai GTM properties
-      description: Retrieve DNS request metrics for Akamai Global Traffic Management (GTM) properties
-      x-policy: andromeda:metrics:akamai:get
-      parameters:
-        - in: query
-          name: property_name
-          required: false
-          type: string
-          description: Filter metrics by Akamai GTM property name
-          x-nullable: true
-        - in: query
-          name: project_id
-          required: false
-          type: string
-          description: Filter metrics by project ID
-          x-nullable: true
-        - in: query
-          name: time_range
-          required: false
-          type: string
-          enum: [last_hour, last_day, last_week]
-          default: last_hour
-          description: Time range for metrics data
-      responses:
-        200:
-          description: A JSON object containing DNS request metrics
-          schema:
-            type: object
-            properties:
-              total_dns_requests:
-                $ref: '#/definitions/akamai_total_dns_requests'
-        400:
-          description: Bad request
-          schema:
-            $ref: '#/definitions/error'
-        404:
-          description: Not Found
-          schema:
-            $ref: '#/definitions/error'
-        default:
-          description: Unexpected Error
-          schema:
-            $ref: '#/definitions/error'
-
 definitions:
   domain:
     type: object
@@ -1962,43 +1914,6 @@ definitions:
         enum:
           - next
           - previous
-
-  akamai_total_dns_requests:
-    type: object
-    properties:
-      property_name:
-        type: string
-        description: Name of the Akamai GTM property
-      total_requests:
-        type: integer
-        description: Total number of DNS requests for the property
-      time_range:
-        type: string
-        description: Time range for the metrics data
-      datacenters:
-        type: array
-        items:
-          type: object
-          properties:
-            datacenter_id:
-              type: string
-              description: ID of the datacenter
-            datacenter_nickname:
-              type: string
-              description: Nickname of the datacenter
-            target_ip:
-              type: string
-              description: Target IP address for the datacenter
-            requests:
-              type: integer
-              description: Number of requests for this datacenter
-            percentage:
-              type: number
-              format: float
-              description: Percentage of total requests for this datacenter
-            status:
-              type: string
-              description: Status of the datacenter
 
 tags:
   - name: Domains
