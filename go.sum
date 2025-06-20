@@ -329,10 +329,10 @@ github.com/rs/cors v1.11.1/go.mod h1:XyqrcTp5zjWr1wsJ8PIRZssZ8b/WMcMf71DJnit4EMU
 github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/russross/blackfriday/v2 v2.1.0 h1:JIOH55/0cWyOuilr9/qlrm0BSXldqnqwMsf35Ld67mk=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
-github.com/sapcc/go-api-declarations v1.15.0 h1:41i1YnHaUq6HGzXtuCd5NqjJsWl8Pav3MSfMlPOYJuQ=
-github.com/sapcc/go-api-declarations v1.15.0/go.mod h1:WIT/BvApD9klcDb9aQbNgOr6sx0hGwd8NUnmGhNVuQQ=
-github.com/sapcc/go-bits v0.0.0-20250612150039-67ead56083c6 h1:xN2z2Kbc8t+5agEAS2nAWaNSmnuJAVtIbRR7pWwoVPk=
-github.com/sapcc/go-bits v0.0.0-20250612150039-67ead56083c6/go.mod h1:/E+XIJ82e8q3At34hUdDuXTQpt5Gsbw/6P8T8e82rcQ=
+github.com/sapcc/go-api-declarations v1.16.0 h1:uMB6SFPBAClusbAWwmeMeUi5eHVf9FpZWWf3VwPrsIg=
+github.com/sapcc/go-api-declarations v1.16.0/go.mod h1:MWmLjmvjftgyAugNUfIhsDsHIzXH1pn32cWLZpiluKg=
+github.com/sapcc/go-bits v0.0.0-20250619083208-447294241e22 h1:fJEtrgn5ECi/1muZ8DxuS75pBR1wVwQ88v3qId+1i6Q=
+github.com/sapcc/go-bits v0.0.0-20250619083208-447294241e22/go.mod h1:MsEyujjMUUhGfpG4zrE94eeaNwURajMBElZe8MfPabE=
 github.com/scottdware/go-bigip v0.0.0-20240809002616-deb9b0aff84a h1:Dp0HN76Jl1n0orM9UVB/AnwqJOBWETm1hHBPDVMKWeE=
 github.com/scottdware/go-bigip v0.0.0-20240809002616-deb9b0aff84a/go.mod h1:ElPIUv+P7DTtT71aHpeNomJ4naq2RTvCA8o5gBIru3w=
 github.com/sergi/go-diff v1.0.0/go.mod h1:0CfEIISq7TuYL3j771MWULgwwjU+GofnZX9QAmXWZgo=
