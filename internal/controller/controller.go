@@ -74,6 +74,10 @@ func New(db *sqlx.DB) *Controller {
 }
 
 func (cc CommonController) PendingSync() error {
+	// Skip sync if agent is not initialized (e.g., in tests)
+	if cc.agent == nil {
+		return nil
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	_, err := cc.agent.Sync(ctx, &rpcmodels.SyncRequest{})
