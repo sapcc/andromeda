@@ -5,7 +5,6 @@
 package metrics
 
 import (
-	"strings"
 	"testing"
 	"time"
 
@@ -133,18 +132,4 @@ func TestMetricDescriptions(t *testing.T) {
 		"Status metric description should indicate it's the most recent value")
 	assert.Contains(t, descUpdated.String(), "when this metric was last updated",
 		"Timestamp metric description should explain what it tracks")
-}
-
-// Helper to extract metric name from description
-func extractMetricName(desc string) string {
-	start := strings.Index(desc, `fqName: "`)
-	if start == -1 {
-		return ""
-	}
-	start += len(`fqName: "`)
-	end := strings.Index(desc[start:], `"`)
-	if end == -1 {
-		return ""
-	}
-	return desc[start : start+end]
 }
