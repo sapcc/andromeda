@@ -72,6 +72,7 @@ const App = (props) => {
                                     overrideEndpoint={props.overrideAndromedaEndpoint}
                                     loginDomains={props?.loginDomains || []}
                                     loginProject={props?.loginProject}
+                                    message={props?.messageOfTheDay}
                         />
                     )}
 

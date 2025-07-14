@@ -10,6 +10,7 @@ import {
     Form,
     FormRow,
     IntroBox,
+    Message,
     Modal,
     Select,
     SelectOption,
@@ -22,7 +23,7 @@ import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {login} from "../actions";
 import {Error} from "./Components";
 
-const LogInModal = ({keystoneEndpoint, overrideEndpoint, loginDomains, loginProject}) => {
+const LogInModal = ({keystoneEndpoint, overrideEndpoint, loginDomains, loginProject, message}) => {
     const setAuth = authStore((state) => state.setAuth)
     const setModal = urlStore((state) => state.openModal)
     const queryClient = useQueryClient()
@@ -104,6 +105,18 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint, loginDomains, loginProj
             {/* Error Bar */}
             <Error error={error}/>
             {isLoading ? <Spinner variant="primary"/> : null}
+
+            {/* Warning Message */}
+            {message && (
+                <Message variant="warning" className="jn-mb-4">
+                    <Stack>
+                        {message}
+                    </Stack>
+                </Message>
+            )}
+
+            {/* Form */}
+
 
             <Form onSubmit={onSubmit}>
                 <Stack distribution="between" gap="2">
