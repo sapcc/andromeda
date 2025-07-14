@@ -6,6 +6,7 @@ package akamai
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v10/pkg/gtm"
@@ -27,6 +28,12 @@ var MONITOR_LIVENESS_TYPE_MAP = map[rpcmodels.Monitor_MonitorType]string{
 func (s *AkamaiAgent) EnsureDomain(domainType string) error {
 	request := gtm.GetDomainRequest{DomainName: config.Global.AkamaiConfig.Domain}
 	if _, err := s.gtm.GetDomain(context.Background(), request); err != nil {
+		// Check if it's a permission error - if so, assume domain exists
+		if strings.Contains(err.Error(), "Forbidden") || strings.Contains(err.Error(), "does not have the grant needed") {
+			log.Warnf("Cannot access domain %s due to permissions, assuming it exists", config.Global.AkamaiConfig.Domain)
+			return nil
+		}
+		
 		log.Warnf("Akamai Domain %s doesn't exist, creating...", config.Global.AkamaiConfig.Domain)
 		domain := gtm.Domain{
 			Name: config.Global.AkamaiConfig.Domain,
