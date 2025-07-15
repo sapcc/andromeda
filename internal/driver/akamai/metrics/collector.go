@@ -83,6 +83,12 @@ func (p *AndromedaAkamaiCollector) Collect(ch chan<- prometheus.Metric) {
 
 		// Process all data rows but only keep the most recent values
 		for _, dataRow := range datarows {
+			// Check if datacenters is empty to prevent panic
+			if len(dataRow.Datacenters) == 0 {
+				log.Warnf("Property %s has no datacenters in dataRow, skipping", property)
+				continue
+			}
+			
 			var projectID string
 			if projectID, err = p.rpc.GetProject(dataRow.Datacenters[0].Nickname); err != nil {
 				log.Error(err.Error())
