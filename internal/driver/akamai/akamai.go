@@ -68,15 +68,22 @@ func NewAkamaiSession(akamaiConfig *config.AkamaiConfig) (*session.Session, stri
 	}
 
 	var domainType string
-	for _, contract := range identity.Contracts {
-		if akamaiConfig.ContractId != "" && contract.ContractID != akamaiConfig.ContractId {
-			continue
-		}
+	
+	// Use configured domain type if available, otherwise auto-detect
+	if akamaiConfig.DomainType != "" {
+		domainType = akamaiConfig.DomainType
+		log.Infof("Using configured domain type: %s", domainType)
+	} else {
+		for _, contract := range identity.Contracts {
+			if akamaiConfig.ContractId != "" && contract.ContractID != akamaiConfig.ContractId {
+				continue
+			}
 
-		domainType = DetectTypeFromFeatures(contract.Features)
-		log.Infof("Detected Akamai Contract '%s' with best features enabling '%s' domain type.",
-			contract.ContractID, domainType)
-		break
+			domainType = DetectTypeFromFeatures(contract.Features)
+			log.Infof("Detected Akamai Contract '%s' with best features enabling '%s' domain type.",
+				contract.ContractID, domainType)
+			break
+		}
 	}
 	return &s, domainType
 }
