@@ -6,6 +6,7 @@ package akamai
 
 import (
 	"context"
+	"net/http"
 	"os"
 	"os/signal"
 	"sync"
@@ -47,6 +48,39 @@ type AkamaiAgent struct {
 	forceSync         chan []string
 	executing         bool
 	datacenterIdCache *lru.Cache[string, int]
+}
+
+var akamaiAgent *AkamaiAgent
+
+func Sync(ctx context.Context, req stormrpc.Request) stormrpc.Response {
+	var domainIDs []string
+	if err := req.Decode(&domainIDs); err != nil {
+		return stormrpc.NewErrorResponse(req.Reply, err)
+	}
+	log.WithField("domainIDs", domainIDs).Info("[Sync] Syncing domains")
+
+	akamaiAgent.forceSync <- domainIDs
+	resp, err := stormrpc.NewResponse(req.Reply, nil)
+	if err != nil {
+		return stormrpc.NewErrorResponse(req.Reply, err)
+	}
+
+	return resp
+}
+
+func GetCidrs(ctx context.Context, req stormrpc.Request) stormrpc.Response {
+	cidrBlocksReq, _ := http.NewRequest(http.MethodGet, "/firewall-rules-manager/v1/cidr-blocks", nil)
+	var cidrBlocks []AkamaiCIDRBlock
+	if _, err := (*akamaiAgent.session).Exec(cidrBlocksReq, &cidrBlocks); err != nil {
+		panic(err)
+	}
+
+	resp, err := stormrpc.NewResponse(req.Reply, cidrBlocks)
+	if err != nil {
+		return stormrpc.NewErrorResponse(req.Reply, err)
+	}
+
+	return resp
 }
 
 func ExecuteAkamaiAgent() error {
@@ -92,6 +126,8 @@ func ExecuteAkamaiAgent() error {
 	svc := &RPCHandlerAkamai{akamaiAgent}
 	akamai.RegisterRPCAgentAkamaiServer(srv, svc)
 	agent.RegisterRPCAgentServer(srv, svc)
+	srv.Handle("andromeda.sync", Sync)
+	srv.Handle("andromeda.get_cidrs.akamai", GetCidrs)
 
 	go func() {
 		_ = srv.Run()

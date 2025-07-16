@@ -15,6 +15,8 @@ jobs:
     container:
       image: quay.io/goswagger/swagger
     steps:
+    - name: Install git
+      run: apk add --no-cache git
     - uses: actions/checkout@v4
     - name: Build
       run: swagger generate markdown --copyright-file COPYRIGHT.txt --output docs/api.md

@@ -10,7 +10,7 @@ RUN PROTOC=/usr/bin/protoc make -C /src ci-build-all
 
 ################################################################################
 
-FROM alpine:3.21
+FROM alpine:3.22
 LABEL source_repository="https://github.com/sapcc/andromeda"
 
 RUN apk add --no-cache ca-certificates

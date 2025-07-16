@@ -29,7 +29,6 @@ type Controller struct {
 	Sync        SyncController
 	GeoMaps     GeoMapController
 	CidrBlocks  CidrBlocksController
-	Metrics     AkamaiMetricsController
 }
 
 type CommonController struct {
@@ -56,7 +55,6 @@ func New(db *sqlx.DB) *Controller {
 		rpc:   rpcClient,
 		agent: agent.NewRPCAgentClient(rpcClient),
 	}
-
 	c := Controller{
 		DomainController{cc},
 		PoolController{cc},
@@ -67,8 +65,7 @@ func New(db *sqlx.DB) *Controller {
 		QuotaController{cc},
 		SyncController{cc},
 		GeoMapController{cc},
-		NewCidrBlocksController(cc),
-		NewAkamaiMetricsController(cc),
+		CidrBlocksController{cc, make(map[string]cidrBlocks)},
 	}
 	return &c
 }
