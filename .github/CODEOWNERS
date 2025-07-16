@@ -7,4 +7,4 @@
 
 # These owners will be the default owners for everything in
 # the repo. Unless a later match takes precedence,
-@ronchi-oss @notandy
+* @ronchi-oss @notandy @sapcc/cc_github_managers_approval
