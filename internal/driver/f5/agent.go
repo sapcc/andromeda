@@ -5,9 +5,8 @@
 package f5
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/signal"
@@ -23,7 +22,7 @@ import (
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/utils"
 
-	"github.com/scottdware/go-bigip"
+	"github.com/f5devcentral/go-bigip"
 
 	"github.com/sapcc/andromeda/internal/driver/f5/as3"
 )
@@ -52,20 +51,35 @@ func (s *FullSync) FullSync(ctx context.Context, req stormrpc.Request) stormrpc.
 }
 
 func ExecuteF5Agent() error {
-	session, err := GetBigIPSession()
-	if err != nil {
-		return fmt.Errorf("acquiring BigIP session: %v", err)
+	log.Debugf("Enabled=%+v Devices=%v VCMPs=%v PhysicalNetwork=%v",
+		config.Global.F5Config.Enabled,
+		config.Global.F5Config.Devices,
+		config.Global.F5Config.VCMPs,
+		config.Global.F5Config.PhysicalNetwork,
+	)
+
+	var activeF5Session *bigip.BigIP
+	for _, url := range config.Global.F5Config.Devices {
+		deviceSession, err := GetBigIPSession(url)
+		if err != nil {
+			return fmt.Errorf("failed to acquire F5 device session: %v", err)
+		}
+		device, err := GetActiveDevice(deviceSession)
+		if err != nil {
+			return fmt.Errorf("failed to determine whether F5 device is active: %v", err)
+		}
+		if device != nil {
+			activeF5Session = deviceSession
+			log.Infof("Connected to F5 device [marketing name = %q, name = %q, version = %s, edition = %q, failover state = %q]",
+				device.MarketingName, device.Name, device.Version, device.Edition, device.FailoverState)
+		}
 	}
 
-	device, err := session.GetCurrentDevice()
-	if err != nil {
-		return err
+	if activeF5Session == nil {
+		return errors.New("failed to determine active F5 session")
 	}
-	log.Infof("connected to %s %s (%s)", device.MarketingName, device.Name, device.Version)
 
-	if err = BigIPSupportsDNS(device); err != nil {
-		return err
-	}
+	log.Info("Connected.")
 
 	nc, err := nats.Connect(config.Global.Default.TransportURL)
 	if err != nil {
@@ -78,7 +92,7 @@ func ExecuteF5Agent() error {
 
 	// Create F5 worker instance with Server RPC interface
 	f5 := F5Agent{
-		session,
+		activeF5Session,
 		server.NewRPCServerClient(client),
 	}
 
@@ -198,46 +212,49 @@ func (f5 *F5Agent) Sync(pending bool) error {
 }
 
 func postDeclaration(v interface{}) error {
-	js, err := json.MarshalIndent(v, "", "\t")
-	if err != nil {
-		return err
-	}
-
-	log.Infof("\n%s\n", string(js))
-
-	session, err := GetBigIPSession()
-	if err != nil {
-		return err
-	}
-	req := &bigip.APIRequest{
-		Method:      "post",
-		URL:         "mgmt/shared/appsvcs/declare",
-		Body:        string(js),
-		ContentType: "application/json",
-	}
-	resp, err := session.APICall(req)
-	if err != nil {
-		print(err)
-	}
-
-	var prettyJSON bytes.Buffer
-	if err := json.Indent(&prettyJSON, resp, "", "\t"); err != nil {
-		return err
-	}
-	log.Info(prettyJSON.String())
-
-	var response as3.Response
-	if err := json.Unmarshal(resp, &response); err != nil {
-		return err
-	}
-
-	for _, result := range response.Results {
-		if result.Code != 200 {
-			return fmt.Errorf("failed post! %s", result.Message)
-		} else {
-			log.Infof("succeeded: %s", result.Tenant)
+	return fmt.Errorf("TO BE FIXED")
+	/*
+		js, err := json.MarshalIndent(v, "", "\t")
+		if err != nil {
+			return err
 		}
-	}
 
-	return nil
+		log.Infof("\n%s\n", string(js))
+
+		session, err := GetBigIPSession()
+		if err != nil {
+			return err
+		}
+		req := &bigip.APIRequest{
+			Method:      "post",
+			URL:         "mgmt/shared/appsvcs/declare",
+			Body:        string(js),
+			ContentType: "application/json",
+		}
+		resp, err := session.APICall(req)
+		if err != nil {
+			print(err)
+		}
+
+		var prettyJSON bytes.Buffer
+		if err := json.Indent(&prettyJSON, resp, "", "\t"); err != nil {
+			return err
+		}
+		log.Info(prettyJSON.String())
+
+		var response as3.Response
+		if err := json.Unmarshal(resp, &response); err != nil {
+			return err
+		}
+
+		for _, result := range response.Results {
+			if result.Code != 200 {
+				return fmt.Errorf("failed post! %s", result.Message)
+			} else {
+				log.Infof("succeeded: %s", result.Tenant)
+			}
+		}
+
+		return nil
+	*/
 }
