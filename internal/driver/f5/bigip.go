@@ -7,11 +7,13 @@ package f5
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"net/url"
 	"strings"
 
 	"github.com/sapcc/andromeda/internal/rpc/server"
 
-	"github.com/scottdware/go-bigip"
+	"github.com/f5devcentral/go-bigip"
 
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/driver/f5/as3"
@@ -207,4 +209,24 @@ func GetForEntity(b *bigip.BigIP, e interface{}, path string) (error, bool) {
 	}
 
 	return nil, true
+}
+
+func GetSessionHostname(session *bigip.BigIP) (string, error) {
+	deviceURL, err := url.Parse(session.Host)
+	if err != nil {
+		return "", err
+	}
+	if deviceURL.Hostname() != "" {
+		return deviceURL.Hostname(), nil
+	}
+	return session.Host, nil
+}
+
+func FilterDeviceMatchingHostname(devices []bigip.Device, hostname string) (*bigip.Device, error) {
+	for _, device := range devices {
+		if strings.HasSuffix(hostname, device.Hostname) {
+			return &device, nil
+		}
+	}
+	return nil, fmt.Errorf("device %s not found", hostname)
 }

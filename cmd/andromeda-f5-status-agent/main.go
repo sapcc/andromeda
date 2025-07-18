@@ -5,13 +5,14 @@
 package main
 
 import (
-	"github.com/apex/log"
-
+	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/driver/f5"
+	"github.com/urfave/cli/v2"
 )
 
 func main() {
-	if err := f5.ExecuteF5StatusAgent(); err != nil {
-		log.Fatal(err.Error())
-	}
+	config.ParseArgsAndRun("andromeda-f5-status-agent", "andromeda F5 status agent",
+		func(c *cli.Context) error {
+			return f5.ExecuteF5StatusAgent()
+		})
 }

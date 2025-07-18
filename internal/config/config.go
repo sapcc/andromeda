@@ -193,8 +193,13 @@ type Database struct {
 }
 
 type F5Config struct {
-	DNSServerAddress string `yaml:"dns_server_address"`
-	ValidateCert     bool   `yaml:"validate_certificates"`
+	Enabled          bool     `yaml:"enabled" description:"Enables F5 reconciliation."`
+	Devices          []string `yaml:"devices" description:"FQDN (hostnames) of each device"`
+	VCMPs            []string `yaml:"vcmps" description:"FQDN (platform hostnames) of each vCMP (Virtual Clustered Multiprocessing)"`
+	PhysicalNetwork  string   `yaml:"physical_network" description:"Physical network name"`
+	DNSServerAddress string   `yaml:"dns_server_address" description:"IS THIS REALLY NEEDED?"`
+	MaxRetries       uint64   `long:"max-retries" ini-name:"max_retries" description:"Maximum number of retries for F5 operations." default:"5"`
+	ValidateCert     bool     `yaml:"validate_certificates" description:"Validate HTTPS certificate"`
 }
 
 type AkamaiConfig struct {
