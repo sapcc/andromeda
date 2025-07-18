@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 
 	"github.com/sapcc/andromeda/internal/auth"
-	akamai "github.com/sapcc/andromeda/internal/rpc/agent/akamai"
+	"github.com/sapcc/andromeda/internal/rpc/agent/akamai"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
 	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/restapi/operations/administrative"
