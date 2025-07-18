@@ -6,7 +6,6 @@ package akamai
 
 import (
 	"context"
-	"net/http"
 	"os"
 	"os/signal"
 	"sync"

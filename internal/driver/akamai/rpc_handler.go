@@ -6,12 +6,7 @@ package akamai
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"net/http"
-	"net/url"
-	"strings"
-	"time"
 
 	"github.com/apex/log"
 
