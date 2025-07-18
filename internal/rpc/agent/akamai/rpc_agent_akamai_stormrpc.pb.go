@@ -11,8 +11,6 @@ import (
 
 // RPCAgentAkamaiClient is the client API for RPCAgentAkamai service.
 type RPCAgentAkamaiClient interface {
-	// GetDNSMetrics retrieves the total DNS metrics for a given project and timeframe.
-	GetDNSMetricsAkamai(ctx context.Context, in *rpcmodels.GetDNSMetricsRequest, opts ...stormrpc.CallOption) (*rpcmodels.GetDNSMetricsResponse, error)
 	GetCidrs(ctx context.Context, in *rpcmodels.GetCidrsRequest, opts ...stormrpc.CallOption) (*rpcmodels.GetCidrsResponse, error)
 }
 
@@ -22,25 +20,6 @@ type rPCAgentAkamaiClient struct {
 
 func NewRPCAgentAkamaiClient(c *stormrpc.Client) RPCAgentAkamaiClient {
 	return &rPCAgentAkamaiClient{c}
-}
-
-func (c *rPCAgentAkamaiClient) GetDNSMetricsAkamai(ctx context.Context, in *rpcmodels.GetDNSMetricsRequest, opts ...stormrpc.CallOption) (*rpcmodels.GetDNSMetricsResponse, error) {
-	var out rpcmodels.GetDNSMetricsResponse
-	r, err := stormrpc.NewRequest("rpc.RPCAgentAkamai.GetDNSMetricsAkamai", in, stormrpc.WithEncodeProto())
-	if err != nil {
-		return nil, err
-	}
-
-	resp := c.c.Do(ctx, r, opts...)
-	if resp.Err != nil {
-		return nil, resp.Err
-	}
-
-	if err = resp.Decode(&out); err != nil {
-		return nil, err
-	}
-
-	return &out, nil
 }
 
 func (c *rPCAgentAkamaiClient) GetCidrs(ctx context.Context, in *rpcmodels.GetCidrsRequest, opts ...stormrpc.CallOption) (*rpcmodels.GetCidrsResponse, error) {
@@ -64,8 +43,6 @@ func (c *rPCAgentAkamaiClient) GetCidrs(ctx context.Context, in *rpcmodels.GetCi
 
 // RPCAgentAkamaiServer is the server API for RPCAgentAkamai service.
 type RPCAgentAkamaiServer interface {
-	// GetDNSMetrics retrieves the total DNS metrics for a given project and timeframe.
-	GetDNSMetricsAkamai(context.Context, *rpcmodels.GetDNSMetricsRequest) (*rpcmodels.GetDNSMetricsResponse, error)
 	GetCidrs(context.Context, *rpcmodels.GetCidrsRequest) (*rpcmodels.GetCidrsResponse, error)
 }
 
@@ -74,38 +51,6 @@ func RegisterRPCAgentAkamaiServer(s *stormrpc.Server, srv RPCAgentAkamaiServer) 
 		handler.SetService(srv)
 		s.Handle(handler.Route(), handler.HandlerFunc())
 	}
-}
-
-type _RPCAgentAkamai_GetDNSMetricsAkamai_Handler struct {
-	route string
-	svc   interface{}
-}
-
-func (h *_RPCAgentAkamai_GetDNSMetricsAkamai_Handler) HandlerFunc() stormrpc.HandlerFunc {
-	return func(ctx context.Context, r stormrpc.Request) stormrpc.Response {
-		var in rpcmodels.GetDNSMetricsRequest
-		if err := r.Decode(&in); err != nil {
-			return stormrpc.NewErrorResponse(r.Reply, fmt.Errorf("error decoding request"))
-		}
-
-		out, err := h.svc.(RPCAgentAkamaiServer).GetDNSMetricsAkamai(ctx, &in)
-		if err != nil {
-			return stormrpc.NewErrorResponse(r.Reply, err)
-		}
-
-		resp, err := stormrpc.NewResponse(r.Reply, out, stormrpc.WithEncodeProto())
-		if err != nil {
-			return stormrpc.NewErrorResponse(r.Reply, err)
-		}
-
-		return resp
-	}
-}
-func (h *_RPCAgentAkamai_GetDNSMetricsAkamai_Handler) Route() string {
-	return h.route
-}
-func (h *_RPCAgentAkamai_GetDNSMetricsAkamai_Handler) SetService(svc interface{}) {
-	h.svc = svc
 }
 
 type _RPCAgentAkamai_GetCidrs_Handler struct {
@@ -141,7 +86,6 @@ func (h *_RPCAgentAkamai_GetCidrs_Handler) SetService(svc interface{}) {
 }
 
 var rPCAgentAkamaiHandlers = []handler{
-	&_RPCAgentAkamai_GetDNSMetricsAkamai_Handler{route: "rpc.RPCAgentAkamai.GetDNSMetricsAkamai"},
 	&_RPCAgentAkamai_GetCidrs_Handler{route: "rpc.RPCAgentAkamai.GetCidrs"},
 }
 

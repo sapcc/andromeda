@@ -8,7 +8,5 @@ option go_package = "github.com/sapcc/andromeda/internal/rpc/agent/akamai";
 
 // RPCAgent is an RPC service for agents (like akamai-agent, f5-agent, ...)
 service RPCAgentAkamai {
-	// GetDNSMetrics retrieves the total DNS metrics for a given project and timeframe.
-	rpc GetDNSMetricsAkamai(GetDNSMetricsRequest) returns (GetDNSMetricsResponse);
 	rpc GetCidrs(GetCidrsRequest) returns (GetCidrsResponse);
 }

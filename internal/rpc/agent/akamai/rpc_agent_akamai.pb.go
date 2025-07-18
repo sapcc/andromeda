@@ -29,24 +29,19 @@ var File_internal_rpc_agent_akamai_rpc_agent_akamai_proto protoreflect.FileDescr
 
 const file_internal_rpc_agent_akamai_rpc_agent_akamai_proto_rawDesc = "" +
 	"\n" +
-	"0internal/rpc/agent/akamai/rpc_agent_akamai.proto\x1a#internal/rpcmodels/rpc_models.proto2\x87\x01\n" +
-	"\x0eRPCAgentAkamai\x12D\n" +
-	"\x13GetDNSMetricsAkamai\x12\x15.GetDNSMetricsRequest\x1a\x16.GetDNSMetricsResponse\x12/\n" +
+	"0internal/rpc/agent/akamai/rpc_agent_akamai.proto\x1a#internal/rpcmodels/rpc_models.proto2A\n" +
+	"\x0eRPCAgentAkamai\x12/\n" +
 	"\bGetCidrs\x12\x10.GetCidrsRequest\x1a\x11.GetCidrsResponseB6Z4github.com/sapcc/andromeda/internal/rpc/agent/akamaib\x06proto3"
 
 var file_internal_rpc_agent_akamai_rpc_agent_akamai_proto_goTypes = []any{
-	(*rpcmodels.GetDNSMetricsRequest)(nil),  // 0: GetDNSMetricsRequest
-	(*rpcmodels.GetCidrsRequest)(nil),       // 1: GetCidrsRequest
-	(*rpcmodels.GetDNSMetricsResponse)(nil), // 2: GetDNSMetricsResponse
-	(*rpcmodels.GetCidrsResponse)(nil),      // 3: GetCidrsResponse
+	(*rpcmodels.GetCidrsRequest)(nil),  // 0: GetCidrsRequest
+	(*rpcmodels.GetCidrsResponse)(nil), // 1: GetCidrsResponse
 }
 var file_internal_rpc_agent_akamai_rpc_agent_akamai_proto_depIdxs = []int32{
-	0, // 0: RPCAgentAkamai.GetDNSMetricsAkamai:input_type -> GetDNSMetricsRequest
-	1, // 1: RPCAgentAkamai.GetCidrs:input_type -> GetCidrsRequest
-	2, // 2: RPCAgentAkamai.GetDNSMetricsAkamai:output_type -> GetDNSMetricsResponse
-	3, // 3: RPCAgentAkamai.GetCidrs:output_type -> GetCidrsResponse
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
+	0, // 0: RPCAgentAkamai.GetCidrs:input_type -> GetCidrsRequest
+	1, // 1: RPCAgentAkamai.GetCidrs:output_type -> GetCidrsResponse
+	1, // [1:2] is the sub-list for method output_type
+	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
