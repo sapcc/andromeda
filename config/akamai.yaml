@@ -1,6 +1,0 @@
-akamai:
-  edgerc: /Users/I516965/.config/SAPCC/andromeda/.edgerc
-  domain: andromeda.akadns.net
-  domain_type: gtm
-  contract_id: BYPASS_CHECK_VALUE
-  combined_status: true
