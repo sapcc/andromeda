@@ -15,7 +15,7 @@ import (
 
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/rpc/agent"
-	akamaiAgent "github.com/sapcc/andromeda/internal/rpc/agent/akamai"
+	"github.com/sapcc/andromeda/internal/rpc/agent/akamai"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
 )
 
@@ -69,7 +69,7 @@ func New(db *sqlx.DB) *Controller {
 		CidrBlocksController{
 			CommonController: cc,
 			cache:           make(map[string]*rpcmodels.GetCidrsResponse),
-			agent:           akamaiAgent.NewRPCAgentAkamaiClient(rpcClient),
+			agent:           akamai.NewRPCAgentAkamaiClient(rpcClient),
 		},
 	}
 	return &c
