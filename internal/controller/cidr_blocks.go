@@ -24,16 +24,6 @@ type CidrBlocksController struct {
 	agent akamai.RPCAgentAkamaiClient
 }
 
-func NewCidrBlocksController(cc CommonController) CidrBlocksController {
-	// Initialize the cache for CIDR blocks
-	cache := make(map[string]*rpcmodels.GetCidrsResponse)
-	return CidrBlocksController{
-		CommonController: cc,
-		cache:            cache,
-		agent:            akamai.NewRPCAgentAkamaiClient(cc.rpc),
-	}
-}
-
 // GetCidrBlocks GET /cidr-blocks
 func (c CidrBlocksController) GetCidrBlocks(params administrative.GetCidrBlocksParams) middleware.Responder {
 	if _, err := auth.Authenticate(params.HTTPRequest, nil); err != nil {
