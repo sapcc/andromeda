@@ -25,6 +25,7 @@ import (
 	"github.com/sapcc/go-bits/liquidapi"
 	"github.com/sapcc/go-bits/logg"
 	"github.com/sapcc/go-bits/must"
+	"github.com/sapcc/go-bits/respondwith"
 	"github.com/urfave/cli/v2"
 
 	"github.com/sapcc/andromeda/client"
@@ -248,6 +249,11 @@ func (l *liquidLogic) SetQuota(ctx context.Context, projectUUID string, req liqu
 		return err
 	}
 	return nil
+}
+
+func (l *liquidLogic) ReviewCommitmentChange(ctx context.Context, req liquid.CommitmentChangeRequest, serviceInfo liquid.ServiceInfo) (liquid.CommitmentChangeResponse, error) {
+	err := errors.New("this liquid does not manage commitments")
+	return liquid.CommitmentChangeResponse{}, respondwith.CustomStatus(http.StatusBadRequest, err)
 }
 
 func main() {
