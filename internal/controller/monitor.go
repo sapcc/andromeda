@@ -123,7 +123,7 @@ func (c MonitorController) PostMonitors(params monitors.PostMonitorsParams) midd
 		panic(err)
 	}
 
-	_ = PendingSync(c.rpc)
+	_ = c.PendingSync()
 	return monitors.NewPostMonitorsCreated().WithPayload(&monitors.PostMonitorsCreatedBody{Monitor: monitor})
 }
 
@@ -189,7 +189,7 @@ func (c MonitorController) PutMonitorsMonitorID(params monitors.PutMonitorsMonit
 	if err := PopulateMonitor(c.db, &monitor, []string{"*"}); err != nil {
 		panic(err)
 	}
-	_ = PendingSync(c.rpc)
+	_ = c.PendingSync()
 	return monitors.NewPutMonitorsMonitorIDAccepted().WithPayload(
 		&monitors.PutMonitorsMonitorIDAcceptedBody{Monitor: &monitor})
 }
@@ -218,7 +218,7 @@ func (c MonitorController) DeleteMonitorsMonitorID(params monitors.DeleteMonitor
 		}
 		panic(err)
 	}
-	_ = PendingSync(c.rpc)
+	_ = c.PendingSync()
 	return monitors.NewDeleteMonitorsMonitorIDNoContent()
 }
 
