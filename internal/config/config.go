@@ -197,7 +197,7 @@ type F5Config struct {
 	Devices          []string `yaml:"devices" description:"FQDN (hostnames) of each device"`
 	VCMPs            []string `yaml:"vcmps" description:"FQDN (platform hostnames) of each vCMP (Virtual Clustered Multiprocessing)"`
 	PhysicalNetwork  string   `yaml:"physical_network" description:"Physical network name"`
-	DNSServerAddress string   `yaml:"dns_server_address" description:"IS THIS REALLY NEEDED?"`
+	DNSServerAddress string   `yaml:"dns_server_address" description:"Needed by GSLB_Server.devices[].address and GSLB_Server.virtualServers[].address"`
 	MaxRetries       uint64   `long:"max-retries" ini-name:"max_retries" description:"Maximum number of retries for F5 operations." default:"5"`
 	ValidateCert     bool     `yaml:"validate_certificates" description:"Validate HTTPS certificate"`
 }

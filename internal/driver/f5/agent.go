@@ -60,6 +60,7 @@ func ExecuteF5Agent() error {
 
 	var activeF5Session *bigip.BigIP
 	for _, url := range config.Global.F5Config.Devices {
+		log.Info(url)
 		deviceSession, err := GetBigIPSession(url)
 		if err != nil {
 			return fmt.Errorf("failed to acquire F5 device session: %v", err)
@@ -80,6 +81,8 @@ func ExecuteF5Agent() error {
 	}
 
 	log.Info("Connected.")
+	log.Info("Exiting for now")
+	os.Exit(0)
 
 	nc, err := nats.Connect(config.Global.Default.TransportURL)
 	if err != nil {

@@ -25,7 +25,7 @@ func (f5 *F5Agent) GetCommonDeclaration() (*as3.Tenant, error) {
 	res, err := f5.rpc.GetMembers(context.Background(), &server.SearchRequest{
 		Provider:      "f5",
 		PageNumber:    0,
-		ResultPerPage: 1000,
+		ResultPerPage: 1000, // TODO: make it possible to go over all results
 	})
 	if err != nil {
 		return nil, err

@@ -185,6 +185,9 @@ func (c StatusController) StatusHandler() error {
 				continue
 			}
 
+			// TODO: ensure this corresponds to a value in table column `member.id`
+			// TODO: if not prefixed by "member_" this is configuration drift, should be
+			// logged as such and skipped
 			memberID := strings.TrimPrefix(memberStats.NestedStats.Entries.VsName.Description, "member_")
 			memberStatus := server.MemberStatusRequest_MemberStatus_UNKNOWN
 			switch memberStats.NestedStats.Entries.StatusAvailabilityState.Description {

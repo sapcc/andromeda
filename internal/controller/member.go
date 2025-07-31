@@ -147,6 +147,7 @@ func (c MemberController) GetMembersMemberID(params members.GetMembersMemberIDPa
 
 // PutMembersMemberID PUT /members/:id
 func (c MemberController) PutMembersMemberID(params members.PutMembersMemberIDParams) middleware.Responder {
+	log.Debug("Hello from PutMembersMemberID")
 	member := models.Member{ID: params.MemberID}
 	if err := PopulateMember(c.db, &member, []string{"project_id", "pool_id"}); err != nil {
 		return members.NewPutMembersMemberIDNotFound().WithPayload(utils.NotFound)
