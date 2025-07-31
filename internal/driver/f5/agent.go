@@ -60,7 +60,6 @@ func ExecuteF5Agent() error {
 
 	var activeF5Session *bigip.BigIP
 	for _, url := range config.Global.F5Config.Devices {
-		log.Info(url)
 		deviceSession, err := GetBigIPSession(url)
 		if err != nil {
 			return fmt.Errorf("failed to acquire F5 device session: %v", err)
@@ -80,10 +79,6 @@ func ExecuteF5Agent() error {
 		return errors.New("failed to determine active F5 session")
 	}
 
-	log.Info("Connected.")
-	log.Info("Exiting for now")
-	os.Exit(0)
-
 	nc, err := nats.Connect(config.Global.Default.TransportURL)
 	if err != nil {
 		return err
@@ -98,6 +93,9 @@ func ExecuteF5Agent() error {
 		activeF5Session,
 		server.NewRPCServerClient(client),
 	}
+
+	log.Info("Exiting for now.")
+	os.Exit(0)
 
 	srv := rpc.NewServer("andromeda-f5-agent", stormrpc.WithNatsConn(nc))
 	fs := &FullSync{&f5}

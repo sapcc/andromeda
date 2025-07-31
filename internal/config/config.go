@@ -142,15 +142,16 @@ func parseConfigFlags(flags []string) error {
 }
 
 type Andromeda struct {
-	Default      Default               `yaml:"DEFAULT"`
-	Database     Database              `yaml:"database"`
-	ApiSettings  ApiSettings           `yaml:"api_settings"`
-	ServiceAuth  clientconfig.AuthInfo `yaml:"service_auth"`
-	Quota        Quota                 `yaml:"quota"`
-	F5Config     F5Config              `yaml:"f5"`
-	AkamaiConfig AkamaiConfig          `yaml:"akamai"`
-	Audit        Audit                 `yaml:"audit_middleware_notifications"`
-	HouseKeeping HouseKeeping          `yaml:"house_keeping"`
+	Default       Default               `yaml:"DEFAULT"`
+	Database      Database              `yaml:"database"`
+	ApiSettings   ApiSettings           `yaml:"api_settings"`
+	ServiceAuth   clientconfig.AuthInfo `yaml:"service_auth"`
+	Quota         Quota                 `yaml:"quota"`
+	F5Config      F5Config              `yaml:"f5"`
+	F5Datacenters []F5Datacenter        `yaml:"f5_datacenters"`
+	AkamaiConfig  AkamaiConfig          `yaml:"akamai"`
+	Audit         Audit                 `yaml:"audit_middleware_notifications"`
+	HouseKeeping  HouseKeeping          `yaml:"house_keeping"`
 }
 
 type ApiSettings struct {
@@ -200,6 +201,14 @@ type F5Config struct {
 	DNSServerAddress string   `yaml:"dns_server_address" description:"Needed by GSLB_Server.devices[].address and GSLB_Server.virtualServers[].address"`
 	MaxRetries       uint64   `long:"max-retries" ini-name:"max_retries" description:"Maximum number of retries for F5 operations." default:"5"`
 	ValidateCert     bool     `yaml:"validate_certificates" description:"Validate HTTPS certificate"`
+}
+
+type F5Datacenter struct {
+	F5URI     string `yaml:"f5_uri" description:"The BigIP resource identifier (e.g. /Common/the_resource_id)"`
+	Name      string `yaml:"name" description:"Column datacenter.name"`
+	City      string `yaml:"city" description:"Column datacenter.city"`
+	Continent string `yaml:"continent" description:"Column datacenter.continent"`
+	Country   string `yaml:"country" description:"Column datacenter.country"`
 }
 
 type AkamaiConfig struct {
