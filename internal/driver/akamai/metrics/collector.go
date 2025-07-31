@@ -117,15 +117,15 @@ func (p *AndromedaAkamaiCollector) Collect(ch chan<- prometheus.Metric) {
 	for key, requests := range latestRequests {
 		ch <- prometheus.MustNewConstMetric(descNumReq, prometheus.GaugeValue,
 			requests, key.property, key.datacenter, key.projectID, key.target)
-		
-		if status, ok := latestStatus[key]; ok {
-			ch <- prometheus.MustNewConstMetric(descStatus, prometheus.GaugeValue,
-				status, key.property, key.datacenter, key.projectID, key.target)
-		}
-		
-		if timestamp, ok := latestTimestamp[key]; ok {
-			ch <- prometheus.MustNewConstMetric(descUpdated, prometheus.GaugeValue,
-				timestamp, key.property, key.datacenter, key.projectID, key.target)
-		}
+	}
+	
+	for key, status := range latestStatus {
+		ch <- prometheus.MustNewConstMetric(descStatus, prometheus.GaugeValue,
+			status, key.property, key.datacenter, key.projectID, key.target)
+	}
+	
+	for key, timestamp := range latestTimestamp {
+		ch <- prometheus.MustNewConstMetric(descUpdated, prometheus.GaugeValue,
+			timestamp, key.property, key.datacenter, key.projectID, key.target)
 	}
 }
