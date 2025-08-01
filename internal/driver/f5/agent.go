@@ -153,7 +153,7 @@ func (f5 *F5Agent) fullSync() {
 		err := f5.Sync()
 		elapsed := time.Now().Sub(syncStart)
 		if err != nil {
-			log.Errorf("Sync failed in %s (next iteration in %s): %s", elapsed, syncInterval, err.Error())
+			log.Errorf("Sync failed after %s (next iteration in %s): %s", elapsed, syncInterval, err.Error())
 			return
 		}
 		log.Infof("Sync completed in %s (next iteration in %s)", elapsed, syncInterval)
