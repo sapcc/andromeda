@@ -5,9 +5,8 @@
 package f5
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/signal"
@@ -17,15 +16,36 @@ import (
 	"github.com/actatum/stormrpc"
 	"github.com/apex/log"
 	"github.com/nats-io/nats.go"
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/rpc"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/utils"
 
-	"github.com/scottdware/go-bigip"
+	"github.com/f5devcentral/go-bigip"
 
 	"github.com/sapcc/andromeda/internal/driver/f5/as3"
+)
+
+const agentName = "f5-as3-declaration"
+
+var (
+	lastSyncTimestampGauge = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "andromeda_agent_last_sync_timestamp",
+			Help: "Last time an agent has successfully completed its sync loop (sync completion timestamp)",
+		},
+		[]string{"agent"},
+	)
+
+	lastSyncDurationDurationSecondsGauge = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "andromeda_agent_last_sync_duration_seconds",
+			Help: "Last time an agent has successfully completed its sync loop (sync duration in seconds)",
+		},
+		[]string{"agent"},
+	)
 )
 
 type F5Agent struct {
@@ -35,6 +55,11 @@ type F5Agent struct {
 
 type FullSync struct {
 	f5 *F5Agent
+}
+
+func init() {
+	prometheus.MustRegister(lastSyncTimestampGauge)
+	prometheus.MustRegister(lastSyncDurationDurationSecondsGauge)
 }
 
 // Method can be of any name
@@ -52,19 +77,32 @@ func (s *FullSync) FullSync(ctx context.Context, req stormrpc.Request) stormrpc.
 }
 
 func ExecuteF5Agent() error {
-	session, err := GetBigIPSession()
-	if err != nil {
-		return fmt.Errorf("acquiring BigIP session: %v", err)
+	log.Debugf("Enabled=%+v Devices=%v VCMPs=%v PhysicalNetwork=%v",
+		config.Global.F5Config.Enabled,
+		config.Global.F5Config.Devices,
+		config.Global.F5Config.VCMPs,
+		config.Global.F5Config.PhysicalNetwork,
+	)
+
+	var activeF5Session *bigip.BigIP
+	for _, url := range config.Global.F5Config.Devices {
+		deviceSession, err := GetBigIPSession(url)
+		if err != nil {
+			return fmt.Errorf("failed to acquire F5 device session: %v", err)
+		}
+		device, err := GetActiveDevice(deviceSession)
+		if err != nil {
+			return fmt.Errorf("failed to determine whether F5 device is active: %v", err)
+		}
+		if device != nil {
+			activeF5Session = deviceSession
+			log.Infof("Connected to F5 device [marketing name = %q, name = %q, version = %s, edition = %q, failover state = %q]",
+				device.MarketingName, device.Name, device.Version, device.Edition, device.FailoverState)
+		}
 	}
 
-	device, err := session.GetCurrentDevice()
-	if err != nil {
-		return err
-	}
-	log.Infof("connected to %s %s (%s)", device.MarketingName, device.Name, device.Version)
-
-	if err = BigIPSupportsDNS(device); err != nil {
-		return err
+	if activeF5Session == nil {
+		return errors.New("failed to determine active F5 session")
 	}
 
 	nc, err := nats.Connect(config.Global.Default.TransportURL)
@@ -78,15 +116,17 @@ func ExecuteF5Agent() error {
 
 	// Create F5 worker instance with Server RPC interface
 	f5 := F5Agent{
-		session,
+		activeF5Session,
 		server.NewRPCServerClient(client),
 	}
 
 	srv := rpc.NewServer("andromeda-f5-agent", stormrpc.WithNatsConn(nc))
 	fs := &FullSync{&f5}
+
+	// Allows the sync to be invoked over RPC via an HTTP handler in
+	// Andromeda Server (see `m31ctl sync`)
 	srv.Handle("andromeda.sync", fs.FullSync)
 
-	go f5.periodicSync()
 	go f5.fullSync()
 	go func() {
 		_ = srv.Run()
@@ -107,33 +147,40 @@ func ExecuteF5Agent() error {
 }
 
 func (f5 *F5Agent) fullSync() {
-	if err := f5.Sync(false); err != nil {
-		log.Error(err.Error())
-	}
-}
-
-func (f5 *F5Agent) periodicSync() {
-	t := time.NewTicker(10 * time.Second)
-	defer t.Stop()
-	for {
-		<-t.C // Activate periodically
-		if err := f5.Sync(true); err != nil {
-			log.Error(err.Error())
+	syncInterval := 5 * time.Minute
+	sync := func() {
+		syncStart := time.Now()
+		err := f5.Sync()
+		elapsed := time.Now().Sub(syncStart)
+		if err != nil {
+			log.Errorf("Sync failed after %s (next iteration in %s): %s", elapsed, syncInterval, err.Error())
+			return
 		}
+		log.Infof("Sync completed in %s (next iteration in %s)", elapsed, syncInterval)
+		lastSyncTimestampGauge.WithLabelValues(agentName).Set(float64(time.Now().Unix()))
+		lastSyncDurationDurationSecondsGauge.WithLabelValues(agentName).Set(elapsed.Seconds())
 	}
-
+	sync()
+	c := time.Tick(syncInterval)
+	for {
+		<-c
+		sync()
+	}
 }
 
-func (f5 *F5Agent) Sync(pending bool) error {
+// Sync relies on the AS3 `POST /declare` endpoint, therefore all entities must
+// be included in the payload.
+func (f5 *F5Agent) Sync() error {
+	log.Info("Skipping for now.")
+	return nil
 	adc := as3.ADC{SchemaVersion: "3.22.0"}
 
-	// Tenants
+	//
 	response, err := f5.rpc.GetDomains(context.Background(), &server.SearchRequest{
 		Provider:       "f5",
 		PageNumber:     0,
 		ResultPerPage:  1000,
 		FullyPopulated: true,
-		Pending:        pending,
 	})
 	if err != nil {
 		return err
@@ -198,46 +245,49 @@ func (f5 *F5Agent) Sync(pending bool) error {
 }
 
 func postDeclaration(v interface{}) error {
-	js, err := json.MarshalIndent(v, "", "\t")
-	if err != nil {
-		return err
-	}
-
-	log.Infof("\n%s\n", string(js))
-
-	session, err := GetBigIPSession()
-	if err != nil {
-		return err
-	}
-	req := &bigip.APIRequest{
-		Method:      "post",
-		URL:         "mgmt/shared/appsvcs/declare",
-		Body:        string(js),
-		ContentType: "application/json",
-	}
-	resp, err := session.APICall(req)
-	if err != nil {
-		print(err)
-	}
-
-	var prettyJSON bytes.Buffer
-	if err := json.Indent(&prettyJSON, resp, "", "\t"); err != nil {
-		return err
-	}
-	log.Info(prettyJSON.String())
-
-	var response as3.Response
-	if err := json.Unmarshal(resp, &response); err != nil {
-		return err
-	}
-
-	for _, result := range response.Results {
-		if result.Code != 200 {
-			return fmt.Errorf("failed post! %s", result.Message)
-		} else {
-			log.Infof("succeeded: %s", result.Tenant)
+	return fmt.Errorf("TO BE FIXED")
+	/*
+		js, err := json.MarshalIndent(v, "", "\t")
+		if err != nil {
+			return err
 		}
-	}
 
-	return nil
+		log.Infof("\n%s\n", string(js))
+
+		session, err := GetBigIPSession()
+		if err != nil {
+			return err
+		}
+		req := &bigip.APIRequest{
+			Method:      "post",
+			URL:         "mgmt/shared/appsvcs/declare",
+			Body:        string(js),
+			ContentType: "application/json",
+		}
+		resp, err := session.APICall(req)
+		if err != nil {
+			print(err)
+		}
+
+		var prettyJSON bytes.Buffer
+		if err := json.Indent(&prettyJSON, resp, "", "\t"); err != nil {
+			return err
+		}
+		log.Info(prettyJSON.String())
+
+		var response as3.Response
+		if err := json.Unmarshal(resp, &response); err != nil {
+			return err
+		}
+
+		for _, result := range response.Results {
+			if result.Code != 200 {
+				return fmt.Errorf("failed post! %s", result.Message)
+			} else {
+				log.Infof("succeeded: %s", result.Tenant)
+			}
+		}
+
+		return nil
+	*/
 }
