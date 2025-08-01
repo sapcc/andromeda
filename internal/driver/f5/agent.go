@@ -94,14 +94,13 @@ func ExecuteF5Agent() error {
 		server.NewRPCServerClient(client),
 	}
 
-	log.Info("Exiting for now.")
-	os.Exit(0)
-
 	srv := rpc.NewServer("andromeda-f5-agent", stormrpc.WithNatsConn(nc))
 	fs := &FullSync{&f5}
+
+	// Allows the sync to be invoked over RPC via an HTTP handler in
+	// Andromeda Server (see `m31ctl sync`)
 	srv.Handle("andromeda.sync", fs.FullSync)
 
-	go f5.periodicSync()
 	go f5.fullSync()
 	go func() {
 		_ = srv.Run()
@@ -122,33 +121,36 @@ func ExecuteF5Agent() error {
 }
 
 func (f5 *F5Agent) fullSync() {
-	if err := f5.Sync(false); err != nil {
-		log.Error(err.Error())
-	}
-}
-
-func (f5 *F5Agent) periodicSync() {
-	t := time.NewTicker(10 * time.Second)
-	defer t.Stop()
-	for {
-		<-t.C // Activate periodically
-		if err := f5.Sync(true); err != nil {
-			log.Error(err.Error())
+	syncInterval := 5 * time.Minute
+	sync := func() {
+		if err := f5.Sync(); err != nil {
+			log.Errorf("Sync failed (next iteration in %s): %s", syncInterval, err.Error())
+			return
 		}
+		log.Infof("Sync completed (next iteration in %s)", syncInterval)
+		// TODO: write a `andromeda_last_sync{agent: f5}` gauge (timestamp) metric that can be alerted on
 	}
-
+	sync()
+	c := time.Tick(syncInterval)
+	for {
+		<-c
+		sync()
+	}
 }
 
-func (f5 *F5Agent) Sync(pending bool) error {
+// Sync relies on the AS3 `POST /declare` endpoint, therefore all entities must
+// be included in the payload.
+func (f5 *F5Agent) Sync() error {
+	log.Info("Skipping for now.")
+	return nil
 	adc := as3.ADC{SchemaVersion: "3.22.0"}
 
-	// Tenants
+	//
 	response, err := f5.rpc.GetDomains(context.Background(), &server.SearchRequest{
 		Provider:       "f5",
 		PageNumber:     0,
 		ResultPerPage:  1000,
 		FullyPopulated: true,
-		Pending:        pending,
 	})
 	if err != nil {
 		return err
