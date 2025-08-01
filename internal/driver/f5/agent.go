@@ -16,6 +16,7 @@ import (
 	"github.com/actatum/stormrpc"
 	"github.com/apex/log"
 	"github.com/nats-io/nats.go"
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/rpc"
@@ -27,6 +28,26 @@ import (
 	"github.com/sapcc/andromeda/internal/driver/f5/as3"
 )
 
+const agentName = "f5-as3-declaration"
+
+var (
+	lastSyncTimestampGauge = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "andromeda_agent_last_sync_timestamp",
+			Help: "Last time an agent has successfully completed its sync loop (sync completion timestamp)",
+		},
+		[]string{"agent"},
+	)
+
+	lastSyncDurationDurationSecondsGauge = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "andromeda_agent_last_sync_duration_seconds",
+			Help: "Last time an agent has successfully completed its sync loop (sync duration in seconds)",
+		},
+		[]string{"agent"},
+	)
+)
+
 type F5Agent struct {
 	bigIP *bigip.BigIP
 	rpc   server.RPCServerClient
@@ -34,6 +55,11 @@ type F5Agent struct {
 
 type FullSync struct {
 	f5 *F5Agent
+}
+
+func init() {
+	prometheus.MustRegister(lastSyncTimestampGauge)
+	prometheus.MustRegister(lastSyncDurationDurationSecondsGauge)
 }
 
 // Method can be of any name
@@ -123,12 +149,16 @@ func ExecuteF5Agent() error {
 func (f5 *F5Agent) fullSync() {
 	syncInterval := 5 * time.Minute
 	sync := func() {
-		if err := f5.Sync(); err != nil {
-			log.Errorf("Sync failed (next iteration in %s): %s", syncInterval, err.Error())
+		syncStart := time.Now()
+		err := f5.Sync()
+		elapsed := time.Now().Sub(syncStart)
+		if err != nil {
+			log.Errorf("Sync failed in %s (next iteration in %s): %s", elapsed, syncInterval, err.Error())
 			return
 		}
-		log.Infof("Sync completed (next iteration in %s)", syncInterval)
-		// TODO: write a `andromeda_last_sync{agent: f5}` gauge (timestamp) metric that can be alerted on
+		log.Infof("Sync completed in %s (next iteration in %s)", elapsed, syncInterval)
+		lastSyncTimestampGauge.WithLabelValues(agentName).Set(float64(time.Now().Unix()))
+		lastSyncDurationDurationSecondsGauge.WithLabelValues(agentName).Set(elapsed.Seconds())
 	}
 	sync()
 	c := time.Tick(syncInterval)
