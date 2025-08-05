@@ -14,8 +14,10 @@ func UpsertF5Datacenters(db *sqlx.DB, f5DCs []config.F5Datacenter) {
 		log.Warn("No F5 datacenters provided in config file; skipping 'upsert F5 datacenters' operation")
 		return
 	}
-	insertQuery := db.Rebind(`INSERT INTO datacenter (admin_state_up, project_id, provider, name, city, continent, country)
-	                VALUES (1, 0, "f5", ?, ?, ?, ?)`)
+	insertQuery := db.Rebind(`INSERT INTO datacenter
+                        (provisioning_status, admin_state_up, project_id,
+			 provider, name, city, continent, country)
+	                VALUES ("ACTIVE", 1, 0, "f5", ?, ?, ?, ?)`)
 	selectQuery := db.Rebind(`SELECT id FROM datacenter WHERE provider = "f5" AND name = ? LIMIT 1`)
 	updateQuery := db.Rebind(`UPDATE datacenter SET city = ?, continent = ?, country = ? WHERE id = ? LIMIT 1`)
 	log.Infof("Upserting %d F5 datacenters...", len(f5DCs))
