@@ -6,6 +6,7 @@ package f5
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -21,6 +22,7 @@ import (
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/rpc"
 	"github.com/sapcc/andromeda/internal/rpc/server"
+	"github.com/sapcc/andromeda/internal/rpcmodels"
 	"github.com/sapcc/andromeda/internal/utils"
 
 	"github.com/f5devcentral/go-bigip"
@@ -168,79 +170,129 @@ func (f5 *F5Agent) fullSync() {
 	}
 }
 
-// Sync relies on the AS3 `POST /declare` endpoint, therefore all entities must
-// be included in the payload.
-func (f5 *F5Agent) Sync() error {
-	log.Info("Skipping for now.")
-	return nil
-	adc := as3.ADC{SchemaVersion: "3.22.0"}
-
-	//
-	response, err := f5.rpc.GetDomains(context.Background(), &server.SearchRequest{
+func (f5 *F5Agent) getDatacenters() ([]*rpcmodels.Datacenter, error) {
+	// AS3 POST /declare payload must include *all* datacenters
+	res, err := f5.rpc.GetDatacenters(context.Background(), &server.SearchRequest{
 		Provider:       "f5",
 		PageNumber:     0,
 		ResultPerPage:  1000,
 		FullyPopulated: true,
 	})
 	if err != nil {
-		return err
+		return nil, fmt.Errorf("rpc.GetDatacenters failed: %s", err)
 	}
+	if res == nil || len(res.GetResponse()) == 0 {
+		return nil, fmt.Errorf("no F5 datacenters found")
+	}
+	log.Debugf("rpc.GetDatacenters returned %d items", len(res.GetResponse()))
+	return res.GetResponse(), nil
+}
 
-	if response.GetResponse() == nil {
-		return nil
+func (f5 *F5Agent) getDomains() ([]*rpcmodels.Domain, error) {
+	// AS3 POST /declare payload must include *all* domains
+	res, err := f5.rpc.GetDomains(context.Background(), &server.SearchRequest{
+		Provider:       "f5",
+		PageNumber:     0,
+		ResultPerPage:  1000, // TODO: make it possible to go over all results
+		FullyPopulated: true,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("rpc.GetDomains failed: %s", err)
 	}
-	common, err := f5.GetCommonDeclaration()
+	if res == nil || len(res.GetResponse()) == 0 {
+		return nil, fmt.Errorf("no F5 domains found")
+	}
+	log.Debugf("rpc.GetDomains returned %d items", len(res.GetResponse()))
+	return res.GetResponse(), nil
+}
+
+func (f5 *F5Agent) getMembers() ([]*rpcmodels.Member, error) {
+	// AS3 POST /declare payload must include *all* members (servers)
+	res, err := f5.rpc.GetMembers(context.Background(), &server.SearchRequest{
+		Provider:      "f5",
+		PageNumber:    0,
+		ResultPerPage: 1000, // TODO: make it possible to go over all results
+	})
+	if err != nil {
+		return nil, fmt.Errorf("rpc.GetMembers failed: %s", err)
+	}
+	if res == nil || len(res.GetResponse()) == 0 {
+		return nil, fmt.Errorf("no F5 members found")
+	}
+	log.Debugf("rpc.GetMembers returned %d items", len(res.GetResponse()))
+	return res.GetResponse(), nil
+}
+
+// Sync relies on the AS3 `POST /declare` endpoint, therefore all entities must
+// be included in the payload.
+func (f5 *F5Agent) Sync() error {
+	adc := as3.ADC{SchemaVersion: "3.22.0"}
+	datacenters, err := f5.getDatacenters()
 	if err != nil {
 		return err
 	}
-	tenant, err := f5.GetTenantDeclaration(response.GetResponse())
+	common, err := f5.GetCommonTenantDeclaration(datacenters)
 	if err != nil {
 		return err
 	}
-
-	adc.AddTenant("ExampleTenant", *tenant)
+	/*
+		tenant, err := f5.GetProjectTenantDeclaration(response.GetResponse())
+		if err != nil {
+			return err
+		}
+	*/
+	// adc.AddTenant("ExampleTenant", *tenant)
 	adc.AddTenant("Common", *common)
-	if err := postDeclaration(adc); err != nil {
-		return err
+	jsonDoc, err := json.Marshal(adc)
+	if err != nil {
+		panic(err)
 	}
+	fmt.Println(string(jsonDoc))
+	/*
+		if err := postDeclaration(adc); err != nil {
+			return err
+		}
+	*/
 
-	var prov []*server.ProvisioningStatusRequest_ProvisioningStatus
-	for _, domain := range response.GetResponse() {
-		log.Infof("%+v", domain)
-		prov = append(prov, &server.ProvisioningStatusRequest_ProvisioningStatus{
-			Id:     domain.GetId(),
-			Model:  server.ProvisioningStatusRequest_ProvisioningStatus_DOMAIN,
-			Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE,
-		})
-
-		for _, pool := range domain.GetPools() {
+	/*
+		var prov []*server.ProvisioningStatusRequest_ProvisioningStatus
+		for _, domain := range response.GetResponse() {
+			log.Infof("%+v", domain)
 			prov = append(prov, &server.ProvisioningStatusRequest_ProvisioningStatus{
-				Id:     pool.GetId(),
-				Model:  server.ProvisioningStatusRequest_ProvisioningStatus_POOL,
+				Id:     domain.GetId(),
+				Model:  server.ProvisioningStatusRequest_ProvisioningStatus_DOMAIN,
 				Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE,
 			})
-			for _, member := range pool.GetMembers() {
+
+			for _, pool := range domain.GetPools() {
 				prov = append(prov, &server.ProvisioningStatusRequest_ProvisioningStatus{
-					Id:     member.GetId(),
-					Model:  server.ProvisioningStatusRequest_ProvisioningStatus_MEMBER,
+					Id:     pool.GetId(),
+					Model:  server.ProvisioningStatusRequest_ProvisioningStatus_POOL,
 					Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE,
 				})
-			}
-			for _, monitor := range pool.GetMonitors() {
-				prov = append(prov, &server.ProvisioningStatusRequest_ProvisioningStatus{
-					Id:     monitor.GetId(),
-					Model:  server.ProvisioningStatusRequest_ProvisioningStatus_MONITOR,
-					Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE,
-				})
+				for _, member := range pool.GetMembers() {
+					prov = append(prov, &server.ProvisioningStatusRequest_ProvisioningStatus{
+						Id:     member.GetId(),
+						Model:  server.ProvisioningStatusRequest_ProvisioningStatus_MEMBER,
+						Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE,
+					})
+				}
+				for _, monitor := range pool.GetMonitors() {
+					prov = append(prov, &server.ProvisioningStatusRequest_ProvisioningStatus{
+						Id:     monitor.GetId(),
+						Model:  server.ProvisioningStatusRequest_ProvisioningStatus_MONITOR,
+						Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE,
+					})
+				}
 			}
 		}
-	}
-	resp, err := f5.rpc.UpdateProvisioningStatus(context.Background(),
-		&server.ProvisioningStatusRequest{ProvisioningStatus: prov})
-	if err != nil {
-		return err
-	}
-	log.Infof("%+v", resp)
+		resp, err := f5.rpc.UpdateProvisioningStatus(context.Background(),
+			&server.ProvisioningStatusRequest{ProvisioningStatus: prov})
+		if err != nil {
+			return err
+		}
+		log.Infof("%+v", resp)
+	*/
 	return nil
 }
 

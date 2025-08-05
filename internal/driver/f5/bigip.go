@@ -5,77 +5,65 @@
 package f5
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/url"
 	"strings"
 
-	"github.com/sapcc/andromeda/internal/rpc/server"
-
+	"github.com/apex/log"
 	"github.com/f5devcentral/go-bigip"
 
-	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/driver/f5/as3"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
 )
 
-func (f5 *F5Agent) GetCommonDeclaration() (*as3.Tenant, error) {
-	var virtualServers []as3.GSLBVirtualServer
-	res, err := f5.rpc.GetMembers(context.Background(), &server.SearchRequest{
-		Provider:      "f5",
-		PageNumber:    0,
-		ResultPerPage: 1000, // TODO: make it possible to go over all results
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	for _, member := range res.GetResponse() {
-
-		virtualServer := as3.GSLBVirtualServer{
-			Name:    "member_" + member.GetId(),
-			Address: member.Address,
-			Port:    member.Port,
-			Enabled: member.AdminStateUp,
-		}
-		virtualServers = append(virtualServers, virtualServer)
-	}
-
-	device := as3.GSLBServerDevice{
-		Address: config.Global.F5Config.DNSServerAddress,
-	}
-
-	gsblServer := as3.GSLBServer{
-		Class: "GSLB_Server",
-		DataCenter: as3.PointerGSLBDataCenter{
-			Use: "testDataCenter",
-		},
-		Devices:                  []as3.GSLBServerDevice{device},
-		VirtualServers:           virtualServers,
-		SnmpProbeEnabled:         true,
-		PathProbeEnabled:         true,
-		ServiceCheckProbeEnabled: true,
-		Monitors: []as3.PointerGSLBMonitor{{
-			BigIP: "/Common/gateway_icmp",
-		}},
-	}
-
-	datacenter := as3.GSLBDatacenter{
-		Class:  "GSLB_Data_Center",
-		Label:  "Test Datacenter",
-		Remark: "Datacenter to test",
-	}
-
-	application := as3.Application{
-		Template: "shared",
-	}
-	application.AddEntity("testServer", gsblServer)
-	application.AddEntity("testDataCenter", datacenter)
-
+func (f5 *F5Agent) GetCommonTenantDeclaration(datacenters []*rpcmodels.Datacenter) (*as3.Tenant, error) {
 	tenant := as3.Tenant{}
-	tenant.AddApplication("Shared", application)
+	application := as3.Application{Template: "shared"}
+	for _, datacenter := range datacenters {
+		log.Debugf("Datacenter: %q", datacenter.Name)
+		application.AddEntity(datacenter.Name, as3.GSLBServer{})
+	}
+	/*
+		var virtualServers []as3.GSLBVirtualServer
+		for _, member := range members {
+			virtualServer := as3.GSLBVirtualServer{
+				Name:    "member_" + member.GetId(),
+				Address: member.Address,
+				Port:    member.Port,
+				Enabled: member.AdminStateUp,
+			}
+			virtualServers = append(virtualServers, virtualServer)
+		}
 
+		device := as3.GSLBServerDevice{
+			Address: config.Global.F5Config.DNSServerAddress,
+		}
+
+		gsblServer := as3.GSLBServer{
+			Class: "GSLB_Server",
+			DataCenter: as3.PointerGSLBDataCenter{
+				Use: "testDataCenter",
+			},
+			Devices:                  []as3.GSLBServerDevice{device},
+			VirtualServers:           virtualServers,
+			SnmpProbeEnabled:         true,
+			PathProbeEnabled:         true,
+			ServiceCheckProbeEnabled: true,
+			Monitors: []as3.PointerGSLBMonitor{{
+				BigIP: "/Common/gateway_icmp",
+			}},
+		}
+
+		datacenter := as3.GSLBDatacenter{
+			Class:  "GSLB_Data_Center",
+			Label:  "Test Datacenter",
+			Remark: "Datacenter to test",
+		}
+	*/
+	//application.AddEntity("testServer", gsblServer)
+
+	tenant.AddApplication("Shared", application)
 	return &tenant, nil
 }
 
@@ -88,7 +76,7 @@ func getPoolLbMode(mode string) string {
 	}
 }
 
-func (f5 *F5Agent) GetTenantDeclaration(domains []*rpcmodels.Domain) (*as3.Tenant, error) {
+func (f5 *F5Agent) GetProjectTenantDeclaration(domains []*rpcmodels.Domain) (*as3.Tenant, error) {
 	application := as3.Application{}
 	for _, domain := range domains {
 		var as3poolsPtr []as3.PointerGSLBPool

@@ -346,6 +346,7 @@ type Datacenter struct {
 	Provider           string                 `protobuf:"bytes,11,opt,name=provider,proto3" json:"provider,omitempty"`
 	Meta               int32                  `protobuf:"varint,12,opt,name=meta,proto3" json:"meta,omitempty"`
 	ProjectId          string                 `protobuf:"bytes,13,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	Name               string                 `protobuf:"bytes,14,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -467,6 +468,13 @@ func (x *Datacenter) GetMeta() int32 {
 func (x *Datacenter) GetProjectId() string {
 	if x != nil {
 		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *Datacenter) GetName() string {
+	if x != nil {
+		return x.Name
 	}
 	return ""
 }
@@ -820,7 +828,7 @@ const file_internal_rpcmodels_rpc_models_proto_rawDesc = "" +
 	"\x0eadmin_state_up\x18\x02 \x01(\bR\fadminStateUp\x12!\n" +
 	"\amembers\x18\x03 \x03(\v2\a.MemberR\amembers\x12$\n" +
 	"\bmonitors\x18\x04 \x03(\v2\b.MonitorR\bmonitors\x12/\n" +
-	"\x13provisioning_status\x18\x05 \x01(\tR\x12provisioningStatus\"\x8a\x03\n" +
+	"\x13provisioning_status\x18\x05 \x01(\tR\x12provisioningStatus\"\x9e\x03\n" +
 	"\n" +
 	"Datacenter\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12$\n" +
@@ -837,7 +845,8 @@ const file_internal_rpcmodels_rpc_models_proto_rawDesc = "" +
 	"\bprovider\x18\v \x01(\tR\bprovider\x12\x12\n" +
 	"\x04meta\x18\f \x01(\x05R\x04meta\x12\x1d\n" +
 	"\n" +
-	"project_id\x18\r \x01(\tR\tprojectId\"P\n" +
+	"project_id\x18\r \x01(\tR\tprojectId\x12\x12\n" +
+	"\x04name\x18\x0e \x01(\tR\x04name\"P\n" +
 	"\x10GeomapAssignment\x12\x1e\n" +
 	"\n" +
 	"datacenter\x18\x01 \x01(\tR\n" +

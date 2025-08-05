@@ -89,7 +89,7 @@ func (u *RPCHandler) GetPools(ctx context.Context, request *SearchRequest) (*Poo
 func (u *RPCHandler) GetDatacenters(ctx context.Context, request *SearchRequest) (*DatacentersResponse, error) {
 	q := sq.
 		Select("id", "admin_state_up", "city", "state_or_province", "continent", "country", "latitude",
-			"longitude", "scope", "provisioning_status", "provider", "meta", "project_id").
+			"longitude", "scope", "provisioning_status", "provider", "meta", "project_id", "name").
 		From("datacenter").
 		Where("provider = ?", request.Provider)
 

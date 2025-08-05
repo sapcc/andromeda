@@ -204,7 +204,7 @@ type F5Config struct {
 }
 
 type F5Datacenter struct {
-	F5URI     string `yaml:"f5_uri" description:"The BigIP resource identifier (e.g. /Common/the_resource_id)"`
+	//F5URI     string `yaml:"f5_uri" description:"The BigIP resource identifier (e.g. /Common/the_resource_id)"`
 	Name      string `yaml:"name" description:"Column datacenter.name"`
 	City      string `yaml:"city" description:"Column datacenter.city"`
 	Continent string `yaml:"continent" description:"Column datacenter.continent"`
