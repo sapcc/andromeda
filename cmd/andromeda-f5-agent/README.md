@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: Copyright 2022-2025 SAP SE or an SAP affiliate company and andromeda contributors
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
 # `andromeda-f5-agent` app
 
 ## Sample AS3 API request: create/update partition
