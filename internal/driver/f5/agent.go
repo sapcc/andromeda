@@ -153,7 +153,7 @@ func (f5 *F5Agent) fullSync() {
 	sync := func() {
 		syncStart := time.Now()
 		err := f5.Sync()
-		elapsed := time.Now().Sub(syncStart)
+		elapsed := time.Since(syncStart)
 		if err != nil {
 			log.Errorf("Sync failed after %s (next iteration in %s): %s", elapsed, syncInterval, err.Error())
 			return
@@ -188,6 +188,8 @@ func (f5 *F5Agent) getDatacenters() ([]*rpcmodels.Datacenter, error) {
 	return res.GetResponse(), nil
 }
 
+/*
+// lint
 func (f5 *F5Agent) getDomains() ([]*rpcmodels.Domain, error) {
 	// AS3 POST /declare payload must include *all* domains
 	res, err := f5.rpc.GetDomains(context.Background(), &server.SearchRequest{
@@ -205,6 +207,7 @@ func (f5 *F5Agent) getDomains() ([]*rpcmodels.Domain, error) {
 	log.Debugf("rpc.GetDomains returned %d items", len(res.GetResponse()))
 	return res.GetResponse(), nil
 }
+*/
 
 func (f5 *F5Agent) getMembers(datacenterId string) ([]*rpcmodels.Member, error) {
 	// AS3 POST /declare payload must include *all* members (servers)
@@ -296,9 +299,9 @@ func (f5 *F5Agent) Sync() error {
 	return nil
 }
 
+/*
+// lint
 func postDeclaration(v interface{}) error {
-	return fmt.Errorf("TO BE FIXED")
-	/*
 		js, err := json.MarshalIndent(v, "", "\t")
 		if err != nil {
 			return err
@@ -341,5 +344,5 @@ func postDeclaration(v interface{}) error {
 		}
 
 		return nil
-	*/
 }
+*/
