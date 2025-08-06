@@ -62,7 +62,6 @@ func (u *RPCHandler) QueryxWithIds(sql string, request *SearchRequest) (*sqlx.Ro
 	}
 
 	sql = u.DB.Rebind(sql)
-	log.Debug(sql)
 	return u.DB.Queryx(sql, args...)
 }
 

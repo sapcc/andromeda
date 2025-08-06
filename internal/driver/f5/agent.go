@@ -231,17 +231,6 @@ func (f5 *F5Agent) Sync() error {
 	if err != nil {
 		return err
 	}
-	for _, datacenter := range datacenters {
-		members, err := f5.getMembers(datacenter.Id)
-		if err != nil {
-			return err
-		}
-		log.Infof("Found %d members for datacenter [id = %s] [name = %s]", len(members), datacenter.Id, datacenter.Name)
-		for _, member := range members {
-			fmt.Println("Member: %#v", member)
-		}
-	}
-	return nil
 	common, err := f5.GetCommonTenantDeclaration(datacenters)
 	if err != nil {
 		return err

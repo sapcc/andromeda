@@ -21,48 +21,24 @@ func (f5 *F5Agent) GetCommonTenantDeclaration(datacenters []*rpcmodels.Datacente
 	tenant := as3.Tenant{}
 	application := as3.Application{Template: "shared"}
 	for _, datacenter := range datacenters {
-		log.Debugf("Datacenter: %q", datacenter.Name)
-		application.AddEntity(datacenter.Name, as3.GSLBServer{})
-	}
-	/*
-		var virtualServers []as3.GSLBVirtualServer
+		log.Infof("Creating GSLBServer declaration for members of datacenter [id = %q] [name = %s]", datacenter.Id, datacenter.Name)
+		members, err := f5.getMembers(datacenter.Id)
+		if err != nil {
+			return nil, err
+		}
+		log.Infof("Found %d members for datacenter [id = %s] [name = %s]", len(members), datacenter.Id, datacenter.Name)
 		for _, member := range members {
-			virtualServer := as3.GSLBVirtualServer{
-				Name:    "member_" + member.GetId(),
-				Address: member.Address,
-				Port:    member.Port,
-				Enabled: member.AdminStateUp,
-			}
-			virtualServers = append(virtualServers, virtualServer)
+			// TODO: members that share `member.Address` must be the same GSLBServer entity
+			application.AddEntity(fmt.Sprintf("cc_andromeda_srv_%s_%s", member.Id, datacenter.Name), as3.GSLBServer{
+				Class:          "GSLB_Server",
+				ServerType:     "generic-host",
+				DataCenter:     as3.PointerGSLBDataCenter{BigIP: "/Common/" + datacenter.Name},
+				Devices:        []as3.GSLBServerDevice{{Address: member.Address}},
+				Monitors:       []as3.PointerGSLBMonitor{{BigIP: "/Common/tcp"}},
+				VirtualServers: []as3.GSLBVirtualServer{{Address: member.Address, Port: member.Port}},
+			})
 		}
-
-		device := as3.GSLBServerDevice{
-			Address: config.Global.F5Config.DNSServerAddress,
-		}
-
-		gsblServer := as3.GSLBServer{
-			Class: "GSLB_Server",
-			DataCenter: as3.PointerGSLBDataCenter{
-				Use: "testDataCenter",
-			},
-			Devices:                  []as3.GSLBServerDevice{device},
-			VirtualServers:           virtualServers,
-			SnmpProbeEnabled:         true,
-			PathProbeEnabled:         true,
-			ServiceCheckProbeEnabled: true,
-			Monitors: []as3.PointerGSLBMonitor{{
-				BigIP: "/Common/gateway_icmp",
-			}},
-		}
-
-		datacenter := as3.GSLBDatacenter{
-			Class:  "GSLB_Data_Center",
-			Label:  "Test Datacenter",
-			Remark: "Datacenter to test",
-		}
-	*/
-	//application.AddEntity("testServer", gsblServer)
-
+	}
 	tenant.AddApplication("Shared", application)
 	return &tenant, nil
 }

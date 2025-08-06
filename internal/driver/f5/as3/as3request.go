@@ -163,16 +163,14 @@ type GSLBMonitorTCP GSLBMonitor
 type GSLBMonitorUDP GSLBMonitor
 
 type GSLBServer struct {
-	Class                    string                `json:"class"`
-	Label                    string                `json:"label,omitempty"`
-	Remark                   string                `json:"remark,omitempty"`
-	DataCenter               PointerGSLBDataCenter `json:"dataCenter,omitempty"`
-	Devices                  []GSLBServerDevice    `json:"devices,omitempty"`
-	VirtualServers           []GSLBVirtualServer   `json:"virtualServers,omitempty"`
-	Monitors                 []PointerGSLBMonitor  `json:"monitors,omitempty"`
-	ServiceCheckProbeEnabled bool                  `json:"serviceCheckProbeEnabled"`
-	SnmpProbeEnabled         bool                  `json:"snmpProbeEnabled"`
-	PathProbeEnabled         bool                  `json:"pathProbeEnabled"`
+	Class          string                `json:"class"`
+	Label          string                `json:"label,omitempty"`
+	Remark         string                `json:"remark,omitempty"`
+	DataCenter     PointerGSLBDataCenter `json:"dataCenter,omitempty"`
+	Devices        []GSLBServerDevice    `json:"devices,omitempty"`
+	VirtualServers []GSLBVirtualServer   `json:"virtualServers,omitempty"`
+	Monitors       []PointerGSLBMonitor  `json:"monitors,omitempty"`
+	ServerType     string                `json:"serverType,omitempty"`
 }
 
 type GSLBServerDevice struct {
