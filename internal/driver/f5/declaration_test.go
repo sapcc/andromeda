@@ -10,32 +10,7 @@ import (
 	"github.com/sapcc/andromeda/internal/driver/f5/as3"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
-
-type mockedStore struct {
-	mock.Mock
-}
-
-func (s *mockedStore) GetDatacenters() ([]*rpcmodels.Datacenter, error) {
-	args := s.Called()
-	return args.Get(0).([]*rpcmodels.Datacenter), args.Error(1)
-}
-
-func (s *mockedStore) GetDomains() ([]*rpcmodels.Domain, error) {
-	args := s.Called()
-	return args.Get(0).([]*rpcmodels.Domain), args.Error(1)
-}
-
-func (s *mockedStore) GetMembers(datacenterId string) ([]*rpcmodels.Member, error) {
-	args := s.Called(datacenterId)
-	return args.Get(0).([]*rpcmodels.Member), args.Error(1)
-}
-
-func (s *mockedStore) GetPools() ([]*rpcmodels.Pool, error) {
-	args := s.Called()
-	return args.Get(0).([]*rpcmodels.Pool), args.Error(1)
-}
 
 func TestBuildsAS3Declaration(t *testing.T) {
 	assert := assert.New(t)
