@@ -12,32 +12,37 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestBuildsAS3Declaration(t *testing.T) {
+func TestAS3DeclarationBuilder(t *testing.T) {
 	assert := assert.New(t)
-	store := new(mockedStore)
-	store.On("GetDatacenters").Return([]*rpcmodels.Datacenter{
-		{Id: "dc1", Name: "dc1"},
-		{Id: "dc2", Name: "dc2"},
-	}, nil)
-	store.On("GetMembers", "dc1").Return([]*rpcmodels.Member{
-		{Id: "member1", Address: "200.10.0.1", Port: 80},
-	}, nil)
-	store.On("GetMembers", "dc2").Return([]*rpcmodels.Member{}, nil)
-	b := as3DeclarationBuilder{store: store}
-	declaration, err := b.Build()
-	assert.Nil(err, "failed to build the declaration")
-	expected := as3.ADC{SchemaVersion: "3.22.0"}
-	tenant := as3.Tenant{}
-	application := as3.Application{Template: "shared"}
-	application.AddEntity("cc_andromeda_srv_member1_dc1", as3.GSLBServer{
-		Class:          "GSLB_Server",
-		ServerType:     "generic-host",
-		DataCenter:     as3.PointerGSLBDataCenter{BigIP: "/Common/dc1"},
-		Devices:        []as3.GSLBServerDevice{{Address: "200.10.0.1"}},
-		Monitors:       []as3.PointerGSLBMonitor{{BigIP: "/Common/tcp"}},
-		VirtualServers: []as3.GSLBVirtualServer{{Address: "200.10.0.1", Port: 80}},
+	t.Run("Two DCs (dc1 and dc2); dc1 has one member; dc2 has no members", func(t *testing.T) {
+		store := new(mockedStore)
+		store.On("GetDatacenters").Return([]*rpcmodels.Datacenter{
+			{Id: "dc1", Name: "dc1"},
+			{Id: "dc2", Name: "dc2"},
+		}, nil)
+		store.On("GetMembers", "dc1").Return([]*rpcmodels.Member{
+			{Id: "member1", Address: "200.10.0.1", Port: 80},
+		}, nil)
+		store.On("GetMembers", "dc2").Return([]*rpcmodels.Member{}, nil)
+		b := as3DeclarationBuilder{store: store}
+		declaration, err := b.Build()
+		assert.Nil(err, "failed to build the declaration")
+		expected := as3.ADC{SchemaVersion: "3.22.0"}
+		tenant := as3.Tenant{}
+		application := as3.Application{Template: "shared"}
+		application.AddEntity("cc_andromeda_srv_member1_dc1", as3.GSLBServer{
+			Class:          "GSLB_Server",
+			ServerType:     "generic-host",
+			DataCenter:     as3.PointerGSLBDataCenter{BigIP: "/Common/dc1"},
+			Devices:        []as3.GSLBServerDevice{{Address: "200.10.0.1"}},
+			Monitors:       []as3.PointerGSLBMonitor{{BigIP: "/Common/tcp"}},
+			VirtualServers: []as3.GSLBVirtualServer{{Address: "200.10.0.1", Port: 80}},
+		})
+		tenant.AddApplication("Shared", application)
+		expected.AddTenant("Common", tenant)
+		assert.Equal(expected, declaration, "declaration built does not match expectation")
 	})
-	tenant.AddApplication("Shared", application)
-	expected.AddTenant("Common", tenant)
-	assert.Equal(expected, declaration, "declaration built does not match expectation")
+	t.Run("One DC (dc1) with 3 members; 2 out of 3 share have the same IP address", func(t *testing.T) {
+		t.Log("TODO")
+	})
 }
