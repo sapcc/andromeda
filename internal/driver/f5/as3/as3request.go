@@ -4,7 +4,9 @@
 
 package as3
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 // AS3
 type AS3 struct {
@@ -94,11 +96,18 @@ func (a Application) MarshalJSON() ([]byte, error) {
 	return json.Marshal(application)
 }
 
-func (a *Application) AddEntity(name string, entity interface{}) {
+func (a *Application) SetEntity(key string, entity interface{}) {
 	if a.entities == nil {
 		a.entities = make(map[string]interface{}, 1)
 	}
-	a.entities[name] = entity
+	a.entities[key] = entity
+}
+
+func (a *Application) GetEntity(key string) any {
+	if val, exists := a.entities[key]; exists {
+		return val
+	}
+	return nil
 }
 
 // GSLB Entities

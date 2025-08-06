@@ -30,7 +30,7 @@ func TestAS3DeclarationBuilder(t *testing.T) {
 		expected := as3.ADC{SchemaVersion: "3.22.0"}
 		tenant := as3.Tenant{}
 		application := as3.Application{Template: "shared"}
-		application.AddEntity("cc_andromeda_srv_member1_dc1", as3.GSLBServer{
+		application.SetEntity("cc_andromeda_srv_200.10.0.1_dc1", as3.GSLBServer{
 			Class:          "GSLB_Server",
 			ServerType:     "generic-host",
 			DataCenter:     as3.PointerGSLBDataCenter{BigIP: "/Common/dc1"},
@@ -42,7 +42,51 @@ func TestAS3DeclarationBuilder(t *testing.T) {
 		expected.AddTenant("Common", tenant)
 		assert.Equal(expected, declaration, "declaration built does not match expectation")
 	})
-	t.Run("One DC (dc1) with 3 members; 2 out of 3 share have the same IP address", func(t *testing.T) {
-		t.Log("TODO")
+	t.Run(`On datacenter "dc1", 2 members share an IP address on different ports`, func(t *testing.T) {
+		// GIVEN
+		// * 1 DC (dc1) with 3 members.
+		// * 2 (member1 and member3) out of 3 members share the same IP address (with different ports: 80 and 9000)
+		// EXPECT
+		// * 2 (not 3) GSLB servers
+		// * member1 and member3 correspond to the same GSLB Server
+		// * member2 gets its own GSLB Server
+		// * The member1/member3 GSLB Server has two VirtualServers (:80 and :9000).
+		store := new(mockedStore)
+		store.On("GetDatacenters").Return([]*rpcmodels.Datacenter{
+			{Id: "dc1", Name: "dc1"},
+		}, nil)
+		store.On("GetMembers", "dc1").Return([]*rpcmodels.Member{
+			{Id: "member1", Address: "200.10.0.100", Port: 80},
+			{Id: "member2", Address: "200.10.0.2", Port: 80},
+			{Id: "member3", Address: "200.10.0.100", Port: 9000},
+		}, nil)
+		b := as3DeclarationBuilder{store: store}
+		declaration, err := b.Build()
+		assert.Nil(err, "failed to build the declaration")
+		expected := as3.ADC{SchemaVersion: "3.22.0"}
+		tenant := as3.Tenant{}
+		application := as3.Application{Template: "shared"}
+		application.SetEntity("cc_andromeda_srv_200.10.0.100_dc1", as3.GSLBServer{
+			Class:      "GSLB_Server",
+			ServerType: "generic-host",
+			DataCenter: as3.PointerGSLBDataCenter{BigIP: "/Common/dc1"},
+			Devices:    []as3.GSLBServerDevice{{Address: "200.10.0.100"}},
+			Monitors:   []as3.PointerGSLBMonitor{{BigIP: "/Common/tcp"}},
+			VirtualServers: []as3.GSLBVirtualServer{
+				{Address: "200.10.0.100", Port: 80},
+				{Address: "200.10.0.100", Port: 9000},
+			},
+		})
+		application.SetEntity("cc_andromeda_srv_200.10.0.2_dc1", as3.GSLBServer{
+			Class:          "GSLB_Server",
+			ServerType:     "generic-host",
+			DataCenter:     as3.PointerGSLBDataCenter{BigIP: "/Common/dc1"},
+			Devices:        []as3.GSLBServerDevice{{Address: "200.10.0.2"}},
+			Monitors:       []as3.PointerGSLBMonitor{{BigIP: "/Common/tcp"}},
+			VirtualServers: []as3.GSLBVirtualServer{{Address: "200.10.0.2", Port: 80}},
+		})
+		tenant.AddApplication("Shared", application)
+		expected.AddTenant("Common", tenant)
+		assert.Equal(expected, declaration, "declaration built does not match expectation")
 	})
 }

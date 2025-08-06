@@ -44,7 +44,7 @@ func (f5 *F5Agent) GetProjectTenantDeclaration(domains []*rpcmodels.Domain) (*as
 			PoolLbMode:         getPoolLbMode(domain.Mode),
 			Pools:              as3poolsPtr,
 		}
-		application.AddEntity("domain_"+domain.Id, as3domain)
+		application.SetEntity("domain_"+domain.Id, as3domain)
 
 		for _, pool := range domain.GetPools() {
 			var as3PoolMembers []as3.GSLBPoolMember
@@ -86,7 +86,7 @@ func (f5 *F5Agent) GetProjectTenantDeclaration(domains []*rpcmodels.Domain) (*as
 					as3Monitor.Send = monitor.GetSend()
 					as3Monitor.Receive = monitor.GetReceive()
 				}
-				application.AddEntity("monitor_"+monitor.GetId(), as3Monitor)
+				application.SetEntity("monitor_"+monitor.GetId(), as3Monitor)
 				as3PoolMonitors = append(as3PoolMonitors, as3.PointerGSLBMonitor{Use: "monitor_" + monitor.GetId()})
 			}
 
@@ -97,7 +97,7 @@ func (f5 *F5Agent) GetProjectTenantDeclaration(domains []*rpcmodels.Domain) (*as
 				Monitors:           as3PoolMonitors,
 				ResourceRecordType: "A",
 			}
-			application.AddEntity("pool_"+pool.GetId(), as3pool)
+			application.SetEntity("pool_"+pool.GetId(), as3pool)
 		}
 	}
 

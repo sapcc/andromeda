@@ -48,17 +48,43 @@ func (b *as3DeclarationBuilder) getCommonTenant() (as3.Tenant, error) {
 		}
 		log.Infof("Found %d members for datacenter [id = %s] [name = %s]", len(members), datacenter.Id, datacenter.Name)
 		for _, member := range members {
-			// TODO: members that share `member.Address` must be the same GSLBServer entity
-			application.AddEntity(fmt.Sprintf("cc_andromeda_srv_%s_%s", member.Id, datacenter.Name), as3.GSLBServer{
-				Class:          "GSLB_Server",
-				ServerType:     "generic-host",
-				DataCenter:     as3.PointerGSLBDataCenter{BigIP: "/Common/" + datacenter.Name},
-				Devices:        []as3.GSLBServerDevice{{Address: member.Address}},
-				Monitors:       []as3.PointerGSLBMonitor{{BigIP: "/Common/tcp"}},
-				VirtualServers: []as3.GSLBVirtualServer{{Address: member.Address, Port: member.Port}},
-			})
+			memberKey := as3DeclarationGSLBServerKey(member.Address, datacenter.Name)
+			entity := application.GetEntity(memberKey)
+			switch entity {
+			case nil:
+				application.SetEntity(memberKey, as3.GSLBServer{
+					Class:          "GSLB_Server",
+					ServerType:     "generic-host",
+					DataCenter:     as3.PointerGSLBDataCenter{BigIP: "/Common/" + datacenter.Name},
+					Devices:        []as3.GSLBServerDevice{{Address: member.Address}},
+					Monitors:       []as3.PointerGSLBMonitor{{BigIP: "/Common/tcp"}},
+					VirtualServers: []as3.GSLBVirtualServer{{Address: member.Address, Port: member.Port}},
+				})
+			default:
+				gslbServer := entity.(as3.GSLBServer)
+				mustAddVirtualServer := true
+				for _, vs := range gslbServer.VirtualServers {
+					if vs.Port == member.Port {
+						mustAddVirtualServer = false
+						break
+					}
+				}
+				if mustAddVirtualServer {
+					gslbServer.VirtualServers = append(gslbServer.VirtualServers,
+						as3.GSLBVirtualServer{
+							Address: member.Address,
+							Port:    member.Port,
+						},
+					)
+					application.SetEntity(memberKey, gslbServer)
+				}
+			}
 		}
 	}
 	tenant.AddApplication("Shared", application)
 	return tenant, nil
+}
+
+func as3DeclarationGSLBServerKey(memberAddress, datacenterName string) string {
+	return fmt.Sprintf("cc_andromeda_srv_%s_%s", memberAddress, datacenterName)
 }
