@@ -22,12 +22,9 @@ import (
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/rpc"
 	"github.com/sapcc/andromeda/internal/rpc/server"
-	"github.com/sapcc/andromeda/internal/rpcmodels"
 	"github.com/sapcc/andromeda/internal/utils"
 
 	"github.com/f5devcentral/go-bigip"
-
-	"github.com/sapcc/andromeda/internal/driver/f5/as3"
 )
 
 const agentName = "f5-as3-declaration"
@@ -51,8 +48,8 @@ var (
 )
 
 type F5Agent struct {
-	bigIP *bigip.BigIP
-	rpc   server.RPCServerClient
+	bigIP              *bigip.BigIP
+	declarationBuilder AS3DeclarationBuilder
 }
 
 type FullSync struct {
@@ -119,7 +116,11 @@ func ExecuteF5Agent() error {
 	// Create F5 worker instance with Server RPC interface
 	f5 := F5Agent{
 		activeF5Session,
-		server.NewRPCServerClient(client),
+		NewAS3DeclarationBuilder(
+			NewAndromedaF5Store(
+				server.NewRPCServerClient(client),
+			),
+		),
 	}
 
 	srv := rpc.NewServer("andromeda-f5-agent", stormrpc.WithNatsConn(nc))
@@ -170,85 +171,16 @@ func (f5 *F5Agent) fullSync() {
 	}
 }
 
-func (f5 *F5Agent) getDatacenters() ([]*rpcmodels.Datacenter, error) {
-	// AS3 POST /declare payload must include *all* datacenters
-	res, err := f5.rpc.GetDatacenters(context.Background(), &server.SearchRequest{
-		Provider:       "f5",
-		PageNumber:     0,
-		ResultPerPage:  1000,
-		FullyPopulated: true,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("rpc.GetDatacenters failed: %s", err)
-	}
-	if res == nil || len(res.GetResponse()) == 0 {
-		return nil, fmt.Errorf("no F5 datacenters found")
-	}
-	log.Debugf("rpc.GetDatacenters returned %d items", len(res.GetResponse()))
-	return res.GetResponse(), nil
-}
-
-/*
-// lint
-func (f5 *F5Agent) getDomains() ([]*rpcmodels.Domain, error) {
-	// AS3 POST /declare payload must include *all* domains
-	res, err := f5.rpc.GetDomains(context.Background(), &server.SearchRequest{
-		Provider:       "f5",
-		PageNumber:     0,
-		ResultPerPage:  1000, // TODO: make it possible to go over all results
-		FullyPopulated: true,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("rpc.GetDomains failed: %s", err)
-	}
-	if res == nil || len(res.GetResponse()) == 0 {
-		return nil, fmt.Errorf("no F5 domains found")
-	}
-	log.Debugf("rpc.GetDomains returned %d items", len(res.GetResponse()))
-	return res.GetResponse(), nil
-}
-*/
-
-func (f5 *F5Agent) getMembers(datacenterId string) ([]*rpcmodels.Member, error) {
-	// AS3 POST /declare payload must include *all* members (servers)
-	res, err := f5.rpc.GetMembers(context.Background(), &server.SearchRequest{
-		DatacenterId:  datacenterId,
-		PageNumber:    0,
-		ResultPerPage: 1000, // TODO: make it possible to go over all results
-	})
-	if err != nil {
-		return nil, fmt.Errorf("rpc.GetMembers failed: %s", err)
-	}
-	if res == nil {
-		return nil, fmt.Errorf("rpc.GetMembers response is nil")
-	}
-	log.Debugf("rpc.GetMembers returned %d items", len(res.GetResponse()))
-	return res.GetResponse(), nil
-}
-
 // Sync relies on the AS3 `POST /declare` endpoint, therefore all entities must
 // be included in the payload.
 func (f5 *F5Agent) Sync() error {
-	adc := as3.ADC{SchemaVersion: "3.22.0"}
-	datacenters, err := f5.getDatacenters()
+	declaration, err := f5.declarationBuilder.Build()
 	if err != nil {
 		return err
 	}
-	common, err := f5.GetCommonTenantDeclaration(datacenters)
+	jsonDoc, err := json.Marshal(declaration)
 	if err != nil {
 		return err
-	}
-	/*
-		tenant, err := f5.GetProjectTenantDeclaration(response.GetResponse())
-		if err != nil {
-			return err
-		}
-	*/
-	// adc.AddTenant("ExampleTenant", *tenant)
-	adc.AddTenant("Common", *common)
-	jsonDoc, err := json.Marshal(adc)
-	if err != nil {
-		panic(err)
 	}
 	fmt.Println(string(jsonDoc))
 	/*
