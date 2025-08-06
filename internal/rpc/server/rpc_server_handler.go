@@ -25,6 +25,9 @@ type RPCHandler struct {
 // QueryxWithIds run sql query if optional WHERE condition based on IDs
 func (u *RPCHandler) QueryxWithIds(sql string, request *SearchRequest) (*sqlx.Rows, error) {
 	args := []interface{}{}
+	if len(request.Provider) > 0 {
+		args = append(args, request.Provider)
+	}
 	if len(request.DatacenterId) > 0 {
 		args = append(args, request.DatacenterId)
 	}
