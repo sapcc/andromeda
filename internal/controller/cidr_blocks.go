@@ -5,22 +5,23 @@
 package controller
 
 import (
-	"encoding/json"
-	"fmt"
+	"context"
+	"time"
 
-	"github.com/actatum/stormrpc"
+	"github.com/apex/log"
 	"github.com/go-openapi/runtime/middleware"
 
 	"github.com/sapcc/andromeda/internal/auth"
+	"github.com/sapcc/andromeda/internal/rpc/agent/akamai"
+	"github.com/sapcc/andromeda/internal/rpcmodels"
 	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/restapi/operations/administrative"
 )
 
-type cidrBlocks []map[string]any
-
 type CidrBlocksController struct {
 	CommonController
-	cache map[string]cidrBlocks
+	cache map[string]*rpcmodels.GetCidrsResponse
+	agent akamai.RPCAgentAkamaiClient
 }
 
 // GetCidrBlocks GET /cidr-blocks
@@ -35,23 +36,18 @@ func (c CidrBlocksController) GetCidrBlocks(params administrative.GetCidrBlocksP
 	}
 
 	// Check if the CIDR blocks are already cached
-	var res cidrBlocks
+	var res *rpcmodels.GetCidrsResponse
 	var ok bool
 	if res, ok = c.cache[provider]; !ok {
-		subject := fmt.Sprintf("andromeda.get_cidrs.%s", provider)
-		r, err := stormrpc.NewRequest(subject, nil)
-		if err != nil {
-			panic(err)
+		ctx, cancel := context.WithTimeout(params.HTTPRequest.Context(), 5*time.Second)
+		defer cancel()
+
+		var err error
+		if res, err = c.agent.GetCidrs(ctx, &rpcmodels.GetCidrsRequest{}); err != nil {
+			log.WithError(err).Error("failed to get cidr blocks")
+			return administrative.NewGetCidrBlocksDefault(408).WithPayload(utils.TryAgainLater)
 		}
 
-		resp := c.rpc.Do(params.HTTPRequest.Context(), r)
-		if resp.Err != nil {
-			panic(resp.Err)
-		}
-
-		if err = json.Unmarshal(resp.Data, &res); err != nil {
-			panic(err)
-		}
 		c.cache[provider] = res
 	}
 	return administrative.NewGetCidrBlocksOK().WithPayload(res)
