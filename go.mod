@@ -6,7 +6,7 @@ module github.com/sapcc/andromeda
 
 go 1.24
 
-toolchain go1.24.4
+toolchain go1.24.5
 
 require (
 	github.com/Boostport/migration v1.1.2
@@ -29,7 +29,7 @@ require (
 	github.com/go-openapi/validate v0.24.0
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/gophercloud/gophercloud/v2 v2.7.0
-	github.com/gophercloud/utils/v2 v2.0.0-20250617123236-b0c67de63928
+	github.com/gophercloud/utils/v2 v2.0.0-20250711132455-9770683b100a
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/iancoleman/strcase v0.3.0
 	github.com/jackc/pgerrcode v0.0.0-20240316143900-6e2875d9b438
@@ -43,8 +43,8 @@ require (
 	github.com/nats-io/nats.go v1.43.0
 	github.com/prometheus/client_golang v1.22.0
 	github.com/rs/cors v1.11.1
-	github.com/sapcc/go-api-declarations v1.16.0
-	github.com/sapcc/go-bits v0.0.0-20250710190843-788fa8ba727b
+	github.com/sapcc/go-api-declarations v1.17.1
+	github.com/sapcc/go-bits v0.0.0-20250722084227-7a82273f02ae
 	github.com/scottdware/go-bigip v0.0.0-20240809002616-deb9b0aff84a
 	github.com/slok/go-http-metrics v0.13.0
 	github.com/stretchr/testify v1.10.0
@@ -111,9 +111,10 @@ require (
 	go.opentelemetry.io/otel/trace v1.24.0 // indirect
 	go.uber.org/ratelimit v0.3.1 // indirect
 	golang.org/x/crypto v0.39.0 // indirect
-	golang.org/x/sync v0.15.0 // indirect
-	golang.org/x/sys v0.33.0 // indirect
-	golang.org/x/text v0.26.0 // indirect
+	golang.org/x/sync v0.16.0 // indirect
+	golang.org/x/sys v0.34.0 // indirect
+	golang.org/x/term v0.32.0 // indirect
+	golang.org/x/text v0.27.0 // indirect
 	golang.org/x/time v0.11.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 )
