@@ -24,7 +24,10 @@ type RPCHandler struct {
 
 // QueryxWithIds run sql query if optional WHERE condition based on IDs
 func (u *RPCHandler) QueryxWithIds(sql string, request *SearchRequest) (*sqlx.Rows, error) {
-	args := []interface{}{request.Provider}
+	args := []interface{}{}
+	if len(request.DatacenterId) > 0 {
+		args = append(args, request.DatacenterId)
+	}
 	if len(request.Ids) > 0 {
 		if strings.Contains(sql, "WHERE") {
 			sql += ` AND id IN (?)`
@@ -41,19 +44,31 @@ func (u *RPCHandler) QueryxWithIds(sql string, request *SearchRequest) (*sqlx.Ro
 	}
 
 	// Provider filter
-	if strings.Contains(sql, "WHERE") {
-		sql += ` AND provider = ?`
-	} else {
-		sql += ` WHERE provider = ?`
+	if len(request.Provider) > 0 {
+		if strings.Contains(sql, "WHERE") {
+			sql += ` AND provider = ?`
+		} else {
+			sql += ` WHERE provider = ?`
+		}
+	}
+
+	// Datacenter filter
+	if len(request.DatacenterId) > 0 {
+		if strings.Contains(sql, "WHERE") {
+			sql += ` AND datacenter_id = ?`
+		} else {
+			sql += ` WHERE datacenter_id = ?`
+		}
 	}
 
 	sql = u.DB.Rebind(sql)
+	log.Debug(sql)
 	return u.DB.Queryx(sql, args...)
 }
 
 func (u *RPCHandler) GetMembers(ctx context.Context, request *SearchRequest) (*MembersResponse, error) {
 	var response = &MembersResponse{}
-	sql := u.DB.Rebind(`SELECT id, admin_state_up, address, port, provisioning_status FROM member;`)
+	sql := u.DB.Rebind(`SELECT id, admin_state_up, address, port, provisioning_status, datacenter_id FROM member`)
 	rows, err := u.QueryxWithIds(sql, request)
 	if err != nil {
 		return nil, err
@@ -61,7 +76,7 @@ func (u *RPCHandler) GetMembers(ctx context.Context, request *SearchRequest) (*M
 	for rows.Next() {
 		var member rpcmodels.Member
 		if err := rows.Scan(&member.Id, &member.AdminStateUp, &member.Address,
-			&member.Port, &member.ProvisioningStatus); err != nil {
+			&member.Port, &member.ProvisioningStatus, &member.DatacenterId); err != nil {
 			return nil, err
 		}
 		response.Response = append(response.Response, &member)

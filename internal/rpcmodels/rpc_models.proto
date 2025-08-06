@@ -61,6 +61,7 @@ message Member {
   uint32 port = 4;
   string datacenter = 5;
   string provisioning_status = 6;
+  string datacenter_id = 7;
 }
 
 message Monitor {

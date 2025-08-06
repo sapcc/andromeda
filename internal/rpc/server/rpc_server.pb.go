@@ -202,6 +202,7 @@ type SearchRequest struct {
 	ResultPerPage  int32                  `protobuf:"varint,4,opt,name=result_per_page,json=resultPerPage,proto3" json:"result_per_page,omitempty"`
 	Pending        bool                   `protobuf:"varint,5,opt,name=pending,proto3" json:"pending,omitempty"`
 	Ids            []string               `protobuf:"bytes,6,rep,name=ids,proto3" json:"ids,omitempty"`
+	DatacenterId   string                 `protobuf:"bytes,7,opt,name=datacenter_id,json=datacenterId,proto3" json:"datacenter_id,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -276,6 +277,13 @@ func (x *SearchRequest) GetIds() []string {
 		return x.Ids
 	}
 	return nil
+}
+
+func (x *SearchRequest) GetDatacenterId() string {
+	if x != nil {
+		return x.DatacenterId
+	}
+	return ""
 }
 
 type DomainsResponse struct {
@@ -938,7 +946,7 @@ var File_internal_rpc_server_rpc_server_proto protoreflect.FileDescriptor
 
 const file_internal_rpc_server_rpc_server_proto_rawDesc = "" +
 	"\n" +
-	"$internal/rpc/server/rpc_server.proto\x1a#internal/rpcmodels/rpc_models.proto\"\xc9\x01\n" +
+	"$internal/rpc/server/rpc_server.proto\x1a#internal/rpcmodels/rpc_models.proto\"\xee\x01\n" +
 	"\rSearchRequest\x12\x1a\n" +
 	"\bprovider\x18\x01 \x01(\tR\bprovider\x12'\n" +
 	"\x0ffully_populated\x18\x02 \x01(\bR\x0efullyPopulated\x12\x1f\n" +
@@ -946,7 +954,8 @@ const file_internal_rpc_server_rpc_server_proto_rawDesc = "" +
 	"pageNumber\x12&\n" +
 	"\x0fresult_per_page\x18\x04 \x01(\x05R\rresultPerPage\x12\x18\n" +
 	"\apending\x18\x05 \x01(\bR\apending\x12\x10\n" +
-	"\x03ids\x18\x06 \x03(\tR\x03ids\"6\n" +
+	"\x03ids\x18\x06 \x03(\tR\x03ids\x12#\n" +
+	"\rdatacenter_id\x18\a \x01(\tR\fdatacenterId\"6\n" +
 	"\x0fDomainsResponse\x12#\n" +
 	"\bresponse\x18\x01 \x03(\v2\a.DomainR\bresponse\"2\n" +
 	"\rPoolsResponse\x12!\n" +

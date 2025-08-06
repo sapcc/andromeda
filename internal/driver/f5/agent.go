@@ -206,18 +206,18 @@ func (f5 *F5Agent) getDomains() ([]*rpcmodels.Domain, error) {
 	return res.GetResponse(), nil
 }
 
-func (f5 *F5Agent) getMembers() ([]*rpcmodels.Member, error) {
+func (f5 *F5Agent) getMembers(datacenterId string) ([]*rpcmodels.Member, error) {
 	// AS3 POST /declare payload must include *all* members (servers)
 	res, err := f5.rpc.GetMembers(context.Background(), &server.SearchRequest{
-		Provider:      "f5",
+		DatacenterId:  datacenterId,
 		PageNumber:    0,
 		ResultPerPage: 1000, // TODO: make it possible to go over all results
 	})
 	if err != nil {
 		return nil, fmt.Errorf("rpc.GetMembers failed: %s", err)
 	}
-	if res == nil || len(res.GetResponse()) == 0 {
-		return nil, fmt.Errorf("no F5 members found")
+	if res == nil {
+		return nil, fmt.Errorf("rpc.GetMembers response is nil")
 	}
 	log.Debugf("rpc.GetMembers returned %d items", len(res.GetResponse()))
 	return res.GetResponse(), nil
@@ -231,6 +231,17 @@ func (f5 *F5Agent) Sync() error {
 	if err != nil {
 		return err
 	}
+	for _, datacenter := range datacenters {
+		members, err := f5.getMembers(datacenter.Id)
+		if err != nil {
+			return err
+		}
+		log.Infof("Found %d members for datacenter [id = %s] [name = %s]", len(members), datacenter.Id, datacenter.Name)
+		for _, member := range members {
+			fmt.Println("Member: %#v", member)
+		}
+	}
+	return nil
 	common, err := f5.GetCommonTenantDeclaration(datacenters)
 	if err != nil {
 		return err
