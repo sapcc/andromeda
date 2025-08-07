@@ -104,14 +104,16 @@ func postAS3Declaration(decl as3.ADC, client as3Client, declChecker func(as3.ADC
 	if err != nil {
 		return err
 	}
-	// TODO: handle response
-	_, err = client.APICall(&bigip.APIRequest{
+	if _, err := client.APICall(&bigip.APIRequest{
 		Method:      "post",
 		URL:         "mgmt/shared/appsvcs/declare",
 		Body:        string(jsonDecl),
 		ContentType: "application/json",
-	})
-	return err
+	}); err != nil {
+		log.Errorf("failed posting AS3 declaration: %s", err)
+		return err
+	}
+	return nil
 }
 
 func sanityCheckAS3Declaration(decl as3.ADC) error {
