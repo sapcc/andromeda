@@ -184,7 +184,6 @@ func (f5 *F5Agent) Sync() error {
 	}
 	log.Debugf("AS3 declaration: %s", string(jsonDoc))
 	if err := postAS3Declaration(decl, f5.bigIP, sanityCheckAS3Declaration); err != nil {
-		log.Errorf("Failed to post AS3 declaration: %s", err)
 		return err
 	}
 	/*
