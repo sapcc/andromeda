@@ -15,6 +15,13 @@ import (
 func TestAS3DeclarationBuilder(t *testing.T) {
 	assert := assert.New(t)
 	t.Run("Two DCs (dc1 and dc2); dc1 has one member; dc2 has no members", func(t *testing.T) {
+		// GIVEN
+		// * 2 DCs (dc1 and dc2)
+		// * dc1 has 1 member; dc2 has no members
+		// * dc1 has 1 domain testapp.sap.com
+		// EXPECT
+		// * 1 GSLB Server in /Common partition
+		// * 1 partition for domain testapp.sap.com
 		store := new(mockedStore)
 		store.On("GetDatacenters").Return([]*rpcmodels.Datacenter{
 			{Id: "dc1", Name: "dc1"},
