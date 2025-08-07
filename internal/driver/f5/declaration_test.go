@@ -43,7 +43,7 @@ func TestAS3DeclarationBuilder(t *testing.T) {
 		b := as3DeclarationBuilder{store: store}
 		declaration, err := b.Build()
 		assert.Nil(err, "failed to build the declaration")
-		expected := as3.ADC{SchemaVersion: "3.22.0"}
+		expected := as3.NewADC()
 		func() {
 			tenant := as3.Tenant{}
 			application := as3.Application{Template: "shared"}
@@ -85,7 +85,7 @@ func TestAS3DeclarationBuilder(t *testing.T) {
 		b := as3DeclarationBuilder{store: store}
 		declaration, err := b.Build()
 		assert.Nil(err, "failed to build the declaration")
-		expected := as3.ADC{SchemaVersion: "3.22.0"}
+		expected := as3.NewADC()
 		tenant := as3.Tenant{}
 		application := as3.Application{Template: "shared"}
 		application.SetEntity("cc_andromeda_srv_200.10.0.100_dc1", as3.GSLBServer{
@@ -127,16 +127,17 @@ func TestPostAS3Declaration(t *testing.T) {
 		client.AssertNotCalled(t, "APICall")
 	})
 	t.Run("if the checker func accepts the declaration then it should post it", func(t *testing.T) {
-		decl := as3.ADC{SchemaVersion: "3.22.0"}
+		decl := as3.NewADC()
 		tenant := as3.Tenant{}
 		application := as3.Application{Template: "shared"}
 		tenant.AddApplication("Shared", application)
 		decl.AddTenant("Common", tenant)
 		t.Run("it should encode the declaration as JSON before posting", func(t *testing.T) {
 			expectedJSONDecl := string(`
-			{ "schemaVersion": "3.22.0",
+			{ "schemaVersion": "3.36.0",
 			  "id" :"",
 			  "class": "ADC",
+			  "updateMode": "complete",
 			  "Common": {
 			    "class": "Tenant",
 			    "label": "",
@@ -178,18 +179,28 @@ func TestPostAS3Declaration(t *testing.T) {
 
 func TestSanityCheckAS3Declaration(t *testing.T) {
 	assert := assert.New(t)
-	t.Run("it should reject a declaration if the /Common tenant is missing", func(t *testing.T) {
-		decl := as3.ADC{}
-		assert.NotNil(sanityCheckAS3Declaration(decl), "declaration should have been rejected")
+	t.Run("it should reject an ad-hoc declaration if the SchemaVersion isn't supported", func(t *testing.T) {
+		decl := as3.NewADC()
+		decl.SchemaVersion = "1.0.0"
+		assert.Same(sanityCheckAS3Declaration(decl), errUnexpectedADCSchemaVersion)
 	})
-	t.Run("it should reject a declaration if the /Common/Shared application is missing", func(t *testing.T) {
-		decl := as3.ADC{}
+	t.Run("it should reject an ad-hoc declaration if the UpdateMode isn't 'complete'", func(t *testing.T) {
+		decl := as3.NewADC()
+		decl.UpdateMode = "selective"
+		assert.Same(sanityCheckAS3Declaration(decl), errUnexpectedADCUpdateMode)
+	})
+	t.Run("it should reject a standard declaration if the /Common tenant is missing", func(t *testing.T) {
+		decl := as3.NewADC()
+		assert.Same(sanityCheckAS3Declaration(decl), errMissingCommonTenant)
+	})
+	t.Run("it should reject a standard declaration if the /Common/Shared application is missing", func(t *testing.T) {
+		decl := as3.NewADC()
 		tenant := as3.Tenant{}
 		decl.AddTenant("Common", tenant)
-		assert.NotNil(sanityCheckAS3Declaration(decl), "declaration should have been rejected")
+		assert.Same(sanityCheckAS3Declaration(decl), errMissingApplicationCommonShared)
 	})
-	t.Run("it should accept a declaration if the /Common/Shared application is present", func(t *testing.T) {
-		decl := as3.ADC{}
+	t.Run("it should accept a standard declaration if the /Common/Shared application is present", func(t *testing.T) {
+		decl := as3.NewADC()
 		tenant := as3.Tenant{}
 		application := as3.Application{Template: "shared"}
 		tenant.AddApplication("Shared", application)

@@ -27,7 +27,7 @@ func NewAS3DeclarationBuilder(s AndromedaF5Store) AS3DeclarationBuilder {
 }
 
 func (b *as3DeclarationBuilder) Build() (as3.ADC, error) {
-	adc := as3.ADC{SchemaVersion: "3.22.0"}
+	adc := as3.NewADC()
 	common, err := b.getCommonTenant()
 	if err != nil {
 		return adc, err
@@ -116,14 +116,25 @@ func postAS3Declaration(decl as3.ADC, client as3Client, declChecker func(as3.ADC
 	return nil
 }
 
+var errUnexpectedADCSchemaVersion = errors.New("unexpected AS3 ADC.SchemaVersion")
+var errUnexpectedADCUpdateMode = errors.New("unexpected AS3 ADC.UpdateMode")
+var errMissingCommonTenant = errors.New("missing required tenant /Common")
+var errMissingApplicationCommonShared = errors.New("missing required application /Common/Shared")
+
 func sanityCheckAS3Declaration(decl as3.ADC) error {
+	if decl.SchemaVersion != as3.ADCSchemaVersion {
+		return errUnexpectedADCSchemaVersion
+	}
+	if decl.UpdateMode != as3.ADCUpdateMode {
+		return errUnexpectedADCUpdateMode
+	}
 	commonT, err := decl.GetTenant("Common")
 	if err != nil {
-		return errors.New("missing required tenant /Common")
+		return errMissingCommonTenant
 	}
 	_, err = commonT.GetApplication("Shared")
 	if err != nil {
-		return errors.New("missing required application /Common/Shared")
+		return errMissingApplicationCommonShared
 	}
 	return nil
 }

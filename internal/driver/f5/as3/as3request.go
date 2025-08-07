@@ -23,8 +23,19 @@ type ADC struct {
 	Remark        string `json:"remark,omitempty"`
 	SchemaVersion string `json:"schemaVersion"`
 	Id            string `json:"id,omitempty"`
+	UpdateMode    string `json:"updateMode,omitempty"`
 
 	tenants map[string]Tenant
+}
+
+const ADCSchemaVersion = "3.36.0"
+const ADCUpdateMode = "complete"
+
+func NewADC() ADC {
+	return ADC{
+		SchemaVersion: ADCSchemaVersion,
+		UpdateMode:    ADCUpdateMode,
+	}
 }
 
 func (a ADC) MarshalJSON() ([]byte, error) {
@@ -32,6 +43,7 @@ func (a ADC) MarshalJSON() ([]byte, error) {
 	adc["class"] = "ADC"
 	adc["schemaVersion"] = a.SchemaVersion
 	adc["id"] = a.Id
+	adc["updateMode"] = a.UpdateMode
 
 	for name, tenant := range a.tenants {
 		adc[name] = tenant

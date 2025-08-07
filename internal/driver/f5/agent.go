@@ -115,8 +115,8 @@ func ExecuteF5Agent() error {
 
 	// Create F5 worker instance with Server RPC interface
 	f5 := F5Agent{
-		activeF5Session,
-		NewAS3DeclarationBuilder(
+		bigIP: activeF5Session,
+		declarationBuilder: NewAS3DeclarationBuilder(
 			NewAndromedaF5Store(
 				server.NewRPCServerClient(client),
 			),
@@ -174,21 +174,18 @@ func (f5 *F5Agent) fullSync() {
 // Sync relies on the AS3 `POST /declare` endpoint, therefore all entities must
 // be included in the payload.
 func (f5 *F5Agent) Sync() error {
-	declaration, err := f5.declarationBuilder.Build()
+	decl, err := f5.declarationBuilder.Build()
 	if err != nil {
 		return err
 	}
-	jsonDoc, err := json.Marshal(declaration)
+	jsonDoc, err := json.Marshal(decl)
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(jsonDoc))
-	/*
-		if err := postDeclaration(adc); err != nil {
-			return err
-		}
-	*/
-
+	log.Debugf("AS3 declaration: %s", string(jsonDoc))
+	if err := postAS3Declaration(decl, f5.bigIP, sanityCheckAS3Declaration); err != nil {
+		return err
+	}
 	/*
 		var prov []*server.ProvisioningStatusRequest_ProvisioningStatus
 		for _, domain := range response.GetResponse() {
@@ -230,51 +227,3 @@ func (f5 *F5Agent) Sync() error {
 	*/
 	return nil
 }
-
-/*
-// lint
-func postDeclaration(v interface{}) error {
-		js, err := json.MarshalIndent(v, "", "\t")
-		if err != nil {
-			return err
-		}
-
-		log.Infof("\n%s\n", string(js))
-
-		session, err := GetBigIPSession()
-		if err != nil {
-			return err
-		}
-		req := &bigip.APIRequest{
-			Method:      "post",
-			URL:         "mgmt/shared/appsvcs/declare",
-			Body:        string(js),
-			ContentType: "application/json",
-		}
-		resp, err := session.APICall(req)
-		if err != nil {
-			print(err)
-		}
-
-		var prettyJSON bytes.Buffer
-		if err := json.Indent(&prettyJSON, resp, "", "\t"); err != nil {
-			return err
-		}
-		log.Info(prettyJSON.String())
-
-		var response as3.Response
-		if err := json.Unmarshal(resp, &response); err != nil {
-			return err
-		}
-
-		for _, result := range response.Results {
-			if result.Code != 200 {
-				return fmt.Errorf("failed post! %s", result.Message)
-			} else {
-				log.Infof("succeeded: %s", result.Tenant)
-			}
-		}
-
-		return nil
-}
-*/
