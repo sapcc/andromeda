@@ -179,12 +179,12 @@ func TestPostAS3Declaration(t *testing.T) {
 
 func TestSanityCheckAS3Declaration(t *testing.T) {
 	assert := assert.New(t)
-	t.Run("it should reject an ad-hoc declaration if the SchemaVersion isn't supported", func(t *testing.T) {
+	t.Run("it should reject a standard declaration if the SchemaVersion is tainted", func(t *testing.T) {
 		decl := as3.NewADC()
 		decl.SchemaVersion = "1.0.0"
 		assert.Same(sanityCheckAS3Declaration(decl), errUnexpectedADCSchemaVersion)
 	})
-	t.Run("it should reject an ad-hoc declaration if the UpdateMode isn't 'complete'", func(t *testing.T) {
+	t.Run("it should reject a standard declaration if the UpdateMode is tainted", func(t *testing.T) {
 		decl := as3.NewADC()
 		decl.UpdateMode = "selective"
 		assert.Same(sanityCheckAS3Declaration(decl), errUnexpectedADCUpdateMode)
