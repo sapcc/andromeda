@@ -27,6 +27,12 @@ func TestAS3DeclarationBuilder(t *testing.T) {
 			{Id: "dc1", Name: "dc1"},
 			{Id: "dc2", Name: "dc2"},
 		}, nil)
+		// TODO: what domains should be retrieved? filtered by what?
+		// there's member.pool_id, so a server is linked to a single pool
+		// of course a pool can contain multiple servers
+		// there's domain_pool_relation, so a domain may be in multiple pools
+		// I think I GetDomains should retrieve all F5 domains by
+		// store.On("GetDomains", "")
 		store.On("GetMembers", "dc1").Return([]*rpcmodels.Member{
 			{Id: "member1", Address: "200.10.0.1", Port: 80},
 		}, nil)
@@ -35,18 +41,24 @@ func TestAS3DeclarationBuilder(t *testing.T) {
 		declaration, err := b.Build()
 		assert.Nil(err, "failed to build the declaration")
 		expected := as3.ADC{SchemaVersion: "3.22.0"}
-		tenant := as3.Tenant{}
-		application := as3.Application{Template: "shared"}
-		application.SetEntity("cc_andromeda_srv_200.10.0.1_dc1", as3.GSLBServer{
-			Class:          "GSLB_Server",
-			ServerType:     "generic-host",
-			DataCenter:     as3.PointerGSLBDataCenter{BigIP: "/Common/dc1"},
-			Devices:        []as3.GSLBServerDevice{{Address: "200.10.0.1"}},
-			Monitors:       []as3.PointerGSLBMonitor{{BigIP: "/Common/tcp"}},
-			VirtualServers: []as3.GSLBVirtualServer{{Address: "200.10.0.1", Port: 80}},
-		})
-		tenant.AddApplication("Shared", application)
-		expected.AddTenant("Common", tenant)
+		func() {
+			tenant := as3.Tenant{}
+			application := as3.Application{Template: "shared"}
+			application.SetEntity("cc_andromeda_srv_200.10.0.1_dc1", as3.GSLBServer{
+				Class:          "GSLB_Server",
+				ServerType:     "generic-host",
+				DataCenter:     as3.PointerGSLBDataCenter{BigIP: "/Common/dc1"},
+				Devices:        []as3.GSLBServerDevice{{Address: "200.10.0.1"}},
+				Monitors:       []as3.PointerGSLBMonitor{{BigIP: "/Common/tcp"}},
+				VirtualServers: []as3.GSLBVirtualServer{{Address: "200.10.0.1", Port: 80}},
+			})
+			tenant.AddApplication("Shared", application)
+			expected.AddTenant("Common", tenant)
+		}()
+		func() {
+			//tenant := as3.Tenant{}
+			//expected.AddTenant("testapp.sap.com", tenant)
+		}()
 		assert.Equal(expected, declaration, "declaration built does not match expectation")
 	})
 	t.Run(`On datacenter "dc1", 2 members share an IP address on different ports`, func(t *testing.T) {
@@ -95,5 +107,27 @@ func TestAS3DeclarationBuilder(t *testing.T) {
 		tenant.AddApplication("Shared", application)
 		expected.AddTenant("Common", tenant)
 		assert.Equal(expected, declaration, "declaration built does not match expectation")
+	})
+}
+
+func TestSanityCheckAS3Declaration(t *testing.T) {
+	assert := assert.New(t)
+	t.Run("it should reject a declaration if the /Common tenant is missing", func(t *testing.T) {
+		decl := as3.ADC{}
+		assert.NotNil(sanityCheckAS3Declaration(decl), "declaration should have been rejected")
+	})
+	t.Run("it should reject a declaration if the /Common/Shared application is missing", func(t *testing.T) {
+		decl := as3.ADC{}
+		tenant := as3.Tenant{}
+		decl.AddTenant("Common", tenant)
+		assert.NotNil(sanityCheckAS3Declaration(decl), "declaration should have been rejected")
+	})
+	t.Run("it should accept a declaration if the /Common/Shared application is present", func(t *testing.T) {
+		decl := as3.ADC{}
+		tenant := as3.Tenant{}
+		application := as3.Application{Template: "shared"}
+		tenant.AddApplication("Shared", application)
+		decl.AddTenant("Common", tenant)
+		assert.Nil(sanityCheckAS3Declaration(decl), "declaration should have been accepted")
 	})
 }

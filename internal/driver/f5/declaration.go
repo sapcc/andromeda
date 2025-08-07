@@ -5,9 +5,11 @@
 package f5
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/apex/log"
+	"github.com/f5devcentral/go-bigip"
 	"github.com/sapcc/andromeda/internal/driver/f5/as3"
 )
 
@@ -41,12 +43,12 @@ func (b *as3DeclarationBuilder) getCommonTenant() (as3.Tenant, error) {
 		return tenant, err
 	}
 	for _, datacenter := range datacenters {
-		log.Infof("Creating GSLBServer declaration for members of datacenter [id = %q] [name = %s]", datacenter.Id, datacenter.Name)
+		log.Debugf("Creating GSLBServer declaration for members of datacenter [id = %q] [name = %s]", datacenter.Id, datacenter.Name)
 		members, err := b.store.GetMembers(datacenter.Id)
 		if err != nil {
 			return tenant, err
 		}
-		log.Infof("Found %d members for datacenter [id = %s] [name = %s]", len(members), datacenter.Id, datacenter.Name)
+		log.Debugf("Found %d members for datacenter [id = %s] [name = %s]", len(members), datacenter.Id, datacenter.Name)
 		for _, member := range members {
 			memberKey := as3DeclarationGSLBServerKey(member.Address, datacenter.Name)
 			entity := application.GetEntity(memberKey)
@@ -87,4 +89,24 @@ func (b *as3DeclarationBuilder) getCommonTenant() (as3.Tenant, error) {
 
 func as3DeclarationGSLBServerKey(memberAddress, datacenterName string) string {
 	return fmt.Sprintf("cc_andromeda_srv_%s_%s", memberAddress, datacenterName)
+}
+
+type as3Client interface {
+	APICall(options *bigip.APIRequest) ([]byte, error)
+}
+
+func postAS3Declaration(decl as3.ADC, client as3Client) error {
+	return nil
+}
+
+func sanityCheckAS3Declaration(decl as3.ADC) error {
+	commonT, err := decl.GetTenant("Common")
+	if err != nil {
+		return errors.New("missing required tenant /Common")
+	}
+	_, err = commonT.GetApplication("Shared")
+	if err != nil {
+		return errors.New("missing required application /Common/Shared")
+	}
+	return nil
 }

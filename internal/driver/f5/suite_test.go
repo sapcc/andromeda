@@ -8,10 +8,20 @@ import (
 	"context"
 
 	"github.com/actatum/stormrpc"
+	"github.com/f5devcentral/go-bigip"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
 	"github.com/stretchr/testify/mock"
 )
+
+type mockedAS3Client struct {
+	mock.Mock
+}
+
+func (c *mockedAS3Client) APICall(options *bigip.APIRequest) ([]byte, error) {
+	args := c.Called(options)
+	return args.Get(0).([]byte), args.Error(1)
+}
 
 type mockedStore struct {
 	mock.Mock

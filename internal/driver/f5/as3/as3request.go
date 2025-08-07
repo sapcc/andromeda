@@ -6,6 +6,7 @@ package as3
 
 import (
 	"encoding/json"
+	"fmt"
 )
 
 // AS3
@@ -45,6 +46,13 @@ func (a *ADC) AddTenant(name string, tenant Tenant) {
 	a.tenants[name] = tenant
 }
 
+func (a *ADC) GetTenant(key string) (Tenant, error) {
+	if val, exists := a.tenants[key]; exists {
+		return val, nil
+	}
+	return Tenant{}, fmt.Errorf("no such key %q", key)
+}
+
 // Tenants
 type Tenant struct {
 	Label  string `json:"label,omitempty"`
@@ -70,6 +78,13 @@ func (t *Tenant) AddApplication(name string, application Application) {
 		t.applications = make(Applications, 1)
 	}
 	t.applications[name] = application
+}
+
+func (t *Tenant) GetApplication(key string) (Application, error) {
+	if val, exists := t.applications[key]; exists {
+		return val, nil
+	}
+	return Application{}, fmt.Errorf("no such key %q", key)
 }
 
 // Applications
