@@ -157,7 +157,15 @@ func TestPostAS3Declaration(t *testing.T) {
 			assert.Nil(err, "it should have succeeded")
 			client.AssertCalled(t, "APICall", mock.Anything)
 		})
-		t.Run("it should fail if posting fails (HTTP status other than 200)", func(t *testing.T) {
+		t.Run("it should fail if posting fails (checking APICall() return value)", func(t *testing.T) {
+			client := new(mockedAS3Client)
+			client.On("APICall", mock.Anything).Return([]byte(""), errors.New("it failed, please let the caller now"))
+			declChecker := func(d as3.ADC) error { return nil }
+			err := postAS3Declaration(decl, client, declChecker)
+			assert.NotNil(err, "it should have failed")
+			client.AssertCalled(t, "APICall", mock.Anything)
+		})
+		t.Run("it should fail if posting fails (inspecting APICall() response payload for its code)", func(t *testing.T) {
 			t.Skip("TODO")
 		})
 		t.Run("it should succeed if posting succeeds (HTTP status is 200)", func(t *testing.T) {
