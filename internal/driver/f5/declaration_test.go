@@ -5,11 +5,14 @@
 package f5
 
 import (
+	"errors"
 	"testing"
 
+	"github.com/f5devcentral/go-bigip"
 	"github.com/sapcc/andromeda/internal/driver/f5/as3"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestAS3DeclarationBuilder(t *testing.T) {
@@ -107,6 +110,59 @@ func TestAS3DeclarationBuilder(t *testing.T) {
 		tenant.AddApplication("Shared", application)
 		expected.AddTenant("Common", tenant)
 		assert.Equal(expected, declaration, "declaration built does not match expectation")
+	})
+}
+
+func TestPostAS3Declaration(t *testing.T) {
+	assert := assert.New(t)
+	t.Run("it should fail (without posting) if checker func fails", func(t *testing.T) {
+		decl := as3.ADC{Label: "I should get rejected"}
+		client := new(mockedAS3Client)
+		declChecker := func(d as3.ADC) error {
+			assert.Equal(d.Label, decl.Label)
+			return errors.New("nope")
+		}
+		err := postAS3Declaration(decl, client, declChecker)
+		assert.NotNil(err, "it should have failed")
+		client.AssertNotCalled(t, "APICall")
+	})
+	t.Run("if the checker func accepts the declaration then it should post it", func(t *testing.T) {
+		decl := as3.ADC{SchemaVersion: "3.22.0"}
+		tenant := as3.Tenant{}
+		application := as3.Application{Template: "shared"}
+		tenant.AddApplication("Shared", application)
+		decl.AddTenant("Common", tenant)
+		t.Run("it should encode the declaration as JSON before posting", func(t *testing.T) {
+			expectedJSONDecl := string(`
+			{ "schemaVersion": "3.22.0",
+			  "id" :"",
+			  "class": "ADC",
+			  "Common": {
+			    "class": "Tenant",
+			    "label": "",
+			    "remark": "",
+			    "Shared": { "class": "Application", "label": "", "remark": "", "template": "shared" }
+			  }
+		        }`)
+			client := new(mockedAS3Client)
+			client.
+				On("APICall",
+					mock.MatchedBy(func(req *bigip.APIRequest) bool {
+						return assert.JSONEq(expectedJSONDecl, req.Body, "unexpected JSON declaration")
+					}),
+				).
+				Return([]byte(`{"code": 200}`), nil)
+			declChecker := func(d as3.ADC) error { return nil }
+			err := postAS3Declaration(decl, client, declChecker)
+			assert.Nil(err, "it should have succeeded")
+			client.AssertCalled(t, "APICall", mock.Anything)
+		})
+		t.Run("it should fail if posting fails (HTTP status other than 200)", func(t *testing.T) {
+			t.Skip("TODO")
+		})
+		t.Run("it should succeed if posting succeeds (HTTP status is 200)", func(t *testing.T) {
+			t.Skip("TODO")
+		})
 	})
 }
 

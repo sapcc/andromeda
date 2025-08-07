@@ -5,6 +5,7 @@
 package f5
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -95,8 +96,22 @@ type as3Client interface {
 	APICall(options *bigip.APIRequest) ([]byte, error)
 }
 
-func postAS3Declaration(decl as3.ADC, client as3Client) error {
-	return nil
+func postAS3Declaration(decl as3.ADC, client as3Client, declChecker func(as3.ADC) error) error {
+	if err := declChecker(decl); err != nil {
+		return err
+	}
+	jsonDecl, err := json.Marshal(decl)
+	if err != nil {
+		return err
+	}
+	// TODO: handle response
+	_, err = client.APICall(&bigip.APIRequest{
+		Method:      "post",
+		URL:         "mgmt/shared/appsvcs/declare",
+		Body:        string(jsonDecl),
+		ContentType: "application/json",
+	})
+	return err
 }
 
 func sanityCheckAS3Declaration(decl as3.ADC) error {
