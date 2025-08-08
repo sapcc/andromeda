@@ -13,11 +13,17 @@ import (
 )
 
 func TestGetActiveDeviceSession(t *testing.T) {
-	t.Skip()
+	t.Skip("Best to first replace bigip.BigIP (struct) with a package-local interface")
 }
 
 func TestMatchActiveDevice(t *testing.T) {
-	t.Skip()
+	t.Skip("Untestable. Need to be able to mock bigip.BigIP.GetDevices(), however bigip.BigIP is not an interface.")
+	t.Run("Fails if no 'active' device found", func(t *testing.T) {
+		t.Skip("see above")
+	})
+	t.Run("Succeeds with first 'active' device (the other is supposed to be 'passive')", func(t *testing.T) {
+		t.Skip("see above")
+	})
 }
 
 func TestGetSessionHostname(t *testing.T) {
