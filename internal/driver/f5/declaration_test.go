@@ -10,6 +10,7 @@ import (
 
 	"github.com/f5devcentral/go-bigip"
 	"github.com/sapcc/andromeda/internal/driver/f5/as3"
+	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -41,9 +42,9 @@ func TestAS3DeclarationBuilder(t *testing.T) {
 		}, nil)
 		store.On("GetMembers", "dc2").Return([]*rpcmodels.Member{}, nil)
 		b := as3DeclarationBuilder{store: store}
-		declaration, _, err := b.Build()
+		declaration, rpcReq, err := b.Build()
 		assert.Nil(err, "failed to build the declaration")
-		expected := as3.NewADC()
+		expectedDecl := as3.NewADC()
 		func() {
 			tenant := as3.Tenant{}
 			application := as3.Application{Template: "shared"}
@@ -56,13 +57,23 @@ func TestAS3DeclarationBuilder(t *testing.T) {
 				VirtualServers: []as3.GSLBVirtualServer{{Address: "200.10.0.1", Port: 80}},
 			})
 			tenant.AddApplication("Shared", application)
-			expected.AddTenant("Common", tenant)
+			expectedDecl.AddTenant("Common", tenant)
 		}()
 		func() {
 			//tenant := as3.Tenant{}
-			//expected.AddTenant("testapp.sap.com", tenant)
+			//expectedDecl.AddTenant("testapp.sap.com", tenant)
 		}()
-		assert.Equal(expected, declaration, "declaration built does not match expectation")
+		assert.Equal(expectedDecl, declaration, "declaration built does not match expectation")
+		expectedRPCUpdates := []*server.ProvisioningStatusRequest_ProvisioningStatus{
+			{
+				Id:     "member1",
+				Model:  server.ProvisioningStatusRequest_ProvisioningStatus_MEMBER,
+				Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE,
+			},
+		}
+		if assert.Len(rpcReq.ProvisioningStatus, len(expectedRPCUpdates), "incorrect RPC status updates length") {
+			assert.Equal(expectedRPCUpdates, rpcReq.ProvisioningStatus)
+		}
 	})
 	t.Run(`On datacenter "dc1", 2 members share an IP address on different ports`, func(t *testing.T) {
 		// GIVEN
@@ -83,7 +94,7 @@ func TestAS3DeclarationBuilder(t *testing.T) {
 			{Id: "member3", Address: "200.10.0.100", Port: 9000},
 		}, nil)
 		b := as3DeclarationBuilder{store: store}
-		declaration, _, err := b.Build()
+		declaration, rpcReq, err := b.Build()
 		assert.Nil(err, "failed to build the declaration")
 		expected := as3.NewADC()
 		tenant := as3.Tenant{}
@@ -110,6 +121,26 @@ func TestAS3DeclarationBuilder(t *testing.T) {
 		tenant.AddApplication("Shared", application)
 		expected.AddTenant("Common", tenant)
 		assert.Equal(expected, declaration, "declaration built does not match expectation")
+		expectedRPCUpdates := []*server.ProvisioningStatusRequest_ProvisioningStatus{
+			{
+				Id:     "member1",
+				Model:  server.ProvisioningStatusRequest_ProvisioningStatus_MEMBER,
+				Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE,
+			},
+			{
+				Id:     "member2",
+				Model:  server.ProvisioningStatusRequest_ProvisioningStatus_MEMBER,
+				Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE,
+			},
+			{
+				Id:     "member3",
+				Model:  server.ProvisioningStatusRequest_ProvisioningStatus_MEMBER,
+				Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE,
+			},
+		}
+		if assert.Len(rpcReq.ProvisioningStatus, len(expectedRPCUpdates), "incorrect RPC status updates length") {
+			assert.Equal(expectedRPCUpdates, rpcReq.ProvisioningStatus)
+		}
 	})
 }
 

@@ -88,6 +88,11 @@ func (b *as3DeclarationBuilder) getCommonTenant() (as3.Tenant, []*server.Provisi
 					application.SetEntity(memberKey, gslbServer)
 				}
 			}
+			rpcUpdates = append(rpcUpdates, &server.ProvisioningStatusRequest_ProvisioningStatus{
+				Id:     member.GetId(),
+				Model:  server.ProvisioningStatusRequest_ProvisioningStatus_MEMBER,
+				Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE,
+			})
 		}
 	}
 	tenant.AddApplication("Shared", application)
