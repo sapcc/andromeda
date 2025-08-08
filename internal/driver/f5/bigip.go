@@ -178,18 +178,18 @@ type deviceSessionFactory func(url string) (*bigIP, error)
 
 func getActiveDeviceSession(
 	conf config.F5Config,
-	matcher activeDeviceMatcher,
-	factory deviceSessionFactory) (*bigIP, *bigip.Device, error) {
+	factory deviceSessionFactory,
+	matcher activeDeviceMatcher) (*bigIP, *bigip.Device, error) {
 	var s *bigIP
 	var d *bigip.Device
 	for _, url := range conf.Devices {
 		session, err := factory(url)
 		if err != nil {
-			return nil, nil, fmt.Errorf("failed to acquire F5 device session: %s", err)
+			return nil, nil, fmt.Errorf("failed to create session: %s", err)
 		}
 		device, err := matchActiveDevice(session)
 		if err != nil {
-			return nil, nil, fmt.Errorf("failed to determine whether F5 device is active: %s", err)
+			return nil, nil, fmt.Errorf("failed to get active device: %s", err)
 		}
 		if device != nil {
 			s = session

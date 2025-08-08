@@ -37,7 +37,7 @@ func ExecuteF5StatusAgent() error {
 		config.Global.F5Config.PhysicalNetwork,
 	)
 
-	activeF5Session, activeF5Device, err := getActiveDeviceSession(config.Global.F5Config, matchActiveDevice, getBigIPSession)
+	activeF5Session, activeF5Device, err := getActiveDeviceSession(config.Global.F5Config, getBigIPSession, matchActiveDevice)
 	if err == nil {
 		return errors.New("failed to determine active F5 session")
 	}

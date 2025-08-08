@@ -10,11 +10,30 @@ import (
 	"testing"
 
 	"github.com/f5devcentral/go-bigip"
+	"github.com/sapcc/andromeda/internal/config"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetActiveDeviceSession(t *testing.T) {
-	t.Skip("Best to first replace bigip.BigIP (struct) with a package-local interface")
+	assert := assert.New(t)
+	conf := config.F5Config{
+		Devices: []string{"https://a.local", "https://b.local"},
+	}
+	t.Run("Fails if device session factory fails", func(t *testing.T) {
+		factory := func(url string) (*bigIP, error) {
+			return nil, errors.New("please let the caller know I failed")
+		}
+		_, _, err := getActiveDeviceSession(conf, factory, nil)
+		if assert.Error(err) {
+			assert.ErrorContains(err, "failed to create session")
+		}
+	})
+	t.Run("Fails if device matcher fails", func(t *testing.T) {
+		t.Skip("Untestable: cannot mock factory due to its *bigIP pointer signature")
+	})
+	t.Run("Succeeds otherwise", func(t *testing.T) {
+		t.Skip("Untestable: cannot mock factory due to its *bigIP pointer signature")
+	})
 }
 
 func TestMatchActiveDevice(t *testing.T) {
