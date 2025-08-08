@@ -7,14 +7,17 @@ package f5
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/actatum/stormrpc"
 	"github.com/apex/log"
 	"github.com/nats-io/nats.go"
-	"github.com/scottdware/go-bigip"
 
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/rpc/server"
@@ -22,26 +25,26 @@ import (
 )
 
 type StatusController struct {
-	bigIP *bigip.BigIP
+	bigIP bigIPSession
 	rpc   server.RPCServerClient
 }
 
 func ExecuteF5StatusAgent() error {
-	session, err := GetBigIPSession()
-	if err != nil {
-		return fmt.Errorf("BigIP: %v", err)
+	log.Debugf("Enabled=%+v Devices=%v VCMPs=%v PhysicalNetwork=%v",
+		config.Global.F5Config.Enabled,
+		config.Global.F5Config.Devices,
+		config.Global.F5Config.VCMPs,
+		config.Global.F5Config.PhysicalNetwork,
+	)
+
+	activeF5Session, activeF5Device, err := getActiveDeviceSession(config.Global.F5Config, getBigIPSession, matchActiveDevice)
+	if err == nil {
+		return errors.New("failed to determine active F5 session")
 	}
 
-	device, err := session.GetCurrentDevice()
-	if err != nil {
-		return err
-	}
-	log.Infof("Connected to %s %s (%s)", device.MarketingName, device.Name, device.Version)
-
-	// check if DNS module activated
-	if err := BigIPSupportsDNS(device); err != nil {
-		return err
-	}
+	// TODO replace with a fmt.Formatter
+	log.Infof("Connected to F5 device [marketing name = %q, name = %q, version = %s, edition = %q, failover state = %q]",
+		activeF5Device.MarketingName, activeF5Device.Name, activeF5Device.Version, activeF5Device.Edition, activeF5Device.FailoverState)
 
 	// RPC server
 	nc, err := nats.Connect(config.Global.Default.TransportURL)
@@ -54,7 +57,7 @@ func ExecuteF5StatusAgent() error {
 	}
 
 	sc := StatusController{
-		session,
+		activeF5Session,
 		server.NewRPCServerClient(client),
 	}
 
@@ -62,23 +65,26 @@ func ExecuteF5StatusAgent() error {
 		go utils.PrometheusListen()
 	}
 
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
+
+	// TODO: exit the go routine gracefully
 	go func() {
+		// TODO: activate immediately, then tick
 		t := time.NewTicker(30 * time.Second)
 		defer t.Stop()
 		for {
 			<-t.C // Activate periodically
-			// Refresh token if needed
-			if time.Until(sc.bigIP.TokenExpiry) <= 60 {
-				if err := sc.bigIP.RefreshTokenSession(36000); err != nil {
-					log.Error(err.Error())
-				}
-			}
 			if err := sc.StatusHandler(); err != nil {
 				log.Error(err.Error())
-				_ = sc.bigIP.RefreshTokenSession(36000)
 			}
 		}
 	}()
+
+	<-done
+	log.Info("Shutting down")
+	_, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 
 	return nil
 }
@@ -129,45 +135,62 @@ type MembersStats struct {
 }
 
 func (c StatusController) StatusHandler() error {
-	pools, err := c.bigIP.GetGTMAPools()
+	log.Debug("StatusHandler started")
+	type gtmPoolA_ResPayload struct {
+		Items []struct {
+			FullPath string `json:"fullPath"`
+		} `json:"items"`
+	}
+	var resPayload gtmPoolA_ResPayload
+	err, ok := GetForEntity(c.bigIP, &resPayload, "gtm/pool/a")
+	if !ok {
+		return fmt.Errorf("gtm/pool/a not found")
+	}
 	if err != nil {
 		return err
 	}
 
+	log.Debugf("Got %d 'gtm/pool/a' items", len(resPayload.Items))
 	var stats MembersCollectionStats
 	var msrs []*server.MemberStatusRequest_MemberStatus
 
-	for _, pool := range pools.GTMAPools {
+	for _, pool := range resPayload.Items {
 		partition := ConvertPartitionPath(pool.FullPath)
+		log.Debugf("Got pool partition %q", partition)
 		err, ok := GetForEntity(c.bigIP, &stats, fmt.Sprintf("gtm/pool/a/%s/members/stats", partition))
 		if err != nil {
 			return err
 		}
-		if ok {
-			for _, partitons := range stats.Entries {
-				memberStats := MembersStats{}
-				if err := json.Unmarshal(partitons, &memberStats); err != nil {
-					log.Warnf("Could not decode nested member stats: %s", err)
-					continue
-				}
-
-				memberID := strings.TrimPrefix(memberStats.NestedStats.Entries.VsName.Description, "member_")
-				memberStatus := server.MemberStatusRequest_MemberStatus_UNKNOWN
-				switch memberStats.NestedStats.Entries.StatusAvailabilityState.Description {
-				case "available":
-					memberStatus = server.MemberStatusRequest_MemberStatus_ONLINE
-				case "offline":
-					memberStatus = server.MemberStatusRequest_MemberStatus_OFFLINE
-				}
-
-				msr := &server.MemberStatusRequest_MemberStatus{
-					Id:     memberID,
-					Status: memberStatus,
-				}
-				log.Debugf("Member %s has status %s", memberID, msr.GetStatus().String())
-
-				msrs = append(msrs, msr)
+		if !ok {
+			// we skip a pool for which no member stats were found
+			continue
+		}
+		for _, partitions := range stats.Entries {
+			memberStats := MembersStats{}
+			if err := json.Unmarshal(partitions, &memberStats); err != nil {
+				log.Warnf("Could not decode nested member stats [partition = %q]: %s", partition, err)
+				continue
 			}
+
+			// TODO: ensure this corresponds to a value in table column `member.id`
+			// TODO: if not prefixed by "member_" this is configuration drift, should be
+			// logged as such and skipped
+			memberID := strings.TrimPrefix(memberStats.NestedStats.Entries.VsName.Description, "member_")
+			memberStatus := server.MemberStatusRequest_MemberStatus_UNKNOWN
+			switch memberStats.NestedStats.Entries.StatusAvailabilityState.Description {
+			case "available":
+				memberStatus = server.MemberStatusRequest_MemberStatus_ONLINE
+			case "offline":
+				memberStatus = server.MemberStatusRequest_MemberStatus_OFFLINE
+			}
+
+			msr := &server.MemberStatusRequest_MemberStatus{
+				Id:     memberID,
+				Status: memberStatus,
+			}
+			log.Debugf("Member %s has status %s", memberID, msr.GetStatus().String())
+
+			msrs = append(msrs, msr)
 		}
 	}
 	_, err = c.rpc.UpdateMemberStatus(context.Background(),
@@ -176,6 +199,7 @@ func (c StatusController) StatusHandler() error {
 		return err
 	}
 	log.Infof("Refreshed status of %d members", len(msrs))
+	log.Debug("StatusHandler finished")
 
 	return nil
 }
