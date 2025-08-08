@@ -12,10 +12,11 @@ import (
 	"github.com/apex/log"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/sapcc/andromeda/internal/driver/f5/as3"
+	"github.com/sapcc/andromeda/internal/rpc/server"
 )
 
 type AS3DeclarationBuilder interface {
-	Build() (as3.ADC, error)
+	Build() (as3.ADC, *server.ProvisioningStatusRequest, error)
 }
 
 type as3DeclarationBuilder struct {
@@ -26,28 +27,33 @@ func NewAS3DeclarationBuilder(s AndromedaF5Store) AS3DeclarationBuilder {
 	return &as3DeclarationBuilder{store: s}
 }
 
-func (b *as3DeclarationBuilder) Build() (as3.ADC, error) {
+func (b *as3DeclarationBuilder) Build() (as3.ADC, *server.ProvisioningStatusRequest, error) {
 	adc := as3.NewADC()
-	common, err := b.getCommonTenant()
+	rpcRequest := &server.ProvisioningStatusRequest{}
+	rpcUpdates := []*server.ProvisioningStatusRequest_ProvisioningStatus{}
+	common, tenantRPCUpdates, err := b.getCommonTenant()
 	if err != nil {
-		return adc, err
+		return adc, rpcRequest, err
 	}
+	rpcUpdates = append(rpcUpdates, tenantRPCUpdates...)
 	adc.AddTenant("Common", common)
-	return adc, nil
+	rpcRequest.ProvisioningStatus = rpcUpdates
+	return adc, rpcRequest, nil
 }
 
-func (b *as3DeclarationBuilder) getCommonTenant() (as3.Tenant, error) {
+func (b *as3DeclarationBuilder) getCommonTenant() (as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error) {
 	tenant := as3.Tenant{}
+	rpcUpdates := []*server.ProvisioningStatusRequest_ProvisioningStatus{}
 	application := as3.Application{Template: "shared"}
 	datacenters, err := b.store.GetDatacenters()
 	if err != nil {
-		return tenant, err
+		return tenant, rpcUpdates, err
 	}
 	for _, datacenter := range datacenters {
 		log.Debugf("Creating GSLBServer declaration for members of datacenter [id = %q] [name = %s]", datacenter.Id, datacenter.Name)
 		members, err := b.store.GetMembers(datacenter.Id)
 		if err != nil {
-			return tenant, err
+			return tenant, rpcUpdates, err
 		}
 		log.Debugf("Found %d members for datacenter [id = %s] [name = %s]", len(members), datacenter.Id, datacenter.Name)
 		for _, member := range members {
@@ -85,7 +91,7 @@ func (b *as3DeclarationBuilder) getCommonTenant() (as3.Tenant, error) {
 		}
 	}
 	tenant.AddApplication("Shared", application)
-	return tenant, nil
+	return tenant, rpcUpdates, nil
 }
 
 func as3DeclarationGSLBServerKey(memberAddress, datacenterName string) string {

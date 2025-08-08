@@ -41,7 +41,7 @@ func TestAS3DeclarationBuilder(t *testing.T) {
 		}, nil)
 		store.On("GetMembers", "dc2").Return([]*rpcmodels.Member{}, nil)
 		b := as3DeclarationBuilder{store: store}
-		declaration, err := b.Build()
+		declaration, _, err := b.Build()
 		assert.Nil(err, "failed to build the declaration")
 		expected := as3.NewADC()
 		func() {
@@ -83,7 +83,7 @@ func TestAS3DeclarationBuilder(t *testing.T) {
 			{Id: "member3", Address: "200.10.0.100", Port: 9000},
 		}, nil)
 		b := as3DeclarationBuilder{store: store}
-		declaration, err := b.Build()
+		declaration, _, err := b.Build()
 		assert.Nil(err, "failed to build the declaration")
 		expected := as3.NewADC()
 		tenant := as3.Tenant{}

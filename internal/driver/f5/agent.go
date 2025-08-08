@@ -50,6 +50,7 @@ var (
 type F5Agent struct {
 	bigIP              *bigip.BigIP
 	declarationBuilder AS3DeclarationBuilder
+	rpc                server.RPCServerClient
 }
 
 type FullSync struct {
@@ -114,13 +115,11 @@ func ExecuteF5Agent() error {
 	}
 
 	// Create F5 worker instance with Server RPC interface
+	rpcClient := server.NewRPCServerClient(client)
 	f5 := F5Agent{
-		bigIP: activeF5Session,
-		declarationBuilder: NewAS3DeclarationBuilder(
-			NewAndromedaF5Store(
-				server.NewRPCServerClient(client),
-			),
-		),
+		bigIP:              activeF5Session,
+		declarationBuilder: NewAS3DeclarationBuilder(NewAndromedaF5Store(rpcClient)),
+		rpc:                rpcClient,
 	}
 
 	srv := rpc.NewServer("andromeda-f5-agent", stormrpc.WithNatsConn(nc))
@@ -174,7 +173,7 @@ func (f5 *F5Agent) fullSync() {
 // Sync relies on the AS3 `POST /declare` endpoint, therefore all entities must
 // be included in the payload.
 func (f5 *F5Agent) Sync() error {
-	decl, err := f5.declarationBuilder.Build()
+	decl, rpcRequest, err := f5.declarationBuilder.Build()
 	if err != nil {
 		return err
 	}
@@ -183,47 +182,14 @@ func (f5 *F5Agent) Sync() error {
 		return err
 	}
 	log.Debugf("AS3 declaration: %s", string(jsonDoc))
+	log.Debugf("RPC provisioning status updates: %v", rpcRequest.ProvisioningStatus)
 	if err := postAS3Declaration(decl, f5.bigIP, sanityCheckAS3Declaration); err != nil {
 		return err
 	}
-	/*
-		var prov []*server.ProvisioningStatusRequest_ProvisioningStatus
-		for _, domain := range response.GetResponse() {
-			log.Infof("%+v", domain)
-			prov = append(prov, &server.ProvisioningStatusRequest_ProvisioningStatus{
-				Id:     domain.GetId(),
-				Model:  server.ProvisioningStatusRequest_ProvisioningStatus_DOMAIN,
-				Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE,
-			})
-
-			for _, pool := range domain.GetPools() {
-				prov = append(prov, &server.ProvisioningStatusRequest_ProvisioningStatus{
-					Id:     pool.GetId(),
-					Model:  server.ProvisioningStatusRequest_ProvisioningStatus_POOL,
-					Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE,
-				})
-				for _, member := range pool.GetMembers() {
-					prov = append(prov, &server.ProvisioningStatusRequest_ProvisioningStatus{
-						Id:     member.GetId(),
-						Model:  server.ProvisioningStatusRequest_ProvisioningStatus_MEMBER,
-						Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE,
-					})
-				}
-				for _, monitor := range pool.GetMonitors() {
-					prov = append(prov, &server.ProvisioningStatusRequest_ProvisioningStatus{
-						Id:     monitor.GetId(),
-						Model:  server.ProvisioningStatusRequest_ProvisioningStatus_MONITOR,
-						Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE,
-					})
-				}
-			}
-		}
-		resp, err := f5.rpc.UpdateProvisioningStatus(context.Background(),
-			&server.ProvisioningStatusRequest{ProvisioningStatus: prov})
-		if err != nil {
-			return err
-		}
-		log.Infof("%+v", resp)
-	*/
+	log.Debugf("Posted AS3 declaration successfully")
+	if _, err := f5.rpc.UpdateProvisioningStatus(context.Background(), rpcRequest); err != nil {
+		return err
+	}
+	log.Debugf("Posted RPC provisioning status updates successfully")
 	return nil
 }
