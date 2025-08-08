@@ -45,7 +45,7 @@ var (
 )
 
 type F5Agent struct {
-	bigIP              *bigIP
+	bigIP              bigIPSession
 	declarationBuilder AS3DeclarationBuilder
 	rpc                server.RPCServerClient
 }

@@ -25,7 +25,7 @@ import (
 )
 
 type StatusController struct {
-	bigIP *bigIP
+	bigIP bigIPSession
 	rpc   server.RPCServerClient
 }
 

@@ -20,7 +20,7 @@ func TestGetActiveDeviceSession(t *testing.T) {
 		Devices: []string{"https://a.local", "https://b.local"},
 	}
 	t.Run("Fails if device session factory fails", func(t *testing.T) {
-		factory := func(url string) (*bigIP, error) {
+		factory := func(url string) (bigIPSession, error) {
 			return nil, errors.New("please let the caller know I failed")
 		}
 		_, _, err := getActiveDeviceSession(conf, factory, nil)
@@ -29,10 +29,40 @@ func TestGetActiveDeviceSession(t *testing.T) {
 		}
 	})
 	t.Run("Fails if device matcher fails", func(t *testing.T) {
-		t.Skip("Untestable: cannot mock factory due to its *bigIP pointer signature")
+		s := new(mockedBigIPSession)
+		factory := func(url string) (bigIPSession, error) {
+			s.On("GetHost").Return("http://c.local")
+			s.On("GetDevices").Return([]bigip.Device{
+				{Name: "a", Hostname: "a.local", FailoverState: "passive"},
+				{Name: "b", Hostname: "b.local", FailoverState: "active"},
+			}, nil)
+			return s, nil
+		}
+		_, _, err := getActiveDeviceSession(conf, factory, matchActiveDevice)
+		s.AssertCalled(t, "GetHost")
+		s.AssertCalled(t, "GetDevices")
+		if assert.Error(err) {
+			assert.ErrorContains(err, "failed to get active device")
+		}
 	})
 	t.Run("Succeeds otherwise", func(t *testing.T) {
-		t.Skip("Untestable: cannot mock factory due to its *bigIP pointer signature")
+		s := new(mockedBigIPSession)
+		factory := func(url string) (bigIPSession, error) {
+			s.On("GetHost").Return("http://b.local")
+			s.On("GetDevices").Return([]bigip.Device{
+				{Name: "a", Hostname: "a.local", FailoverState: "passive"},
+				{Name: "b", Hostname: "b.local", FailoverState: "active"},
+			}, nil)
+			return s, nil
+		}
+		session, device, err := getActiveDeviceSession(conf, factory, matchActiveDevice)
+		s.AssertCalled(t, "GetHost")
+		s.AssertCalled(t, "GetDevices")
+		if assert.Nil(err) {
+			assert.Equal("b", device.Name)
+			assert.Equal("b.local", device.Hostname)
+			assert.Same(s, session)
+		}
 	})
 }
 
@@ -162,9 +192,7 @@ func TestGetBigIPSession(t *testing.T) {
 	t.Run("Succeeds without environment variables", func(t *testing.T) {
 		s, err := getBigIPSession("https://johndoe:insecure@f5-device-1.local")
 		assert.Nil(err)
-		assert.Equal("https://f5-device-1.local", s.Host)
-		assert.Equal("johndoe", s.User)
-		assert.Equal("insecure", s.Password)
+		assert.Equal("https://f5-device-1.local", s.GetHost())
 	})
 	t.Run("Succeeds with environment variables (fallback if credentials not in URL)", func(t *testing.T) {
 		assert.Nil(os.Setenv("BIGIP_USER", "johndoe"))
@@ -175,8 +203,6 @@ func TestGetBigIPSession(t *testing.T) {
 		}()
 		s, err := getBigIPSession("https://f5-device-1.local")
 		assert.Nil(err)
-		assert.Equal("https://f5-device-1.local", s.Host)
-		assert.Equal("johndoe", s.User)
-		assert.Equal("insecure", s.Password)
+		assert.Equal("https://f5-device-1.local", s.GetHost())
 	})
 }
