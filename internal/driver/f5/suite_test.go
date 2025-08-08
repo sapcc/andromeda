@@ -23,6 +23,26 @@ func (c *mockedAS3Client) APICall(options *bigip.APIRequest) ([]byte, error) {
 	return args.Get(0).([]byte), args.Error(1)
 }
 
+type mockedBigIPSession struct {
+	bigIP
+	mock.Mock
+}
+
+func (s *mockedBigIPSession) APICall(options *bigip.APIRequest) ([]byte, error) {
+	args := s.Called(options)
+	return args.Get(0).([]byte), args.Error(1)
+}
+
+func (s *mockedBigIPSession) GetDevices() ([]bigip.Device, error) {
+	args := s.Called()
+	return args.Get(0).([]bigip.Device), args.Error(1)
+}
+
+func (s *mockedBigIPSession) GetHost() string {
+	args := s.Called()
+	return args.String(0)
+}
+
 type mockedStore struct {
 	mock.Mock
 }

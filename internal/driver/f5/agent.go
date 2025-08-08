@@ -22,8 +22,6 @@ import (
 	"github.com/sapcc/andromeda/internal/rpc"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/utils"
-
-	"github.com/f5devcentral/go-bigip"
 )
 
 const agentName = "f5-as3-declaration"
@@ -47,7 +45,7 @@ var (
 )
 
 type F5Agent struct {
-	bigIP              *bigip.BigIP
+	bigIP              *bigIP
 	declarationBuilder AS3DeclarationBuilder
 	rpc                server.RPCServerClient
 }

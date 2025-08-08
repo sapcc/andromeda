@@ -128,14 +128,14 @@ func GetiControlRestPartitionPath(path []string) string {
 	return buffer.String()
 }
 
-func GetForEntity(b *bigip.BigIP, e interface{}, path string) (error, bool) {
+func GetForEntity(s bigIPSession, e interface{}, path string) (error, bool) {
 	req := &bigip.APIRequest{
 		Method:      "get",
 		URL:         path,
 		ContentType: "application/json",
 	}
 
-	resp, err := b.APICall(req)
+	resp, err := s.APICall(req)
 	if err != nil {
 		var reqError bigip.RequestError
 		_ = json.Unmarshal(resp, &reqError)
@@ -155,14 +155,32 @@ func GetForEntity(b *bigip.BigIP, e interface{}, path string) (error, bool) {
 
 // TODO what's above this line is pending refactoring
 
-type activeDeviceMatcher func(*bigip.BigIP) (*bigip.Device, error)
-type deviceSessionFactory func(url string) (*bigip.BigIP, error)
+type bigIPSession interface {
+	APICall(options *bigip.APIRequest) ([]byte, error)
+	GetDevices() ([]bigip.Device, error)
+	GetHost() string
+}
+
+type bigIP struct {
+	*bigip.BigIP
+}
+
+func newBigIPSession(b *bigip.BigIP) *bigIP {
+	return &bigIP{BigIP: b}
+}
+
+func (b *bigIP) GetHost() string {
+	return b.BigIP.Host
+}
+
+type activeDeviceMatcher func(bigIPSession) (*bigip.Device, error)
+type deviceSessionFactory func(url string) (*bigIP, error)
 
 func getActiveDeviceSession(
 	conf config.F5Config,
 	matcher activeDeviceMatcher,
-	factory deviceSessionFactory) (*bigip.BigIP, *bigip.Device, error) {
-	var s *bigip.BigIP
+	factory deviceSessionFactory) (*bigIP, *bigip.Device, error) {
+	var s *bigIP
 	var d *bigip.Device
 	for _, url := range conf.Devices {
 		session, err := factory(url)
@@ -182,8 +200,8 @@ func getActiveDeviceSession(
 	return s, d, nil
 }
 
-func matchActiveDevice(session *bigip.BigIP) (*bigip.Device, error) {
-	hostname, err := getSessionHostname(session)
+func matchActiveDevice(session bigIPSession) (*bigip.Device, error) {
+	hostname, err := getSessionHostnameFromURL(session.GetHost())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get hostname from F5 device session: %s", err)
 	}
@@ -201,15 +219,15 @@ func matchActiveDevice(session *bigip.BigIP) (*bigip.Device, error) {
 	return device, nil
 }
 
-func getSessionHostname(session *bigip.BigIP) (string, error) {
-	deviceURL, err := url.Parse(session.Host)
+func getSessionHostnameFromURL(rawURL string) (string, error) {
+	parsedURL, err := url.Parse(rawURL)
 	if err != nil {
 		return "", err
 	}
-	if deviceURL.Hostname() != "" {
-		return deviceURL.Hostname(), nil
+	if parsedURL.Hostname() != "" {
+		return parsedURL.Hostname(), nil
 	}
-	return session.Host, nil
+	return rawURL, nil
 }
 
 func filterDeviceMatchingHostnameSuffix(devices []bigip.Device, hostname string) (*bigip.Device, error) {
@@ -221,7 +239,7 @@ func filterDeviceMatchingHostnameSuffix(devices []bigip.Device, hostname string)
 	return nil, fmt.Errorf("device %s not found", hostname)
 }
 
-func getBigIPSession(rawURL string) (*bigip.BigIP, error) {
+func getBigIPSession(rawURL string) (*bigIP, error) {
 	parsedURL, err := url.Parse(rawURL)
 	if err != nil {
 		return nil, err
@@ -244,7 +262,7 @@ func getBigIPSession(rawURL string) (*bigip.BigIP, error) {
 	}
 	// todo: make configurable
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	return bigip.NewSession(&bigip.Config{
+	return newBigIPSession(bigip.NewSession(&bigip.Config{
 		Address:           parsedURL.Hostname(),
 		Username:          user,
 		Password:          password,
@@ -255,5 +273,5 @@ func getBigIPSession(rawURL string) (*bigip.BigIP, error) {
 			TokenTimeout:   1200 * time.Second,
 			APICallRetries: int(config.Global.F5Config.MaxRetries),
 		},
-	}), nil
+	})), nil
 }

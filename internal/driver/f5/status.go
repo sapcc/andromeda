@@ -17,7 +17,6 @@ import (
 
 	"github.com/actatum/stormrpc"
 	"github.com/apex/log"
-	"github.com/f5devcentral/go-bigip"
 	"github.com/nats-io/nats.go"
 
 	"github.com/sapcc/andromeda/internal/config"
@@ -26,7 +25,7 @@ import (
 )
 
 type StatusController struct {
-	bigIP *bigip.BigIP
+	bigIP *bigIP
 	rpc   server.RPCServerClient
 }
 

@@ -5,6 +5,7 @@
 package f5
 
 import (
+	"errors"
 	"os"
 	"testing"
 
@@ -17,29 +18,90 @@ func TestGetActiveDeviceSession(t *testing.T) {
 }
 
 func TestMatchActiveDevice(t *testing.T) {
-	t.Skip("Untestable. Need to be able to mock bigip.BigIP.GetDevices(), however bigip.BigIP is not an interface.")
-	t.Run("Fails if no 'active' device found", func(t *testing.T) {
-		t.Skip("see above")
+	assert := assert.New(t)
+	t.Run("Fails if session has a bad hostname", func(t *testing.T) {
+		s := new(mockedBigIPSession)
+		s.On("GetHost").Return("://b.local")
+		_, err := matchActiveDevice(s)
+		s.AssertCalled(t, "GetHost")
+		s.AssertNotCalled(t, "GetDevices")
+		if assert.Error(err) {
+			assert.ErrorContains(err, "failed to get hostname")
+		}
 	})
-	t.Run("Succeeds with first 'active' device (the other is supposed to be 'passive')", func(t *testing.T) {
-		t.Skip("see above")
+	t.Run("Fails if it cannot get devices list", func(t *testing.T) {
+		s := new(mockedBigIPSession)
+		s.On("GetHost").Return("https://b.local")
+		s.On("GetDevices").Return([]bigip.Device{}, errors.New("please let the caller now I failed"))
+		_, err := matchActiveDevice(s)
+		s.AssertCalled(t, "GetHost")
+		s.AssertCalled(t, "GetDevices")
+		if assert.Error(err) {
+			assert.ErrorContains(err, "failed to get devices")
+		}
+	})
+	t.Run("Fails if it cannot find one device whose hostname matches the session host (suffix matching)", func(t *testing.T) {
+		s := new(mockedBigIPSession)
+		devices := []bigip.Device{
+			{Name: "a", Hostname: "x.local", FailoverState: "passive"},
+			{Name: "b", Hostname: "y.local", FailoverState: "active"},
+		}
+		s.On("GetHost").Return("https://b.local")
+		s.On("GetDevices").Return(devices, nil)
+		_, err := matchActiveDevice(s)
+		s.AssertCalled(t, "GetHost")
+		s.AssertCalled(t, "GetDevices")
+		if assert.Error(err) {
+			assert.ErrorContains(err, "failed to filter")
+		}
+	})
+	t.Run("Fails if no 'active' device found", func(t *testing.T) {
+		s := new(mockedBigIPSession)
+		devices := []bigip.Device{
+			{Name: "a", Hostname: "a.local", FailoverState: "passive"},
+			{Name: "b", Hostname: "b.local", FailoverState: "passive"},
+		}
+		s.On("GetHost").Return("https://b.local")
+		s.On("GetDevices").Return(devices, nil)
+		d, err := matchActiveDevice(s)
+		s.AssertCalled(t, "GetHost")
+		s.AssertCalled(t, "GetDevices")
+		assert.Nil(err)
+		assert.Nil(d, "no active device should have been found")
+	})
+	t.Run("Succeeds with first 'active' device (the other is expected to be 'passive')", func(t *testing.T) {
+		s := new(mockedBigIPSession)
+		devices := []bigip.Device{
+			{Name: "a", Hostname: "a.local", FailoverState: "passive"},
+			{Name: "b", Hostname: "b.local", FailoverState: "active"},
+		}
+		s.On("GetHost").Return("https://b.local")
+		s.On("GetDevices").Return(devices, nil)
+		d, err := matchActiveDevice(s)
+		s.AssertCalled(t, "GetHost")
+		s.AssertCalled(t, "GetDevices")
+		assert.Nil(err)
+		if assert.NotNil(d, "one device (Name: 'b') should have been detected as 'active'") {
+			assert.Equal(d.Name, "b")
+			assert.Equal(d.Hostname, "b.local")
+		}
 	})
 }
 
-func TestGetSessionHostname(t *testing.T) {
+func TestGetSessionHostnameFromURL(t *testing.T) {
 	assert := assert.New(t)
 	t.Run("Fails if malformed URL", func(t *testing.T) {
-		_, err := getSessionHostname(&bigip.BigIP{Host: "://foo.bar"})
+		_, err := getSessionHostnameFromURL("://foo.bar")
 		assert.Error(err)
 	})
 	t.Run("Succeeds with parsed hostname, if any", func(t *testing.T) {
-		hostname, err := getSessionHostname(&bigip.BigIP{Host: "https://foo.bar"})
+		hostname, err := getSessionHostnameFromURL("https://foo.bar")
 		assert.Nil(err)
 		assert.Equal("foo.bar", hostname)
 	})
 	t.Run("Succeeds but falls back to BigIP.Host if parsed URL has no hostname", func(t *testing.T) {
 		// TODO not sure what's the point of supporting this scenario
-		hostname, err := getSessionHostname(&bigip.BigIP{Host: "---"})
+		hostname, err := getSessionHostnameFromURL("---")
 		assert.Nil(err)
 		assert.Equal("---", hostname)
 	})
