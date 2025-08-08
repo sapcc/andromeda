@@ -21,7 +21,22 @@ func TestMatchActiveDevice(t *testing.T) {
 }
 
 func TestGetSessionHostname(t *testing.T) {
-	t.Skip()
+	assert := assert.New(t)
+	t.Run("Fails if malformed URL", func(t *testing.T) {
+		_, err := getSessionHostname(&bigip.BigIP{Host: "://foo.bar"})
+		assert.Error(err)
+	})
+	t.Run("Succeeds with parsed hostname, if any", func(t *testing.T) {
+		hostname, err := getSessionHostname(&bigip.BigIP{Host: "https://foo.bar"})
+		assert.Nil(err)
+		assert.Equal("foo.bar", hostname)
+	})
+	t.Run("Succeeds but falls back to BigIP.Host if parsed URL has no hostname", func(t *testing.T) {
+		// TODO not sure what's the point of supporting this scenario
+		hostname, err := getSessionHostname(&bigip.BigIP{Host: "---"})
+		assert.Nil(err)
+		assert.Equal("---", hostname)
+	})
 }
 
 func TestFilterDeviceMatchingHostnameSuffix(t *testing.T) {
