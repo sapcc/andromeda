@@ -191,7 +191,7 @@ func matchActiveDevice(session *bigip.BigIP) (*bigip.Device, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get devices from F5 device session: %s", err)
 	}
-	device, err := filterDeviceMatchingHostname(devices, hostname)
+	device, err := filterDeviceMatchingHostnameSuffix(devices, hostname)
 	if err != nil {
 		return nil, fmt.Errorf("failed to filter F5 device matching session hostname: %v", err)
 	}
@@ -212,7 +212,7 @@ func getSessionHostname(session *bigip.BigIP) (string, error) {
 	return session.Host, nil
 }
 
-func filterDeviceMatchingHostname(devices []bigip.Device, hostname string) (*bigip.Device, error) {
+func filterDeviceMatchingHostnameSuffix(devices []bigip.Device, hostname string) (*bigip.Device, error) {
 	for _, device := range devices {
 		if strings.HasSuffix(hostname, device.Hostname) {
 			return &device, nil

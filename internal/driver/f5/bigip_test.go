@@ -8,6 +8,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/f5devcentral/go-bigip"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,8 +24,25 @@ func TestGetSessionHostname(t *testing.T) {
 	t.Skip()
 }
 
-func TestFilterDeviceMatchingHostname(t *testing.T) {
-	t.Skip()
+func TestFilterDeviceMatchingHostnameSuffix(t *testing.T) {
+	assert := assert.New(t)
+	t.Run("Fails if no matches", func(t *testing.T) {
+		devices := []bigip.Device{
+			{Hostname: "foo"},
+			{Hostname: "bar"},
+		}
+		_, err := filterDeviceMatchingHostnameSuffix(devices, "a-very-long-hostname")
+		assert.Error(err)
+	})
+	t.Run("Succeeds if suffix matches", func(t *testing.T) {
+		devices := []bigip.Device{
+			{Hostname: "hostname-foo"},
+			{Hostname: "long-hostname"},
+		}
+		d, err := filterDeviceMatchingHostnameSuffix(devices, "a-very.long-hostname")
+		assert.Nil(err)
+		assert.Equal(d.Hostname, "long-hostname")
+	})
 }
 
 func TestGetBigIPSession(t *testing.T) {
