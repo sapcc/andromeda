@@ -5,13 +5,18 @@
 package f5
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"net/url"
+	"os"
 	"strings"
+	"time"
 
 	"github.com/f5devcentral/go-bigip"
 
+	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/driver/f5/as3"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
 )
@@ -148,7 +153,55 @@ func GetForEntity(b *bigip.BigIP, e interface{}, path string) (error, bool) {
 	return nil, true
 }
 
-func GetSessionHostname(session *bigip.BigIP) (string, error) {
+// TODO what's above this line is pending refactoring
+
+type activeDeviceMatcher func(*bigip.BigIP) (*bigip.Device, error)
+type deviceSessionFactory func(url string) (*bigip.BigIP, error)
+
+func getActiveDeviceSession(
+	conf config.F5Config,
+	matcher activeDeviceMatcher,
+	factory deviceSessionFactory) (*bigip.BigIP, *bigip.Device, error) {
+	var s *bigip.BigIP
+	var d *bigip.Device
+	for _, url := range conf.Devices {
+		session, err := factory(url)
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to acquire F5 device session: %s", err)
+		}
+		device, err := matchActiveDevice(session)
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to determine whether F5 device is active: %s", err)
+		}
+		if device != nil {
+			s = session
+			d = device
+			break
+		}
+	}
+	return s, d, nil
+}
+
+func matchActiveDevice(session *bigip.BigIP) (*bigip.Device, error) {
+	hostname, err := getSessionHostname(session)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get hostname from F5 device session: %s", err)
+	}
+	devices, err := session.GetDevices()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get devices from F5 device session: %s", err)
+	}
+	device, err := filterDeviceMatchingHostname(devices, hostname)
+	if err != nil {
+		return nil, fmt.Errorf("failed to filter F5 device matching session hostname: %v", err)
+	}
+	if device.FailoverState != "active" {
+		return nil, nil
+	}
+	return device, nil
+}
+
+func getSessionHostname(session *bigip.BigIP) (string, error) {
 	deviceURL, err := url.Parse(session.Host)
 	if err != nil {
 		return "", err
@@ -159,11 +212,48 @@ func GetSessionHostname(session *bigip.BigIP) (string, error) {
 	return session.Host, nil
 }
 
-func FilterDeviceMatchingHostname(devices []bigip.Device, hostname string) (*bigip.Device, error) {
+func filterDeviceMatchingHostname(devices []bigip.Device, hostname string) (*bigip.Device, error) {
 	for _, device := range devices {
 		if strings.HasSuffix(hostname, device.Hostname) {
 			return &device, nil
 		}
 	}
 	return nil, fmt.Errorf("device %s not found", hostname)
+}
+
+func getBigIPSession(rawURL string) (*bigip.BigIP, error) {
+	parsedURL, err := url.Parse(rawURL)
+	if err != nil {
+		return nil, err
+	}
+	user := parsedURL.User.Username()
+	if user == "" {
+		var ok bool
+		user, ok = os.LookupEnv("BIGIP_USER")
+		if !ok {
+			return nil, fmt.Errorf("BIGIP_USER required for host '%s'", parsedURL.Hostname())
+		}
+	}
+	// check for password
+	password, ok := parsedURL.User.Password()
+	if !ok {
+		password, ok = os.LookupEnv("BIGIP_PASSWORD")
+		if !ok {
+			return nil, fmt.Errorf("BIGIP_PASSWORD required for host '%s'", parsedURL.Hostname())
+		}
+	}
+	// todo: make configurable
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	return bigip.NewSession(&bigip.Config{
+		Address:           parsedURL.Hostname(),
+		Username:          user,
+		Password:          password,
+		LoginReference:    "tmos",
+		CertVerifyDisable: !config.Global.F5Config.ValidateCert,
+		ConfigOptions: &bigip.ConfigOptions{
+			APICallTimeout: 60 * time.Second,
+			TokenTimeout:   1200 * time.Second,
+			APICallRetries: int(config.Global.F5Config.MaxRetries),
+		},
+	}), nil
 }

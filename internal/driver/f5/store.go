@@ -8,7 +8,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/apex/log"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
 )
@@ -42,7 +41,6 @@ func (s *andromedaF5Store) GetDatacenters() ([]*rpcmodels.Datacenter, error) {
 	if res == nil || len(res.GetResponse()) == 0 {
 		return nil, fmt.Errorf("no F5 datacenters found")
 	}
-	log.Debugf("rpc.GetDatacenters returned %d items", len(res.GetResponse()))
 	return res.GetResponse(), nil
 }
 
@@ -60,7 +58,6 @@ func (s *andromedaF5Store) GetDomains() ([]*rpcmodels.Domain, error) {
 	if res == nil || len(res.GetResponse()) == 0 {
 		return nil, fmt.Errorf("no F5 domains found")
 	}
-	log.Debugf("rpc.GetDomains returned %d items", len(res.GetResponse()))
 	return res.GetResponse(), nil
 }
 
@@ -77,7 +74,6 @@ func (s *andromedaF5Store) GetMembers(datacenterId string) ([]*rpcmodels.Member,
 	if res == nil {
 		return nil, fmt.Errorf("rpc.GetMembers response is nil")
 	}
-	log.Debugf("rpc.GetMembers returned %d items", len(res.GetResponse()))
 	return res.GetResponse(), nil
 }
 
@@ -94,6 +90,5 @@ func (s *andromedaF5Store) GetPools() ([]*rpcmodels.Pool, error) {
 	if res == nil {
 		return nil, fmt.Errorf("rpc.GetPools response is nil")
 	}
-	log.Debugf("rpc.GetPools returned %d items", len(res.GetResponse()))
 	return res.GetResponse(), nil
 }

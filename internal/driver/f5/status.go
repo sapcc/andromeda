@@ -38,26 +38,14 @@ func ExecuteF5StatusAgent() error {
 		config.Global.F5Config.PhysicalNetwork,
 	)
 
-	var activeF5Session *bigip.BigIP
-	for _, url := range config.Global.F5Config.Devices {
-		deviceSession, err := GetBigIPSession(url)
-		if err != nil {
-			return fmt.Errorf("failed to acquire F5 device session: %v", err)
-		}
-		device, err := GetActiveDevice(deviceSession)
-		if err != nil {
-			return fmt.Errorf("failed to determine whether F5 device is active: %v", err)
-		}
-		if device != nil {
-			activeF5Session = deviceSession
-			log.Infof("Connected to F5 device [marketing name = %q, name = %q, version = %s, edition = %q, failover state = %q]",
-				device.MarketingName, device.Name, device.Version, device.Edition, device.FailoverState)
-		}
-	}
-
-	if activeF5Session == nil {
+	activeF5Session, activeF5Device, err := getActiveDeviceSession(config.Global.F5Config, matchActiveDevice, getBigIPSession)
+	if err == nil {
 		return errors.New("failed to determine active F5 session")
 	}
+
+	// TODO replace with a fmt.Formatter
+	log.Infof("Connected to F5 device [marketing name = %q, name = %q, version = %s, edition = %q, failover state = %q]",
+		activeF5Device.MarketingName, activeF5Device.Name, activeF5Device.Version, activeF5Device.Edition, activeF5Device.FailoverState)
 
 	// RPC server
 	nc, err := nats.Connect(config.Global.Default.TransportURL)

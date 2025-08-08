@@ -9,7 +9,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/apex/log"
 	"github.com/f5devcentral/go-bigip"
 	"github.com/sapcc/andromeda/internal/driver/f5/as3"
 	"github.com/sapcc/andromeda/internal/rpc/server"
@@ -50,12 +49,10 @@ func (b *as3DeclarationBuilder) getCommonTenant() (as3.Tenant, []*server.Provisi
 		return tenant, rpcUpdates, err
 	}
 	for _, datacenter := range datacenters {
-		log.Debugf("Creating GSLBServer declaration for members of datacenter [id = %q] [name = %s]", datacenter.Id, datacenter.Name)
 		members, err := b.store.GetMembers(datacenter.Id)
 		if err != nil {
 			return tenant, rpcUpdates, err
 		}
-		log.Debugf("Found %d members for datacenter [id = %s] [name = %s]", len(members), datacenter.Id, datacenter.Name)
 		for _, member := range members {
 			memberKey := as3DeclarationGSLBServerKey(member.Address, datacenter.Name)
 			entity := application.GetEntity(memberKey)
@@ -121,7 +118,6 @@ func postAS3Declaration(decl as3.ADC, client as3Client, declChecker func(as3.ADC
 		Body:        string(jsonDecl),
 		ContentType: "application/json",
 	}); err != nil {
-		log.Errorf("failed posting AS3 declaration: %s", err)
 		return err
 	}
 	return nil
