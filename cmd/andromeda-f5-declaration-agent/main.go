@@ -5,14 +5,15 @@
 package main
 
 import (
+	"github.com/urfave/cli/v2"
+
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/driver/f5"
-	"github.com/urfave/cli/v2"
 )
 
 func main() {
-	config.ParseArgsAndRun("andromeda-f5-status-agent", "andromeda F5 status agent",
+	config.ParseArgsAndRun("andromeda-f5-declaration-agent", "andromeda F5 declaration agent",
 		func(c *cli.Context) error {
-			return f5.ExecuteF5StatusAgent()
+			return f5.ExecuteF5DeclarationAgent()
 		})
 }
