@@ -26,6 +26,7 @@ import (
 	"github.com/sapcc/andromeda/internal/policy"
 	"github.com/sapcc/andromeda/internal/rpc"
 	"github.com/sapcc/andromeda/internal/rpc/server"
+	"github.com/sapcc/andromeda/internal/server/bootstrap"
 	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/middlewares"
 	"github.com/sapcc/andromeda/restapi"
@@ -65,6 +66,9 @@ func ExecuteServer(server *restapi.Server) error {
 
 	// Mapper function for SQL name mapping, snake_case table names
 	db.MapperFunc(strcase.ToSnake)
+
+	// Upsert F5 datacenters from config file
+	bootstrap.UpsertF5Datacenters(db, config.Global.F5Datacenters)
 
 	// Policy Engine
 	policy.SetPolicyEngine(config.Global.ApiSettings.PolicyEngine)
