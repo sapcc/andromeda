@@ -5,9 +5,9 @@
 package f5
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/signal"
@@ -17,55 +17,76 @@ import (
 	"github.com/actatum/stormrpc"
 	"github.com/apex/log"
 	"github.com/nats-io/nats.go"
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/rpc"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/utils"
-
-	"github.com/scottdware/go-bigip"
-
-	"github.com/sapcc/andromeda/internal/driver/f5/as3"
 )
 
-type F5Agent struct {
-	bigIP *bigip.BigIP
-	rpc   server.RPCServerClient
+func init() {
+	prometheus.MustRegister(lastSyncTimestampGauge)
+	prometheus.MustRegister(lastSyncDurationSecondsGauge)
 }
 
-type FullSync struct {
-	f5 *F5Agent
+var lastSyncTimestampGauge = prometheus.NewGaugeVec(
+	prometheus.GaugeOpts{
+		Name: "andromeda_agent_last_sync_timestamp",
+		Help: "Last time an agent has successfully completed its sync loop (sync completion timestamp)",
+	},
+	[]string{"agent"},
+)
+var lastSyncDurationSecondsGauge = prometheus.NewGaugeVec(
+	prometheus.GaugeOpts{
+		Name: "andromeda_agent_last_sync_duration_seconds",
+		Help: "Last time an agent has successfully completed its sync loop (sync duration in seconds)",
+	},
+	[]string{"agent"},
+)
+
+type syncFunc func(session bigIPSession, rpc server.RPCServerClient) error
+type instrumentedSyncFunc func(session bigIPSession, rpc server.RPCServerClient)
+
+func syncWorker(syncInterval time.Duration, session bigIPSession, rpc server.RPCServerClient, instrumentedSyncFunc instrumentedSyncFunc) {
+	instrumentedSyncFunc(session, rpc)
+	c := time.Tick(syncInterval)
+	for {
+		<-c
+		instrumentedSyncFunc(session, rpc)
+	}
 }
 
-// Method can be of any name
-func (s *FullSync) FullSync(ctx context.Context, req stormrpc.Request) stormrpc.Response {
-	log.WithField("request", req).Info("[pubsub.1] Received event")
-	// do something with event
-	s.f5.fullSync()
-
-	resp, err := stormrpc.NewResponse(req.Reply, nil)
-	if err != nil {
-		return stormrpc.NewErrorResponse(req.Reply, err)
+func makeInstrumentedSyncFunc(agentName string, syncInterval time.Duration, syncFunc syncFunc) instrumentedSyncFunc {
+	return func(session bigIPSession, rpc server.RPCServerClient) {
+		syncStart := time.Now()
+		err := syncFunc(session, rpc)
+		elapsed := time.Since(syncStart)
+		if err != nil {
+			log.Errorf("Sync failed after %s (next iteration in %s): %s", elapsed, syncInterval, err.Error())
+			return
+		}
+		log.Infof("Sync completed in %s (next iteration in %s)", elapsed, syncInterval)
+		lastSyncTimestampGauge.WithLabelValues(agentName).Set(float64(time.Now().Unix()))
+		lastSyncDurationSecondsGauge.WithLabelValues(agentName).Set(elapsed.Seconds())
 	}
-
-	return resp
 }
 
-func ExecuteF5Agent() error {
-	session, err := GetBigIPSession()
+func ExecuteF5Agent(agentName string, syncInterval time.Duration, syncFunc syncFunc) error {
+	log.Debugf("Enabled=%+v Devices=%v VCMPs=%v PhysicalNetwork=%v",
+		config.Global.F5Config.Enabled,
+		config.Global.F5Config.Devices,
+		config.Global.F5Config.VCMPs,
+		config.Global.F5Config.PhysicalNetwork,
+	)
+
+	activeF5Session, activeF5Device, err := getActiveDeviceSession(config.Global.F5Config, getBigIPSession, matchActiveDevice)
 	if err != nil {
-		return fmt.Errorf("acquiring BigIP session: %v", err)
+		return errors.New("failed to determine active F5 session")
 	}
 
-	device, err := session.GetCurrentDevice()
-	if err != nil {
-		return err
-	}
-	log.Infof("connected to %s %s (%s)", device.MarketingName, device.Name, device.Version)
-
-	if err = BigIPSupportsDNS(device); err != nil {
-		return err
-	}
+	log.Infof("Connected to F5 device [marketing name = %q, name = %q, version = %s, edition = %q, failover state = %q]",
+		activeF5Device.MarketingName, activeF5Device.Name, activeF5Device.Version, activeF5Device.Edition, activeF5Device.FailoverState)
 
 	nc, err := nats.Connect(config.Global.Default.TransportURL)
 	if err != nil {
@@ -77,17 +98,32 @@ func ExecuteF5Agent() error {
 	}
 
 	// Create F5 worker instance with Server RPC interface
-	f5 := F5Agent{
-		session,
-		server.NewRPCServerClient(client),
-	}
+	rpcClient := server.NewRPCServerClient(client)
+	srv := rpc.NewServer(fmt.Sprintf("andromeda-%s-agent", agentName), stormrpc.WithNatsConn(nc))
 
-	srv := rpc.NewServer("andromeda-f5-agent", stormrpc.WithNatsConn(nc))
-	fs := &FullSync{&f5}
-	srv.Handle("andromeda.sync", fs.FullSync)
+	instrumentedSyncFunc := makeInstrumentedSyncFunc(agentName, syncInterval, syncFunc)
 
-	go f5.periodicSync()
-	go f5.fullSync()
+	// Allows the sync to be invoked over RPC via an HTTP handler in Andromeda Server
+	// see `m31ctl sync`
+	// TODO it doesn't work; the first handler to receive the message
+	// runs the sync, while the other will not receive any event.
+	srv.Handle("andromeda.sync", func(ctx context.Context, req stormrpc.Request) stormrpc.Response {
+		log.WithField("request", req).Info("[pubsub.1] Received event")
+		instrumentedSyncFunc(activeF5Session, rpcClient)
+		resp, err := stormrpc.NewResponse(req.Reply, nil)
+
+		// TODO if setting resp.Err works, then instrumentedSyncFunc
+		// should return an error and make this possible.
+		// Update: if set to an error, it will cause the Andromeda Server to panic
+		// resp.Err = syncErr
+
+		if err != nil {
+			return stormrpc.NewErrorResponse(req.Reply, err)
+		}
+		return resp
+	})
+
+	go syncWorker(syncInterval, activeF5Session, rpcClient, instrumentedSyncFunc)
 	go func() {
 		_ = srv.Run()
 	}()
@@ -106,138 +142,45 @@ func ExecuteF5Agent() error {
 	return srv.Shutdown(ctx)
 }
 
-func (f5 *F5Agent) fullSync() {
-	if err := f5.Sync(false); err != nil {
-		log.Error(err.Error())
-	}
+func ExecuteF5DeclarationAgent() error {
+	return ExecuteF5Agent("f5-declaration", 5*time.Minute, declarationSync)
 }
 
-func (f5 *F5Agent) periodicSync() {
-	t := time.NewTicker(10 * time.Second)
-	defer t.Stop()
-	for {
-		<-t.C // Activate periodically
-		if err := f5.Sync(true); err != nil {
-			log.Error(err.Error())
-		}
-	}
-
+func ExecuteF5StatusAgent() error {
+	return ExecuteF5Agent("f5-status", 5*time.Minute, statusSync)
 }
 
-func (f5 *F5Agent) Sync(pending bool) error {
-	adc := as3.ADC{SchemaVersion: "3.22.0"}
-
-	// Tenants
-	response, err := f5.rpc.GetDomains(context.Background(), &server.SearchRequest{
-		Provider:       "f5",
-		PageNumber:     0,
-		ResultPerPage:  1000,
-		FullyPopulated: true,
-		Pending:        pending,
-	})
+func declarationSync(session bigIPSession, rpc server.RPCServerClient) error {
+	decl, rpcRequest, err := buildAS3Declaration(NewAndromedaF5Store(rpc), buildAS3CommonTenant, buildAS3DomainTenant)
 	if err != nil {
 		return err
 	}
-
-	if response.GetResponse() == nil {
-		return nil
-	}
-	common, err := f5.GetCommonDeclaration()
+	jsonDoc, err := json.Marshal(decl)
 	if err != nil {
 		return err
 	}
-	tenant, err := f5.GetTenantDeclaration(response.GetResponse())
-	if err != nil {
+	log.Debugf("AS3 declaration: %s", string(jsonDoc))
+	log.Debugf("RPC provisioning status updates: %v", rpcRequest.ProvisioningStatus)
+	if err := postAS3Declaration(decl, session, sanityCheckAS3Declaration); err != nil {
 		return err
 	}
-
-	adc.AddTenant("ExampleTenant", *tenant)
-	adc.AddTenant("Common", *common)
-	if err := postDeclaration(adc); err != nil {
+	log.Debugf("Posted AS3 declaration successfully")
+	if _, err := rpc.UpdateProvisioningStatus(context.Background(), rpcRequest); err != nil {
 		return err
 	}
-
-	var prov []*server.ProvisioningStatusRequest_ProvisioningStatus
-	for _, domain := range response.GetResponse() {
-		log.Infof("%+v", domain)
-		prov = append(prov, &server.ProvisioningStatusRequest_ProvisioningStatus{
-			Id:     domain.GetId(),
-			Model:  server.ProvisioningStatusRequest_ProvisioningStatus_DOMAIN,
-			Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE,
-		})
-
-		for _, pool := range domain.GetPools() {
-			prov = append(prov, &server.ProvisioningStatusRequest_ProvisioningStatus{
-				Id:     pool.GetId(),
-				Model:  server.ProvisioningStatusRequest_ProvisioningStatus_POOL,
-				Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE,
-			})
-			for _, member := range pool.GetMembers() {
-				prov = append(prov, &server.ProvisioningStatusRequest_ProvisioningStatus{
-					Id:     member.GetId(),
-					Model:  server.ProvisioningStatusRequest_ProvisioningStatus_MEMBER,
-					Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE,
-				})
-			}
-			for _, monitor := range pool.GetMonitors() {
-				prov = append(prov, &server.ProvisioningStatusRequest_ProvisioningStatus{
-					Id:     monitor.GetId(),
-					Model:  server.ProvisioningStatusRequest_ProvisioningStatus_MONITOR,
-					Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE,
-				})
-			}
-		}
-	}
-	resp, err := f5.rpc.UpdateProvisioningStatus(context.Background(),
-		&server.ProvisioningStatusRequest{ProvisioningStatus: prov})
-	if err != nil {
-		return err
-	}
-	log.Infof("%+v", resp)
+	log.Debugf("Posted RPC provisioning status updates successfully")
 	return nil
 }
 
-func postDeclaration(v interface{}) error {
-	js, err := json.MarshalIndent(v, "", "\t")
+func statusSync(session bigIPSession, rpc server.RPCServerClient) error {
+	req, err := buildMemberStatusUpdateRequest(session, NewAndromedaF5Store(rpc))
 	if err != nil {
 		return err
 	}
-
-	log.Infof("\n%s\n", string(js))
-
-	session, err := GetBigIPSession()
-	if err != nil {
+	log.Debugf("RPC member status updates: %v", req.MemberStatus)
+	if _, err = rpc.UpdateMemberStatus(context.Background(), req); err != nil {
 		return err
 	}
-	req := &bigip.APIRequest{
-		Method:      "post",
-		URL:         "mgmt/shared/appsvcs/declare",
-		Body:        string(js),
-		ContentType: "application/json",
-	}
-	resp, err := session.APICall(req)
-	if err != nil {
-		print(err)
-	}
-
-	var prettyJSON bytes.Buffer
-	if err := json.Indent(&prettyJSON, resp, "", "\t"); err != nil {
-		return err
-	}
-	log.Info(prettyJSON.String())
-
-	var response as3.Response
-	if err := json.Unmarshal(resp, &response); err != nil {
-		return err
-	}
-
-	for _, result := range response.Results {
-		if result.Code != 200 {
-			return fmt.Errorf("failed post! %s", result.Message)
-		} else {
-			log.Infof("succeeded: %s", result.Tenant)
-		}
-	}
-
+	log.Debugf("Posted RPC member status updates successfully")
 	return nil
 }

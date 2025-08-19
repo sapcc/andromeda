@@ -25,6 +25,7 @@ message SearchRequest {
   int32 result_per_page = 4;
   bool pending = 5;
   repeated string ids = 6;
+  string datacenter_id = 7;
 }
 
 message DomainsResponse {
