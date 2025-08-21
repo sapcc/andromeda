@@ -103,7 +103,7 @@ func fetchPoolTypeAMemberAvailability(session bigIPSession, urlPath string) (str
 	}
 	var membersStats *MembersStats
 	// stats.Entries, if valid, will always be a size 1 map and its only
-	// key is always the pool type A member stats we need, so we interate
+	// key is always the pool type A member stats we need, so we iterate
 	// just once in order to unmarshal its raw JSON value as a struct.
 	for _, rawEntry := range mcs.Entries {
 		if err := json.Unmarshal(rawEntry, &membersStats); err != nil {
