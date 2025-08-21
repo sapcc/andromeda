@@ -7,7 +7,6 @@ package f5
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
 	"os/signal"
@@ -82,7 +81,7 @@ func ExecuteF5Agent(agentName string, syncInterval time.Duration, syncFn syncFun
 
 	activeF5Session, activeF5Device, err := getActiveDeviceSession(config.Global.F5Config, getBigIPSession, matchActiveDevice)
 	if err != nil {
-		return errors.New("failed to determine active F5 session")
+		return fmt.Errorf("failed to determine active F5 session: %w", err)
 	}
 
 	log.Infof("Connected to F5 device [marketing name = %q, name = %q, version = %s, edition = %q, failover state = %q]",
