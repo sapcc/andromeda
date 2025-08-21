@@ -48,19 +48,19 @@ var lastSyncDurationSecondsGauge = prometheus.NewGaugeVec(
 type syncFunc func(session bigIPSession, rpc server.RPCServerClient) error
 type instrumentedSyncFunc func(session bigIPSession, rpc server.RPCServerClient)
 
-func syncWorker(syncInterval time.Duration, session bigIPSession, rpc server.RPCServerClient, instrumentedSyncFunc instrumentedSyncFunc) {
-	instrumentedSyncFunc(session, rpc)
+func syncWorker(syncInterval time.Duration, session bigIPSession, rpc server.RPCServerClient, syncFn instrumentedSyncFunc) {
+	syncFn(session, rpc)
 	c := time.Tick(syncInterval)
 	for {
 		<-c
-		instrumentedSyncFunc(session, rpc)
+		syncFn(session, rpc)
 	}
 }
 
-func makeInstrumentedSyncFunc(agentName string, syncInterval time.Duration, syncFunc syncFunc) instrumentedSyncFunc {
+func makeInstrumentedSyncFunc(agentName string, syncInterval time.Duration, syncFn syncFunc) instrumentedSyncFunc {
 	return func(session bigIPSession, rpc server.RPCServerClient) {
 		syncStart := time.Now()
-		err := syncFunc(session, rpc)
+		err := syncFn(session, rpc)
 		elapsed := time.Since(syncStart)
 		if err != nil {
 			log.Errorf("Sync failed after %s (next iteration in %s): %s", elapsed, syncInterval, err.Error())
@@ -72,7 +72,7 @@ func makeInstrumentedSyncFunc(agentName string, syncInterval time.Duration, sync
 	}
 }
 
-func ExecuteF5Agent(agentName string, syncInterval time.Duration, syncFunc syncFunc) error {
+func ExecuteF5Agent(agentName string, syncInterval time.Duration, syncFn syncFunc) error {
 	log.Debugf("Enabled=%+v Devices=%v VCMPs=%v PhysicalNetwork=%v",
 		config.Global.F5Config.Enabled,
 		config.Global.F5Config.Devices,
@@ -101,7 +101,7 @@ func ExecuteF5Agent(agentName string, syncInterval time.Duration, syncFunc syncF
 	rpcClient := server.NewRPCServerClient(client)
 	srv := rpc.NewServer(fmt.Sprintf("andromeda-%s-agent", agentName), stormrpc.WithNatsConn(nc))
 
-	instrumentedSyncFunc := makeInstrumentedSyncFunc(agentName, syncInterval, syncFunc)
+	instrumentedSyncFunc := makeInstrumentedSyncFunc(agentName, syncInterval, syncFn)
 
 	// Allows the sync to be invoked over RPC via an HTTP handler in Andromeda Server
 	// see `m31ctl sync`
