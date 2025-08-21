@@ -18,6 +18,7 @@ import (
 	"github.com/sapcc/andromeda/internal/config"
 )
 
+// TODO consider moving from `BigIP.APICall()` to `BigIP.PostAs3Bigip()` for better req/res handling
 type bigIPSession interface {
 	APICall(options *bigip.APIRequest) ([]byte, error)
 	GetDevices() ([]bigip.Device, error)
