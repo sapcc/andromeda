@@ -59,7 +59,7 @@ func TestBuildMemberStatusUpdateRequest(t *testing.T) {
 			Return([]byte(`{"entries": {"theKey": {"nestedStats": {"entries": {"status.availabilityState": {"description": "unknown"}}}}}}`), nil)
 		session.
 			On("APICall", &bigip.APIRequest{Method: "get", ContentType: "application/json", URL: expectedURLPaths[3]}).
-			Return([]byte(`{"code": 404}`), &errBigIPEntityNotFound{})
+			Return([]byte(`{"code": 404}`), errors.New("entity not found"))
 		store := new(mockedStore)
 		store.On("GetDatacenters").Return([]*rpcmodels.Datacenter{
 			{Id: "dc1-uuid", Name: "dc1-name"},
