@@ -57,7 +57,7 @@ func syncWorker(syncInterval time.Duration, session bigIPSession, rpc server.RPC
 	}
 }
 
-func makeInstrumentedSyncFunc(agentName string, syncInterval time.Duration, syncFn syncFunc) instrumentedSyncFunc {
+func newInstrumentedSyncFunc(agentName string, syncInterval time.Duration, syncFn syncFunc) instrumentedSyncFunc {
 	return func(session bigIPSession, rpc server.RPCServerClient) {
 		syncStart := time.Now()
 		err := syncFn(session, rpc)
@@ -101,7 +101,7 @@ func ExecuteF5Agent(agentName string, syncInterval time.Duration, syncFn syncFun
 	rpcClient := server.NewRPCServerClient(client)
 	srv := rpc.NewServer(fmt.Sprintf("andromeda-%s-agent", agentName), stormrpc.WithNatsConn(nc))
 
-	instrumentedSyncFunc := makeInstrumentedSyncFunc(agentName, syncInterval, syncFn)
+	instrumentedSyncFunc := newInstrumentedSyncFunc(agentName, syncInterval, syncFn)
 
 	// Allows the sync to be invoked over RPC via an HTTP handler in Andromeda Server
 	// see `m31ctl sync`
