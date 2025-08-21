@@ -211,6 +211,7 @@ func postAS3Declaration(decl as3.ADC, client as3Client, declChecker func(as3.ADC
 	if err != nil {
 		return err
 	}
+	log.Debugf("AS3 declaration: %s", string(jsonDecl))
 	if res, err := client.APICall(&bigip.APIRequest{
 		Method:      "post",
 		URL:         "mgmt/shared/appsvcs/declare",

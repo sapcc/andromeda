@@ -6,7 +6,6 @@ package f5
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 	"os/signal"
@@ -154,11 +153,6 @@ func declarationSync(session bigIPSession, rpc server.RPCServerClient) error {
 	if err != nil {
 		return err
 	}
-	jsonDoc, err := json.Marshal(decl)
-	if err != nil {
-		return err
-	}
-	log.Debugf("AS3 declaration: %s", string(jsonDoc))
 	log.Debugf("RPC provisioning status updates: %v", rpcRequest.ProvisioningStatus)
 	if err := postAS3Declaration(decl, session, sanityCheckAS3Declaration); err != nil {
 		return err
