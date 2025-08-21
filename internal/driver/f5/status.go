@@ -113,14 +113,6 @@ func fetchPoolTypeAMemberAvailability(session bigIPSession, urlPath string) (str
 	return membersStats.NestedStats.Entries.StatusAvailabilityState.Description, nil
 }
 
-type errBigIPEntityNotFound struct {
-	bigIPURLPath string
-}
-
-func (e *errBigIPEntityNotFound) Error() string {
-	return fmt.Sprintf("entity not found [BigIP URL Path = %s]", e.bigIPURLPath)
-}
-
 func fetchPoolTypeAMemberStats(s bigIPSession, urlPath string) (MembersCollectionStats, error) {
 	mcs := MembersCollectionStats{}
 	req := &bigip.APIRequest{
@@ -133,7 +125,7 @@ func fetchPoolTypeAMemberStats(s bigIPSession, urlPath string) (MembersCollectio
 		var reqError bigip.RequestError
 		_ = json.Unmarshal(resp, &reqError)
 		if reqError.Code == 404 {
-			return mcs, &errBigIPEntityNotFound{bigIPURLPath: urlPath}
+			return mcs, fmt.Errorf("entity not found [BigIP URL Path = %s]: %w", urlPath, err)
 		}
 		return mcs, err
 	}
