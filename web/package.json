@@ -66,5 +66,8 @@
       "value": "",
       "description": "Default project for login"
     }
+  },
+  "dependencies": {
+    "use-sync-external-store": "^1.5.0"
   }
 }
