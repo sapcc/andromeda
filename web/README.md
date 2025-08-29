@@ -29,3 +29,16 @@ export APP_PORT=8000; npm run start
 ```sh
 npm run build
 ```
+
+### Keystone Server requirements
+
+The Keystone API Server must allow CORS (Cross-Origin Resource Sharing) on `/v3/auth/tokens` so the Andromeda Web GUI can create a Keystone token. The following is a sample minimal CORS configuration for a local Keystone API Server fronted by the Apache 2 HTTP Server:
+
+```
+<Location /v3/auth/tokens>
+    Header set Access-Control-Allow-Origin "http://localhost:8000"
+    Header set Access-Control-Allow-Methods "POST"
+    Header set Access-Control-Allow-Headers "Content-Type, X-User-Domain-Name"
+    Header set Access-Control-Expose-Headers "X-Subject-Token"
+</Location>
+```
