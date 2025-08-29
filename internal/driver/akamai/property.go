@@ -91,7 +91,7 @@ MEMBERLOOP:
 			continue
 		}
 
-		datacenterUUID := member.GetDatacenter()
+		datacenterUUID := member.GetDatacenterId()
 		var datacenterID int
 		if len(datacenterUUID) > 0 {
 			var err error
@@ -116,7 +116,7 @@ MEMBERLOOP:
 
 		// Add new traffic target
 		trafficTarget := gtm.TrafficTarget{
-			Name:         member.GetDatacenter(),
+			Name:         member.GetDatacenterId(),
 			Enabled:      member.GetAdminStateUp(),
 			Servers:      []string{member.Address},
 			Weight:       50,

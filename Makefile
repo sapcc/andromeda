@@ -89,6 +89,12 @@ migrate: bin/migrate
 	$(MIGRATE) -path db/migrations -database "cockroachdb://root@localhost:26257/andromeda?sslmode=disable" drop -f
 	$(MIGRATE) -path db/migrations -database "cockroachdb://root@localhost:26257/andromeda?sslmode=disable" up
 
+.PHONY: pb-storm-files
+pb-storm-files: $(PB_STORM_FILES)
+
+.PHONY: pb-files
+pb-files: $(PB_FILES)
+
 %.pb.storm.go: %.proto
 	$(PROTOC) --stormrpc_out=. --stormrpc_opt=paths=source_relative -I. $<
 
