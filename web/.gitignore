@@ -23,6 +23,7 @@
 .env.production.local
 secretProps.js
 secretProps.json
+public/appProps.json
 public/App*.js
 public/App*.js.map
 public/chunk*.js
