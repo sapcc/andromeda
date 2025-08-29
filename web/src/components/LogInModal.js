@@ -38,6 +38,13 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint, loginDomains, loginProj
         project: loginProject,
     })
 
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault()
+            onSubmit(event)
+        }
+    }
+
     const onSubmit = (event) => {
         setIsLoading(true)
         event.preventDefault();
@@ -136,6 +143,7 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint, loginDomains, loginProj
                         value={credentials.project}
                         disabled={isLoading}
                         onChange={handleChange}
+                        onKeyDown={handleKeyDown}
                         autoComplete="on"
                     />
                     <Button
@@ -153,6 +161,7 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint, loginDomains, loginProj
                                 value={credentials.username}
                                 disabled={isLoading}
                                 onChange={handleChange}
+                                onKeyDown={handleKeyDown}
                                 required
                             />
                         </FormRow>
@@ -164,6 +173,7 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint, loginDomains, loginProj
                                 value={credentials.password}
                                 disabled={isLoading}
                                 onChange={handleChange}
+                                onKeyDown={handleKeyDown}
                                 required
                             />
                         </FormRow>
