@@ -6,6 +6,7 @@ package server
 
 import (
 	"context"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -18,6 +19,9 @@ import (
 	"github.com/iancoleman/strcase"
 	"github.com/jmoiron/sqlx"
 	"github.com/prometheus/client_golang/prometheus"
+	metrics "github.com/slok/go-http-metrics/metrics/prometheus"
+	"github.com/slok/go-http-metrics/middleware"
+	"github.com/slok/go-http-metrics/middleware/std"
 	"github.com/xo/dburl"
 
 	_ "github.com/sapcc/andromeda/db/plugins"
@@ -38,6 +42,18 @@ import (
 	"github.com/sapcc/andromeda/restapi/operations/monitors"
 	"github.com/sapcc/andromeda/restapi/operations/pools"
 )
+
+func metricsMiddlewareWrapper(route string, metricsMiddleware middleware.Middleware) func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return std.Handler(
+			route,
+			metricsMiddleware,
+			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				next.ServeHTTP(w, r)
+			}),
+		)
+	}
+}
 
 func ExecuteServer(server *restapi.Server) error {
 	log.Info("Starting up andromeda-server")
@@ -148,6 +164,7 @@ func ExecuteServer(server *restapi.Server) error {
 		api.AdministrativeDeleteQuotasProjectIDHandler = administrative.DeleteQuotasProjectIDHandlerFunc(c.Quotas.DeleteQuotasProjectID)
 
 		qc := middlewares.NewQuotaController(db)
+
 		api.AddMiddlewareFor("POST", "/datacenters", qc.QuotaHandler)
 		api.AddMiddlewareFor("POST", "/domains", qc.QuotaHandler)
 		api.AddMiddlewareFor("POST", "/monitors", qc.QuotaHandler)
@@ -159,6 +176,18 @@ func ExecuteServer(server *restapi.Server) error {
 		api.AddMiddlewareFor("DELETE", "/pools/{pool_id}", qc.QuotaHandler)
 		api.AddMiddlewareFor("DELETE", "/pools/{pool_id}/members/{member_id}", qc.QuotaHandler)
 	}
+
+	metricsMiddleware := middleware.New(middleware.Config{
+		Recorder:      metrics.NewRecorder(metrics.Config{}),
+		GroupedStatus: true,
+	})
+
+	api.AddMiddlewareFor("GET", "/datacenters", metricsMiddlewareWrapper("/datacenters", metricsMiddleware))
+	api.AddMiddlewareFor("POST", "/datacenters", metricsMiddlewareWrapper("/datacenters", metricsMiddleware))
+	api.AddMiddlewareFor("GET", "/datacenters/{datacenter_id}", metricsMiddlewareWrapper("/datacenters/:datacenter_id", metricsMiddleware))
+	api.AddMiddlewareFor("PUT", "/datacenters/{datacenter_id}", metricsMiddlewareWrapper("/datacenters/:datacenter_id", metricsMiddleware))
+	api.AddMiddlewareFor("DELETE", "/datacenters/{datacenter_id}", metricsMiddlewareWrapper("/datacenters/:datacenter_id", metricsMiddleware))
+
 	server.SetAPI(api)
 
 	//_rpc worker
