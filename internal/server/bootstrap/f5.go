@@ -20,7 +20,7 @@ func UpsertF5Datacenters(db *sqlx.DB, f5DCs []config.F5Datacenter) {
 	}
 	tx, err := db.Beginx()
 	if err != nil {
-		log.Errorf("Failed to start UpsertF5Datacenters() transaction: %w", err)
+		log.Errorf("Failed to start UpsertF5Datacenters() transaction: %s", err)
 		return
 	}
 	defer func() { _ = tx.Rollback() }()
