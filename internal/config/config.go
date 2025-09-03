@@ -205,10 +205,13 @@ type F5Config struct {
 
 type F5Datacenter struct {
 	//F5URI     string `yaml:"f5_uri" description:"The BigIP resource identifier (e.g. /Common/the_resource_id)"`
-	Name      string `yaml:"name" description:"Column datacenter.name"`
-	City      string `yaml:"city" description:"Column datacenter.city"`
-	Continent string `yaml:"continent" description:"Column datacenter.continent"`
-	Country   string `yaml:"country" description:"Column datacenter.country"`
+	Name            string  `yaml:"name" description:"Column datacenter.name"`
+	City            string  `yaml:"city" description:"Column datacenter.city"`
+	Continent       string  `yaml:"continent" description:"Column datacenter.continent"`
+	Country         string  `yaml:"country" description:"Column datacenter.country"`
+	StateOrProvince string  `yaml:"state_or_province" description:"Column datacenter.state_or_province"`
+	Latitude        float64 `yaml:"latitude" description:"Column datacenter.latitude"`
+	Longitude       float64 `yaml:"longitude" description:"Column datacenter.longitude"`
 }
 
 type AkamaiConfig struct {
