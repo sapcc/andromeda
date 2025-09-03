@@ -180,6 +180,7 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint, loginDomains, loginProj
                         onClick={onSubmit}
                     />
                 </ButtonRow>
+                <input type="submit" hidden />
             </Form>
         </Modal>
     )
