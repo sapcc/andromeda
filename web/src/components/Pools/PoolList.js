@@ -44,8 +44,8 @@ const PoolList = () => {
 
             {/* Loading indicator for page content */}
             <Loading isLoading={isLoading} />
-            <Stack gap="2" className="jn-px-2 jn-py-2 jn-bg-theme-background-lvl-1">
-                <div className="jn-text-lg jn-text-theme-high">
+            <Stack gap="2" className="px-2 py-2 bg-theme-background-lvl-1">
+                <div className="text-lg text-theme-high">
                     <strong>Pools</strong>
                 </div>
                 <Button
@@ -80,7 +80,7 @@ const PoolList = () => {
                         <DataGridHeadCell>Created</DataGridHeadCell>
                         <DataGridHeadCell>Updated</DataGridHeadCell>
                         <DataGridHeadCell>Status</DataGridHeadCell>
-                        <DataGridHeadCell className="jn-items-end">Options</DataGridHeadCell>
+                        <DataGridHeadCell className="items-end">Options</DataGridHeadCell>
                     </DataGridRow>
 
                     {/* Render items: */}
@@ -96,7 +96,7 @@ const PoolList = () => {
                     )}
                 </DataGrid>
             ) : (
-                <div className="jn-p-4">There are no pools to display.</div>
+                <div className="p-4">There are no pools to display.</div>
             )
             }
             <Box>

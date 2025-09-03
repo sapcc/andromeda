@@ -108,7 +108,7 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint, loginDomains, loginProj
 
             {/* Warning Message */}
             {message && (
-                <Message variant="warning" className="jn-mb-4">
+                <Message variant="warning" className="mb-4">
                     <Stack>
                         {message}
                     </Stack>
@@ -139,7 +139,7 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint, loginDomains, loginProj
                         autoComplete="on"
                     />
                     <Button
-                        className="jn-h-textinput"
+                        className="h-textinput"
                         icon="manageAccounts"
                         onClick={() => setShowCredentials(!showCredentials)}
                     />
@@ -169,7 +169,7 @@ const LogInModal = ({keystoneEndpoint, overrideEndpoint, loginDomains, loginProj
                         </FormRow>
                     </div>
             )}
-                <ButtonRow name="Default ButtonRow" className="jn-mt-2 jn-justify-end">
+                <ButtonRow name="Default ButtonRow" className="mt-2 justify-end">
                     <Button
                         icon="openInBrowser"
                         label={`Enter ${credentials.domain}`}

@@ -36,8 +36,8 @@ const MonitorList = () => {
 
     return (
         <Stack direction="vertical" className="basis-1 md:basis-1/2 mt-6">
-            <Stack gap="2" className="jn-px-2 jn-py-2 jn-bg-theme-background-lvl-1">
-                <div className="jn-text-lg jn-text-theme-high">
+            <Stack gap="2" className="px-2 py-2 bg-theme-background-lvl-1">
+                <div className="text-lg text-theme-high">
                     <strong>Associated Monitors<Badge>Pool {poolId}</Badge></strong>
                 </div>
                 <Button
@@ -65,7 +65,7 @@ const MonitorList = () => {
                         <DataGridHeadCell>Created</DataGridHeadCell>
                         <DataGridHeadCell>Updated</DataGridHeadCell>
                         <DataGridHeadCell>Status</DataGridHeadCell>
-                        <DataGridHeadCell className="jn-items-end">Options</DataGridHeadCell>
+                        <DataGridHeadCell className="items-end">Options</DataGridHeadCell>
                     </DataGridRow>
 
                     {/* Render items: */}
@@ -76,7 +76,7 @@ const MonitorList = () => {
                     )}
                 </DataGrid>
             ) : (
-                <div className="jn-p-4">There are no Monitors to display.</div>
+                <div className="p-4">There are no Monitors to display.</div>
             )
             }
             <Box>

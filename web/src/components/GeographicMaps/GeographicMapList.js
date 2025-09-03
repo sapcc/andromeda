@@ -45,8 +45,8 @@ const GeographicMapList = () => {
                 distribution="between"
                 direction="horizontal"
                 alignment="center"
-                className="jn-px-6 jn-py-3 mt-6 jn-bg-theme-background-lvl-1">
-                <div className="jn-text-lg jn-text-theme-high">
+                className="px-6 py-3 mt-6 bg-theme-background-lvl-1">
+                <div className="text-lg text-theme-high">
                     <strong>Geographic Maps</strong>
                 </div>
                 <Button
@@ -66,7 +66,7 @@ const GeographicMapList = () => {
                         <DataGridHeadCell>Created</DataGridHeadCell>
                         <DataGridHeadCell>Updated</DataGridHeadCell>
                         <DataGridHeadCell>Status</DataGridHeadCell>
-                        <DataGridHeadCell className="jn-items-end">Options</DataGridHeadCell>
+                        <DataGridHeadCell className="items-end">Options</DataGridHeadCell>
                     </DataGridRow>
 
                     {/* Render items: */}
@@ -77,7 +77,7 @@ const GeographicMapList = () => {
                     )}
                 </DataGrid>
             ) : (
-                <div className="jn-p-4">There are no geographical maps to display.</div>
+                <div className="p-4">There are no geographical maps to display.</div>
             )
             }
             <Box>
