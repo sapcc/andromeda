@@ -7,6 +7,8 @@ package bootstrap
 import (
 	"github.com/apex/log"
 	"github.com/jmoiron/sqlx"
+
+	andromedaDB "github.com/sapcc/andromeda/db"
 	"github.com/sapcc/andromeda/internal/config"
 )
 
@@ -15,40 +17,65 @@ import (
 // performed (no deletes)
 func UpsertF5Datacenters(db *sqlx.DB, f5DCs []config.F5Datacenter) {
 	if len(f5DCs) == 0 {
-		log.Warn("No F5 datacenters provided in config file; skipping 'upsert F5 datacenters' operation")
 		return
 	}
-	tx, err := db.Beginx()
-	if err != nil {
-		log.Errorf("Failed to start UpsertF5Datacenters() transaction: %s", err)
-		return
-	}
-	defer func() { _ = tx.Rollback() }()
-	log.Info("Upserting F5 datacenters...")
-	insertQuery := tx.Rebind(`INSERT INTO datacenter
-                        (provisioning_status, admin_state_up, project_id,
-			 provider, name, city, continent, country)
-	                VALUES ("ACTIVE", 1, 0, "f5", ?, ?, ?, ?)`)
-	selectQuery := tx.Rebind(`SELECT id FROM datacenter WHERE provider = "f5" AND name = ? LIMIT 1`)
-	updateQuery := tx.Rebind(`UPDATE datacenter SET city = ?, continent = ?, country = ? WHERE id = ? LIMIT 1`)
-	for _, f5DC := range f5DCs {
-		row := tx.QueryRow(selectQuery, f5DC.Name)
-		var id string
-		if err := row.Scan(&id); err != nil {
-			if _, err := tx.Exec(insertQuery, f5DC.Name, f5DC.City, f5DC.Continent, f5DC.Country); err != nil {
-				log.Errorf("Could not create F5 datacenter %q: %s", f5DC.Name, err)
-				return
+
+	log.Infof("Upserting %d F5 datacenters into the database", len(f5DCs))
+	if err := andromedaDB.TxExecute(db, func(tx *sqlx.Tx) error {
+		insertStmt, err := tx.PrepareNamed(`
+			INSERT INTO datacenter 
+				(name, continent, country, state_or_province, city, latitude, longitude, 
+				provisioning_status, scope, admin_state_up, project_id, provider)
+			VALUES 
+				(:name, :continent, :country, :state_or_province, :city, :latitude, :longitude, 
+				'ACTIVE', 'public', TRUE, '-', 'f5')
+			;
+		`)
+		if err != nil {
+			return err
+		}
+
+		updateStmt, err := tx.PrepareNamed(`
+			UPDATE datacenter 
+			SET 
+				city = :city,
+				continent = :continent,
+				country = :country,
+				latitude = :latitude,
+				longitude = :longitude,
+				state_or_province = :state_or_province,
+				provider = 'f5',
+				provisioning_status = 'ACTIVE',
+				scope = 'public',
+				admin_state_up = TRUE,
+				project_id = '-',
+				updated_at = NOW()
+			WHERE 
+				id = (SELECT id FROM datacenter WHERE provider = 'f5' AND name = :name)
+		`)
+		if err != nil {
+			return err
+		}
+
+		for _, f5DC := range f5DCs {
+			res, err := updateStmt.Exec(f5DC)
+			if err != nil {
+				return err
 			}
-			continue
+			if rows, err := res.RowsAffected(); err != nil || rows == 0 {
+				// no rows updated, try to insert
+				if _, err := insertStmt.Exec(f5DC); err != nil {
+					return err
+				}
+			} else if err != nil {
+				return err
+			}
 		}
-		if _, err := tx.Exec(updateQuery, f5DC.City, f5DC.Continent, f5DC.Country, id); err != nil {
-			log.Errorf("Could not update F5 datacenter %q: %s", f5DC.Name, err)
-			return
-		}
+
+		return nil
+	}); err != nil {
+		log.Errorf("Failed to upsert F5 datacenters: %s", err)
+	} else {
+		log.Infof("Successfully upserted %d F5 datacenters into the database", len(f5DCs))
 	}
-	if err := tx.Commit(); err != nil {
-		log.Errorf("Failed to commit UpsertF5Datacenters() transaction: %w", err)
-		return
-	}
-	log.Infof("Successfully upserted F5 datacenters")
 }

@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  mariadb:
+    image: mariadb:latest # Specifies the MariaDB image to use
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: andromeda
+    ports:
+      - "3306:3306" # Maps port 3306 on the host to port 3306 in the container
+    volumes:
+      - mariadb_data:/var/lib/mysql # Persists data to a named volume
+  nats:
+    image: nats:latest
+    ports:
+      - "4222:4222"
+    command: "-V"
+
+volumes:
+  mariadb_data:

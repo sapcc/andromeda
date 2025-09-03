@@ -10,6 +10,7 @@ SPDX-PackageComment = "The code in this project may include calls to APIs (\"API
 [[annotations]]
 path = [
     ".github/**",
+    ".devcontainer/**",
     "go.sum",
     "policy.json",
     "client/**",
