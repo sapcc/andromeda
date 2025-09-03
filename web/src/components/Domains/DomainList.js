@@ -60,7 +60,7 @@ const DomainList = () => {
                         <DataGridHeadCell>Updated</DataGridHeadCell>
                         <DataGridHeadCell>Pools</DataGridHeadCell>
                         <DataGridHeadCell>Status</DataGridHeadCell>
-                        <DataGridHeadCell className="jn-items-end">Options</DataGridHeadCell>
+                        <DataGridHeadCell className="items-end">Options</DataGridHeadCell>
                     </DataGridRow>
 
                     {/* Render items: */}
@@ -71,7 +71,7 @@ const DomainList = () => {
                     )}
                 </DataGrid>
             ) : (
-                <div className="jn-p-4">There are no domains to display.</div>
+                <div className="p-4">There are no domains to display.</div>
             )
             }
             <Box>

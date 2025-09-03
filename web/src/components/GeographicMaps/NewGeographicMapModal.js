@@ -116,12 +116,12 @@ const NewGeographicMapModal = () => {
 
                 <Box>
                     <Label text="Datacenter - Country association"/>
-                    <DatacenterSelect className="jn-mt-2" setDatacenter={setDatacenter} setError={setError} label="Assign Datacenter" />
-                    <Stack direction="horizontal" gap="2" className="jn-py-2">
+                    <DatacenterSelect className="mt-2" setDatacenter={setDatacenter} setError={setError} label="Assign Datacenter" />
+                    <Stack direction="horizontal" gap="2" className="py-2">
                         <Stack direction="vertical" gap="1" className="basis-1/3">
                             {Object.keys(continents).filter((continentKey, _) => Object.entries(countries)
                                 .filter(([countryKey, value]) => value.continent === continentKey && !(countryKey in assignments)).length > 0).map((key, index) => (
-                                <div key={index} className="jn-p-1">
+                                <div key={index} className="p-1">
                                     <Icon icon={expandContinent[key] ? "expandMore" : "chevronRight"} onClick={() => {
                                         setExpandContinent({...expandContinent, [key]: !expandContinent[key]})
                                     }}

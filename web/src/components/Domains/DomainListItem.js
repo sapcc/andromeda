@@ -88,7 +88,7 @@ const DomainListItem = ({domain, setError}) => {
                     />
                 </DataGridCell>
                 <DataGridCell><ListItemStatus data={domain}/></DataGridCell>
-                <DataGridCell className="jn-items-end">
+                <DataGridCell className="items-end">
                     {/* Use <Stack> to align and space elements: */}
                     <Stack gap="1.5">
                         <Icon

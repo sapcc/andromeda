@@ -34,8 +34,8 @@ const DatacenterMenu = ({formState, setFormState, setError}) => {
 
     return (
         <div>
-            <table className="table-auto w-full jn-text-left">
-                <thead className="jn-bg-theme-background-lvl-2">
+            <table className="table-auto w-full text-left">
+                <thead className="bg-theme-background-lvl-2">
                     <tr className="">
                         <th>Name/ID</th>
                         <th>Country</th>
@@ -50,11 +50,11 @@ const DatacenterMenu = ({formState, setFormState, setError}) => {
                             e.preventDefault();
                             onDatacenterClick(datacenter.id)
                         }}
-                        className={`cursor-pointer hover:jn-bg-theme-background-lvl-3 hover:jn-text-theme-accent ${formState.datacenter_id === datacenter.id && "jn-text-theme-accent"}`}>
-                        <td className={"jn-inline-flex"}>
+                        className={`cursor-pointer hover:bg-theme-background-lvl-3 hover:text-theme-accent ${formState.datacenter_id === datacenter.id && "text-theme-accent"}`}>
+                        <td className={"inline-flex"}>
                             <Icon
                                 icon={formState.datacenter_id === datacenter.id ? "checkCircle" : "addCircle"}
-                                className={"jn-mr-2"}
+                                className={"mr-2"}
                             />
                             {`${datacenter.name || datacenter.id}`}</td>
                         <td>{datacenter.country}</td>
