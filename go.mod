@@ -6,7 +6,7 @@ module github.com/sapcc/andromeda
 
 go 1.24
 
-toolchain go1.25.0
+toolchain go1.25.1
 
 require (
 	github.com/Boostport/migration v1.1.2
@@ -47,7 +47,6 @@ require (
 	github.com/rs/cors v1.11.1
 	github.com/sapcc/go-api-declarations v1.17.4
 	github.com/sapcc/go-bits v0.0.0-20250828142518-d29beaf1bcca
-	github.com/scottdware/go-bigip v0.0.0-20240809002616-deb9b0aff84a
 	github.com/slok/go-http-metrics v0.13.0
 	github.com/stretchr/testify v1.10.0
 	github.com/urfave/cli/v2 v2.27.7
