@@ -22,12 +22,12 @@ require (
 	github.com/dre1080/recovr v1.0.3
 	github.com/f5devcentral/go-bigip v0.0.0-20250702152414-3ab735e221a2
 	github.com/getsentry/sentry-go v0.20.0
-	github.com/go-openapi/errors v0.22.1
+	github.com/go-openapi/errors v0.22.2
 	github.com/go-openapi/loads v0.22.0
 	github.com/go-openapi/runtime v0.28.0
 	github.com/go-openapi/spec v0.21.0
 	github.com/go-openapi/strfmt v0.23.0
-	github.com/go-openapi/swag v0.23.1
+	github.com/go-openapi/swag v0.24.1
 	github.com/go-openapi/validate v0.24.0
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/gophercloud/gophercloud/v2 v2.8.0
@@ -47,9 +47,8 @@ require (
 	github.com/rs/cors v1.11.1
 	github.com/sapcc/go-api-declarations v1.17.4
 	github.com/sapcc/go-bits v0.0.0-20250828142518-d29beaf1bcca
-	github.com/scottdware/go-bigip v0.0.0-20240809002616-deb9b0aff84a
 	github.com/slok/go-http-metrics v0.13.0
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.1
 	github.com/urfave/cli/v2 v2.27.7
 	github.com/xo/dburl v0.23.8
 	golang.org/x/net v0.43.0
@@ -72,6 +71,17 @@ require (
 	github.com/go-openapi/analysis v0.23.0 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
 	github.com/go-openapi/jsonreference v0.21.0 // indirect
+	github.com/go-openapi/swag/cmdutils v0.24.0 // indirect
+	github.com/go-openapi/swag/conv v0.24.0 // indirect
+	github.com/go-openapi/swag/fileutils v0.24.0 // indirect
+	github.com/go-openapi/swag/jsonname v0.24.0 // indirect
+	github.com/go-openapi/swag/jsonutils v0.24.0 // indirect
+	github.com/go-openapi/swag/loading v0.24.0 // indirect
+	github.com/go-openapi/swag/mangling v0.24.0 // indirect
+	github.com/go-openapi/swag/netutils v0.24.0 // indirect
+	github.com/go-openapi/swag/stringutils v0.24.0 // indirect
+	github.com/go-openapi/swag/typeutils v0.24.0 // indirect
+	github.com/go-openapi/swag/yamlutils v0.24.0 // indirect
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0 // indirect
 	github.com/gobuffalo/logger v1.0.3 // indirect
 	github.com/gobuffalo/packd v1.0.0 // indirect
