@@ -20,7 +20,7 @@ require (
 	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/dlmiddlecote/sqlstats v1.0.2
 	github.com/dre1080/recovr v1.0.3
-	github.com/f5devcentral/go-bigip v0.0.0-20250702152414-3ab735e221a2
+	github.com/f5devcentral/go-bigip v0.0.0-20250822141249-7a00a55994d9
 	github.com/getsentry/sentry-go v0.20.0
 	github.com/go-openapi/errors v0.22.1
 	github.com/go-openapi/loads v0.22.0
@@ -47,7 +47,6 @@ require (
 	github.com/rs/cors v1.11.1
 	github.com/sapcc/go-api-declarations v1.17.4
 	github.com/sapcc/go-bits v0.0.0-20250828142518-d29beaf1bcca
-	github.com/scottdware/go-bigip v0.0.0-20240809002616-deb9b0aff84a
 	github.com/slok/go-http-metrics v0.13.0
 	github.com/stretchr/testify v1.10.0
 	github.com/urfave/cli/v2 v2.27.7
