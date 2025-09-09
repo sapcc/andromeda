@@ -9,7 +9,7 @@ import (
 	"net/http/httptest"
 
 	"github.com/go-openapi/runtime"
-	"github.com/go-openapi/swag"
+	"github.com/go-openapi/swag/conv"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/sapcc/andromeda/models"
@@ -60,7 +60,7 @@ func (t *SuiteTest) TestDatacenters() {
 func (t *SuiteTest) TestUpdateDatacenterSelective() {
 	dc := t.c.Datacenters
 
-	testDatacenter := datacenters.PostDatacentersBody{Datacenter: &models.Datacenter{Name: swag.String("test")}}
+	testDatacenter := datacenters.PostDatacentersBody{Datacenter: &models.Datacenter{Name: conv.Pointer("test")}}
 
 	// Write new datacenter
 	res := dc.PostDatacenters(datacenters.PostDatacentersParams{Datacenter: testDatacenter})
@@ -72,7 +72,7 @@ func (t *SuiteTest) TestUpdateDatacenterSelective() {
 	assert.Equal(t.T(), datacenter.Datacenter.Name, testDatacenter.Datacenter.Name)
 
 	// Update datacenter
-	testDatacenter.Datacenter.City = swag.String("berlin")
+	testDatacenter.Datacenter.City = conv.Pointer("berlin")
 	testDatacenter.Datacenter.Name = nil
 	res = dc.PutDatacentersDatacenterID(datacenters.PutDatacentersDatacenterIDParams{DatacenterID: datacenter.Datacenter.ID,
 		Datacenter: datacenters.PutDatacentersDatacenterIDBody(testDatacenter)})

@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/go-openapi/runtime"
-	"github.com/go-openapi/swag"
+	"github.com/go-openapi/swag/conv"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/sapcc/andromeda/internal/utils"
@@ -69,14 +69,14 @@ func (t *SuiteTest) TestMonitors() {
 
 func TestValidateMonitor(t *testing.T) {
 	monitor := models.Monitor{
-		Send: swag.String("GET /"),
-		Type: swag.String(models.MonitorTypeHTTP),
+		Send: conv.Pointer("GET /"),
+		Type: conv.Pointer(models.MonitorTypeHTTP),
 	}
 	assert.Equal(t, validateMonitor(&monitor), utils.InvalidSendString)
 
-	monitor.Send = swag.String("http://example.com/test")
+	monitor.Send = conv.Pointer("http://example.com/test")
 	assert.Equal(t, validateMonitor(&monitor), utils.InvalidSendString)
 
-	monitor.Send = swag.String("/test/site?param1=1&param2=2")
+	monitor.Send = conv.Pointer("/test/site?param1=1&param2=2")
 	assert.Nil(t, validateMonitor(&monitor))
 }
