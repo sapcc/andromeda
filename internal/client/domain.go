@@ -9,7 +9,7 @@ import (
 	"fmt"
 
 	"github.com/go-openapi/strfmt"
-	"github.com/go-openapi/swag"
+	"github.com/go-openapi/swag/conv"
 
 	"github.com/sapcc/andromeda/client/domains"
 	"github.com/sapcc/andromeda/models"
@@ -133,9 +133,9 @@ func (*DomainSet) Execute(_ []string) error {
 
 	domain := domains.PutDomainsDomainIDBody{Domain: &models.Domain{}}
 	if DomainOptions.DomainSet.Disable {
-		domain.Domain.AdminStateUp = swag.Bool(false)
+		domain.Domain.AdminStateUp = conv.Pointer(false)
 	} else if DomainOptions.DomainSet.Enable {
-		domain.Domain.AdminStateUp = swag.Bool(true)
+		domain.Domain.AdminStateUp = conv.Pointer(true)
 	}
 	if DomainOptions.DomainSet.Name != "" {
 		domain.Domain.Name = &DomainOptions.DomainSet.Name

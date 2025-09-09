@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/go-openapi/loads"
-	"github.com/go-openapi/swag"
+	"github.com/go-openapi/swag/mangling"
 )
 
 var (
@@ -28,6 +28,7 @@ func SetModelDefaults(s interface{}) error {
 		return err
 	}
 	instanceType = strings.ToLower(instanceType)
+	nameMangler := mangling.NewNameMangler()
 	for specDefinitionName, specDefinitionModel := range SwaggerSpec.Spec().Definitions {
 		if specDefinitionName == instanceType {
 
@@ -36,7 +37,7 @@ func SetModelDefaults(s interface{}) error {
 
 				// Check if model has default set
 				if property.Default != nil {
-					propertyField := reflect.ValueOf(s).Elem().FieldByName(swag.ToGoName(propName))
+					propertyField := reflect.ValueOf(s).Elem().FieldByName(nameMangler.ToGoName(propName))
 					if propertyField.Kind() != reflect.Ptr && propertyField.Kind() != reflect.Uintptr {
 						return fmt.Errorf("unexpected field %s for specDefinitionModel %s", propName, specDefinitionName)
 					}

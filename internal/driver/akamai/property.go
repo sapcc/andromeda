@@ -11,7 +11,7 @@ import (
 
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v10/pkg/gtm"
 	"github.com/apex/log"
-	"github.com/go-openapi/swag"
+	"github.com/go-openapi/swag/conv"
 
 	"github.com/sapcc/andromeda/internal/driver"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
@@ -166,7 +166,7 @@ MEMBERLOOP:
 				if domainName := monitor.GetDomainName(); domainName != "" {
 					livenessTest.HTTPHeaders = []gtm.HTTPHeader{{Name: "Host", Value: domainName}}
 				}
-				livenessTest.HTTPMethod = swag.String(monitor.GetMethod().String())
+				livenessTest.HTTPMethod = conv.Pointer(monitor.GetMethod().String())
 			case rpcmodels.Monitor_TCP:
 				livenessTest.RequestString = monitor.GetSend()
 				livenessTest.ResponseString = monitor.GetReceive()
