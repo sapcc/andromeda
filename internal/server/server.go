@@ -93,6 +93,8 @@ func ExecuteServer(server *restapi.Server) error {
 		prometheus.MustRegister(collector)
 	}
 
+	go ProviderEntitiesMetricsWorker(5*time.Minute, db, CollectProviderEntitiesMetrics)
+
 	// Domains
 	api.DomainsGetDomainsHandler = domains.GetDomainsHandlerFunc(c.Domains.GetDomains)
 	api.DomainsPostDomainsHandler = domains.PostDomainsHandlerFunc(c.Domains.PostDomains)
