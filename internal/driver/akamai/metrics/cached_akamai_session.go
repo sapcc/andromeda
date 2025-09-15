@@ -145,8 +145,12 @@ func (c *CachedAkamaiSession) getTrafficReport(property string) ([]DataRows, err
 	params := url.Values{}
 	params.Add("start", start.UTC().Format(time.RFC3339))
 	params.Add("end", end.UTC().Format(time.RFC3339))
+	log.Debugf("[CachedAkamaiSession] Time interval for traffic reports set to [ START = %s | END = %s ]",
+		start.UTC().Format(time.RFC3339),
+		end.UTC().Format(time.RFC3339),
+	)
 	uri := fmt.Sprintf("%s?%s", path, params.Encode())
-	log.Info(uri)
+	log.Infof("[CachedAkamaiSession] Retrieving %s", uri)
 
 	var trafficReport TrafficReport
 	err := c.get(uri, &trafficReport)
@@ -156,7 +160,7 @@ func (c *CachedAkamaiSession) getTrafficReport(property string) ([]DataRows, err
 
 	c.lastPropertyRefresh[property] = end
 	evicted := c.dataRowCache.Add(property, trafficReport.DataRows)
-	log.Debugf("getTrafficReport evicted %d", evicted)
+	log.Debugf("[CachedAkamaiSession] evicted: %t", evicted)
 	return trafficReport.DataRows, nil
 }
 
