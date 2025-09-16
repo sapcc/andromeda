@@ -182,30 +182,38 @@ func AkamaiPropertyMetricsSync(syncID uint, propertyCh <-chan string, akamaiSess
 			continue
 		}
 
-		for _, dataRow := range datarows {
-			var projectID string
-			if projectID, err = rpcClient.GetProject(dataRow.Datacenters[0].Nickname); err != nil {
-				log.Errorf("%s Failed to extract project ID: %v", logPrefix, err.Error())
-				continue
-			}
-			for _, datacenter := range dataRow.Datacenters {
-				target := strings.Split(datacenter.TrafficTargetName, " - ")[1]
+		if len(datarows) == 0 {
+			log.Debugf("%s Skipping empty report (zero entries) for property %s", logPrefix, property)
+			continue
+		}
 
-				log.Debugf("%s [PROPERTY = %s | DC = %s | PROJECT = %s | TARGET = %s | TIMESTAMP = %s | REQUESTS = %d ]",
-					logPrefix, property, datacenter.Nickname,
-					projectID, target, dataRow.Timestamp.Format(time.RFC3339),
-					datacenter.Requests)
+		// by dropping all but the latest report, we ensure
+		// the same reported count isn't re-added to the respective
+		// Prometheus counter in future iterations of propertyCh
+		dataRow := datarows[len(datarows)-1]
 
-				requestsCounter.
-					WithLabelValues(property, datacenter.Nickname, projectID, target).
-					Add(float64(datacenter.Requests))
-				requestsLastSyncGauge.
-					WithLabelValues(property, datacenter.Nickname, projectID, target).
-					Set(float64(time.Now().Unix()))
-				requestsLastReportPeriodGauge.
-					WithLabelValues(property, datacenter.Nickname, projectID, target).
-					Set(float64(dataRow.Timestamp.Unix()))
-			}
+		var projectID string
+		if projectID, err = rpcClient.GetProject(dataRow.Datacenters[0].Nickname); err != nil {
+			log.Errorf("%s Failed to extract project ID: %v", logPrefix, err.Error())
+			continue
+		}
+		for _, datacenter := range dataRow.Datacenters {
+			target := strings.Split(datacenter.TrafficTargetName, " - ")[1]
+
+			log.Debugf("%s [PROPERTY = %s | DC = %s | PROJECT = %s | TARGET = %s | TIMESTAMP = %s | REQUESTS = %d ]",
+				logPrefix, property, datacenter.Nickname,
+				projectID, target, dataRow.Timestamp.Format(time.RFC3339),
+				datacenter.Requests)
+
+			requestsCounter.
+				WithLabelValues(property, datacenter.Nickname, projectID, target).
+				Add(float64(datacenter.Requests))
+			requestsLastSyncGauge.
+				WithLabelValues(property, datacenter.Nickname, projectID, target).
+				Set(float64(time.Now().Unix()))
+			requestsLastReportPeriodGauge.
+				WithLabelValues(property, datacenter.Nickname, projectID, target).
+				Set(float64(dataRow.Timestamp.Unix()))
 		}
 	}
 }
