@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/actatum/stormrpc"
 	"github.com/apex/log"
@@ -39,10 +40,21 @@ func ExecuteAkamaiMetrics() error {
 	prometheus.MustRegister(requestsLastSyncGauge)
 	prometheus.MustRegister(requestsSyncErrorsCounter)
 	prometheus.MustRegister(requestsLastReportPeriodGauge)
-	go AkamaiCustomMetricsSyncWorker(
-		NewCachedAkamaiSession(*session, config.Global.AkamaiConfig.Domain),
-		NewCachedRPCClient(client),
-		AkamaiCustomMetricsSync)
+
+	go func() {
+		akamaiSession := NewCachedAkamaiSession(*session, config.Global.AkamaiConfig.Domain)
+		rpcClient := NewCachedRPCClient(client)
+		AkamaiCustomMetricsSync(akamaiSession, rpcClient)
+
+		// Akamai API limitation, see <https://techdocs.akamai.com/gtm-reporting/reference/get-traffic-property>
+		interval := 5 * time.Minute
+
+		c := time.Tick(interval)
+		for {
+			<-c
+			AkamaiCustomMetricsSync(akamaiSession, rpcClient)
+		}
+	}()
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
