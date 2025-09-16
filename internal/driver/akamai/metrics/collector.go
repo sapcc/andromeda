@@ -123,19 +123,6 @@ var requestsLastReportPeriodGauge = prometheus.NewGaugeVec(
 	[]string{"domain", "datacenter_id", "project_id", "target_ip"},
 )
 
-type CustomMetricsSyncFunc func(akamaiSession *CachedAkamaiSession, rpcClient *CachedRPCClient)
-
-func AkamaiCustomMetricsSyncWorker(akamaiSession *CachedAkamaiSession, rpcClient *CachedRPCClient, syncFn CustomMetricsSyncFunc) {
-	syncFn(akamaiSession, rpcClient)
-	// Akamai API limitation, see <https://techdocs.akamai.com/gtm-reporting/reference/get-traffic-property>
-	interval := 5 * time.Minute
-	c := time.Tick(interval)
-	for {
-		<-c
-		syncFn(akamaiSession, rpcClient)
-	}
-}
-
 func AkamaiCustomMetricsSync(akamaiSession *CachedAkamaiSession, rpcClient *CachedRPCClient) {
 	syncStart := time.Now()
 
