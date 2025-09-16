@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"sync"
 	"time"
 
 	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v10/pkg/session"
@@ -30,14 +31,17 @@ type CachedAkamaiSession struct {
 	lastWindow          PropertiesWindow
 	lastPropertyRefresh map[string]time.Time
 	dataRowCache        *expirable.LRU[string, []DataRows]
+	rateLimiter         *AkamaiRateLimiter
+	gtmLock             sync.Mutex
 }
 
-func NewCachedAkamaiSession(s session.Session, domain string) *CachedAkamaiSession {
+func NewCachedAkamaiSession(s session.Session, domain string, rl *AkamaiRateLimiter) *CachedAkamaiSession {
 	return &CachedAkamaiSession{
 		Session:             s,
 		managementDomain:    domain,
 		lastPropertyRefresh: make(map[string]time.Time),
 		dataRowCache:        expirable.NewLRU[string, []DataRows](1000, nil, 5*time.Minute),
+		rateLimiter:         rl,
 	}
 }
 
@@ -49,6 +53,8 @@ func (c *CachedAkamaiSession) get(uri string, out any) error {
 	if err != nil {
 		return err
 	}
+
+	c.rateLimiter.UseToken()
 
 	resp, err := c.Exec(req, out)
 	if err != nil {
@@ -68,6 +74,7 @@ func (c *CachedAkamaiSession) get(uri string, out any) error {
 }
 
 // getPropertiesWindow returns the start and end time of the properties window
+// to be called directly exclusively by CachedAkamaiSession
 func (c *CachedAkamaiSession) refreshPropertiesWindow() error {
 	uri := "/gtm-api/v1/reports/traffic/properties-window"
 
@@ -113,6 +120,9 @@ func (c *CachedAkamaiSession) getTrafficReport(property string) ([]DataRows, err
 	if cached, ok := c.dataRowCache.Get(property); ok {
 		return cached, nil
 	}
+
+	c.gtmLock.Lock()
+	defer c.gtmLock.Unlock()
 
 	path := fmt.Sprintf("/gtm-api/v1/reports/traffic/domains/%s/properties/%s", c.managementDomain, property)
 
@@ -180,6 +190,9 @@ type DomainSummary struct {
 
 // getProperties returns the properties
 func (c *CachedAkamaiSession) getProperties() ([]string, error) {
+	c.gtmLock.Lock()
+	defer c.gtmLock.Unlock()
+
 	uri := fmt.Sprintf("/gtm-api/v1/reports/domain-list/%s", c.managementDomain)
 
 	// only refresh if older than 10 min, or never fetched

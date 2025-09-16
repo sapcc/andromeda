@@ -5,7 +5,6 @@
 package metrics
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 	"sync"
@@ -34,7 +33,7 @@ type AndromedaAkamaiCollector struct {
 
 func NewAndromedaAkamaiCollector(session session.Session, client *stormrpc.Client, managementDomain string) *AndromedaAkamaiCollector {
 	andromedaAkamaiCollector := AndromedaAkamaiCollector{
-		session:          NewCachedAkamaiSession(session, managementDomain),
+		session:          NewCachedAkamaiSession(session, managementDomain, NewAkamaiRateLimiter(40)),
 		rpc:              NewCachedRPCClient(client),
 		managementDomain: managementDomain,
 		fqName:           "akamai",
@@ -123,6 +122,13 @@ var requestsLastReportPeriodGauge = prometheus.NewGaugeVec(
 	[]string{"domain", "datacenter_id", "project_id", "target_ip"},
 )
 
+var rateLimitingDurationSeconds = prometheus.NewCounter(
+	prometheus.CounterOpts{
+		Name: "andromeda_akamai_ratelimiting_duration_seconds",
+		Help: "Time that Go routines spend waiting on the rate limiter",
+	},
+)
+
 func AkamaiCustomMetricsSync(akamaiSession *CachedAkamaiSession, rpcClient *CachedRPCClient) {
 	syncStart := time.Now()
 
@@ -134,86 +140,57 @@ func AkamaiCustomMetricsSync(akamaiSession *CachedAkamaiSession, rpcClient *Cach
 
 	log.Debugf("[AkamaiCustomMetricsSync] Got %d properties", len(properties))
 
-	// submit the work to be done and close the channel
-	// for simplicity, the same time window reference is applied to all properties
-	propertyCh := make(chan string, len(properties))
-	for _, property := range properties {
-		propertyCh <- property
-	}
-	close(propertyCh)
-
-	// use a worker pool: each worker handles one property at a time
-	// TODO: make CachedAkamaiSession thread-safe to enable real worker pool
+	// each go routine handles a single property, then terminates
 	var wg sync.WaitGroup
-	numPropertyWorkers := 1
-	for k := range numPropertyWorkers {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			AkamaiPropertyMetricsSync(uint(k+1), propertyCh, akamaiSession, rpcClient)
-		}()
+	for _, property := range properties {
+		wg.Go(func() {
+			AkamaiPropertyMetricsSync(akamaiSession, rpcClient, property)
+		})
 	}
+	wg.Wait()
 
-	done := make(chan struct{})
-	go func() {
-		wg.Wait()
-		close(done)
-	}()
-
-	// either wait for the worker pool to handle all properties or force time out
-	timeout := 60 * time.Second
-	select {
-	case <-done:
-		log.Infof("[AkamaiCustomMetricsSync] Sync completed in %s", time.Since(syncStart))
-	case <-time.After(timeout):
-		log.Errorf("[AkamaiCustomMetricsSync] Sync timed out after %s", timeout)
-	}
+	log.Infof("[AkamaiCustomMetricsSync] Sync completed in %s", time.Since(syncStart))
 }
 
-func AkamaiPropertyMetricsSync(syncID uint, propertyCh <-chan string, akamaiSession *CachedAkamaiSession, rpcClient *CachedRPCClient) {
-	logPrefix := fmt.Sprintf("[AkamaiPropertyMetricsSync #%02d]", syncID)
-	log.Debugf("%s Reading from properties channel", logPrefix)
+func AkamaiPropertyMetricsSync(akamaiSession *CachedAkamaiSession, rpcClient *CachedRPCClient, property string) {
+	datarows, err := akamaiSession.getTrafficReport(property)
+	if err != nil {
+		log.Errorf("Failed to fetch traffic reports for property %s: %v", property, err.Error())
+		requestsSyncErrorsCounter.WithLabelValues(property).Inc()
+		return
+	}
 
-	for property := range propertyCh {
-		datarows, err := akamaiSession.getTrafficReport(property)
-		if err != nil {
-			log.Errorf("%s Failed to fetch traffic reports for property %s: %v", logPrefix, property, err.Error())
-			requestsSyncErrorsCounter.WithLabelValues(property).Inc()
-			continue
-		}
+	if len(datarows) == 0 {
+		log.Debugf("Skipping empty report (zero entries) for property %s", property)
+		return
+	}
 
-		if len(datarows) == 0 {
-			log.Debugf("%s Skipping empty report (zero entries) for property %s", logPrefix, property)
-			continue
-		}
+	// by dropping all but the latest report, we ensure
+	// the same reported count isn't re-added to the respective
+	// Prometheus counter in future iterations of propertyCh
+	dataRow := datarows[len(datarows)-1]
 
-		// by dropping all but the latest report, we ensure
-		// the same reported count isn't re-added to the respective
-		// Prometheus counter in future iterations of propertyCh
-		dataRow := datarows[len(datarows)-1]
+	var projectID string
+	if projectID, err = rpcClient.GetProject(dataRow.Datacenters[0].Nickname); err != nil {
+		log.Errorf("%s Failed to extract report project ID for property %s: %v", property, err.Error())
+		return
+	}
+	for _, datacenter := range dataRow.Datacenters {
+		target := strings.Split(datacenter.TrafficTargetName, " - ")[1]
 
-		var projectID string
-		if projectID, err = rpcClient.GetProject(dataRow.Datacenters[0].Nickname); err != nil {
-			log.Errorf("%s Failed to extract project ID: %v", logPrefix, err.Error())
-			continue
-		}
-		for _, datacenter := range dataRow.Datacenters {
-			target := strings.Split(datacenter.TrafficTargetName, " - ")[1]
+		log.Debugf("[PROPERTY = %s | DC = %s | PROJECT = %s | TARGET = %s | TIMESTAMP = %s | REQUESTS = %d ]",
+			property, datacenter.Nickname,
+			projectID, target, dataRow.Timestamp.Format(time.RFC3339),
+			datacenter.Requests)
 
-			log.Debugf("%s [PROPERTY = %s | DC = %s | PROJECT = %s | TARGET = %s | TIMESTAMP = %s | REQUESTS = %d ]",
-				logPrefix, property, datacenter.Nickname,
-				projectID, target, dataRow.Timestamp.Format(time.RFC3339),
-				datacenter.Requests)
-
-			requestsCounter.
-				WithLabelValues(property, datacenter.Nickname, projectID, target).
-				Add(float64(datacenter.Requests))
-			requestsLastSyncGauge.
-				WithLabelValues(property, datacenter.Nickname, projectID, target).
-				Set(float64(time.Now().Unix()))
-			requestsLastReportPeriodGauge.
-				WithLabelValues(property, datacenter.Nickname, projectID, target).
-				Set(float64(dataRow.Timestamp.Unix()))
-		}
+		requestsCounter.
+			WithLabelValues(property, datacenter.Nickname, projectID, target).
+			Add(float64(datacenter.Requests))
+		requestsLastSyncGauge.
+			WithLabelValues(property, datacenter.Nickname, projectID, target).
+			Set(float64(time.Now().Unix()))
+		requestsLastReportPeriodGauge.
+			WithLabelValues(property, datacenter.Nickname, projectID, target).
+			Set(float64(dataRow.Timestamp.Unix()))
 	}
 }
