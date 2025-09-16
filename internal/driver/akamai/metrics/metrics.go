@@ -40,19 +40,17 @@ func ExecuteAkamaiMetrics() error {
 	prometheus.MustRegister(requestsLastSyncGauge)
 	prometheus.MustRegister(requestsSyncErrorsCounter)
 	prometheus.MustRegister(requestsLastReportPeriodGauge)
+	prometheus.MustRegister(rateLimitingDurationSeconds)
 
 	go func() {
-		akamaiSession := NewCachedAkamaiSession(*session, config.Global.AkamaiConfig.Domain)
+		akamaiSession := NewCachedAkamaiSession(*session, config.Global.AkamaiConfig.Domain, NewAkamaiRateLimiter(40))
 		rpcClient := NewCachedRPCClient(client)
-		AkamaiCustomMetricsSync(akamaiSession, rpcClient)
 
 		// Akamai API limitation, see <https://techdocs.akamai.com/gtm-reporting/reference/get-traffic-property>
 		interval := 5 * time.Minute
-
-		c := time.Tick(interval)
 		for {
-			<-c
 			AkamaiCustomMetricsSync(akamaiSession, rpcClient)
+			time.Sleep(interval)
 		}
 	}()
 
