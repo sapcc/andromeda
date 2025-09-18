@@ -31,7 +31,7 @@ API Documentation: https://sapcc.github.io/andromeda/
 Andromeda provides a reference CLI client called `m31ctl` that uses the REST API of Andromeda.
 
 ## Running Requirements
-* go 1.24
+* go 1.25
 * NATS
 * SQL Database (PostgreSQL/MariaDB/CockroachDB)
 
