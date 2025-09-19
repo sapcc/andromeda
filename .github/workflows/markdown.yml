@@ -17,8 +17,8 @@ jobs:
     - name: Install git
       run: apk add --no-cache git
     - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      with:
+        fetch-depth: 0
     - name: Build
       run: swagger generate markdown --copyright-file COPYRIGHT.txt --output docs/api.md
     - name: Create Pull Request
