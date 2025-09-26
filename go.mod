@@ -54,7 +54,7 @@ require (
 	github.com/urfave/cli/v2 v2.27.7
 	github.com/xo/dburl v0.23.8
 	golang.org/x/net v0.43.0
-	google.golang.org/protobuf v1.36.8
+	google.golang.org/protobuf v1.36.9
 	gopkg.in/yaml.v3 v3.0.1
 )
 
