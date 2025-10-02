@@ -90,7 +90,7 @@ func TestBuildAS3Declaration(t *testing.T) {
 		})
 
 		t.Run("Adds the domain tenant to the AS3 declaration", func(t *testing.T) {
-			tenant, err := declaration.GetTenant("domain_tenant_dom1-uuid")
+			tenant, err := declaration.GetTenant("domain_dom1-uuid")
 			assert.Nil(err)
 			assert.Equal(expectedDomainTenant, tenant)
 		})

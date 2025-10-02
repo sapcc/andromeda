@@ -53,7 +53,7 @@ func buildAS3Declaration(s AndromedaF5Store, ctbFunc as3CommonTenantBuilderFunc,
 			return adc, rpcRequest, err
 		}
 		rpcUpdates = append(rpcUpdates, domainTenantRPCUpdates...)
-		adc.AddTenant("domain_tenant_"+domain.Id, domainTenant)
+		adc.AddTenant(as3DeclarationGSLBDomainTenantKey(domain.Id), domainTenant)
 	}
 	rpcRequest.ProvisioningStatus = rpcUpdates
 	return adc, rpcRequest, nil
@@ -175,7 +175,7 @@ func buildAS3CommonTenant(
 }
 
 func as3DeclarationGSLBDomainTenantKey(domainID string) string {
-	return "domain_tenant_" + domainID
+	return "domain_" + domainID
 }
 
 func as3DeclarationGSLBPoolKey(poolID string) string {

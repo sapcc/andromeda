@@ -43,10 +43,10 @@ func TestBuildMemberStatusUpdateRequest(t *testing.T) {
 
 	t.Run("Succeeds if the domain/pool/member entries returned by RPC are correct and F5 API works", func(t *testing.T) {
 		expectedURLPaths := []string{
-			"gtm/pool/a/~domain_tenant_dom1-uuid~application~pool_pool1-uuid/members/~Common~cc_andromeda_srv_10.10.0.11_dc1-name:10.10.0.11:80/stats",
-			"gtm/pool/a/~domain_tenant_dom1-uuid~application~pool_pool1-uuid/members/~Common~cc_andromeda_srv_10.10.0.12_dc2-name:10.10.0.12:80/stats",
-			"gtm/pool/a/~domain_tenant_dom1-uuid~application~pool_pool1-uuid/members/~Common~cc_andromeda_srv_10.10.0.13_dc2-name:10.10.0.13:80/stats",
-			"gtm/pool/a/~domain_tenant_dom1-uuid~application~pool_pool1-uuid/members/~Common~cc_andromeda_srv_10.10.0.14_dc2-name:10.10.0.14:80/stats"}
+			"gtm/pool/a/~domain_dom1-uuid~application~pool_pool1-uuid/members/~Common~cc_andromeda_srv_10.10.0.11_dc1-name:10.10.0.11:80/stats",
+			"gtm/pool/a/~domain_dom1-uuid~application~pool_pool1-uuid/members/~Common~cc_andromeda_srv_10.10.0.12_dc2-name:10.10.0.12:80/stats",
+			"gtm/pool/a/~domain_dom1-uuid~application~pool_pool1-uuid/members/~Common~cc_andromeda_srv_10.10.0.13_dc2-name:10.10.0.13:80/stats",
+			"gtm/pool/a/~domain_dom1-uuid~application~pool_pool1-uuid/members/~Common~cc_andromeda_srv_10.10.0.14_dc2-name:10.10.0.14:80/stats"}
 		session := new(mockedBigIPSession)
 		session.
 			On("APICall", &bigip.APIRequest{Method: "get", ContentType: "application/json", URL: expectedURLPaths[0]}).
