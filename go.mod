@@ -20,7 +20,7 @@ require (
 	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/dlmiddlecote/sqlstats v1.0.2
 	github.com/dre1080/recovr v1.0.3
-	github.com/f5devcentral/go-bigip v0.0.0-20250822141249-7a00a55994d9
+	github.com/f5devcentral/go-bigip v0.0.0-20250928174250-859d6942bc8a
 	github.com/getsentry/sentry-go v0.20.0
 	github.com/go-openapi/errors v0.22.2
 	github.com/go-openapi/loads v0.22.0

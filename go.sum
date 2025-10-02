@@ -68,8 +68,8 @@ github.com/docker/go-units v0.5.0 h1:69rxXcBk27SvSaaxTtLh/8llcHD8vYHT7WSdRZ/jvr4
 github.com/docker/go-units v0.5.0/go.mod h1:fgPhTUdO+D/Jk86RDLlptpiXQzgHJF7gydDDbaIK4Dk=
 github.com/dre1080/recovr v1.0.3 h1:ePIUAU6R2b5U1ZfknulI9zrfVm55NbV4FYDKlUJXBEo=
 github.com/dre1080/recovr v1.0.3/go.mod h1:QV2VG2MZQYPszdtZ9bsZTpTdWTP81Mer3UHQXqo5bfY=
-github.com/f5devcentral/go-bigip v0.0.0-20250822141249-7a00a55994d9 h1:bplPzj3b2gnVaOnkvZfWoOTMrHGdom9Czsw3vTpq6P0=
-github.com/f5devcentral/go-bigip v0.0.0-20250822141249-7a00a55994d9/go.mod h1:0Lkr0fBU6O1yBxF2mt9JFwXpaFbIb/wAY7oM3dMJDdA=
+github.com/f5devcentral/go-bigip v0.0.0-20250928174250-859d6942bc8a h1:KycIxgbIm3ygmqgqib2RTLv3Yirs5Fmf22vXu9qg7fE=
+github.com/f5devcentral/go-bigip v0.0.0-20250928174250-859d6942bc8a/go.mod h1:0Lkr0fBU6O1yBxF2mt9JFwXpaFbIb/wAY7oM3dMJDdA=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/fatih/color v1.16.0 h1:zmkK9Ngbjj+K0yRhTVONQh1p/HknKYSlNT+vZCzyokM=
 github.com/fatih/color v1.16.0/go.mod h1:fL2Sau1YI5c0pdGEVCbKQbLXB6edEj1ZgiY4NijnWvE=
