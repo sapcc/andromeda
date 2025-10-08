@@ -23,26 +23,6 @@ import (
 	"github.com/sapcc/andromeda/internal/utils"
 )
 
-func init() {
-	prometheus.MustRegister(lastSyncTimestampGauge)
-	prometheus.MustRegister(lastSyncDurationSecondsGauge)
-}
-
-var lastSyncTimestampGauge = prometheus.NewGaugeVec(
-	prometheus.GaugeOpts{
-		Name: "andromeda_agent_last_sync_timestamp",
-		Help: "Last time an agent has successfully completed its sync loop (sync completion timestamp)",
-	},
-	[]string{"agent"},
-)
-var lastSyncDurationSecondsGauge = prometheus.NewGaugeVec(
-	prometheus.GaugeOpts{
-		Name: "andromeda_agent_last_sync_duration_seconds",
-		Help: "Last time an agent has successfully completed its sync loop (sync duration in seconds)",
-	},
-	[]string{"agent"},
-)
-
 type syncFunc func(session bigIPSession, rpc server.RPCServerClient) error
 type instrumentedSyncFunc func(session bigIPSession, rpc server.RPCServerClient)
 
@@ -148,6 +128,10 @@ func ExecuteF5StatusAgent() error {
 	return ExecuteF5Agent("f5-status", 5*time.Minute, statusSync)
 }
 
+func ExecuteF5MetricsAgent() error {
+	return ExecuteF5Agent("f5-metrics", 5*time.Minute, metricsSync)
+}
+
 func declarationSync(session bigIPSession, rpc server.RPCServerClient) error {
 	decl, rpcRequest, err := buildAS3Declaration(NewAndromedaF5Store(rpc), buildAS3CommonTenant, buildAS3DomainTenant)
 	if err != nil {
@@ -176,4 +160,9 @@ func statusSync(session bigIPSession, rpc server.RPCServerClient) error {
 	}
 	log.Debugf("Posted RPC member status updates successfully")
 	return nil
+}
+
+func metricsSync(session bigIPSession, rpc server.RPCServerClient) error {
+	prometheus.MustRegister(virtualServerPicksCounter)
+	return collectVirtualServerMetrics(session, NewAndromedaF5Store(rpc), virtualServerPicksCounter)
 }
