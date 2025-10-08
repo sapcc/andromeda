@@ -81,55 +81,6 @@ func TestBuildMemberStatusUpdateRequest(t *testing.T) {
 	})
 }
 
-func TestFetchPoolTypeAMemberAvailability(t *testing.T) {
-	assert := assert.New(t)
-
-	t.Run("Fails if F5 API request fails", func(t *testing.T) {
-		session := new(mockedBigIPSession)
-		session.On("APICall", mock.Anything).Return([]byte(""), errors.New("API Request failed"))
-		_, err := fetchPoolTypeAMemberAvailability(session, "/some/path")
-		assert.ErrorContains(err, "API Request failed")
-	})
-
-	t.Run("Fails if JSON response payload contains more than one key in `.entries`", func(t *testing.T) {
-		jsonDoc := `{
-			"kind": "tm:gtm:pool:a:members:membersstats",
-			"entries": {
-			  "theKey": {"nestedStats": {"entries": {"status.availabilityState": {"description": "offline"}}}},
-			  "badKey": {"nestedStats": {"entries": {"status.availabilityState": {"description": "offline"}}}}
-			}
-		}`
-		session := new(mockedBigIPSession)
-		session.On("APICall", mock.Anything).Return([]byte(jsonDoc), nil)
-		_, err := fetchPoolTypeAMemberAvailability(session, "/some/path")
-		assert.ErrorContains(err, "expected exactly 1 key")
-	})
-
-	t.Run("Fails if JSON response payload contains an invalid value at `.entries.theKey.nestedStats`", func(t *testing.T) {
-		jsonDoc := `{
-			"kind": "tm:gtm:pool:a:members:membersstats",
-			"entries": {"theKey": "badNestedStats"}
-		}`
-		session := new(mockedBigIPSession)
-		session.On("APICall", mock.Anything).Return([]byte(jsonDoc), nil)
-		_, err := fetchPoolTypeAMemberAvailability(session, "/some/path")
-		assert.ErrorContains(err, "could not decode nested member stats")
-	})
-
-	t.Run("Succeds if JSON payload is decoded correctly all the way to the availability state description", func(t *testing.T) {
-		jsonDoc := `{
-			"kind": "tm:gtm:pool:a:members:membersstats",
-			"entries": {"theKey": {"nestedStats": {"entries": {"status.availabilityState": {"description": "offline"}}}}}
-		}`
-		session := new(mockedBigIPSession)
-		session.On("APICall", mock.Anything).Return([]byte(jsonDoc), nil)
-		status, err := fetchPoolTypeAMemberAvailability(session, "/some/path")
-		session.AssertCalled(t, "APICall", &bigip.APIRequest{Method: "get", URL: "/some/path", ContentType: "application/json"})
-		assert.Nil(err)
-		assert.Equal("offline", status)
-	})
-}
-
 func TestFetchPoolTypeAMemberStats(t *testing.T) {
 	assert := assert.New(t)
 
@@ -157,13 +108,16 @@ func TestFetchPoolTypeAMemberStats(t *testing.T) {
 	t.Run("Succeeds if F5 API request succeeds and JSON payload can be decoded", func(t *testing.T) {
 		jsonDoc := `{
 			"kind": "tm:gtm:pool:a:members:membersstats",
-			"entries": {"theKey": {"nestedStats": {"entries": {"status.availabilityState": {"description": "offline"}}}}}
+			"entries": {"theKey": {"nestedStats": {"entries": {
+			  "status.availabilityState": {"description": "offline"},
+			  "vsPicks": 5
+			}}}}
 		}`
 		session := new(mockedBigIPSession)
 		session.On("APICall", mock.Anything).Return([]byte(jsonDoc), nil)
-		mcs, err := fetchPoolTypeAMemberStats(session, "/some/path")
+		membersStats, err := fetchPoolTypeAMemberStats(session, "/some/path")
 		session.AssertCalled(t, "APICall", &bigip.APIRequest{Method: "get", URL: "/some/path", ContentType: "application/json"})
 		assert.Nil(err)
-		assert.Equal("tm:gtm:pool:a:members:membersstats", mcs.Kind)
+		assert.Equal("offline", membersStats.NestedStats.Entries.StatusAvailabilityState.Description)
 	})
 }
