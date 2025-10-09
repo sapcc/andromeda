@@ -33,6 +33,18 @@ type MembersStats struct {
 	} `json:"nestedStats"`
 }
 
+type ServerStats struct {
+	NestedStats struct {
+		Kind     string `json:"kind"`
+		SelfLink string `json:"selfLink"`
+		Entries  struct {
+			VirtualServerPicks struct {
+				Value uint64 `json:"value"`
+			} `json:"vsPicks"`
+		} `json:"entries"`
+	} `json:"nestedStats"`
+}
+
 func buildMemberStatusUpdateRequest(session bigIPSession, store AndromedaF5Store) (*server.MemberStatusRequest, error) {
 	datacenters, err := store.GetDatacenters()
 	if err != nil {
@@ -64,13 +76,13 @@ func buildMemberStatusUpdateRequest(session bigIPSession, store AndromedaF5Store
 					as3DeclarationGSLBServerKey(m.Address, datacentersByID[m.DatacenterId].Name),
 					as3DeclarationGSLBVirtualServerName(m.Address, m.Port),
 				)
-				memberStatus, err := fetchPoolTypeAMemberAvailability(session, urlPath)
+				membersStats, err := fetchPoolTypeAMemberStats(session, urlPath)
 				if err != nil {
 					log.Warnf("failed to determine GSLB_Pool_Member_A status [BigIP URL path = %s]: %s", urlPath, err)
 				}
 				updates = append(updates, &server.MemberStatusRequest_MemberStatus{
 					Id:     m.Id,
-					Status: memberStatusFromPoolTypeAMemberAvailabilityState(memberStatus),
+					Status: memberStatusFromPoolTypeAMemberAvailabilityState(membersStats.NestedStats.Entries.StatusAvailabilityState.Description),
 				})
 			}
 		}
@@ -80,6 +92,10 @@ func buildMemberStatusUpdateRequest(session bigIPSession, store AndromedaF5Store
 
 func poolTypeAMemberStatsURL(gslbDomainTenantKey, gslbPoolKey, gslbServerKey, gslbVirtualServerName string) string {
 	return fmt.Sprintf("gtm/pool/a/~%s~application~%s/members/~Common~%s:%s/stats", gslbDomainTenantKey, gslbPoolKey, gslbServerKey, gslbVirtualServerName)
+}
+
+func serverStatsURL(gslbServerKey string) string {
+	return fmt.Sprintf("gtm/server/~Common~%s/stats", gslbServerKey)
 }
 
 func memberStatusFromPoolTypeAMemberAvailabilityState(availabilityState string) server.MemberStatusRequest_MemberStatus_StatusType {
@@ -93,27 +109,8 @@ func memberStatusFromPoolTypeAMemberAvailabilityState(availabilityState string) 
 	}
 }
 
-func fetchPoolTypeAMemberAvailability(session bigIPSession, urlPath string) (string, error) {
-	mcs, err := fetchPoolTypeAMemberStats(session, urlPath)
-	if err != nil {
-		return "", err
-	}
-	if len(mcs.Entries) != 1 {
-		return "", fmt.Errorf("expected exactly 1 key in `.entries`, got %d", len(mcs.Entries))
-	}
-	var membersStats *MembersStats
-	// stats.Entries, if valid, will always be a size 1 map and its only
-	// key is always the pool type A member stats we need, so we iterate
-	// just once in order to unmarshal its raw JSON value as a struct.
-	for _, rawEntry := range mcs.Entries {
-		if err := json.Unmarshal(rawEntry, &membersStats); err != nil {
-			return "", fmt.Errorf("could not decode nested member stats `entries.???.nestedStats`: %s", err)
-		}
-	}
-	return membersStats.NestedStats.Entries.StatusAvailabilityState.Description, nil
-}
-
-func fetchPoolTypeAMemberStats(s bigIPSession, urlPath string) (MembersCollectionStats, error) {
+func fetchPoolTypeAMemberStats(s bigIPSession, urlPath string) (MembersStats, error) {
+	var membersStats MembersStats
 	mcs := MembersCollectionStats{}
 	req := &bigip.APIRequest{
 		Method:      "get",
@@ -125,13 +122,59 @@ func fetchPoolTypeAMemberStats(s bigIPSession, urlPath string) (MembersCollectio
 		var reqError bigip.RequestError
 		_ = json.Unmarshal(resp, &reqError)
 		if reqError.Code == 404 {
-			return mcs, fmt.Errorf("entity not found [BigIP URL Path = %s]: %w", urlPath, err)
+			return membersStats, fmt.Errorf("entity not found [BigIP URL Path = %s]: %w", urlPath, err)
 		}
-		return mcs, err
+		return membersStats, err
 	}
 	err = json.Unmarshal(resp, &mcs)
 	if err != nil {
-		return mcs, err
+		return membersStats, err
 	}
-	return mcs, nil
+	if len(mcs.Entries) != 1 {
+		return membersStats, fmt.Errorf("expected exactly 1 key in `.entries`, got %d", len(mcs.Entries))
+	}
+	// stats.Entries, if valid, will always be a size 1 map and its only
+	// key is always the pool type A member stats we need, so we iterate
+	// just once in order to unmarshal its raw JSON value as a struct.
+	for _, rawEntry := range mcs.Entries {
+		if err := json.Unmarshal(rawEntry, &membersStats); err != nil {
+			return membersStats, fmt.Errorf("could not decode nested member stats `entries.???.nestedStats`: %s", err)
+		}
+	}
+	return membersStats, nil
+}
+
+func fetchServerStats(s bigIPSession, urlPath string) (ServerStats, error) {
+	var serverStats ServerStats
+	mcs := MembersCollectionStats{}
+	req := &bigip.APIRequest{
+		Method:      "get",
+		URL:         urlPath,
+		ContentType: "application/json",
+	}
+	resp, err := s.APICall(req)
+	if err != nil {
+		var reqError bigip.RequestError
+		_ = json.Unmarshal(resp, &reqError)
+		if reqError.Code == 404 {
+			return serverStats, fmt.Errorf("entity not found [BigIP URL Path = %s]: %w", urlPath, err)
+		}
+		return serverStats, err
+	}
+	err = json.Unmarshal(resp, &mcs)
+	if err != nil {
+		return serverStats, err
+	}
+	if len(mcs.Entries) != 1 {
+		return serverStats, fmt.Errorf("expected exactly 1 key in `.entries`, got %d", len(mcs.Entries))
+	}
+	// stats.Entries, if valid, will always be a size 1 map and its only
+	// key is always the pool type A member stats we need, so we iterate
+	// just once in order to unmarshal its raw JSON value as a struct.
+	for _, rawEntry := range mcs.Entries {
+		if err := json.Unmarshal(rawEntry, &serverStats); err != nil {
+			return serverStats, fmt.Errorf("could not decode nested member stats `entries.???.nestedStats`: %s", err)
+		}
+	}
+	return serverStats, nil
 }

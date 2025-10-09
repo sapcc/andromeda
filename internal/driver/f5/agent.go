@@ -28,6 +28,8 @@ func init() {
 	prometheus.MustRegister(lastSyncDurationSecondsGauge)
 }
 
+// Operational metrics
+
 var lastSyncTimestampGauge = prometheus.NewGaugeVec(
 	prometheus.GaugeOpts{
 		Name: "andromeda_agent_last_sync_timestamp",
@@ -41,6 +43,16 @@ var lastSyncDurationSecondsGauge = prometheus.NewGaugeVec(
 		Help: "Last time an agent has successfully completed its sync loop (sync duration in seconds)",
 	},
 	[]string{"agent"},
+)
+
+// Federated metrics
+
+var virtualServerPicksCounter = prometheus.NewCounterVec(
+	prometheus.CounterOpts{
+		Name: "andromeda_f5_virtual_server_picks",
+		Help: "Total picks of the virtual server by the DNS resolver (derived from F5 iControlRest tm:gtm:server:serverstats endpoint)",
+	},
+	[]string{"domain", "datacenter_id", "project_id", "target_ip"},
 )
 
 type syncFunc func(session bigIPSession, rpc server.RPCServerClient) error
@@ -148,6 +160,10 @@ func ExecuteF5StatusAgent() error {
 	return ExecuteF5Agent("f5-status", 5*time.Minute, statusSync)
 }
 
+func ExecuteF5MetricsAgent() error {
+	return ExecuteF5Agent("f5-metrics", 5*time.Minute, metricsSync)
+}
+
 func declarationSync(session bigIPSession, rpc server.RPCServerClient) error {
 	decl, rpcRequest, err := buildAS3Declaration(NewAndromedaF5Store(rpc), buildAS3CommonTenant, buildAS3DomainTenant)
 	if err != nil {
@@ -175,5 +191,14 @@ func statusSync(session bigIPSession, rpc server.RPCServerClient) error {
 		return err
 	}
 	log.Debugf("Posted RPC member status updates successfully")
+	return nil
+}
+
+func metricsSync(session bigIPSession, rpc server.RPCServerClient) error {
+	prometheus.MustRegister(virtualServerPicksCounter)
+	err := collectVirtualServerMetrics(session, NewAndromedaF5Store(rpc), virtualServerPicksCounter)
+	if err != nil {
+		return err
+	}
 	return nil
 }
