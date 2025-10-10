@@ -3051,7 +3051,7 @@ Unexpected Error
 | heartbeat | date-time (formatted string)| `strfmt.DateTime` |  | | The UTC date and timestamp when had the last heartbeat. | `2020-05-11 17:21:34` |
 | host | hostname (formatted string)| `strfmt.Hostname` |  | | Hostname of the computer the service is running. | `example.host` |
 | id | string| `string` |  | | ID of the RPC service. | `andromeda-agent-fbb49979-03f5-4a97-a334-1fd2c9f61e7e` |
-| metadata | [interface{}](#interface)| `interface{}` |  | |  |  |
+| metadata | [any](#any)| `any` |  | |  |  |
 | provider | string| `string` |  | | Provider this service supports. | `akamai` |
 | rpc_address | string| `string` |  | | RPC Endpoint Address. | `_INBOX.VEfFxcAzZQ9iM9vwGH49It` |
 | type | string| `string` |  | | Type of service. | `healthcheck` |
