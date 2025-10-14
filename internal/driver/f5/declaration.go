@@ -91,7 +91,7 @@ func buildAS3DomainTenant(
 		}
 		application.SetEntity("pool_"+p.Id, as3.GSLBPool{
 			Class:              "GSLB_Pool",
-			LBModePreferred:    as3DeclarationLBMode(domain.Mode),
+			LBModePreferred:    as3DeclarationPoolMemberLBMode(domain.Mode),
 			LBModeAlternate:    "none",
 			LBModeFallback:     "none",
 			Members:            as3PoolMembers,
@@ -107,7 +107,7 @@ func buildAS3DomainTenant(
 		Class:              "GSLB_Domain",
 		DomainName:         domain.Fqdn,
 		ResourceRecordType: domain.RecordType,
-		PoolLbMode:         as3DeclarationLBMode(domain.Mode),
+		PoolLbMode:         as3DeclarationDomainPoolLBMode(),
 		Pools:              as3PoolReferences,
 	}
 	application.SetEntity("wideip", as3Domain)
@@ -190,12 +190,33 @@ func as3DeclarationGSLBVirtualServerName(memberAddress string, memberPort uint32
 	return memberAddress + ":" + strconv.FormatUint(uint64(memberPort), 10)
 }
 
-func as3DeclarationLBMode(memberMode string) string {
+// as3DeclarationDomainPoolLBMode refers to valid values for GSLB_Domain.poolLbMode.
+func as3DeclarationDomainPoolLBMode() string {
+	return "global-availability"
+}
+
+// as3DeclarationPoolMemberLBMode refers to valid values for:
+//
+// - GSLB_Pool.lbModeAlternate
+// - GSLB_Pool.lbModeFallback
+// - GSLB_Pool.lbModePreferred
+//
+// Expected behavior for supported values:
+//
+//   - global-availability: DNS resolution pick is fixed to the first available
+//     virtual server in a pool (i.e. GSLB_Pool.Members[0]).
+//
+//   - round-robin: DNS resolution pick is both circular and sequential among
+//     GSLB_Pool.Members[]. Over time each virtual server in a pool is picked
+//     an equal amount of times compared to the other pool members.
+func as3DeclarationPoolMemberLBMode(memberMode string) string {
 	switch memberMode {
+	case models.DomainModeROUNDROBIN:
+		return "round-robin"
 	case models.DomainModeAVAILABILITY:
 		return "global-availability"
 	default:
-		return "global-availability"
+		return "round-robin"
 	}
 }
 
