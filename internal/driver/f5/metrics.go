@@ -10,6 +10,7 @@ import (
 	"github.com/sapcc/andromeda/internal/rpcmodels"
 )
 
+// these metrics are intended to be added to all F5 agents
 func init() {
 	prometheus.MustRegister(lastSyncTimestampGauge)
 	prometheus.MustRegister(lastSyncDurationSecondsGauge)

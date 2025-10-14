@@ -129,6 +129,7 @@ func ExecuteF5StatusAgent() error {
 }
 
 func ExecuteF5MetricsAgent() error {
+	prometheus.MustRegister(virtualServerPicksCounter)
 	return ExecuteF5Agent("f5-metrics", 5*time.Minute, metricsSync)
 }
 
@@ -163,6 +164,5 @@ func statusSync(session bigIPSession, rpc server.RPCServerClient) error {
 }
 
 func metricsSync(session bigIPSession, rpc server.RPCServerClient) error {
-	prometheus.MustRegister(virtualServerPicksCounter)
 	return collectVirtualServerMetrics(session, NewAndromedaF5Store(rpc), virtualServerPicksCounter)
 }
