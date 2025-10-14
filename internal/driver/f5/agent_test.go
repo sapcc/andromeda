@@ -214,3 +214,47 @@ func TestStatusSync(t *testing.T) {
 		rpc.AssertCalled(t, "UpdateMemberStatus", mock.Anything, expectedReq, mock.Anything)
 	})
 }
+
+func TestMetricsSync(t *testing.T) {
+	assert := assert.New(t)
+
+	t.Run("Fails if metrics collection fails", func(t *testing.T) {
+		session := new(mockedBigIPSession)
+		rpc := new(mockedRPCClient)
+		rpc.
+			On("GetDatacenters", mock.Anything, mock.Anything, mock.Anything).
+			Return(
+				&server.DatacentersResponse{},
+				errors.New("RPC GetDatacenters() failed"),
+			)
+		err := metricsSync(session, rpc)
+		assert.ErrorContains(err, "RPC GetDatacenters() failed")
+	})
+
+	t.Run("Succeeds otherwise", func(t *testing.T) {
+		session := new(mockedBigIPSession)
+		rpc := new(mockedRPCClient)
+		rpc.
+			On("GetDatacenters", mock.Anything, mock.Anything, mock.Anything).
+			Return(
+				&server.DatacentersResponse{
+					Response: []*rpcmodels.Datacenter{
+						{Id: "dc1-uuid", Name: "dc1-name"},
+					},
+				},
+				nil,
+			)
+		rpc.
+			On("GetDomains", mock.Anything, mock.Anything, mock.Anything).
+			Return(
+				&server.DomainsResponse{
+					Response: []*rpcmodels.Domain{
+						{Id: "domain1-uuid"},
+					},
+				},
+				nil,
+			)
+		err := metricsSync(session, rpc)
+		assert.Nil(err)
+	})
+}
