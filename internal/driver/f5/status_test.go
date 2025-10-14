@@ -109,8 +109,7 @@ func TestFetchPoolTypeAMemberStats(t *testing.T) {
 		jsonDoc := `{
 			"kind": "tm:gtm:pool:a:members:membersstats",
 			"entries": {"theKey": {"nestedStats": {"entries": {
-			  "status.availabilityState": {"description": "offline"},
-			  "vsPicks": 5
+			  "status.availabilityState": {"description": "offline"}
 			}}}}
 		}`
 		session := new(mockedBigIPSession)
@@ -119,5 +118,47 @@ func TestFetchPoolTypeAMemberStats(t *testing.T) {
 		session.AssertCalled(t, "APICall", &bigip.APIRequest{Method: "get", URL: "/some/path", ContentType: "application/json"})
 		assert.Nil(err)
 		assert.Equal("offline", membersStats.NestedStats.Entries.StatusAvailabilityState.Description)
+	})
+}
+
+func TestFetchServerStats(t *testing.T) {
+	assert := assert.New(t)
+
+	t.Run("Fails if F5 API request fails", func(t *testing.T) {
+		session := new(mockedBigIPSession)
+		session.On("APICall", mock.Anything).Return([]byte(""), errors.New("API Request failed"))
+		_, err := fetchServerStats(session, "/some/path")
+		assert.ErrorContains(err, "API Request failed")
+	})
+
+	t.Run("Fails with special error if F5 API request soft fails with 404", func(t *testing.T) {
+		session := new(mockedBigIPSession)
+		session.On("APICall", mock.Anything).Return([]byte(`{"code": 404}`), errors.New("404"))
+		_, err := fetchServerStats(session, "/some/path")
+		assert.ErrorContains(err, "entity not found")
+	})
+
+	t.Run("Fails if F5 API request succeeds but response JSON payload cannot be decoded", func(t *testing.T) {
+		session := new(mockedBigIPSession)
+		session.On("APICall", mock.Anything).Return([]byte(`{`), nil)
+		_, err := fetchServerStats(session, "/some/path")
+		assert.ErrorContains(err, "unexpected end of JSON input")
+	})
+
+	t.Run("Succeeds if F5 API request succeeds and JSON payload can be decoded", func(t *testing.T) {
+		jsonDoc := `{
+			"kind": "tm:gtm:server:serverstats",
+			"entries": {"theKey": {"nestedStats": {"entries": {
+			  "vsPicks": {
+			    "value": 10
+			  }
+			}}}}
+		}`
+		session := new(mockedBigIPSession)
+		session.On("APICall", mock.Anything).Return([]byte(jsonDoc), nil)
+		serverStats, err := fetchServerStats(session, "/some/path")
+		session.AssertCalled(t, "APICall", &bigip.APIRequest{Method: "get", URL: "/some/path", ContentType: "application/json"})
+		assert.Nil(err)
+		assert.Equal(uint64(10), serverStats.NestedStats.Entries.VirtualServerPicks.Value)
 	})
 }
