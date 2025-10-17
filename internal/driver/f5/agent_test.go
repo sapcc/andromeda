@@ -11,6 +11,7 @@ import (
 	"github.com/f5devcentral/go-bigip"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
+	"github.com/sapcc/andromeda/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -111,7 +112,7 @@ func TestDeclarationSync(t *testing.T) {
 				{
 					Id:         "dom1-uuid",
 					Fqdn:       "hello-world.local",
-					Mode:       "???",
+					Mode:       models.DomainModeAVAILABILITY,
 					RecordType: "A",
 					Pools: []*rpcmodels.Pool{
 						{
