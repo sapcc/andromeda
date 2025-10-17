@@ -6,7 +6,7 @@ module github.com/sapcc/andromeda
 
 go 1.25
 
-toolchain go1.25.2
+toolchain go1.25.3
 
 require (
 	github.com/Boostport/migration v1.1.2
