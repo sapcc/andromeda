@@ -120,7 +120,9 @@ func fetchPoolTypeAMemberStats(s bigIPSession, urlPath string) (MembersStats, er
 	resp, err := s.APICall(req)
 	if err != nil {
 		var reqError bigip.RequestError
-		_ = json.Unmarshal(resp, &reqError)
+		if unmarshalErr := json.Unmarshal(resp, &reqError); unmarshalErr != nil {
+			return membersStats, fmt.Errorf("could not unmarshal error response payload [BigIP URL Path = %s]: %w / APICall err = %w", urlPath, unmarshalErr, err)
+		}
 		if reqError.Code == 404 {
 			return membersStats, fmt.Errorf("entity not found [BigIP URL Path = %s]: %w", urlPath, err)
 		}
@@ -155,7 +157,9 @@ func fetchServerStats(s bigIPSession, urlPath string) (ServerStats, error) {
 	resp, err := s.APICall(req)
 	if err != nil {
 		var reqError bigip.RequestError
-		_ = json.Unmarshal(resp, &reqError)
+		if unmarshalErr := json.Unmarshal(resp, &reqError); unmarshalErr != nil {
+			return serverStats, fmt.Errorf("could not unmarshal error response payload [BigIP URL Path = %s]: %w / APICall err = %w", urlPath, unmarshalErr, err)
+		}
 		if reqError.Code == 404 {
 			return serverStats, fmt.Errorf("entity not found [BigIP URL Path = %s]: %w", urlPath, err)
 		}
