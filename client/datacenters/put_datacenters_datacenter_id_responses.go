@@ -37,6 +37,12 @@ func (o *PutDatacentersDatacenterIDReader) ReadResponse(response runtime.ClientR
 			return nil, err
 		}
 		return result, nil
+	case 400:
+		result := NewPutDatacentersDatacenterIDBadRequest()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 404:
 		result := NewPutDatacentersDatacenterIDNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -114,6 +120,74 @@ func (o *PutDatacentersDatacenterIDAccepted) GetPayload() *PutDatacentersDatacen
 func (o *PutDatacentersDatacenterIDAccepted) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(PutDatacentersDatacenterIDAcceptedBody)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewPutDatacentersDatacenterIDBadRequest creates a PutDatacentersDatacenterIDBadRequest with default headers values
+func NewPutDatacentersDatacenterIDBadRequest() *PutDatacentersDatacenterIDBadRequest {
+	return &PutDatacentersDatacenterIDBadRequest{}
+}
+
+/*
+PutDatacentersDatacenterIDBadRequest describes a response with status code 400, with default header values.
+
+Bad request
+*/
+type PutDatacentersDatacenterIDBadRequest struct {
+	Payload *models.Error
+}
+
+// IsSuccess returns true when this put datacenters datacenter Id bad request response has a 2xx status code
+func (o *PutDatacentersDatacenterIDBadRequest) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this put datacenters datacenter Id bad request response has a 3xx status code
+func (o *PutDatacentersDatacenterIDBadRequest) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this put datacenters datacenter Id bad request response has a 4xx status code
+func (o *PutDatacentersDatacenterIDBadRequest) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this put datacenters datacenter Id bad request response has a 5xx status code
+func (o *PutDatacentersDatacenterIDBadRequest) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this put datacenters datacenter Id bad request response a status code equal to that given
+func (o *PutDatacentersDatacenterIDBadRequest) IsCode(code int) bool {
+	return code == 400
+}
+
+// Code gets the status code for the put datacenters datacenter Id bad request response
+func (o *PutDatacentersDatacenterIDBadRequest) Code() int {
+	return 400
+}
+
+func (o *PutDatacentersDatacenterIDBadRequest) Error() string {
+	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] putDatacentersDatacenterIdBadRequest  %+v", 400, o.Payload)
+}
+
+func (o *PutDatacentersDatacenterIDBadRequest) String() string {
+	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] putDatacentersDatacenterIdBadRequest  %+v", 400, o.Payload)
+}
+
+func (o *PutDatacentersDatacenterIDBadRequest) GetPayload() *models.Error {
+	return o.Payload
+}
+
+func (o *PutDatacentersDatacenterIDBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.Error)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

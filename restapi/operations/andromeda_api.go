@@ -171,7 +171,15 @@ func NewAndromedaAPI(spec *loads.Document) *AndromedaAPI {
 	}
 }
 
-/*AndromedaAPI Platform agnostic GSLB frontend */
+/*
+AndromedaAPI Platform agnostic GSLB frontend
+
+```
+# SPDX-FileCopyrightText: Copyright 2025 SAP SE or an SAP affiliate company
+#
+# SPDX-License-Identifier: Apache-2.0
+```
+*/
 type AndromedaAPI struct {
 	spec            *loads.Document
 	context         *middleware.Context
