@@ -81,6 +81,10 @@ func (c DatacenterController) PostDatacenters(params datacenters.PostDatacenters
 		panic(err)
 	}
 
+	if strings.ToLower(datacenter.Provider) == "f5" {
+		return datacenters.NewPostDatacentersBadRequest().WithPayload(utils.RestrictedDatacenterProvider)
+	}
+
 	sql := `
 		INSERT INTO datacenter 
     		(name, admin_state_up, continent, country, state_or_province, 
@@ -118,13 +122,16 @@ func (c DatacenterController) GetDatacentersDatacenterID(params datacenters.GetD
 // PutDatacentersDatacenterID PUT /datacenters/:id
 func (c DatacenterController) PutDatacentersDatacenterID(params datacenters.PutDatacentersDatacenterIDParams) middleware.Responder {
 	datacenter := models.Datacenter{ID: params.DatacenterID}
-	err := PopulateDatacenter(c.db, &datacenter, []string{"project_id"})
+	err := PopulateDatacenter(c.db, &datacenter, []string{"project_id", "provider"})
 	if err != nil {
 		return datacenters.NewPutDatacentersDatacenterIDNotFound().WithPayload(utils.NotFound)
 	}
 	requestVars := map[string]string{"project_id": *datacenter.ProjectID}
 	if _, err := auth.Authenticate(params.HTTPRequest, requestVars); err != nil {
 		return datacenters.NewPutDatacentersDatacenterIDDefault(403).WithPayload(utils.PolicyForbidden)
+	}
+	if strings.ToLower(params.Datacenter.Datacenter.Provider) == "f5" || strings.ToLower(datacenter.Provider) == "f5" {
+		return datacenters.NewPostDatacentersBadRequest().WithPayload(utils.RestrictedDatacenterProvider)
 	}
 
 	params.Datacenter.Datacenter.ID = params.DatacenterID
@@ -159,12 +166,15 @@ func (c DatacenterController) PutDatacentersDatacenterID(params datacenters.PutD
 // DeleteDatacentersDatacenterID DELETE /datacenters/:id
 func (c DatacenterController) DeleteDatacentersDatacenterID(params datacenters.DeleteDatacentersDatacenterIDParams) middleware.Responder {
 	datacenter := models.Datacenter{ID: params.DatacenterID}
-	if err := PopulateDatacenter(c.db, &datacenter, []string{"project_id"}); err != nil {
+	if err := PopulateDatacenter(c.db, &datacenter, []string{"project_id", "provider"}); err != nil {
 		return datacenters.NewDeleteDatacentersDatacenterIDNotFound().WithPayload(utils.NotFound)
 	}
 	requestVars := map[string]string{"project_id": *datacenter.ProjectID}
 	if _, err := auth.Authenticate(params.HTTPRequest, requestVars); err != nil {
 		return datacenters.NewDeleteDatacentersDatacenterIDDefault(403).WithPayload(utils.PolicyForbidden)
+	}
+	if strings.ToLower(datacenter.Provider) == "f5" {
+		return datacenters.NewPostDatacentersBadRequest().WithPayload(utils.RestrictedDatacenterProvider)
 	}
 
 	var count int

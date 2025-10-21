@@ -62,6 +62,51 @@ func (o *PostDatacentersCreated) WriteResponse(rw http.ResponseWriter, producer 
 	}
 }
 
+// PostDatacentersBadRequestCode is the HTTP code returned for type PostDatacentersBadRequest
+const PostDatacentersBadRequestCode int = 400
+
+/*
+PostDatacentersBadRequest Bad request
+
+swagger:response postDatacentersBadRequest
+*/
+type PostDatacentersBadRequest struct {
+
+	/*
+	  In: Body
+	*/
+	Payload *models.Error `json:"body,omitempty"`
+}
+
+// NewPostDatacentersBadRequest creates PostDatacentersBadRequest with default headers values
+func NewPostDatacentersBadRequest() *PostDatacentersBadRequest {
+
+	return &PostDatacentersBadRequest{}
+}
+
+// WithPayload adds the payload to the post datacenters bad request response
+func (o *PostDatacentersBadRequest) WithPayload(payload *models.Error) *PostDatacentersBadRequest {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the post datacenters bad request response
+func (o *PostDatacentersBadRequest) SetPayload(payload *models.Error) {
+	o.Payload = payload
+}
+
+// WriteResponse to the client
+func (o *PostDatacentersBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.WriteHeader(400)
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
+	}
+}
+
 // PostDatacentersNotFoundCode is the HTTP code returned for type PostDatacentersNotFound
 const PostDatacentersNotFoundCode int = 404
 

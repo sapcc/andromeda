@@ -30,7 +30,7 @@ func init() {
   ],
   "swagger": "2.0",
   "info": {
-    "description": "Platform agnostic GSLB frontend",
+    "description": "Platform agnostic GSLB frontend\n\n` + "`" + `` + "`" + `` + "`" + `\n# SPDX-FileCopyrightText: Copyright 2025 SAP SE or an SAP affiliate company\n#\n# SPDX-License-Identifier: Apache-2.0\n` + "`" + `` + "`" + `` + "`" + `",
     "title": "Andromeda",
     "version": "1.1.1"
   },
@@ -170,6 +170,12 @@ func init() {
                   "$ref": "#/definitions/datacenter"
                 }
               }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/error"
             }
           },
           "404": {
@@ -2720,7 +2726,7 @@ func init() {
   ],
   "swagger": "2.0",
   "info": {
-    "description": "Platform agnostic GSLB frontend",
+    "description": "Platform agnostic GSLB frontend\n\n` + "`" + `` + "`" + `` + "`" + `\n# SPDX-FileCopyrightText: Copyright 2025 SAP SE or an SAP affiliate company\n#\n# SPDX-License-Identifier: Apache-2.0\n` + "`" + `` + "`" + `` + "`" + `",
     "title": "Andromeda",
     "version": "1.1.1"
   },
@@ -2873,6 +2879,12 @@ func init() {
                   "$ref": "#/definitions/datacenter"
                 }
               }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/error"
             }
           },
           "404": {
