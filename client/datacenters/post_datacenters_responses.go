@@ -37,6 +37,12 @@ func (o *PostDatacentersReader) ReadResponse(response runtime.ClientResponse, co
 			return nil, err
 		}
 		return result, nil
+	case 400:
+		result := NewPostDatacentersBadRequest()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 404:
 		result := NewPostDatacentersNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -114,6 +120,74 @@ func (o *PostDatacentersCreated) GetPayload() *PostDatacentersCreatedBody {
 func (o *PostDatacentersCreated) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(PostDatacentersCreatedBody)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewPostDatacentersBadRequest creates a PostDatacentersBadRequest with default headers values
+func NewPostDatacentersBadRequest() *PostDatacentersBadRequest {
+	return &PostDatacentersBadRequest{}
+}
+
+/*
+PostDatacentersBadRequest describes a response with status code 400, with default header values.
+
+Bad request
+*/
+type PostDatacentersBadRequest struct {
+	Payload *models.Error
+}
+
+// IsSuccess returns true when this post datacenters bad request response has a 2xx status code
+func (o *PostDatacentersBadRequest) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this post datacenters bad request response has a 3xx status code
+func (o *PostDatacentersBadRequest) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this post datacenters bad request response has a 4xx status code
+func (o *PostDatacentersBadRequest) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this post datacenters bad request response has a 5xx status code
+func (o *PostDatacentersBadRequest) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this post datacenters bad request response a status code equal to that given
+func (o *PostDatacentersBadRequest) IsCode(code int) bool {
+	return code == 400
+}
+
+// Code gets the status code for the post datacenters bad request response
+func (o *PostDatacentersBadRequest) Code() int {
+	return 400
+}
+
+func (o *PostDatacentersBadRequest) Error() string {
+	return fmt.Sprintf("[POST /datacenters][%d] postDatacentersBadRequest  %+v", 400, o.Payload)
+}
+
+func (o *PostDatacentersBadRequest) String() string {
+	return fmt.Sprintf("[POST /datacenters][%d] postDatacentersBadRequest  %+v", 400, o.Payload)
+}
+
+func (o *PostDatacentersBadRequest) GetPayload() *models.Error {
+	return o.Payload
+}
+
+func (o *PostDatacentersBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.Error)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

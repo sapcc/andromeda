@@ -447,6 +447,10 @@ paths:
             properties:
               datacenter:
                 $ref: '#/definitions/datacenter'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error'
         404:
           description: Not Found
           schema:
@@ -510,6 +514,10 @@ paths:
             properties:
               datacenter:
                 $ref: '#/definitions/datacenter'
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error'
         404:
           description: Not Found
           schema:
@@ -527,6 +535,10 @@ paths:
       responses:
         204:
           description: Resource successfully deleted.
+        400:
+          description: Bad request
+          schema:
+            $ref: '#/definitions/error'
         404:
           description: Not Found
           schema:
