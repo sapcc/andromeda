@@ -23,22 +23,22 @@ import (
 	"github.com/sapcc/andromeda/internal/utils"
 )
 
-type syncFunc func(session bigIPSession, rpc server.RPCServerClient) error
-type instrumentedSyncFunc func(session bigIPSession, rpc server.RPCServerClient)
+type syncFunc func(f5Config config.F5Config, session bigIPSession, rpc server.RPCServerClient) error
+type instrumentedSyncFunc func(f5Config config.F5Config, session bigIPSession, rpc server.RPCServerClient)
 
-func syncWorker(syncInterval time.Duration, session bigIPSession, rpc server.RPCServerClient, syncFn instrumentedSyncFunc) {
-	syncFn(session, rpc)
+func syncWorker(syncInterval time.Duration, f5Config config.F5Config, session bigIPSession, rpc server.RPCServerClient, syncFn instrumentedSyncFunc) {
+	syncFn(f5Config, session, rpc)
 	c := time.Tick(syncInterval)
 	for {
 		<-c
-		syncFn(session, rpc)
+		syncFn(f5Config, session, rpc)
 	}
 }
 
 func newInstrumentedSyncFunc(agentName string, syncInterval time.Duration, syncFn syncFunc) instrumentedSyncFunc {
-	return func(session bigIPSession, rpc server.RPCServerClient) {
+	return func(f5Config config.F5Config, session bigIPSession, rpc server.RPCServerClient) {
 		syncStart := time.Now()
-		err := syncFn(session, rpc)
+		err := syncFn(f5Config, session, rpc)
 		elapsed := time.Since(syncStart)
 		if err != nil {
 			log.Errorf("Sync failed after %s (next iteration in %s): %s", elapsed, syncInterval, err.Error())
@@ -87,7 +87,7 @@ func ExecuteF5Agent(agentName string, syncInterval time.Duration, syncFn syncFun
 	// runs the sync, while the other will not receive any event.
 	srv.Handle("andromeda.sync", func(ctx context.Context, req stormrpc.Request) stormrpc.Response {
 		log.WithField("request", req).Info("[pubsub.1] Received event")
-		instrumentedSyncFunc(activeF5Session, rpcClient)
+		instrumentedSyncFunc(config.Global.F5Config, activeF5Session, rpcClient)
 		resp, err := stormrpc.NewResponse(req.Reply, nil)
 
 		// TODO if setting resp.Err works, then instrumentedSyncFunc
@@ -101,7 +101,7 @@ func ExecuteF5Agent(agentName string, syncInterval time.Duration, syncFn syncFun
 		return resp
 	})
 
-	go syncWorker(syncInterval, activeF5Session, rpcClient, instrumentedSyncFunc)
+	go syncWorker(syncInterval, config.Global.F5Config, activeF5Session, rpcClient, instrumentedSyncFunc)
 	go func() {
 		_ = srv.Run()
 	}()
@@ -133,8 +133,8 @@ func ExecuteF5MetricsAgent() error {
 	return ExecuteF5Agent("f5-metrics", 5*time.Minute, metricsSync)
 }
 
-func declarationSync(session bigIPSession, rpc server.RPCServerClient) error {
-	decl, rpcRequest, err := buildAS3Declaration(NewAndromedaF5Store(rpc), buildAS3CommonTenant, buildAS3DomainTenant)
+func declarationSync(f5Config config.F5Config, session bigIPSession, rpc server.RPCServerClient) error {
+	decl, rpcRequest, err := buildAS3Declaration(f5Config, NewAndromedaF5Store(rpc), buildAS3CommonTenant, buildAS3DomainTenant)
 	if err != nil {
 		return err
 	}
@@ -150,7 +150,7 @@ func declarationSync(session bigIPSession, rpc server.RPCServerClient) error {
 	return nil
 }
 
-func statusSync(session bigIPSession, rpc server.RPCServerClient) error {
+func statusSync(f5Config config.F5Config, session bigIPSession, rpc server.RPCServerClient) error {
 	req, err := buildMemberStatusUpdateRequest(session, NewAndromedaF5Store(rpc))
 	if err != nil {
 		return err
@@ -163,6 +163,6 @@ func statusSync(session bigIPSession, rpc server.RPCServerClient) error {
 	return nil
 }
 
-func metricsSync(session bigIPSession, rpc server.RPCServerClient) error {
+func metricsSync(f5Config config.F5Config, session bigIPSession, rpc server.RPCServerClient) error {
 	return collectVirtualServerMetrics(session, NewAndromedaF5Store(rpc), virtualServerPicksCounter)
 }

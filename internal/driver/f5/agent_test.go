@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/f5devcentral/go-bigip"
+	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
 	"github.com/sapcc/andromeda/models"
@@ -23,7 +24,7 @@ func TestDeclarationSync(t *testing.T) {
 		session := new(mockedBigIPSession)
 		rpc := new(mockedRPCClient)
 		rpc.On("GetDatacenters", mock.Anything, mock.Anything, mock.Anything).Return(&server.DatacentersResponse{}, errors.New("RPC GetDatacenters() failed"))
-		err := declarationSync(session, rpc)
+		err := declarationSync(config.F5Config{}, session, rpc)
 		assert.ErrorContains(err, "RPC GetDatacenters() failed")
 	})
 
@@ -52,7 +53,7 @@ func TestDeclarationSync(t *testing.T) {
 		t.Run("... if it cannot post the AS3 declaration request", func(t *testing.T) {
 			session := new(mockedBigIPSession)
 			session.On("APICall", mock.Anything).Return([]byte(""), errors.New("BigIP APICall() failed"))
-			err := declarationSync(session, rpc)
+			err := declarationSync(config.F5Config{}, session, rpc)
 			assert.ErrorContains(err, "BigIP APICall() failed")
 		})
 
@@ -61,7 +62,7 @@ func TestDeclarationSync(t *testing.T) {
 			session.On("APICall", mock.Anything).Return([]byte(""), nil)
 			rpc.On("UpdateProvisioningStatus", mock.Anything, mock.Anything, mock.Anything).Return(
 				&server.ProvisioningStatusResponse{}, errors.New("RPC UpdateProvisioningStatus() failed"))
-			err := declarationSync(session, rpc)
+			err := declarationSync(config.F5Config{}, session, rpc)
 			assert.ErrorContains(err, "RPC UpdateProvisioningStatus() failed")
 		})
 	})
@@ -111,7 +112,7 @@ func TestDeclarationSync(t *testing.T) {
 			Response: []*rpcmodels.Domain{
 				{
 					Id:         "dom1-uuid",
-					Fqdn:       "hello-world.local",
+					Fqdn:       "hello-world",
 					Mode:       models.DomainModeAVAILABILITY,
 					RecordType: "A",
 					Pools: []*rpcmodels.Pool{
@@ -132,7 +133,7 @@ func TestDeclarationSync(t *testing.T) {
 			},
 		}, nil)
 		rpc.On("UpdateProvisioningStatus", mock.Anything, expectedRequest, mock.Anything).Return(&server.ProvisioningStatusResponse{}, nil)
-		err := declarationSync(session, rpc)
+		err := declarationSync(config.F5Config{DomainSuffix: ".local"}, session, rpc)
 		assert.Nil(err)
 		session.AssertCalled(t, "APICall", expectedAPIRequest)
 		rpc.AssertCalled(t, "GetDatacenters", mock.Anything, expectedDatacentersSearchRequest, mock.Anything)
@@ -150,7 +151,7 @@ func TestStatusSync(t *testing.T) {
 		session := new(mockedBigIPSession)
 		rpc := new(mockedRPCClient)
 		rpc.On("GetDatacenters", mock.Anything, mock.Anything, mock.Anything).Return(&server.DatacentersResponse{}, errors.New("RPC failed for datacenters"))
-		err := statusSync(session, rpc)
+		err := statusSync(config.F5Config{}, session, rpc)
 		assert.ErrorContains(err, "RPC failed for datacenters")
 		rpc.AssertNumberOfCalls(t, "GetDatacenters", 1)
 		rpc.AssertNotCalled(t, "GetDomains")
@@ -169,7 +170,7 @@ func TestStatusSync(t *testing.T) {
 			{Id: "dom1-uuid", Pools: []*rpcmodels.Pool{}},
 		}}, nil)
 		rpc.On("UpdateMemberStatus", mock.Anything, mock.Anything, mock.Anything).Return(&server.MemberStatusResponse{}, errors.New("RPC failed for UpdateMemberStatus"))
-		err := statusSync(session, rpc)
+		err := statusSync(config.F5Config{}, session, rpc)
 		assert.ErrorContains(err, "RPC failed for UpdateMemberStatus")
 		rpc.AssertNumberOfCalls(t, "GetDatacenters", 1)
 		rpc.AssertNumberOfCalls(t, "GetDomains", 1)
@@ -207,7 +208,7 @@ func TestStatusSync(t *testing.T) {
 					Status: server.MemberStatusRequest_MemberStatus_ONLINE,
 				}}}
 		rpc.On("UpdateMemberStatus", mock.Anything, mock.Anything, mock.Anything).Return(&server.MemberStatusResponse{}, nil)
-		err := statusSync(session, rpc)
+		err := statusSync(config.F5Config{}, session, rpc)
 		assert.Nil(err)
 		session.AssertNumberOfCalls(t, "APICall", 1)
 		rpc.AssertNumberOfCalls(t, "GetDatacenters", 1)
@@ -228,7 +229,7 @@ func TestMetricsSync(t *testing.T) {
 				&server.DatacentersResponse{},
 				errors.New("RPC GetDatacenters() failed"),
 			)
-		err := metricsSync(session, rpc)
+		err := metricsSync(config.F5Config{}, session, rpc)
 		assert.ErrorContains(err, "RPC GetDatacenters() failed")
 	})
 
@@ -255,7 +256,7 @@ func TestMetricsSync(t *testing.T) {
 				},
 				nil,
 			)
-		err := metricsSync(session, rpc)
+		err := metricsSync(config.F5Config{}, session, rpc)
 		assert.Nil(err)
 	})
 }

@@ -12,6 +12,7 @@ import (
 
 	"github.com/apex/log"
 	"github.com/f5devcentral/go-bigip"
+	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/driver/f5/as3"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
@@ -21,10 +22,10 @@ import (
 type as3CommonTenantBuilderFunc func(s AndromedaF5Store, datacenters []*rpcmodels.Datacenter) (
 	as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error)
 
-type as3DomainTenantBuilderFunc func(datacentersByID map[string]*rpcmodels.Datacenter, domain *rpcmodels.Domain) (
+type as3DomainTenantBuilderFunc func(f5Config config.F5Config, datacentersByID map[string]*rpcmodels.Datacenter, domain *rpcmodels.Domain) (
 	as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error)
 
-func buildAS3Declaration(s AndromedaF5Store, ctbFunc as3CommonTenantBuilderFunc, dtbFunc as3DomainTenantBuilderFunc) (
+func buildAS3Declaration(f5Config config.F5Config, s AndromedaF5Store, ctbFunc as3CommonTenantBuilderFunc, dtbFunc as3DomainTenantBuilderFunc) (
 	as3.ADC, *server.ProvisioningStatusRequest, error) {
 	adc := as3.NewADC()
 	rpcRequest := &server.ProvisioningStatusRequest{}
@@ -48,7 +49,7 @@ func buildAS3Declaration(s AndromedaF5Store, ctbFunc as3CommonTenantBuilderFunc,
 		return adc, rpcRequest, err
 	}
 	for _, domain := range domains {
-		domainTenant, domainTenantRPCUpdates, err := dtbFunc(datacentersByID, domain)
+		domainTenant, domainTenantRPCUpdates, err := dtbFunc(f5Config, datacentersByID, domain)
 		if err != nil {
 			return adc, rpcRequest, err
 		}
@@ -60,6 +61,7 @@ func buildAS3Declaration(s AndromedaF5Store, ctbFunc as3CommonTenantBuilderFunc,
 }
 
 func buildAS3DomainTenant(
+	f5Config config.F5Config,
 	datacentersByID map[string]*rpcmodels.Datacenter,
 	domain *rpcmodels.Domain) (as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error) {
 	tenant := as3.Tenant{}
@@ -105,7 +107,7 @@ func buildAS3DomainTenant(
 	})
 	as3Domain := as3.GSLBDomain{
 		Class:              "GSLB_Domain",
-		DomainName:         domain.Fqdn,
+		DomainName:         domain.Fqdn + f5Config.DomainSuffix,
 		ResourceRecordType: domain.RecordType,
 		PoolLbMode:         as3DeclarationDomainPoolLBMode(),
 		Pools:              as3PoolReferences,
