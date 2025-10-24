@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/f5devcentral/go-bigip"
+	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/driver/f5/as3"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
@@ -22,7 +23,7 @@ func TestBuildAS3Declaration(t *testing.T) {
 	t.Run("Fails if RPC GetDatacenters() fails", func(t *testing.T) {
 		store := new(mockedStore)
 		store.On("GetDatacenters").Return([]*rpcmodels.Datacenter{}, errors.New("RPC GetDatacenters() failed"))
-		_, _, err := buildAS3Declaration(store, buildAS3CommonTenant, buildAS3DomainTenant)
+		_, _, err := buildAS3Declaration(config.F5Config{}, store, buildAS3CommonTenant, buildAS3DomainTenant)
 		assert.ErrorContains(err, "RPC GetDatacenters() failed")
 	})
 
@@ -32,7 +33,7 @@ func TestBuildAS3Declaration(t *testing.T) {
 		as3CommonTenantBuilder := func(s AndromedaF5Store, datacenters []*rpcmodels.Datacenter) (as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error) {
 			return as3.Tenant{}, []*server.ProvisioningStatusRequest_ProvisioningStatus{}, errors.New("ctbFunc failed")
 		}
-		_, _, err := buildAS3Declaration(store, as3CommonTenantBuilder, buildAS3DomainTenant)
+		_, _, err := buildAS3Declaration(config.F5Config{}, store, as3CommonTenantBuilder, buildAS3DomainTenant)
 		assert.ErrorContains(err, "ctbFunc failed")
 	})
 
@@ -43,7 +44,7 @@ func TestBuildAS3Declaration(t *testing.T) {
 		as3CommonTenantBuilder := func(s AndromedaF5Store, datacenters []*rpcmodels.Datacenter) (as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error) {
 			return as3.Tenant{}, []*server.ProvisioningStatusRequest_ProvisioningStatus{}, nil
 		}
-		_, _, err := buildAS3Declaration(store, as3CommonTenantBuilder, buildAS3DomainTenant)
+		_, _, err := buildAS3Declaration(config.F5Config{}, store, as3CommonTenantBuilder, buildAS3DomainTenant)
 		assert.ErrorContains(err, "RPC GetDomains() failed")
 	})
 
@@ -54,10 +55,10 @@ func TestBuildAS3Declaration(t *testing.T) {
 		as3CommonTenantBuilder := func(s AndromedaF5Store, datacenters []*rpcmodels.Datacenter) (as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error) {
 			return as3.Tenant{}, []*server.ProvisioningStatusRequest_ProvisioningStatus{}, nil
 		}
-		as3DomainTenantBuilder := func(datacentersByID map[string]*rpcmodels.Datacenter, domain *rpcmodels.Domain) (as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error) {
+		as3DomainTenantBuilder := func(f5Config config.F5Config, datacentersByID map[string]*rpcmodels.Datacenter, domain *rpcmodels.Domain) (as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error) {
 			return as3.Tenant{}, []*server.ProvisioningStatusRequest_ProvisioningStatus{}, errors.New("dtbFunc failed")
 		}
-		_, _, err := buildAS3Declaration(store, as3CommonTenantBuilder, as3DomainTenantBuilder)
+		_, _, err := buildAS3Declaration(config.F5Config{}, store, as3CommonTenantBuilder, as3DomainTenantBuilder)
 		assert.ErrorContains(err, "dtbFunc failed")
 	})
 
@@ -72,7 +73,7 @@ func TestBuildAS3Declaration(t *testing.T) {
 				{Id: "member1", Model: server.ProvisioningStatusRequest_ProvisioningStatus_MEMBER, Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE},
 			}, nil
 		}
-		as3DomainTenantBuilder := func(datacentersByID map[string]*rpcmodels.Datacenter, domain *rpcmodels.Domain) (as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error) {
+		as3DomainTenantBuilder := func(f5Config config.F5Config, datacentersByID map[string]*rpcmodels.Datacenter, domain *rpcmodels.Domain) (as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error) {
 			return expectedDomainTenant, []*server.ProvisioningStatusRequest_ProvisioningStatus{
 				{Id: "pool1-uuid", Model: server.ProvisioningStatusRequest_ProvisioningStatus_POOL, Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE},
 				{Id: "pool2-uuid", Model: server.ProvisioningStatusRequest_ProvisioningStatus_POOL, Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE},
@@ -80,7 +81,7 @@ func TestBuildAS3Declaration(t *testing.T) {
 			}, nil
 		}
 
-		declaration, req, err := buildAS3Declaration(store, as3CommonTenantBuilder, as3DomainTenantBuilder)
+		declaration, req, err := buildAS3Declaration(config.F5Config{}, store, as3CommonTenantBuilder, as3DomainTenantBuilder)
 		assert.Nil(err)
 
 		t.Run("Adds the common tenant to the AS3 declaration", func(t *testing.T) {
@@ -123,7 +124,7 @@ func TestBuildAS3DomainTenant(t *testing.T) {
 				{Id: "pool1-uuid", Members: []*rpcmodels.Member{{Id: "member1", Address: "200.10.0.1", Port: 80, DatacenterId: "dc1-uuid"}}},
 			},
 		}
-		_, _, err := buildAS3DomainTenant(datacentersByID, domain)
+		_, _, err := buildAS3DomainTenant(config.F5Config{}, datacentersByID, domain)
 		assert.ErrorContains(err, "invalid datacenter ID for member")
 	})
 
@@ -138,7 +139,7 @@ func TestBuildAS3DomainTenant(t *testing.T) {
 				{Id: "pool1-uuid", Members: []*rpcmodels.Member{{Id: "member1", Address: "200.10.0.1", Port: 80, DatacenterId: "dc1-uuid"}}},
 			},
 		}
-		_, _, err := buildAS3DomainTenant(datacentersByID, domain)
+		_, _, err := buildAS3DomainTenant(config.F5Config{}, datacentersByID, domain)
 		assert.ErrorContains(err, "nil datacenter for member")
 	})
 
@@ -148,7 +149,7 @@ func TestBuildAS3DomainTenant(t *testing.T) {
 		}
 		domain := &rpcmodels.Domain{
 			Id:         "dom1-uuid",
-			Fqdn:       "test1.internal",
+			Fqdn:       "test1",
 			Mode:       "AVAILABILITY",
 			RecordType: "A",
 			Pools: []*rpcmodels.Pool{
@@ -169,8 +170,7 @@ func TestBuildAS3DomainTenant(t *testing.T) {
 				},
 			},
 		}
-
-		tenant, req, err := buildAS3DomainTenant(datacentersByID, domain)
+		tenant, req, err := buildAS3DomainTenant(config.F5Config{DomainSuffix: ".internal"}, datacentersByID, domain)
 		assert.Nil(err)
 
 		t.Run("Builds tenant correctly", func(t *testing.T) {

@@ -201,6 +201,7 @@ type F5Config struct {
 	DNSServerAddress string   `yaml:"dns_server_address" description:"Needed by GSLB_Server.devices[].address and GSLB_Server.virtualServers[].address"`
 	MaxRetries       uint64   `long:"max-retries" ini-name:"max_retries" description:"Maximum number of retries for F5 operations." default:"5"`
 	ValidateCert     bool     `yaml:"validate_certificates" description:"Validate HTTPS certificate"`
+	DomainSuffix     string   `yaml:"domain_suffix" description:"Automatically appended to FQDN of Andromeda domains before posting the AS3 declaration"`
 }
 
 type F5Datacenter struct {
