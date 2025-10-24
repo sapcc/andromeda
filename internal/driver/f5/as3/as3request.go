@@ -185,14 +185,15 @@ type GSLBPoolMemberCNAME GSLBPoolMember
 type GSLBPoolMemberMX GSLBPoolMember
 
 type GSLBMonitor struct {
-	Class       string `json:"class"`
-	Label       string `json:"label,omitempty"`
-	Remark      string `json:"remark,omitempty"`
-	MonitorType string `json:"monitorType"`
-	Interval    int64  `json:"interval,omitempty"`
-	Timeout     int64  `json:"timeout,omitempty"`
-	Receive     string `json:"receive,omitempty"`
-	Send        string `json:"send,omitempty"`
+	Class        string `json:"class"`
+	Label        string `json:"label,omitempty"`
+	Remark       string `json:"remark,omitempty"`
+	MonitorType  string `json:"monitorType"`
+	Interval     int64  `json:"interval,omitempty"`
+	Timeout      int64  `json:"timeout,omitempty"`
+	ProbeTimeout int64  `json:"probeTimeout,omitempty"`
+	Receive      string `json:"receive,omitempty"`
+	Send         string `json:"send,omitempty"`
 }
 
 type GSLBMonitorHTTP GSLBMonitor

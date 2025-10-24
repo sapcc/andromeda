@@ -62,6 +62,7 @@ message Member {
   string datacenter_id = 5;
   string provisioning_status = 6;
   string project_id = 7;
+  string pool_id = 8;
 }
 
 message Monitor {

@@ -18,7 +18,7 @@ import (
 	"github.com/sapcc/andromeda/models"
 )
 
-type as3CommonTenantBuilderFunc func(s AndromedaF5Store, datacenters []*rpcmodels.Datacenter) (
+type as3CommonTenantBuilderFunc func(s AndromedaF5Store, datacenters []*rpcmodels.Datacenter, domains []*rpcmodels.Domain) (
 	as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error)
 
 type as3DomainTenantBuilderFunc func(datacentersByID map[string]*rpcmodels.Datacenter, domain *rpcmodels.Domain) (
@@ -37,16 +37,18 @@ func buildAS3Declaration(s AndromedaF5Store, ctbFunc as3CommonTenantBuilderFunc,
 	for _, dc := range datacenters {
 		datacentersByID[dc.Id] = dc
 	}
-	commonTenant, commonTenantRPCUpdates, err := ctbFunc(s, datacenters)
+	// build the /Common key
+	domains, err := s.GetDomains()
+	if err != nil {
+		return adc, rpcRequest, err
+	}
+	commonTenant, commonTenantRPCUpdates, err := ctbFunc(s, datacenters, domains)
 	if err != nil {
 		return adc, rpcRequest, err
 	}
 	rpcUpdates = append(rpcUpdates, commonTenantRPCUpdates...)
 	adc.AddTenant("Common", commonTenant)
-	domains, err := s.GetDomains()
-	if err != nil {
-		return adc, rpcRequest, err
-	}
+	// build all /domain_{domainID} keys
 	for _, domain := range domains {
 		domainTenant, domainTenantRPCUpdates, err := dtbFunc(datacentersByID, domain)
 		if err != nil {
@@ -117,16 +119,50 @@ func buildAS3DomainTenant(
 
 func buildAS3CommonTenant(
 	s AndromedaF5Store,
-	datacenters []*rpcmodels.Datacenter) (as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error) {
+	datacenters []*rpcmodels.Datacenter,
+	domains []*rpcmodels.Domain) (as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error) {
 	tenant := as3.Tenant{}
 	rpcUpdates := []*server.ProvisioningStatusRequest_ProvisioningStatus{}
 	application := as3.Application{Template: "shared"}
+	// allows referencing monitors by pool ID when iterating over members
+	monitorsByPoolID := map[string][]*rpcmodels.Monitor{}
+	// add all monitors under /Common/Shared
+	for _, domain := range domains {
+		for _, pool := range domain.Pools {
+			monitorsByPoolID[pool.Id] = pool.Monitors
+			for _, monitor := range pool.Monitors {
+				monitorKey := as3DeclarationGSLBMonitorKey(monitor.Id)
+				application.SetEntity(monitorKey, as3.GSLBMonitor{
+					Class:        "GSLB_Monitor",
+					MonitorType:  as3DeclarationMonitorType(monitor.Type.String()),
+					Interval:     monitor.Interval,
+					ProbeTimeout: monitor.Timeout,
+					Send:         monitor.Send,
+					Receive:      monitor.Receive,
+				})
+				rpcUpdates = append(rpcUpdates, &server.ProvisioningStatusRequest_ProvisioningStatus{
+					Id:     monitor.GetId(),
+					Model:  server.ProvisioningStatusRequest_ProvisioningStatus_MONITOR,
+					Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE,
+				})
+			}
+		}
+	}
+	// add all servers under /Common/Shared
 	for _, datacenter := range datacenters {
 		members, err := s.GetMembers(datacenter.Id)
 		if err != nil {
 			return tenant, rpcUpdates, err
 		}
 		for _, member := range members {
+			monitorPointers := []as3.PointerGSLBMonitor{}
+			if monitors, ok := monitorsByPoolID[member.PoolId]; ok {
+				for _, monitor := range monitors {
+					monitorPointers = append(monitorPointers, as3.PointerGSLBMonitor{
+						Use: as3DeclarationGSLBMonitorKey(monitor.Id),
+					})
+				}
+			}
 			memberKey := as3DeclarationGSLBServerKey(member.Address, datacenter.Name)
 			entity := application.GetEntity(memberKey)
 			switch entity {
@@ -136,7 +172,7 @@ func buildAS3CommonTenant(
 					ServerType: "generic-host",
 					DataCenter: as3.PointerGSLBDataCenter{BigIP: "/Common/" + datacenter.Name},
 					Devices:    []as3.GSLBServerDevice{{Address: member.Address}},
-					Monitors:   []as3.PointerGSLBMonitor{{BigIP: "/Common/tcp"}},
+					Monitors:   monitorPointers,
 					VirtualServers: []as3.GSLBVirtualServer{{
 						Address: member.Address,
 						Port:    member.Port,
@@ -182,6 +218,10 @@ func as3DeclarationGSLBPoolKey(poolID string) string {
 	return "pool_" + poolID
 }
 
+func as3DeclarationGSLBMonitorKey(monitorID string) string {
+	return fmt.Sprintf("cc_andromeda_monitor_%s", monitorID)
+}
+
 func as3DeclarationGSLBServerKey(memberAddress, datacenterName string) string {
 	return fmt.Sprintf("cc_andromeda_srv_%s_%s", memberAddress, datacenterName)
 }
@@ -217,6 +257,29 @@ func as3DeclarationPoolMemberLBMode(memberMode string) string {
 		return "global-availability"
 	default:
 		return "round-robin"
+	}
+}
+
+// as3DeclarationMonitorType maps an Andromeda monitor type string to an F5/AS3 monitor type string.
+//
+// Andromeda does not support all F5 monitor types.
+//
+// For the full list of F5 monitor types, see (allowed values of field "monitorType" of class "Monitor"):
+// <https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/refguide/schemaref/Monitor.schema.json.html>
+func as3DeclarationMonitorType(monitorType string) string {
+	switch monitorType {
+	case models.MonitorTypeHTTP:
+		return "http"
+	case models.MonitorTypeHTTPS:
+		return "https"
+	case models.MonitorTypeICMP:
+		return "gateway-icmp"
+	case models.MonitorTypeTCP:
+		return "tcp"
+	case models.MonitorTypeUDP:
+		return "udp"
+	default:
+		return "tcp"
 	}
 }
 
