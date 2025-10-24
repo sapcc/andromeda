@@ -73,11 +73,12 @@ func TestDeclarationSync(t *testing.T) {
 			Method:      "post",
 			URL:         "mgmt/shared/appsvcs/declare",
 			ContentType: "application/json",
-			Body:        `{"Common":{"Shared":{"cc_andromeda_srv_200.10.0.1_dc1":{"class":"GSLB_Server","dataCenter":{"bigip":"/Common/dc1"},"devices":[{"address":"200.10.0.1"}],"virtualServers":[{"address":"200.10.0.1","name":"200.10.0.1:80","port":80}],"monitors":[{"bigip":"/Common/tcp"}],"serverType":"generic-host"},"cc_andromeda_srv_200.10.0.2_dc2":{"class":"GSLB_Server","dataCenter":{"bigip":"/Common/dc2"},"devices":[{"address":"200.10.0.2"}],"virtualServers":[{"address":"200.10.0.2","name":"200.10.0.2:80","port":80}],"monitors":[{"bigip":"/Common/tcp"}],"serverType":"generic-host"},"class":"Application","label":"","remark":"","template":"shared"},"class":"Tenant","label":"","remark":""},"class":"ADC","domain_dom1-uuid":{"application":{"class":"Application","label":"","pool_pool1-uuid":{"class":"GSLB_Pool","resourceRecordType":"A","members":[{"server":{"use":"/Common/Shared/cc_andromeda_srv_200.10.0.1_dc1"},"virtualServer":"200.10.0.1:80"}],"lbModePreferred":"global-availability","lbModeAlternate":"none","lbModeFallback":"none"},"pool_pool2-uuid":{"class":"GSLB_Pool","resourceRecordType":"A","members":[{"server":{"use":"/Common/Shared/cc_andromeda_srv_200.10.0.2_dc2"},"virtualServer":"200.10.0.2:80"}],"lbModePreferred":"global-availability","lbModeAlternate":"none","lbModeFallback":"none"},"remark":"","template":"","wideip":{"class":"GSLB_Domain","domainName":"hello-world.local","resourceRecordType":"A","poolLbMode":"global-availability","pools":[{"use":"pool_pool1-uuid"},{"use":"pool_pool2-uuid"}]}},"class":"Tenant","label":"","remark":""},"id":"","schemaVersion":"3.36.0","updateMode":"complete"}`,
+			Body:        `{"Common":{"Shared":{"cc_andromeda_monitor_mon1-uuid":{"class":"GSLB_Monitor","monitorType":"https","interval":60,"probeTimeout":10,"receive":"bar","send":"foo"},"cc_andromeda_srv_200.10.0.1_dc1":{"class":"GSLB_Server","dataCenter":{"bigip":"/Common/dc1"},"devices":[{"address":"200.10.0.1"}],"virtualServers":[{"address":"200.10.0.1","name":"200.10.0.1:80","port":80}],"serverType":"generic-host"},"cc_andromeda_srv_200.10.0.2_dc2":{"class":"GSLB_Server","dataCenter":{"bigip":"/Common/dc2"},"devices":[{"address":"200.10.0.2"}],"virtualServers":[{"address":"200.10.0.2","name":"200.10.0.2:80","port":80}],"serverType":"generic-host"},"class":"Application","label":"","remark":"","template":"shared"},"class":"Tenant","label":"","remark":""},"class":"ADC","domain_dom1-uuid":{"application":{"class":"Application","label":"","pool_pool1-uuid":{"class":"GSLB_Pool","resourceRecordType":"A","members":[{"server":{"use":"/Common/Shared/cc_andromeda_srv_200.10.0.1_dc1"},"virtualServer":"200.10.0.1:80"}],"lbModePreferred":"global-availability","lbModeAlternate":"none","lbModeFallback":"none"},"pool_pool2-uuid":{"class":"GSLB_Pool","resourceRecordType":"A","members":[{"server":{"use":"/Common/Shared/cc_andromeda_srv_200.10.0.2_dc2"},"virtualServer":"200.10.0.2:80"}],"lbModePreferred":"global-availability","lbModeAlternate":"none","lbModeFallback":"none"},"remark":"","template":"","wideip":{"class":"GSLB_Domain","domainName":"hello-world.local","resourceRecordType":"A","poolLbMode":"global-availability","pools":[{"use":"pool_pool1-uuid"},{"use":"pool_pool2-uuid"}]}},"class":"Tenant","label":"","remark":""},"id":"","schemaVersion":"3.36.0","updateMode":"complete"}`,
 		}
 		session.On("APICall", expectedAPIRequest).Return([]byte(`{"code": 200}`), nil)
 		expectedRequest := &server.ProvisioningStatusRequest{
 			ProvisioningStatus: []*server.ProvisioningStatusRequest_ProvisioningStatus{
+				{Id: "mon1-uuid", Model: server.ProvisioningStatusRequest_ProvisioningStatus_MONITOR, Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE},
 				{Id: "member1-uuid", Model: server.ProvisioningStatusRequest_ProvisioningStatus_MEMBER, Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE},
 				{Id: "member2-uuid", Model: server.ProvisioningStatusRequest_ProvisioningStatus_MEMBER, Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE},
 				{Id: "pool1-uuid", Model: server.ProvisioningStatusRequest_ProvisioningStatus_POOL, Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE},
@@ -120,6 +121,17 @@ func TestDeclarationSync(t *testing.T) {
 							Id: "pool1-uuid",
 							Members: []*rpcmodels.Member{
 								{Id: "member1-uuid", Address: "200.10.0.1", Port: 80, DatacenterId: "dc1-uuid"},
+							},
+							Monitors: []*rpcmodels.Monitor{
+								{
+									Id:       "mon1-uuid",
+									PoolId:   "pool1-uuid",
+									Type:     rpcmodels.Monitor_HTTPS,
+									Send:     "foo",
+									Receive:  "bar",
+									Interval: 60,
+									Timeout:  10,
+								},
 							},
 						},
 						{

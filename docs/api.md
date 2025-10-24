@@ -1954,6 +1954,38 @@ Unexpected Error
 POST /v1/monitors
 ```
 
+### F5 monitors
+
+Andromeda pool monitors are mapped to [F5 monitors][f5-monitors] based on the `type` property as follows:
+
+[f5-monitors]: <https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/refguide/schemaref/Monitor.schema.json.html>
+
+| Andromeda | F5             |
+|-----------|----------------|
+| `HTTP`    | `http`         |
+| `HTTPS`   | `https`        |
+| `ICMP`    | `gateway-icmp` |
+| `TCP`     | `tcp`          |
+| `UDP`     | `udp`          |
+
+Andromeda monitor properties map to an F5 `GSLB_Monitor` as follows:
+
+| Andromeda     | F5 `GSLB_Monitor` object | Comments                                       |
+|---------------|--------------------------|------------------------------------------------|
+| `domain_name` | -                        | Unsupported by F5/AS3                          |
+| `http_method` | -                        | Unsupported by F5/AS3 (see caveats below)      |
+| `interval`    | `interval`               |                                                |
+| `receive`     | `receive`                | `HTTP` / `HTTPS` only                          |
+| `send`        | `send`                   | `HTTP` / `HTTPS` only                          |
+| `timeout`     | `probeTimeout`           |                                                |
+| `type`        | `monitorType`            |                                                |
+
+Caveats:
+
+* For HTTP/S monitors, F5 decides on the HTTP method, URL path and HTTP version according to `Monitor.send`. For details please refer to the [Monitor_HTTP object][monitor-http-object].
+
+[monitor-http-object]: <https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/refguide/schemaref/Monitor.schema.json.html#monitor-http-object>
+
 #### Parameters
 
 | Name | Source | Type | Go type | Separator | Required | Default | Description |
@@ -3081,7 +3113,7 @@ Unexpected Error
 | heartbeat | date-time (formatted string)| `strfmt.DateTime` |  | | The UTC date and timestamp when had the last heartbeat. | `2020-05-11 17:21:34` |
 | host | hostname (formatted string)| `strfmt.Hostname` |  | | Hostname of the computer the service is running. | `example.host` |
 | id | string| `string` |  | | ID of the RPC service. | `andromeda-agent-fbb49979-03f5-4a97-a334-1fd2c9f61e7e` |
-| metadata | [any](#any)| `any` |  | |  |  |
+| metadata | [interface{}](#interface)| `interface{}` |  | |  |  |
 | provider | string| `string` |  | | Provider this service supports. | `akamai` |
 | rpc_address | string| `string` |  | | RPC Endpoint Address. | `_INBOX.VEfFxcAzZQ9iM9vwGH49It` |
 | type | string| `string` |  | | Type of service. | `healthcheck` |

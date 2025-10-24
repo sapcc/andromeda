@@ -70,7 +70,7 @@ func (u *RPCHandler) QueryxWithIds(sql string, request *SearchRequest) (*sqlx.Ro
 
 func (u *RPCHandler) GetMembers(ctx context.Context, request *SearchRequest) (*MembersResponse, error) {
 	var response = &MembersResponse{}
-	sql := u.DB.Rebind(`SELECT id, admin_state_up, address, port, provisioning_status, datacenter_id, project_id FROM member`)
+	sql := u.DB.Rebind(`SELECT id, admin_state_up, address, port, provisioning_status, datacenter_id, project_id, pool_id FROM member`)
 	rows, err := u.QueryxWithIds(sql, request)
 	if err != nil {
 		return nil, err
@@ -78,7 +78,7 @@ func (u *RPCHandler) GetMembers(ctx context.Context, request *SearchRequest) (*M
 	for rows.Next() {
 		var member rpcmodels.Member
 		if err := rows.Scan(&member.Id, &member.AdminStateUp, &member.Address,
-			&member.Port, &member.ProvisioningStatus, &member.DatacenterId, &member.ProjectId); err != nil {
+			&member.Port, &member.ProvisioningStatus, &member.DatacenterId, &member.ProjectId, &member.PoolId); err != nil {
 			return nil, err
 		}
 		response.Response = append(response.Response, &member)
@@ -315,6 +315,7 @@ func populateMembers(u *RPCHandler, poolID string) ([]*rpcmodels.Member, error) 
 			return nil, err
 		}
 
+		member.PoolId = poolID
 		members = append(members, &member)
 	}
 	return members, nil

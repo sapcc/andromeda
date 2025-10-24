@@ -30,7 +30,8 @@ func TestBuildAS3Declaration(t *testing.T) {
 	t.Run("Fails if AS3 Common tenant builder function fails", func(t *testing.T) {
 		store := new(mockedStore)
 		store.On("GetDatacenters").Return([]*rpcmodels.Datacenter{{Id: "dc1-uuid", Name: "dc1"}}, nil)
-		as3CommonTenantBuilder := func(s AndromedaF5Store, datacenters []*rpcmodels.Datacenter) (as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error) {
+		store.On("GetDomains").Return([]*rpcmodels.Domain{}, nil)
+		as3CommonTenantBuilder := func(s AndromedaF5Store, datacenters []*rpcmodels.Datacenter, domains []*rpcmodels.Domain) (as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error) {
 			return as3.Tenant{}, []*server.ProvisioningStatusRequest_ProvisioningStatus{}, errors.New("ctbFunc failed")
 		}
 		_, _, err := buildAS3Declaration(config.F5Config{}, store, as3CommonTenantBuilder, buildAS3DomainTenant)
@@ -41,7 +42,7 @@ func TestBuildAS3Declaration(t *testing.T) {
 		store := new(mockedStore)
 		store.On("GetDatacenters").Return([]*rpcmodels.Datacenter{{Id: "dc1-uuid", Name: "dc1"}}, nil)
 		store.On("GetDomains").Return([]*rpcmodels.Domain{}, errors.New("RPC GetDomains() failed"))
-		as3CommonTenantBuilder := func(s AndromedaF5Store, datacenters []*rpcmodels.Datacenter) (as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error) {
+		as3CommonTenantBuilder := func(s AndromedaF5Store, datacenters []*rpcmodels.Datacenter, domains []*rpcmodels.Domain) (as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error) {
 			return as3.Tenant{}, []*server.ProvisioningStatusRequest_ProvisioningStatus{}, nil
 		}
 		_, _, err := buildAS3Declaration(config.F5Config{}, store, as3CommonTenantBuilder, buildAS3DomainTenant)
@@ -52,7 +53,7 @@ func TestBuildAS3Declaration(t *testing.T) {
 		store := new(mockedStore)
 		store.On("GetDatacenters").Return([]*rpcmodels.Datacenter{{Id: "dc1-uuid", Name: "dc1"}}, nil)
 		store.On("GetDomains").Return([]*rpcmodels.Domain{{Id: "dom1-uuid"}}, nil)
-		as3CommonTenantBuilder := func(s AndromedaF5Store, datacenters []*rpcmodels.Datacenter) (as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error) {
+		as3CommonTenantBuilder := func(s AndromedaF5Store, datacenters []*rpcmodels.Datacenter, domains []*rpcmodels.Domain) (as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error) {
 			return as3.Tenant{}, []*server.ProvisioningStatusRequest_ProvisioningStatus{}, nil
 		}
 		as3DomainTenantBuilder := func(f5Config config.F5Config, datacentersByID map[string]*rpcmodels.Datacenter, domain *rpcmodels.Domain) (as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error) {
@@ -68,7 +69,7 @@ func TestBuildAS3Declaration(t *testing.T) {
 		store.On("GetDomains").Return([]*rpcmodels.Domain{{Id: "dom1-uuid"}}, nil)
 		expectedCommonTenant := as3.Tenant{}
 		expectedDomainTenant := as3.Tenant{}
-		as3CommonTenantBuilder := func(s AndromedaF5Store, datacenters []*rpcmodels.Datacenter) (as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error) {
+		as3CommonTenantBuilder := func(s AndromedaF5Store, datacenters []*rpcmodels.Datacenter, domains []*rpcmodels.Domain) (as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error) {
 			return expectedCommonTenant, []*server.ProvisioningStatusRequest_ProvisioningStatus{
 				{Id: "member1", Model: server.ProvisioningStatusRequest_ProvisioningStatus_MEMBER, Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE},
 			}, nil
@@ -232,9 +233,10 @@ func TestBuildAS3CommonTenant(t *testing.T) {
 			{Id: "dc1-uuid", Name: "dc1"},
 			{Id: "dc2-uuid", Name: "dc2"},
 		}
+		domains := []*rpcmodels.Domain{}
 		s := new(mockedStore)
 		s.On("GetMembers", "dc1-uuid").Return([]*rpcmodels.Member{}, errors.New("RPC GetDomains() failed"))
-		_, _, err := buildAS3CommonTenant(s, datacenters)
+		_, _, err := buildAS3CommonTenant(s, datacenters, domains)
 		s.AssertCalled(t, "GetMembers", "dc1-uuid")
 		s.AssertNotCalled(t, "GetMembers", "dc2-uuid")
 		assert.ErrorContains(err, "RPC GetDomains() failed")
@@ -245,6 +247,7 @@ func TestBuildAS3CommonTenant(t *testing.T) {
 			{Id: "dc1-uuid", Name: "dc1"},
 			{Id: "dc2-uuid", Name: "dc2"},
 		}
+		domains := []*rpcmodels.Domain{}
 		store := new(mockedStore)
 		store.On("GetMembers", "dc1-uuid").Return([]*rpcmodels.Member{
 			{Id: "member1", Address: "200.10.0.1", Port: 80},
@@ -255,7 +258,7 @@ func TestBuildAS3CommonTenant(t *testing.T) {
 			{Id: "member4", Address: "200.10.0.4", Port: 80},
 			{Id: "member5", Address: "200.10.0.5", Port: 80},
 		}, nil)
-		tenant, req, err := buildAS3CommonTenant(store, datacenters)
+		tenant, req, err := buildAS3CommonTenant(store, datacenters, domains)
 		expectedTenant := as3.Tenant{}
 		application := as3.Application{Template: "shared"}
 		application.SetEntity("cc_andromeda_srv_200.10.0.1_dc1", as3.GSLBServer{
@@ -263,7 +266,7 @@ func TestBuildAS3CommonTenant(t *testing.T) {
 			ServerType:     "generic-host",
 			DataCenter:     as3.PointerGSLBDataCenter{BigIP: "/Common/dc1"},
 			Devices:        []as3.GSLBServerDevice{{Address: "200.10.0.1"}},
-			Monitors:       []as3.PointerGSLBMonitor{{BigIP: "/Common/tcp"}},
+			Monitors:       []as3.PointerGSLBMonitor{},
 			VirtualServers: []as3.GSLBVirtualServer{{Address: "200.10.0.1", Port: 80, Name: "200.10.0.1:80"}},
 		})
 		application.SetEntity("cc_andromeda_srv_200.10.0.2_dc1", as3.GSLBServer{
@@ -271,7 +274,7 @@ func TestBuildAS3CommonTenant(t *testing.T) {
 			ServerType: "generic-host",
 			DataCenter: as3.PointerGSLBDataCenter{BigIP: "/Common/dc1"},
 			Devices:    []as3.GSLBServerDevice{{Address: "200.10.0.2"}},
-			Monitors:   []as3.PointerGSLBMonitor{{BigIP: "/Common/tcp"}},
+			Monitors:   []as3.PointerGSLBMonitor{},
 			VirtualServers: []as3.GSLBVirtualServer{
 				{Address: "200.10.0.2", Port: 80, Name: "200.10.0.2:80"},
 				{Address: "200.10.0.2", Port: 8080, Name: "200.10.0.2:8080"},
@@ -282,7 +285,7 @@ func TestBuildAS3CommonTenant(t *testing.T) {
 			ServerType:     "generic-host",
 			DataCenter:     as3.PointerGSLBDataCenter{BigIP: "/Common/dc2"},
 			Devices:        []as3.GSLBServerDevice{{Address: "200.10.0.4"}},
-			Monitors:       []as3.PointerGSLBMonitor{{BigIP: "/Common/tcp"}},
+			Monitors:       []as3.PointerGSLBMonitor{},
 			VirtualServers: []as3.GSLBVirtualServer{{Address: "200.10.0.4", Port: 80, Name: "200.10.0.4:80"}},
 		})
 		application.SetEntity("cc_andromeda_srv_200.10.0.5_dc2", as3.GSLBServer{
@@ -290,7 +293,7 @@ func TestBuildAS3CommonTenant(t *testing.T) {
 			ServerType:     "generic-host",
 			DataCenter:     as3.PointerGSLBDataCenter{BigIP: "/Common/dc2"},
 			Devices:        []as3.GSLBServerDevice{{Address: "200.10.0.5"}},
-			Monitors:       []as3.PointerGSLBMonitor{{BigIP: "/Common/tcp"}},
+			Monitors:       []as3.PointerGSLBMonitor{},
 			VirtualServers: []as3.GSLBVirtualServer{{Address: "200.10.0.5", Port: 80, Name: "200.10.0.5:80"}},
 		})
 		expectedTenant.AddApplication("Shared", application)
@@ -306,6 +309,74 @@ func TestBuildAS3CommonTenant(t *testing.T) {
 		assert.Equal(expectedRPCUpdates, req)
 		store.AssertCalled(t, "GetMembers", "dc1-uuid")
 		store.AssertCalled(t, "GetMembers", "dc2-uuid")
+	})
+
+	t.Run("Defines monitors and their references correctly (under /Common/Shared)", func(t *testing.T) {
+		datacenters := []*rpcmodels.Datacenter{
+			{Id: "dc1-uuid", Name: "dc1"},
+		}
+		domains := []*rpcmodels.Domain{
+			{
+				Id: "dom1-uuid",
+				Pools: []*rpcmodels.Pool{
+					{
+						Id: "pool1-uuid",
+						Monitors: []*rpcmodels.Monitor{
+							{
+								Id:       "mon1-uuid",
+								Type:     rpcmodels.Monitor_HTTPS,
+								Send:     "foo",
+								Receive:  "bar",
+								Interval: 60,
+								Timeout:  10,
+							},
+						},
+					},
+				},
+			},
+		}
+		store := new(mockedStore)
+		store.On("GetMembers", "dc1-uuid").Return([]*rpcmodels.Member{
+			{Id: "member1", Address: "200.10.0.1", Port: 80, PoolId: "pool1-uuid"},
+			{Id: "member2", Address: "200.10.0.2", Port: 80, PoolId: "pool1-uuid"},
+		}, nil)
+		tenant, req, err := buildAS3CommonTenant(store, datacenters, domains)
+		expectedTenant := as3.Tenant{}
+		application := as3.Application{Template: "shared"}
+		application.SetEntity("cc_andromeda_monitor_mon1-uuid", as3.GSLBMonitor{
+			Class:        "GSLB_Monitor",
+			MonitorType:  "https",
+			Send:         "foo",
+			Receive:      "bar",
+			Interval:     60,
+			ProbeTimeout: 10,
+		})
+		application.SetEntity("cc_andromeda_srv_200.10.0.1_dc1", as3.GSLBServer{
+			Class:          "GSLB_Server",
+			ServerType:     "generic-host",
+			DataCenter:     as3.PointerGSLBDataCenter{BigIP: "/Common/dc1"},
+			Devices:        []as3.GSLBServerDevice{{Address: "200.10.0.1"}},
+			Monitors:       []as3.PointerGSLBMonitor{{Use: "cc_andromeda_monitor_mon1-uuid"}},
+			VirtualServers: []as3.GSLBVirtualServer{{Address: "200.10.0.1", Port: 80, Name: "200.10.0.1:80"}},
+		})
+		application.SetEntity("cc_andromeda_srv_200.10.0.2_dc1", as3.GSLBServer{
+			Class:          "GSLB_Server",
+			ServerType:     "generic-host",
+			DataCenter:     as3.PointerGSLBDataCenter{BigIP: "/Common/dc1"},
+			Devices:        []as3.GSLBServerDevice{{Address: "200.10.0.2"}},
+			Monitors:       []as3.PointerGSLBMonitor{{Use: "cc_andromeda_monitor_mon1-uuid"}},
+			VirtualServers: []as3.GSLBVirtualServer{{Address: "200.10.0.2", Port: 80, Name: "200.10.0.2:80"}},
+		})
+		expectedTenant.AddApplication("Shared", application)
+		expectedRPCUpdates := []*server.ProvisioningStatusRequest_ProvisioningStatus{
+			{Id: "mon1-uuid", Model: server.ProvisioningStatusRequest_ProvisioningStatus_MONITOR, Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE},
+			{Id: "member1", Model: server.ProvisioningStatusRequest_ProvisioningStatus_MEMBER, Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE},
+			{Id: "member2", Model: server.ProvisioningStatusRequest_ProvisioningStatus_MEMBER, Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE},
+		}
+		assert.Nil(err)
+		assert.Equal(expectedTenant, tenant)
+		assert.Equal(expectedRPCUpdates, req)
+		store.AssertCalled(t, "GetMembers", "dc1-uuid")
 	})
 }
 
