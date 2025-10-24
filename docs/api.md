@@ -161,6 +161,7 @@ DELETE /v1/datacenters/{datacenter_id}
 | Code | Status | Description | Has headers | Schema |
 |------|--------|-------------|:-----------:|--------|
 | [204](#delete-datacenters-datacenter-id-204) | No Content | Resource successfully deleted. |  | [schema](#delete-datacenters-datacenter-id-204-schema) |
+| [400](#delete-datacenters-datacenter-id-400) | Bad Request | Bad request |  | [schema](#delete-datacenters-datacenter-id-400-schema) |
 | [404](#delete-datacenters-datacenter-id-404) | Not Found | Not Found |  | [schema](#delete-datacenters-datacenter-id-404-schema) |
 | [default](#delete-datacenters-datacenter-id-default) | | Unexpected Error |  | [schema](#delete-datacenters-datacenter-id-default-schema) |
 
@@ -171,6 +172,15 @@ DELETE /v1/datacenters/{datacenter_id}
 Status: No Content
 
 ###### <span id="delete-datacenters-datacenter-id-204-schema"></span> Schema
+
+##### <span id="delete-datacenters-datacenter-id-400"></span> 400 - Bad request
+Status: Bad Request
+
+###### <span id="delete-datacenters-datacenter-id-400-schema"></span> Schema
+   
+  
+
+[Error](#error)
 
 ##### <span id="delete-datacenters-datacenter-id-404"></span> 404 - Not Found
 Status: Not Found
@@ -1600,6 +1610,7 @@ POST /v1/datacenters
 | Code | Status | Description | Has headers | Schema |
 |------|--------|-------------|:-----------:|--------|
 | [201](#post-datacenters-201) | Created | Created datacenter. |  | [schema](#post-datacenters-201-schema) |
+| [400](#post-datacenters-400) | Bad Request | Bad request |  | [schema](#post-datacenters-400-schema) |
 | [404](#post-datacenters-404) | Not Found | Not Found |  | [schema](#post-datacenters-404-schema) |
 | [default](#post-datacenters-default) | | Unexpected Error |  | [schema](#post-datacenters-default-schema) |
 
@@ -1614,6 +1625,15 @@ Status: Created
   
 
 [PostDatacentersCreatedBody](#post-datacenters-created-body)
+
+##### <span id="post-datacenters-400"></span> 400 - Bad request
+Status: Bad Request
+
+###### <span id="post-datacenters-400-schema"></span> Schema
+   
+  
+
+[Error](#error)
 
 ##### <span id="post-datacenters-404"></span> 404 - Not Found
 Status: Not Found
@@ -2169,6 +2189,7 @@ PUT /v1/datacenters/{datacenter_id}
 | Code | Status | Description | Has headers | Schema |
 |------|--------|-------------|:-----------:|--------|
 | [202](#put-datacenters-datacenter-id-202) | Accepted | Updated datacenter. |  | [schema](#put-datacenters-datacenter-id-202-schema) |
+| [400](#put-datacenters-datacenter-id-400) | Bad Request | Bad request |  | [schema](#put-datacenters-datacenter-id-400-schema) |
 | [404](#put-datacenters-datacenter-id-404) | Not Found | Not Found |  | [schema](#put-datacenters-datacenter-id-404-schema) |
 | [default](#put-datacenters-datacenter-id-default) | | Unexpected Error |  | [schema](#put-datacenters-datacenter-id-default-schema) |
 
@@ -2183,6 +2204,15 @@ Status: Accepted
   
 
 [PutDatacentersDatacenterIDAcceptedBody](#put-datacenters-datacenter-id-accepted-body)
+
+##### <span id="put-datacenters-datacenter-id-400"></span> 400 - Bad request
+Status: Bad Request
+
+###### <span id="put-datacenters-datacenter-id-400-schema"></span> Schema
+   
+  
+
+[Error](#error)
 
 ##### <span id="put-datacenters-datacenter-id-404"></span> 404 - Not Found
 Status: Not Found
