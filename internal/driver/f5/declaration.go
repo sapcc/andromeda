@@ -18,6 +18,8 @@ import (
 	"github.com/sapcc/andromeda/models"
 )
 
+var errEntityPendingDeletion = errors.New("this entity has been marked as either PENDING_DELETE or DELETED and therefore must be excluded from the AS3 declaration")
+
 type as3CommonTenantBuilderFunc func(s AndromedaF5Store, datacenters []*rpcmodels.Datacenter, domains []*rpcmodels.Domain) (
 	as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error)
 
@@ -51,25 +53,67 @@ func buildAS3Declaration(f5Config config.F5Config, s AndromedaF5Store, ctbFunc a
 	// build all /domain_{domainID} keys
 	for _, domain := range domains {
 		domainTenant, domainTenantRPCUpdates, err := dtbFunc(f5Config, datacentersByID, domain)
-		if err != nil {
+		// not a soft error: the declaration cannot be built
+		if err != nil && err != errEntityPendingDeletion {
 			return adc, rpcRequest, err
 		}
+		// only the active domains may be included in the declaration.
+		// domains pending deletion are excluded (and thus deleted by AS3).
+		if err != errEntityPendingDeletion {
+			adc.AddTenant(as3DeclarationGSLBDomainTenantKey(domain.Id), domainTenant)
+		}
 		rpcUpdates = append(rpcUpdates, domainTenantRPCUpdates...)
-		adc.AddTenant(as3DeclarationGSLBDomainTenantKey(domain.Id), domainTenant)
 	}
 	rpcRequest.ProvisioningStatus = rpcUpdates
 	return adc, rpcRequest, nil
 }
 
+// buildAS3DomainTenant builds one domain tenant ("domain_{domainID}" keys of AS3 declaration).
+//
+// If the given domain has been either scheduled for deletion or marked as
+// deleted, the returned tenant (first return value) should be considered a
+// zero value to be discarded. This condition can be checked for by comparing
+// the return error (third return value) to errEntityPendingDeletion.
+//
+// In case the domain provisioning status is set as PENDING_DELETE, the
+// returned slice of provisioning status requests will include an entry for
+// this domain, which shall be sent over RPC to the Andromeda Server
+// immediately after the next successful posting of the AS3 declaration.
 func buildAS3DomainTenant(
 	f5Config config.F5Config,
 	datacentersByID map[string]*rpcmodels.Datacenter,
 	domain *rpcmodels.Domain) (as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error) {
 	tenant := as3.Tenant{}
 	rpcUpdates := []*server.ProvisioningStatusRequest_ProvisioningStatus{}
+	switch domain.ProvisioningStatus {
+	case server.ProvisioningStatusRequest_ProvisioningStatus_DELETED.String(),
+		server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String():
+		if domain.ProvisioningStatus == server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String() {
+			rpcUpdates = append(rpcUpdates, &server.ProvisioningStatusRequest_ProvisioningStatus{
+				Id:     domain.Id,
+				Model:  server.ProvisioningStatusRequest_ProvisioningStatus_DOMAIN,
+				Status: server.ProvisioningStatusRequest_ProvisioningStatus_DELETED,
+			})
+		}
+		// by excluding the entity from the AS3 declaration the API will delete it from the F5 device
+		return tenant, rpcUpdates, errEntityPendingDeletion
+	}
 	application := as3.Application{}
 	as3PoolReferences := []as3.PointerGSLBPool{}
 	for _, p := range domain.Pools {
+		switch p.ProvisioningStatus {
+		case server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String(),
+			server.ProvisioningStatusRequest_ProvisioningStatus_DELETED.String():
+			if p.ProvisioningStatus == server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String() {
+				rpcUpdates = append(rpcUpdates, &server.ProvisioningStatusRequest_ProvisioningStatus{
+					Id:     p.Id,
+					Model:  server.ProvisioningStatusRequest_ProvisioningStatus_POOL,
+					Status: server.ProvisioningStatusRequest_ProvisioningStatus_DELETED,
+				})
+			}
+			// by excluding the entity from the AS3 declaration the API will delete it from the F5 device
+			continue
+		}
 		rpcUpdates = append(rpcUpdates, &server.ProvisioningStatusRequest_ProvisioningStatus{
 			Id:     p.Id,
 			Model:  server.ProvisioningStatusRequest_ProvisioningStatus_POOL,
@@ -132,6 +176,19 @@ func buildAS3CommonTenant(
 		for _, pool := range domain.Pools {
 			monitorsByPoolID[pool.Id] = pool.Monitors
 			for _, monitor := range pool.Monitors {
+				switch monitor.ProvisioningStatus {
+				case server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String(),
+					server.ProvisioningStatusRequest_ProvisioningStatus_DELETED.String():
+					if monitor.ProvisioningStatus == server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String() {
+						rpcUpdates = append(rpcUpdates, &server.ProvisioningStatusRequest_ProvisioningStatus{
+							Id:     monitor.Id,
+							Model:  server.ProvisioningStatusRequest_ProvisioningStatus_MONITOR,
+							Status: server.ProvisioningStatusRequest_ProvisioningStatus_DELETED,
+						})
+					}
+					// by excluding the entity from the AS3 declaration the API will delete it from the F5 device
+					continue
+				}
 				monitorKey := as3DeclarationGSLBMonitorKey(monitor.Id)
 				application.SetEntity(monitorKey, as3.GSLBMonitor{
 					Class:        "GSLB_Monitor",
@@ -156,9 +213,28 @@ func buildAS3CommonTenant(
 			return tenant, rpcUpdates, err
 		}
 		for _, member := range members {
+			switch member.ProvisioningStatus {
+			case server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String(),
+				server.ProvisioningStatusRequest_ProvisioningStatus_DELETED.String():
+				if member.ProvisioningStatus == server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String() {
+					rpcUpdates = append(rpcUpdates, &server.ProvisioningStatusRequest_ProvisioningStatus{
+						Id:     member.Id,
+						Model:  server.ProvisioningStatusRequest_ProvisioningStatus_MEMBER,
+						Status: server.ProvisioningStatusRequest_ProvisioningStatus_DELETED,
+					})
+				}
+				// by excluding the entity from the AS3 declaration the API will delete it from the F5 device
+				continue
+			}
 			monitorPointers := []as3.PointerGSLBMonitor{}
 			if monitors, ok := monitorsByPoolID[member.PoolId]; ok {
 				for _, monitor := range monitors {
+					switch monitor.ProvisioningStatus {
+					case server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String(),
+						server.ProvisioningStatusRequest_ProvisioningStatus_DELETED.String():
+						// these monitors are not part of the declaration (see GSLB_Monitor setup above)
+						continue
+					}
 					monitorPointers = append(monitorPointers, as3.PointerGSLBMonitor{
 						Use: as3DeclarationGSLBMonitorKey(monitor.Id),
 					})
