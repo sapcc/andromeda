@@ -18,10 +18,21 @@ import (
 	"github.com/sapcc/andromeda/internal/config"
 )
 
-// TODO consider moving from `BigIP.APICall()` to `BigIP.PostAs3Bigip()` for better req/res handling
+// bigIPSession is a minimal subset of struct type github.com/f5devcentral/go-bigip/BigIP
 type bigIPSession interface {
+	// APICall is defined by BigIP
+	// It's best suited for iControlREST GET requests
 	APICall(options *bigip.APIRequest) ([]byte, error)
+
+	// PostAs3Bigip is defined by BigIP
+	// It's necessary for POST /mgmt/shared/appsvcs/declare custom response payload handling
+	PostAs3Bigip(as3NewJson, tenantFilter, queryParam string) (error, string, string)
+
+	// GetDevices is defined by BigIP
 	GetDevices() ([]bigip.Device, error)
+
+	// GetHost is unique to this interface
+	// It's a test-friendly shorthand for BigIP.Host
 	GetHost() string
 }
 

@@ -18,9 +18,10 @@ type mockedAS3Client struct {
 	mock.Mock
 }
 
-func (c *mockedAS3Client) APICall(options *bigip.APIRequest) ([]byte, error) {
-	args := c.Called(options)
-	return args.Get(0).([]byte), args.Error(1)
+//nolint:staticcheck // must comply with F5 SDK signature (error returned first, not last)
+func (c *mockedAS3Client) PostAs3Bigip(as3NewJson, tenantFilter, queryParam string) (error, string, string) {
+	args := c.Called(as3NewJson, tenantFilter, queryParam)
+	return args.Error(0), args.String(1), args.String(2)
 }
 
 type mockedBigIPSession struct {
@@ -31,6 +32,12 @@ type mockedBigIPSession struct {
 func (s *mockedBigIPSession) APICall(options *bigip.APIRequest) ([]byte, error) {
 	args := s.Called(options)
 	return args.Get(0).([]byte), args.Error(1)
+}
+
+//nolint:staticcheck // must comply with F5 SDK signature (error returned first, not last)
+func (c *mockedBigIPSession) PostAs3Bigip(as3NewJson, tenantFilter, queryParam string) (error, string, string) {
+	args := c.Called(as3NewJson, tenantFilter, queryParam)
+	return args.Error(0), args.String(1), args.String(2)
 }
 
 func (s *mockedBigIPSession) GetDevices() ([]bigip.Device, error) {

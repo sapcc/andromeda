@@ -11,7 +11,6 @@ import (
 	"strconv"
 
 	"github.com/apex/log"
-	"github.com/f5devcentral/go-bigip"
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/driver/f5/as3"
 	"github.com/sapcc/andromeda/internal/rpc/server"
@@ -285,8 +284,9 @@ func as3DeclarationMonitorType(monitorType string) string {
 	}
 }
 
+// as3Client is a subset of interface bigIPSession
 type as3Client interface {
-	APICall(options *bigip.APIRequest) ([]byte, error)
+	PostAs3Bigip(as3NewJson, tenantFilter, queryParam string) (error, string, string)
 }
 
 func postAS3Declaration(decl as3.ADC, client as3Client, declChecker func(as3.ADC) error) error {
@@ -298,25 +298,8 @@ func postAS3Declaration(decl as3.ADC, client as3Client, declChecker func(as3.ADC
 		return err
 	}
 	log.Debugf("AS3 declaration: %s", string(jsonDecl))
-	if res, err := client.APICall(&bigip.APIRequest{
-		Method:      "post",
-		URL:         "mgmt/shared/appsvcs/declare",
-		Body:        string(jsonDecl),
-		ContentType: "application/json",
-	}); err != nil {
-		type as3ErrorResponse struct {
-			Errors []string `json:"errors"`
-		}
-		var as3Res as3ErrorResponse
-		if err := json.Unmarshal(res, &as3Res); err != nil {
-			log.Errorf("AS3 declaration rejected by AS3 API; failed to JSON-decode API response body due to: %#v", err)
-			log.Errorf("AS3 response body: %s", string(res))
-		}
-		log.Errorf("AS3 declaration rejected by AS3 API; %d issue(s) found", len(as3Res.Errors))
-		for idx, message := range as3Res.Errors {
-			log.Errorf("AS3 declaration issue #%d: %s", idx+1, message)
-		}
-		return err
+	if err, _, _ := client.PostAs3Bigip(string(jsonDecl), "", ""); err != nil {
+		return fmt.Errorf("failed to post AS3 declaration: %w", err)
 	}
 	return nil
 }

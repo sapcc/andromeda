@@ -8,7 +8,6 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/f5devcentral/go-bigip"
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/driver/f5/as3"
 	"github.com/sapcc/andromeda/internal/rpc/server"
@@ -403,48 +402,31 @@ func TestPostAS3Declaration(t *testing.T) {
 		decl.AddTenant("Common", tenant)
 
 		t.Run("it should encode the declaration as JSON before posting", func(t *testing.T) {
-			expectedJSONDecl := string(`
-			{ "schemaVersion": "3.36.0",
-			  "id" :"",
-			  "class": "ADC",
-			  "updateMode": "complete",
-			  "Common": {
-			    "class": "Tenant",
-			    "label": "",
-			    "remark": "",
-			    "Shared": { "class": "Application", "label": "", "remark": "", "template": "shared" }
-			  }
-		        }`)
+			expectedJSONDecl := `{"Common":{"Shared":{"class":"Application","label":"","remark":"","template":"shared"},"class":"Tenant","label":"","remark":""},"class":"ADC","id":"","schemaVersion":"3.36.0","updateMode":"complete"}`
 			client := new(mockedAS3Client)
-			client.
-				On("APICall",
-					mock.MatchedBy(func(req *bigip.APIRequest) bool {
-						return assert.JSONEq(expectedJSONDecl, req.Body, "unexpected JSON declaration")
-					}),
-				).
-				Return([]byte(`{"code": 200}`), nil)
+			client.On("PostAs3Bigip", mock.Anything, "", "").Return(nil, "", "")
 			declChecker := func(d as3.ADC) error { return nil }
 			err := postAS3Declaration(decl, client, declChecker)
 			assert.Nil(err, "it should have succeeded")
-			client.AssertCalled(t, "APICall", mock.Anything)
+			client.AssertCalled(t, "PostAs3Bigip", expectedJSONDecl, "", "")
 		})
 
-		t.Run("it should fail if posting fails (checking APICall() error return value is enough)", func(t *testing.T) {
+		t.Run("it should fail if posting fails (checking PostAs3Bigip() error return value is enough)", func(t *testing.T) {
 			client := new(mockedAS3Client)
-			client.On("APICall", mock.Anything).Return([]byte(""), errors.New("it failed, please let the caller now"))
+			client.On("PostAs3Bigip", mock.Anything, "", "").Return(errors.New("it failed, please let the caller now"), "", "")
 			declChecker := func(d as3.ADC) error { return nil }
 			err := postAS3Declaration(decl, client, declChecker)
 			assert.NotNil(err, "it should have failed")
-			client.AssertCalled(t, "APICall", mock.Anything)
+			client.AssertCalled(t, "PostAs3Bigip", mock.Anything, "", "")
 		})
 
-		t.Run("it should succeed if posting succeeds (checking APICall() error return value is enough)", func(t *testing.T) {
+		t.Run("it should succeed if posting succeeds (checking PostAs3Bigip() error return value is enough)", func(t *testing.T) {
 			client := new(mockedAS3Client)
-			client.On("APICall", mock.Anything).Return([]byte(""), nil)
+			client.On("PostAs3Bigip", mock.Anything, "", "").Return(nil, "", "")
 			declChecker := func(d as3.ADC) error { return nil }
 			err := postAS3Declaration(decl, client, declChecker)
 			assert.Nil(err, "it should have succeeded")
-			client.AssertCalled(t, "APICall", mock.Anything)
+			client.AssertCalled(t, "PostAs3Bigip", mock.Anything, "", "")
 		})
 	})
 }
