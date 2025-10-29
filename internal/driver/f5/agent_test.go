@@ -52,14 +52,14 @@ func TestDeclarationSync(t *testing.T) {
 
 		t.Run("... if it cannot post the AS3 declaration request", func(t *testing.T) {
 			session := new(mockedBigIPSession)
-			session.On("APICall", mock.Anything).Return([]byte(""), errors.New("BigIP APICall() failed"))
+			session.On("PostAs3Bigip", mock.Anything, mock.Anything, mock.Anything).Return(errors.New("BigIP PostAs3Bigip() failed"), "", "")
 			err := declarationSync(config.F5Config{}, session, rpc)
-			assert.ErrorContains(err, "BigIP APICall() failed")
+			assert.ErrorContains(err, "BigIP PostAs3Bigip() failed")
 		})
 
 		t.Run("... if it cannot post the update request over RPC", func(t *testing.T) {
 			session := new(mockedBigIPSession)
-			session.On("APICall", mock.Anything).Return([]byte(""), nil)
+			session.On("PostAs3Bigip", mock.Anything, mock.Anything, mock.Anything).Return(nil, "", "")
 			rpc.On("UpdateProvisioningStatus", mock.Anything, mock.Anything, mock.Anything).Return(
 				&server.ProvisioningStatusResponse{}, errors.New("RPC UpdateProvisioningStatus() failed"))
 			err := declarationSync(config.F5Config{}, session, rpc)
@@ -69,13 +69,8 @@ func TestDeclarationSync(t *testing.T) {
 
 	t.Run("Succeeds otherwise", func(t *testing.T) {
 		session := new(mockedBigIPSession)
-		expectedAPIRequest := &bigip.APIRequest{
-			Method:      "post",
-			URL:         "mgmt/shared/appsvcs/declare",
-			ContentType: "application/json",
-			Body:        `{"Common":{"Shared":{"cc_andromeda_monitor_mon1-uuid":{"class":"GSLB_Monitor","monitorType":"https","interval":60,"probeTimeout":10,"receive":"bar","send":"foo"},"cc_andromeda_srv_200.10.0.1_dc1":{"class":"GSLB_Server","dataCenter":{"bigip":"/Common/dc1"},"devices":[{"address":"200.10.0.1"}],"virtualServers":[{"address":"200.10.0.1","name":"200.10.0.1:80","port":80}],"serverType":"generic-host"},"cc_andromeda_srv_200.10.0.2_dc2":{"class":"GSLB_Server","dataCenter":{"bigip":"/Common/dc2"},"devices":[{"address":"200.10.0.2"}],"virtualServers":[{"address":"200.10.0.2","name":"200.10.0.2:80","port":80}],"serverType":"generic-host"},"class":"Application","label":"","remark":"","template":"shared"},"class":"Tenant","label":"","remark":""},"class":"ADC","domain_dom1-uuid":{"application":{"class":"Application","label":"","pool_pool1-uuid":{"class":"GSLB_Pool","resourceRecordType":"A","members":[{"server":{"use":"/Common/Shared/cc_andromeda_srv_200.10.0.1_dc1"},"virtualServer":"200.10.0.1:80"}],"lbModePreferred":"global-availability","lbModeAlternate":"none","lbModeFallback":"none"},"pool_pool2-uuid":{"class":"GSLB_Pool","resourceRecordType":"A","members":[{"server":{"use":"/Common/Shared/cc_andromeda_srv_200.10.0.2_dc2"},"virtualServer":"200.10.0.2:80"}],"lbModePreferred":"global-availability","lbModeAlternate":"none","lbModeFallback":"none"},"remark":"","template":"","wideip":{"class":"GSLB_Domain","domainName":"hello-world.local","resourceRecordType":"A","poolLbMode":"global-availability","pools":[{"use":"pool_pool1-uuid"},{"use":"pool_pool2-uuid"}]}},"class":"Tenant","label":"","remark":""},"id":"","schemaVersion":"3.36.0","updateMode":"complete"}`,
-		}
-		session.On("APICall", expectedAPIRequest).Return([]byte(`{"code": 200}`), nil)
+		expectedJSONReqPayload := `{"Common":{"Shared":{"cc_andromeda_monitor_mon1-uuid":{"class":"GSLB_Monitor","monitorType":"https","interval":60,"probeTimeout":10,"receive":"bar","send":"foo"},"cc_andromeda_srv_200.10.0.1_dc1":{"class":"GSLB_Server","dataCenter":{"bigip":"/Common/dc1"},"devices":[{"address":"200.10.0.1"}],"virtualServers":[{"address":"200.10.0.1","name":"200.10.0.1:80","port":80}],"serverType":"generic-host"},"cc_andromeda_srv_200.10.0.2_dc2":{"class":"GSLB_Server","dataCenter":{"bigip":"/Common/dc2"},"devices":[{"address":"200.10.0.2"}],"virtualServers":[{"address":"200.10.0.2","name":"200.10.0.2:80","port":80}],"serverType":"generic-host"},"class":"Application","label":"","remark":"","template":"shared"},"class":"Tenant","label":"","remark":""},"class":"ADC","domain_dom1-uuid":{"application":{"class":"Application","label":"","pool_pool1-uuid":{"class":"GSLB_Pool","resourceRecordType":"A","members":[{"server":{"use":"/Common/Shared/cc_andromeda_srv_200.10.0.1_dc1"},"virtualServer":"200.10.0.1:80"}],"lbModePreferred":"global-availability","lbModeAlternate":"none","lbModeFallback":"none"},"pool_pool2-uuid":{"class":"GSLB_Pool","resourceRecordType":"A","members":[{"server":{"use":"/Common/Shared/cc_andromeda_srv_200.10.0.2_dc2"},"virtualServer":"200.10.0.2:80"}],"lbModePreferred":"global-availability","lbModeAlternate":"none","lbModeFallback":"none"},"remark":"","template":"","wideip":{"class":"GSLB_Domain","domainName":"hello-world.local","resourceRecordType":"A","poolLbMode":"global-availability","pools":[{"use":"pool_pool1-uuid"},{"use":"pool_pool2-uuid"}]}},"class":"Tenant","label":"","remark":""},"id":"","schemaVersion":"3.36.0","updateMode":"complete"}`
+		session.On("PostAs3Bigip", expectedJSONReqPayload, "", "").Return(nil, "", "")
 		expectedRequest := &server.ProvisioningStatusRequest{
 			ProvisioningStatus: []*server.ProvisioningStatusRequest_ProvisioningStatus{
 				{Id: "mon1-uuid", Model: server.ProvisioningStatusRequest_ProvisioningStatus_MONITOR, Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE},
@@ -147,7 +142,7 @@ func TestDeclarationSync(t *testing.T) {
 		rpc.On("UpdateProvisioningStatus", mock.Anything, expectedRequest, mock.Anything).Return(&server.ProvisioningStatusResponse{}, nil)
 		err := declarationSync(config.F5Config{DomainSuffix: ".local"}, session, rpc)
 		assert.Nil(err)
-		session.AssertCalled(t, "APICall", expectedAPIRequest)
+		session.AssertCalled(t, "PostAs3Bigip", expectedJSONReqPayload, "", "")
 		rpc.AssertCalled(t, "GetDatacenters", mock.Anything, expectedDatacentersSearchRequest, mock.Anything)
 		rpc.AssertCalled(t, "GetMembers", mock.Anything, expectedMembersSearchRequests[0], mock.Anything)
 		rpc.AssertCalled(t, "GetMembers", mock.Anything, expectedMembersSearchRequests[1], mock.Anything)
