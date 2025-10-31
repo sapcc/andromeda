@@ -86,15 +86,14 @@ func buildAS3DomainTenant(
 	tenant := as3.Tenant{}
 	rpcUpdates := []*server.ProvisioningStatusRequest_ProvisioningStatus{}
 	switch domain.ProvisioningStatus {
-	case server.ProvisioningStatusRequest_ProvisioningStatus_DELETED.String(),
-		server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String():
-		if domain.ProvisioningStatus == server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String() {
-			rpcUpdates = append(rpcUpdates, &server.ProvisioningStatusRequest_ProvisioningStatus{
-				Id:     domain.Id,
-				Model:  server.ProvisioningStatusRequest_ProvisioningStatus_DOMAIN,
-				Status: server.ProvisioningStatusRequest_ProvisioningStatus_DELETED,
-			})
-		}
+	case server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String():
+		rpcUpdates = append(rpcUpdates, &server.ProvisioningStatusRequest_ProvisioningStatus{
+			Id:     domain.Id,
+			Model:  server.ProvisioningStatusRequest_ProvisioningStatus_DOMAIN,
+			Status: server.ProvisioningStatusRequest_ProvisioningStatus_DELETED,
+		})
+		fallthrough
+	case server.ProvisioningStatusRequest_ProvisioningStatus_DELETED.String():
 		// by excluding the entity from the AS3 declaration the API will delete it from the F5 device
 		return tenant, rpcUpdates, errEntityPendingDeletion
 	}
@@ -102,15 +101,14 @@ func buildAS3DomainTenant(
 	as3PoolReferences := []as3.PointerGSLBPool{}
 	for _, p := range domain.Pools {
 		switch p.ProvisioningStatus {
-		case server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String(),
-			server.ProvisioningStatusRequest_ProvisioningStatus_DELETED.String():
-			if p.ProvisioningStatus == server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String() {
-				rpcUpdates = append(rpcUpdates, &server.ProvisioningStatusRequest_ProvisioningStatus{
-					Id:     p.Id,
-					Model:  server.ProvisioningStatusRequest_ProvisioningStatus_POOL,
-					Status: server.ProvisioningStatusRequest_ProvisioningStatus_DELETED,
-				})
-			}
+		case server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String():
+			rpcUpdates = append(rpcUpdates, &server.ProvisioningStatusRequest_ProvisioningStatus{
+				Id:     p.Id,
+				Model:  server.ProvisioningStatusRequest_ProvisioningStatus_POOL,
+				Status: server.ProvisioningStatusRequest_ProvisioningStatus_DELETED,
+			})
+			fallthrough
+		case server.ProvisioningStatusRequest_ProvisioningStatus_DELETED.String():
 			// by excluding the entity from the AS3 declaration the API will delete it from the F5 device
 			continue
 		}
@@ -177,15 +175,14 @@ func buildAS3CommonTenant(
 			monitorsByPoolID[pool.Id] = pool.Monitors
 			for _, monitor := range pool.Monitors {
 				switch monitor.ProvisioningStatus {
-				case server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String(),
-					server.ProvisioningStatusRequest_ProvisioningStatus_DELETED.String():
-					if monitor.ProvisioningStatus == server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String() {
-						rpcUpdates = append(rpcUpdates, &server.ProvisioningStatusRequest_ProvisioningStatus{
-							Id:     monitor.Id,
-							Model:  server.ProvisioningStatusRequest_ProvisioningStatus_MONITOR,
-							Status: server.ProvisioningStatusRequest_ProvisioningStatus_DELETED,
-						})
-					}
+				case server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String():
+					rpcUpdates = append(rpcUpdates, &server.ProvisioningStatusRequest_ProvisioningStatus{
+						Id:     monitor.Id,
+						Model:  server.ProvisioningStatusRequest_ProvisioningStatus_MONITOR,
+						Status: server.ProvisioningStatusRequest_ProvisioningStatus_DELETED,
+					})
+					fallthrough
+				case server.ProvisioningStatusRequest_ProvisioningStatus_DELETED.String():
 					// by excluding the entity from the AS3 declaration the API will delete it from the F5 device
 					continue
 				}
@@ -214,15 +211,14 @@ func buildAS3CommonTenant(
 		}
 		for _, member := range members {
 			switch member.ProvisioningStatus {
-			case server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String(),
-				server.ProvisioningStatusRequest_ProvisioningStatus_DELETED.String():
-				if member.ProvisioningStatus == server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String() {
-					rpcUpdates = append(rpcUpdates, &server.ProvisioningStatusRequest_ProvisioningStatus{
-						Id:     member.Id,
-						Model:  server.ProvisioningStatusRequest_ProvisioningStatus_MEMBER,
-						Status: server.ProvisioningStatusRequest_ProvisioningStatus_DELETED,
-					})
-				}
+			case server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String():
+				rpcUpdates = append(rpcUpdates, &server.ProvisioningStatusRequest_ProvisioningStatus{
+					Id:     member.Id,
+					Model:  server.ProvisioningStatusRequest_ProvisioningStatus_MEMBER,
+					Status: server.ProvisioningStatusRequest_ProvisioningStatus_DELETED,
+				})
+				fallthrough
+			case server.ProvisioningStatusRequest_ProvisioningStatus_DELETED.String():
 				// by excluding the entity from the AS3 declaration the API will delete it from the F5 device
 				continue
 			}
