@@ -64,48 +64,250 @@ func TestBuildAS3Declaration(t *testing.T) {
 
 	t.Run("Succeeds by creating the full AS3 declaration", func(t *testing.T) {
 		store := new(mockedStore)
-		store.On("GetDatacenters").Return([]*rpcmodels.Datacenter{{Id: "dc1-uuid", Name: "dc1"}}, nil)
-		store.On("GetDomains").Return([]*rpcmodels.Domain{{Id: "dom1-uuid"}}, nil)
-		expectedCommonTenant := as3.Tenant{}
-		expectedDomainTenant := as3.Tenant{}
-		as3CommonTenantBuilder := func(s AndromedaF5Store, datacenters []*rpcmodels.Datacenter, domains []*rpcmodels.Domain) (as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error) {
-			return expectedCommonTenant, []*server.ProvisioningStatusRequest_ProvisioningStatus{
-				{Id: "member1", Model: server.ProvisioningStatusRequest_ProvisioningStatus_MEMBER, Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE},
-			}, nil
-		}
-		as3DomainTenantBuilder := func(f5Config config.F5Config, datacentersByID map[string]*rpcmodels.Datacenter, domain *rpcmodels.Domain) (as3.Tenant, []*server.ProvisioningStatusRequest_ProvisioningStatus, error) {
-			return expectedDomainTenant, []*server.ProvisioningStatusRequest_ProvisioningStatus{
-				{Id: "pool1-uuid", Model: server.ProvisioningStatusRequest_ProvisioningStatus_POOL, Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE},
-				{Id: "pool2-uuid", Model: server.ProvisioningStatusRequest_ProvisioningStatus_POOL, Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE},
-				{Id: "dom1-uuid", Model: server.ProvisioningStatusRequest_ProvisioningStatus_DOMAIN, Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE},
-			}, nil
-		}
 
-		declaration, req, err := buildAS3Declaration(config.F5Config{}, store, as3CommonTenantBuilder, as3DomainTenantBuilder)
+		store.On("GetDatacenters").Return(
+			[]*rpcmodels.Datacenter{
+				{Id: "dc1-uuid", Name: "dc1"},
+			},
+			nil)
+
+		store.On("GetDomains").Return(
+			[]*rpcmodels.Domain{
+				{
+					Id:                 "dom1-uuid",
+					ProvisioningStatus: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE.String(),
+					Pools: []*rpcmodels.Pool{
+						{
+							Id: "pool1-uuid",
+							Members: []*rpcmodels.Member{
+								{
+									Id:           "member1-uuid",
+									DatacenterId: "dc1-uuid",
+									Address:      "200.100.50.1",
+									Port:         81,
+								},
+								{
+									Id:           "member2-uuid",
+									DatacenterId: "dc1-uuid",
+									Address:      "200.100.50.2",
+									Port:         82,
+								},
+							},
+							Monitors: []*rpcmodels.Monitor{
+								{
+									Id:                 "mon1-uuid",
+									Type:               rpcmodels.Monitor_HTTP,
+									Interval:           60,
+									Timeout:            10,
+									ProvisioningStatus: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE.String(),
+								},
+								{
+									Id:                 "mon2-uuid",
+									Type:               rpcmodels.Monitor_HTTPS,
+									Interval:           60,
+									Timeout:            10,
+									ProvisioningStatus: server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String(),
+								},
+								{
+									Id:                 "mon3-uuid",
+									Type:               rpcmodels.Monitor_ICMP,
+									Interval:           60,
+									Timeout:            10,
+									ProvisioningStatus: server.ProvisioningStatusRequest_ProvisioningStatus_DELETED.String(),
+								},
+							},
+							ProvisioningStatus: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE.String(),
+						},
+						{
+							Id:                 "pool2-uuid",
+							ProvisioningStatus: server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String(),
+						},
+						{
+							Id:                 "pool3-uuid",
+							ProvisioningStatus: server.ProvisioningStatusRequest_ProvisioningStatus_DELETED.String(),
+						},
+					},
+				},
+				{
+					Id:                 "dom2-uuid",
+					ProvisioningStatus: server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String(),
+				},
+				{
+					Id:                 "dom3-uuid",
+					ProvisioningStatus: server.ProvisioningStatusRequest_ProvisioningStatus_DELETED.String(),
+				},
+			},
+			nil)
+
+		store.On("GetMembers", "dc1-uuid").Return(
+			[]*rpcmodels.Member{
+				{
+					Id:                 "member1-uuid",
+					Address:            "200.100.50.1",
+					Port:               81,
+					PoolId:             "pool1-uuid",
+					ProvisioningStatus: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE.String(),
+				},
+				{
+					Id:                 "member2-uuid",
+					Address:            "200.100.50.2",
+					Port:               82,
+					PoolId:             "pool1-uuid",
+					ProvisioningStatus: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE.String(),
+				},
+				{
+					Id:                 "member3-uuid",
+					Address:            "200.100.50.3",
+					Port:               83,
+					PoolId:             "pool1-uuid",
+					ProvisioningStatus: server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String(),
+				},
+				{
+					Id:                 "member4-uuid",
+					Address:            "200.100.50.4",
+					Port:               84,
+					PoolId:             "pool1-uuid",
+					ProvisioningStatus: server.ProvisioningStatusRequest_ProvisioningStatus_DELETED.String(),
+				},
+			},
+			nil)
+
+		declaration, req, err := buildAS3Declaration(config.F5Config{}, store, buildAS3CommonTenant, buildAS3DomainTenant)
 		assert.Nil(err)
 
-		t.Run("Adds the common tenant to the AS3 declaration", func(t *testing.T) {
+		t.Run("Builds the Common tenant correctly", func(t *testing.T) {
+			expectedCommonTenant := as3.Tenant{}
+			commonApp := as3.Application{Template: "shared"}
+			commonApp.SetEntity("cc_andromeda_srv_200.100.50.1_dc1", as3.GSLBServer{
+				Class:      "GSLB_Server",
+				ServerType: "generic-host",
+				DataCenter: as3.PointerGSLBDataCenter{BigIP: "/Common/dc1"},
+				Devices:    []as3.GSLBServerDevice{{Address: "200.100.50.1"}},
+				Monitors: []as3.PointerGSLBMonitor{
+					{Use: "cc_andromeda_monitor_mon1-uuid"},
+				},
+				VirtualServers: []as3.GSLBVirtualServer{
+					{Address: "200.100.50.1", Port: 81, Name: "200.100.50.1:81"},
+				},
+			})
+			commonApp.SetEntity("cc_andromeda_srv_200.100.50.2_dc1", as3.GSLBServer{
+				Class:      "GSLB_Server",
+				ServerType: "generic-host",
+				DataCenter: as3.PointerGSLBDataCenter{BigIP: "/Common/dc1"},
+				Devices:    []as3.GSLBServerDevice{{Address: "200.100.50.2"}},
+				Monitors: []as3.PointerGSLBMonitor{
+					{Use: "cc_andromeda_monitor_mon1-uuid"},
+				},
+				VirtualServers: []as3.GSLBVirtualServer{
+					{Address: "200.100.50.2", Port: 82, Name: "200.100.50.2:82"},
+				},
+			})
+			commonApp.SetEntity("cc_andromeda_monitor_mon1-uuid", as3.GSLBMonitor{
+				Class:        "GSLB_Monitor",
+				MonitorType:  "http",
+				Interval:     60,
+				ProbeTimeout: 10,
+			})
+			expectedCommonTenant.AddApplication("Shared", commonApp)
 			tenant, err := declaration.GetTenant("Common")
 			assert.Nil(err)
 			assert.Equal(expectedCommonTenant, tenant)
 		})
 
-		t.Run("Adds the domain tenant to the AS3 declaration", func(t *testing.T) {
-			tenant, err := declaration.GetTenant("domain_dom1-uuid")
+		t.Run("Builds the active domain tenants correctly", func(t *testing.T) {
+			domainApp := as3.Application{}
+			domainApp.SetEntity("wideip", as3.GSLBDomain{
+				Class: "GSLB_Domain",
+				Pools: []as3.PointerGSLBPool{
+					{Use: "pool_pool1-uuid"},
+				},
+				PoolLbMode: "global-availability",
+			})
+			domainApp.SetEntity("pool_pool1-uuid", as3.GSLBPool{
+				Class:           "GSLB_Pool",
+				LBModePreferred: "round-robin",
+				LBModeAlternate: "none",
+				LBModeFallback:  "none",
+				Members: []as3.GSLBPoolMember{
+					{
+						Server:        as3.PointerGSLBServer{Use: "/Common/Shared/cc_andromeda_srv_200.100.50.1_dc1"},
+						VirtualServer: "200.100.50.1:81",
+					},
+					{
+						Server:        as3.PointerGSLBServer{Use: "/Common/Shared/cc_andromeda_srv_200.100.50.2_dc1"},
+						VirtualServer: "200.100.50.2:82",
+					},
+				},
+				ResourceRecordType: "A",
+			})
+			expectedDomainTenant := as3.Tenant{}
+			expectedDomainTenant.AddApplication("application", domainApp)
+			domainTenant, err := declaration.GetTenant(as3DeclarationGSLBDomainTenantKey("dom1-uuid"))
 			assert.Nil(err)
-			assert.Equal(expectedDomainTenant, tenant)
+			assert.Equal(expectedDomainTenant, domainTenant)
 		})
 
-		t.Run("Combines the RPC update requests returned by both the common and domain tenant builders", func(t *testing.T) {
-			expectedReq := &server.ProvisioningStatusRequest{
+		t.Run("Excludes domains marked PENDING_DELETE", func(t *testing.T) {
+			_, err := declaration.GetTenant(as3DeclarationGSLBDomainTenantKey("dom2-uuid"))
+			assert.Error(err)
+		})
+
+		t.Run("Excludes domains marked DELETED", func(t *testing.T) {
+			_, err := declaration.GetTenant(as3DeclarationGSLBDomainTenantKey("dom3-uuid"))
+			assert.Error(err)
+		})
+
+		t.Run("Creates the expected provisioning status updates", func(t *testing.T) {
+			expectedUpdates := &server.ProvisioningStatusRequest{
 				ProvisioningStatus: []*server.ProvisioningStatusRequest_ProvisioningStatus{
-					{Id: "member1", Model: server.ProvisioningStatusRequest_ProvisioningStatus_MEMBER, Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE},
-					{Id: "pool1-uuid", Model: server.ProvisioningStatusRequest_ProvisioningStatus_POOL, Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE},
-					{Id: "pool2-uuid", Model: server.ProvisioningStatusRequest_ProvisioningStatus_POOL, Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE},
-					{Id: "dom1-uuid", Model: server.ProvisioningStatusRequest_ProvisioningStatus_DOMAIN, Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE},
+					{
+						Id:     "mon1-uuid",
+						Model:  server.ProvisioningStatusRequest_ProvisioningStatus_MONITOR,
+						Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE,
+					},
+					{
+						Id:     "mon2-uuid",
+						Model:  server.ProvisioningStatusRequest_ProvisioningStatus_MONITOR,
+						Status: server.ProvisioningStatusRequest_ProvisioningStatus_DELETED, // transitioned from PENDING_DELETE
+					},
+					{
+						Id:     "member1-uuid",
+						Model:  server.ProvisioningStatusRequest_ProvisioningStatus_MEMBER,
+						Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE,
+					},
+					{
+						Id:     "member2-uuid",
+						Model:  server.ProvisioningStatusRequest_ProvisioningStatus_MEMBER,
+						Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE,
+					},
+					{
+						Id:     "member3-uuid",
+						Model:  server.ProvisioningStatusRequest_ProvisioningStatus_MEMBER,
+						Status: server.ProvisioningStatusRequest_ProvisioningStatus_DELETED, // transitioned from PENDING_DELETE
+					},
+					{
+						Id:     "pool1-uuid",
+						Model:  server.ProvisioningStatusRequest_ProvisioningStatus_POOL,
+						Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE,
+					},
+					{
+						Id:     "pool2-uuid",
+						Model:  server.ProvisioningStatusRequest_ProvisioningStatus_POOL,
+						Status: server.ProvisioningStatusRequest_ProvisioningStatus_DELETED, // transitioned from PENDING_DELETE
+					},
+					{
+						Id:     "dom1-uuid",
+						Model:  server.ProvisioningStatusRequest_ProvisioningStatus_DOMAIN,
+						Status: server.ProvisioningStatusRequest_ProvisioningStatus_ACTIVE,
+					},
+					{
+						Id:     "dom2-uuid",
+						Model:  server.ProvisioningStatusRequest_ProvisioningStatus_DOMAIN,
+						Status: server.ProvisioningStatusRequest_ProvisioningStatus_DELETED, // transitioned from PENDING_DELETE
+					},
 				},
 			}
-			assert.Equal(expectedReq, req)
+			assert.Equal(expectedUpdates, req)
 		})
 	})
 }
@@ -141,6 +343,29 @@ func TestBuildAS3DomainTenant(t *testing.T) {
 		}
 		_, _, err := buildAS3DomainTenant(config.F5Config{}, datacentersByID, domain)
 		assert.ErrorContains(err, "nil datacenter for member")
+	})
+
+	t.Run("Soft-fails if domain has been marked PENDING_DELETE", func(t *testing.T) {
+		domain := &rpcmodels.Domain{
+			Id:                 "dom1-uuid",
+			ProvisioningStatus: server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String(),
+		}
+		_, updates, err := buildAS3DomainTenant(config.F5Config{}, map[string]*rpcmodels.Datacenter{}, domain)
+		assert.Equal(err, errEntityPendingDeletion)
+		assert.Equal(updates, []*server.ProvisioningStatusRequest_ProvisioningStatus{
+			{
+				Id:     domain.Id,
+				Model:  server.ProvisioningStatusRequest_ProvisioningStatus_DOMAIN,
+				Status: server.ProvisioningStatusRequest_ProvisioningStatus_DELETED,
+			},
+		})
+	})
+
+	t.Run("Soft-fails if domain has been marked DELETED", func(t *testing.T) {
+		domain := &rpcmodels.Domain{ProvisioningStatus: server.ProvisioningStatusRequest_ProvisioningStatus_DELETED.String()}
+		_, updates, err := buildAS3DomainTenant(config.F5Config{}, map[string]*rpcmodels.Datacenter{}, domain)
+		assert.Equal(err, errEntityPendingDeletion)
+		assert.Empty(updates)
 	})
 
 	t.Run("Succeeds by creating a direct mapping between each Andromeda domain's pools and members and their F5 counterpart entity", func(t *testing.T) {
