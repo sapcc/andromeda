@@ -54,12 +54,12 @@ func buildAS3Declaration(f5Config config.F5Config, s AndromedaF5Store, ctbFunc a
 	for _, domain := range domains {
 		domainTenant, domainTenantRPCUpdates, err := dtbFunc(f5Config, datacentersByID, domain)
 		// not a soft error: the declaration cannot be built
-		if err != nil && err != errEntityPendingDeletion {
+		if err != nil && !errors.Is(err, errEntityPendingDeletion) {
 			return adc, rpcRequest, err
 		}
 		// only the active domains may be included in the declaration.
 		// domains pending deletion are excluded (and thus deleted by AS3).
-		if err != errEntityPendingDeletion {
+		if !errors.Is(err, errEntityPendingDeletion) {
 			adc.AddTenant(as3DeclarationGSLBDomainTenantKey(domain.Id), domainTenant)
 		}
 		rpcUpdates = append(rpcUpdates, domainTenantRPCUpdates...)
