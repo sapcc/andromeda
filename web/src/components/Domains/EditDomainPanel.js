@@ -118,6 +118,11 @@ const EditDomainPanel = ({closeCallback}) => {
                             label="Akamai"
                             value="akamai"
                         />
+                        <SelectOption
+                            key="f5"
+                            label="F5"
+                            value="f5"
+                        />
                     </Select>
                     <TextInput
                         label="Fully Qualified Domain Name"

@@ -53,10 +53,10 @@ const NewDatacenterModal = () => {
 
     return (
         <Modal
-            title="Add new Datacenter"
+            title="Add new Akamai Datacenter"
             open
             onCancel={closeModal}
-            confirmButtonLabel="Save new Datacenter"
+            confirmButtonLabel="Save new Akamai Datacenter"
             onConfirm={onSubmit}
         >
             <Stack direction="vertical" gap="2">
