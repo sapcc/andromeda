@@ -32,7 +32,7 @@ require (
 	github.com/go-openapi/swag/mangling v0.25.1
 	github.com/go-openapi/validate v0.25.0
 	github.com/go-sql-driver/mysql v1.9.3
-	github.com/gophercloud/gophercloud/v2 v2.8.0
+	github.com/gophercloud/gophercloud/v2 v2.9.0
 	github.com/gophercloud/utils/v2 v2.0.0-20250930154317-576cdf6142a7
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/iancoleman/strcase v0.3.0
@@ -42,13 +42,13 @@ require (
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/lib/pq v1.10.9
-	github.com/majewsky/gg v1.3.0
+	github.com/majewsky/gg v1.4.0
 	github.com/mcuadros/go-defaults v1.2.0
 	github.com/nats-io/nats.go v1.47.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/rs/cors v1.11.1
 	github.com/sapcc/go-api-declarations v1.17.4
-	github.com/sapcc/go-bits v0.0.0-20251113131016-b7245870e76e
+	github.com/sapcc/go-bits v0.0.0-20251119215428-a048ca8f6eba
 	github.com/slok/go-http-metrics v0.13.0
 	github.com/stretchr/testify v1.11.1
 	github.com/urfave/cli/v2 v2.27.7
@@ -115,7 +115,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
-	github.com/prometheus/common v0.67.2 // indirect
+	github.com/prometheus/common v0.67.3 // indirect
 	github.com/prometheus/procfs v0.17.0 // indirect
 	github.com/rabbitmq/amqp091-go v1.10.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
