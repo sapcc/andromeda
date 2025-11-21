@@ -11,7 +11,7 @@
     "@tanstack/react-query-devtools": "^5.85.9",
     "chalk": "^5.6.0",
     "countries-list": "^3.1.1",
-    "esbuild": "^0.25.9",
+    "esbuild": "^0.27.0",
     "esbuild-plugin-inline-image": "^0.0.9",
     "esbuild-plugin-inline-import": "^1.1.0",
     "lodash-es": "^4.17.21",
