@@ -391,6 +391,16 @@ func TestBuildAS3DomainTenant(t *testing.T) {
 					Members: []*rpcmodels.Member{
 						{Id: "member4", Address: "200.10.0.4", Port: 80, DatacenterId: "dc1-uuid"},
 						{Id: "member5", Address: "200.10.0.5", Port: 80, DatacenterId: "dc1-uuid"},
+						{
+							// this member should be excluded from the declaration due to its provisioning status
+							Id: "member6", Address: "200.10.0.6", Port: 80, DatacenterId: "dc1-uuid",
+							ProvisioningStatus: server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String(),
+						},
+						{
+							// this member should be excluded from the declaration due to its provisioning status
+							Id: "member7", Address: "200.10.0.7", Port: 80, DatacenterId: "dc1-uuid",
+							ProvisioningStatus: server.ProvisioningStatusRequest_ProvisioningStatus_DELETED.String(),
+						},
 					},
 				},
 			},
