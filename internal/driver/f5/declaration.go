@@ -120,6 +120,13 @@ func buildAS3DomainTenant(
 		as3PoolReferences = append(as3PoolReferences, as3.PointerGSLBPool{Use: "pool_" + p.Id})
 		as3PoolMembers := []as3.GSLBPoolMember{}
 		for _, m := range p.Members {
+			switch m.ProvisioningStatus {
+			case server.ProvisioningStatusRequest_ProvisioningStatus_PENDING_DELETE.String(),
+				server.ProvisioningStatusRequest_ProvisioningStatus_DELETED.String():
+				// by excluding the entity from the AS3 declaration the API will delete it from the F5 device.
+				// the respective pool member RPC update is covered by buildAS3CommonTenant().
+				continue
+			}
 			if _, exists := datacentersByID[m.DatacenterId]; !exists {
 				return tenant, rpcUpdates, fmt.Errorf("invalid datacenter ID for member [datacenter ID = %s, member ID = %s]", m.DatacenterId, m.Id)
 			}
