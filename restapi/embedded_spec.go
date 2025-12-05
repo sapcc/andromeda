@@ -30,7 +30,7 @@ func init() {
   ],
   "swagger": "2.0",
   "info": {
-    "description": "Platform agnostic GSLB frontend",
+    "description": "Platform agnostic GSLB frontend\n\n` + "`" + `` + "`" + `` + "`" + `\n# SPDX-FileCopyrightText: Copyright 2025 SAP SE or an SAP affiliate company\n#\n# SPDX-License-Identifier: Apache-2.0\n` + "`" + `` + "`" + `` + "`" + `",
     "title": "Andromeda",
     "version": "1.1.1"
   },
@@ -172,6 +172,12 @@ func init() {
               }
             }
           },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
           "404": {
             "description": "Not Found",
             "schema": {
@@ -256,6 +262,12 @@ func init() {
               }
             }
           },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
           "404": {
             "description": "Not Found",
             "schema": {
@@ -279,6 +291,12 @@ func init() {
         "responses": {
           "204": {
             "description": "Resource successfully deleted."
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
           },
           "404": {
             "description": "Not Found",
@@ -1124,6 +1142,7 @@ func init() {
         "x-policy": "andromeda:monitor:get_all"
       },
       "post": {
+        "description": "### F5 monitors\n\nAndromeda pool monitors are mapped to [F5 monitors][f5-monitors] based on the ` + "`" + `type` + "`" + ` property as follows:\n\n[f5-monitors]: \u003chttps://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/refguide/schemaref/Monitor.schema.json.html\u003e\n\n| Andromeda | F5             |\n|-----------|----------------|\n| ` + "`" + `HTTP` + "`" + `    | ` + "`" + `http` + "`" + `         |\n| ` + "`" + `HTTPS` + "`" + `   | ` + "`" + `https` + "`" + `        |\n| ` + "`" + `ICMP` + "`" + `    | ` + "`" + `gateway-icmp` + "`" + ` |\n| ` + "`" + `TCP` + "`" + `     | ` + "`" + `tcp` + "`" + `          |\n| ` + "`" + `UDP` + "`" + `     | ` + "`" + `udp` + "`" + `          |\n\nAndromeda monitor properties map to an F5 ` + "`" + `Monitor` + "`" + ` as follows:\n\n| Andromeda     | F5 ` + "`" + `Monitor` + "`" + ` object   | Comments                                       |\n|---------------|-----------------------|------------------------------------------------|\n| ` + "`" + `domain_name` + "`" + ` | -                     | Unsupported by F5/AS3                          |\n| ` + "`" + `http_method` + "`" + ` | -                     | Unsupported by F5/AS3 (see caveats below)      |\n| ` + "`" + `interval` + "`" + `    | ` + "`" + `interval` + "`" + `            |                                                |\n| ` + "`" + `receive` + "`" + `     | ` + "`" + `receive` + "`" + `             | ` + "`" + `HTTP` + "`" + ` / ` + "`" + `HTTPS` + "`" + ` only                          |\n| ` + "`" + `send` + "`" + `        | ` + "`" + `send` + "`" + `                | ` + "`" + `HTTP` + "`" + ` / ` + "`" + `HTTPS` + "`" + ` only                          |\n| ` + "`" + `timeout` + "`" + `     | ` + "`" + `timeout` + "`" + `             |                                                |\n| ` + "`" + `type` + "`" + `        | ` + "`" + `monitorType` + "`" + `         |                                                |\n\nCaveats:\n\n* For HTTP/S monitors, F5 decides on the HTTP method, URL path and HTTP version according to ` + "`" + `Monitor.send` + "`" + `. For details please refer to the [Monitor_HTTP object][monitor-http-object].\n\n[monitor-http-object]: \u003chttps://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/refguide/schemaref/Monitor.schema.json.html#monitor-http-object\u003e",
         "tags": [
           "Monitors"
         ],
@@ -2720,7 +2739,7 @@ func init() {
   ],
   "swagger": "2.0",
   "info": {
-    "description": "Platform agnostic GSLB frontend",
+    "description": "Platform agnostic GSLB frontend\n\n` + "`" + `` + "`" + `` + "`" + `\n# SPDX-FileCopyrightText: Copyright 2025 SAP SE or an SAP affiliate company\n#\n# SPDX-License-Identifier: Apache-2.0\n` + "`" + `` + "`" + `` + "`" + `",
     "title": "Andromeda",
     "version": "1.1.1"
   },
@@ -2875,6 +2894,12 @@ func init() {
               }
             }
           },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
           "404": {
             "description": "Not Found",
             "schema": {
@@ -2959,6 +2984,12 @@ func init() {
               }
             }
           },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
           "404": {
             "description": "Not Found",
             "schema": {
@@ -2982,6 +3013,12 @@ func init() {
         "responses": {
           "204": {
             "description": "Resource successfully deleted."
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
           },
           "404": {
             "description": "Not Found",
@@ -3879,6 +3916,7 @@ func init() {
         "x-policy": "andromeda:monitor:get_all"
       },
       "post": {
+        "description": "### F5 monitors\n\nAndromeda pool monitors are mapped to [F5 monitors][f5-monitors] based on the ` + "`" + `type` + "`" + ` property as follows:\n\n[f5-monitors]: \u003chttps://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/refguide/schemaref/Monitor.schema.json.html\u003e\n\n| Andromeda | F5             |\n|-----------|----------------|\n| ` + "`" + `HTTP` + "`" + `    | ` + "`" + `http` + "`" + `         |\n| ` + "`" + `HTTPS` + "`" + `   | ` + "`" + `https` + "`" + `        |\n| ` + "`" + `ICMP` + "`" + `    | ` + "`" + `gateway-icmp` + "`" + ` |\n| ` + "`" + `TCP` + "`" + `     | ` + "`" + `tcp` + "`" + `          |\n| ` + "`" + `UDP` + "`" + `     | ` + "`" + `udp` + "`" + `          |\n\nAndromeda monitor properties map to an F5 ` + "`" + `Monitor` + "`" + ` as follows:\n\n| Andromeda     | F5 ` + "`" + `Monitor` + "`" + ` object   | Comments                                       |\n|---------------|-----------------------|------------------------------------------------|\n| ` + "`" + `domain_name` + "`" + ` | -                     | Unsupported by F5/AS3                          |\n| ` + "`" + `http_method` + "`" + ` | -                     | Unsupported by F5/AS3 (see caveats below)      |\n| ` + "`" + `interval` + "`" + `    | ` + "`" + `interval` + "`" + `            |                                                |\n| ` + "`" + `receive` + "`" + `     | ` + "`" + `receive` + "`" + `             | ` + "`" + `HTTP` + "`" + ` / ` + "`" + `HTTPS` + "`" + ` only                          |\n| ` + "`" + `send` + "`" + `        | ` + "`" + `send` + "`" + `                | ` + "`" + `HTTP` + "`" + ` / ` + "`" + `HTTPS` + "`" + ` only                          |\n| ` + "`" + `timeout` + "`" + `     | ` + "`" + `timeout` + "`" + `             |                                                |\n| ` + "`" + `type` + "`" + `        | ` + "`" + `monitorType` + "`" + `         |                                                |\n\nCaveats:\n\n* For HTTP/S monitors, F5 decides on the HTTP method, URL path and HTTP version according to ` + "`" + `Monitor.send` + "`" + `. For details please refer to the [Monitor_HTTP object][monitor-http-object].\n\n[monitor-http-object]: \u003chttps://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/refguide/schemaref/Monitor.schema.json.html#monitor-http-object\u003e",
         "tags": [
           "Monitors"
         ],

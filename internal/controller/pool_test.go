@@ -9,7 +9,7 @@ import (
 	"net/http/httptest"
 
 	"github.com/go-openapi/strfmt"
-	"github.com/go-openapi/swag"
+	"github.com/go-openapi/swag/conv"
 
 	"github.com/go-openapi/runtime"
 	"github.com/stretchr/testify/assert"
@@ -21,7 +21,7 @@ import (
 func (t *SuiteTest) createPool(domains []strfmt.UUID) strfmt.UUID {
 	pool := pools.PostPoolsBody{
 		Pool: &models.Pool{
-			Name:    swag.String("test"),
+			Name:    conv.Pointer("test"),
 			Domains: domains,
 		},
 	}
@@ -97,7 +97,7 @@ func (t *SuiteTest) TestPoolImmutable() {
 	// Update pool
 	pool := pools.PutPoolsPoolIDBody{
 		Pool: &models.Pool{
-			Name: swag.String("test2"),
+			Name: conv.Pointer("test2"),
 		},
 	}
 	res := pc.PutPoolsPoolID(pools.PutPoolsPoolIDParams{PoolID: poolID, Pool: pool})

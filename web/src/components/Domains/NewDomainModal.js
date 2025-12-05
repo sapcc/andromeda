@@ -82,13 +82,16 @@ const NewDomainModal = () => {
                     label="Provider"
                     disabled={isPending}
                     value={formState.provider}
-                    helptext="Currently, only Akamai is supported."
                     onChange={(target) => setFormState({...formState, provider: target})}
                     required
                 >
                     <SelectOption
                         label="Akamai"
                         value="akamai"
+                    />
+                    <SelectOption
+                        label="F5"
+                        value="f5"
                     />
                 </Select>
                 <TextInput

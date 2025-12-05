@@ -5,83 +5,15 @@
 package f5
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
-	"strings"
-	"time"
 
-	"github.com/actatum/stormrpc"
 	"github.com/apex/log"
-	"github.com/nats-io/nats.go"
-	"github.com/scottdware/go-bigip"
+	"github.com/f5devcentral/go-bigip"
 
-	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/rpc/server"
-	"github.com/sapcc/andromeda/internal/utils"
+	"github.com/sapcc/andromeda/internal/rpcmodels"
 )
-
-type StatusController struct {
-	bigIP *bigip.BigIP
-	rpc   server.RPCServerClient
-}
-
-func ExecuteF5StatusAgent() error {
-	session, err := GetBigIPSession()
-	if err != nil {
-		return fmt.Errorf("BigIP: %v", err)
-	}
-
-	device, err := session.GetCurrentDevice()
-	if err != nil {
-		return err
-	}
-	log.Infof("Connected to %s %s (%s)", device.MarketingName, device.Name, device.Version)
-
-	// check if DNS module activated
-	if err := BigIPSupportsDNS(device); err != nil {
-		return err
-	}
-
-	// RPC server
-	nc, err := nats.Connect(config.Global.Default.TransportURL)
-	if err != nil {
-		return err
-	}
-	client, err := stormrpc.NewClient("", stormrpc.WithNatsConn(nc))
-	if err != nil {
-		return err
-	}
-
-	sc := StatusController{
-		session,
-		server.NewRPCServerClient(client),
-	}
-
-	if config.Global.Default.Prometheus {
-		go utils.PrometheusListen()
-	}
-
-	go func() {
-		t := time.NewTicker(30 * time.Second)
-		defer t.Stop()
-		for {
-			<-t.C // Activate periodically
-			// Refresh token if needed
-			if time.Until(sc.bigIP.TokenExpiry) <= 60 {
-				if err := sc.bigIP.RefreshTokenSession(36000); err != nil {
-					log.Error(err.Error())
-				}
-			}
-			if err := sc.StatusHandler(); err != nil {
-				log.Error(err.Error())
-				_ = sc.bigIP.RefreshTokenSession(36000)
-			}
-		}
-	}()
-
-	return nil
-}
 
 type MembersCollectionStats struct {
 	Kind     string                     `json:"kind"`
@@ -94,88 +26,159 @@ type MembersStats struct {
 		Kind     string `json:"kind"`
 		SelfLink string `json:"selfLink"`
 		Entries  struct {
-			Alternate struct {
-				Value int `json:"value"`
-			} `json:"alternate"`
-			Fallback struct {
-				Value int `json:"value"`
-			} `json:"fallback"`
-			PoolName struct {
-				Description string `json:"description"`
-			} `json:"poolName"`
-			PoolType struct {
-				Description string `json:"description"`
-			} `json:"poolType"`
-			Preferred struct {
-				Value int `json:"value"`
-			} `json:"preferred"`
-			ServerName struct {
-				Description string `json:"description"`
-			} `json:"serverName"`
 			StatusAvailabilityState struct {
 				Description string `json:"description"`
 			} `json:"status.availabilityState"`
-			StatusEnabledState struct {
-				Description string `json:"description"`
-			} `json:"status.enabledState"`
-			StatusStatusReason struct {
-				Description string `json:"description"`
-			} `json:"status.statusReason"`
-			VsName struct {
-				Description string `json:"description"`
-			} `json:"vsName"`
 		} `json:"entries"`
 	} `json:"nestedStats"`
 }
 
-func (c StatusController) StatusHandler() error {
-	pools, err := c.bigIP.GetGTMAPools()
+type ServerStats struct {
+	NestedStats struct {
+		Kind     string `json:"kind"`
+		SelfLink string `json:"selfLink"`
+		Entries  struct {
+			VirtualServerPicks struct {
+				Value uint64 `json:"value"`
+			} `json:"vsPicks"`
+		} `json:"entries"`
+	} `json:"nestedStats"`
+}
+
+func buildMemberStatusUpdateRequest(session bigIPSession, store AndromedaF5Store) (*server.MemberStatusRequest, error) {
+	datacenters, err := store.GetDatacenters()
 	if err != nil {
-		return err
+		return nil, err
 	}
-
-	var stats MembersCollectionStats
-	var msrs []*server.MemberStatusRequest_MemberStatus
-
-	for _, pool := range pools.GTMAPools {
-		partition := ConvertPartitionPath(pool.FullPath)
-		err, ok := GetForEntity(c.bigIP, &stats, fmt.Sprintf("gtm/pool/a/%s/members/stats", partition))
-		if err != nil {
-			return err
-		}
-		if ok {
-			for _, partitons := range stats.Entries {
-				memberStats := MembersStats{}
-				if err := json.Unmarshal(partitons, &memberStats); err != nil {
-					log.Warnf("Could not decode nested member stats: %s", err)
+	datacentersByID := make(map[string]*rpcmodels.Datacenter, len(datacenters))
+	for _, dc := range datacenters {
+		datacentersByID[dc.Id] = dc
+	}
+	domains, err := store.GetDomains()
+	if err != nil {
+		return nil, err
+	}
+	updates := []*server.MemberStatusRequest_MemberStatus{}
+	for _, d := range domains {
+		for _, p := range d.Pools {
+			for _, m := range p.Members {
+				if _, exists := datacentersByID[m.DatacenterId]; !exists {
+					log.Warnf("invalid datacenter ID for member [datacenter ID = %s, member ID = %s]", m.DatacenterId, m.Id)
 					continue
 				}
-
-				memberID := strings.TrimPrefix(memberStats.NestedStats.Entries.VsName.Description, "member_")
-				memberStatus := server.MemberStatusRequest_MemberStatus_UNKNOWN
-				switch memberStats.NestedStats.Entries.StatusAvailabilityState.Description {
-				case "available":
-					memberStatus = server.MemberStatusRequest_MemberStatus_ONLINE
-				case "offline":
-					memberStatus = server.MemberStatusRequest_MemberStatus_OFFLINE
+				if datacentersByID[m.DatacenterId] == nil {
+					log.Warnf("nil datacenter for member [member ID = %s]", m.Id)
+					continue
 				}
-
-				msr := &server.MemberStatusRequest_MemberStatus{
-					Id:     memberID,
-					Status: memberStatus,
+				urlPath := poolTypeAMemberStatsURL(
+					as3DeclarationGSLBDomainTenantKey(d.Id),
+					as3DeclarationGSLBPoolKey(p.Id),
+					as3DeclarationGSLBServerKey(m.Address, datacentersByID[m.DatacenterId].Name),
+					as3DeclarationGSLBVirtualServerName(m.Address, m.Port),
+				)
+				membersStats, err := fetchPoolTypeAMemberStats(session, urlPath)
+				if err != nil {
+					log.Warnf("failed to determine GSLB_Pool_Member_A status [BigIP URL path = %s]: %s", urlPath, err)
 				}
-				log.Debugf("Member %s has status %s", memberID, msr.GetStatus().String())
-
-				msrs = append(msrs, msr)
+				updates = append(updates, &server.MemberStatusRequest_MemberStatus{
+					Id:     m.Id,
+					Status: memberStatusFromPoolTypeAMemberAvailabilityState(membersStats.NestedStats.Entries.StatusAvailabilityState.Description),
+				})
 			}
 		}
 	}
-	_, err = c.rpc.UpdateMemberStatus(context.Background(),
-		&server.MemberStatusRequest{MemberStatus: msrs})
-	if err != nil {
-		return err
-	}
-	log.Infof("Refreshed status of %d members", len(msrs))
+	return &server.MemberStatusRequest{MemberStatus: updates}, nil
+}
 
-	return nil
+func poolTypeAMemberStatsURL(gslbDomainTenantKey, gslbPoolKey, gslbServerKey, gslbVirtualServerName string) string {
+	return fmt.Sprintf("gtm/pool/a/~%s~application~%s/members/~Common~%s:%s/stats", gslbDomainTenantKey, gslbPoolKey, gslbServerKey, gslbVirtualServerName)
+}
+
+func serverStatsURL(gslbServerKey string) string {
+	return fmt.Sprintf("gtm/server/~Common~%s/stats", gslbServerKey)
+}
+
+func memberStatusFromPoolTypeAMemberAvailabilityState(availabilityState string) server.MemberStatusRequest_MemberStatus_StatusType {
+	switch availabilityState {
+	case "available":
+		return server.MemberStatusRequest_MemberStatus_ONLINE
+	case "offline":
+		return server.MemberStatusRequest_MemberStatus_OFFLINE
+	default:
+		return server.MemberStatusRequest_MemberStatus_UNKNOWN
+	}
+}
+
+func fetchPoolTypeAMemberStats(s bigIPSession, urlPath string) (MembersStats, error) {
+	var membersStats MembersStats
+	mcs := MembersCollectionStats{}
+	req := &bigip.APIRequest{
+		Method:      "get",
+		URL:         urlPath,
+		ContentType: "application/json",
+	}
+	resp, err := s.APICall(req)
+	if err != nil {
+		var reqError bigip.RequestError
+		if unmarshalErr := json.Unmarshal(resp, &reqError); unmarshalErr != nil {
+			return membersStats, fmt.Errorf("could not unmarshal error response payload [BigIP URL Path = %s]: %w / APICall err = %w", urlPath, unmarshalErr, err)
+		}
+		if reqError.Code == 404 {
+			return membersStats, fmt.Errorf("entity not found [BigIP URL Path = %s]: %w", urlPath, err)
+		}
+		return membersStats, err
+	}
+	err = json.Unmarshal(resp, &mcs)
+	if err != nil {
+		return membersStats, err
+	}
+	if len(mcs.Entries) != 1 {
+		return membersStats, fmt.Errorf("expected exactly 1 key in `.entries`, got %d", len(mcs.Entries))
+	}
+	// stats.Entries, if valid, will always be a size 1 map and its only
+	// key is always the pool type A member stats we need, so we iterate
+	// just once in order to unmarshal its raw JSON value as a struct.
+	for _, rawEntry := range mcs.Entries {
+		if err := json.Unmarshal(rawEntry, &membersStats); err != nil {
+			return membersStats, fmt.Errorf("could not decode nested member stats `entries.???.nestedStats`: %s", err)
+		}
+	}
+	return membersStats, nil
+}
+
+func fetchServerStats(s bigIPSession, urlPath string) (ServerStats, error) {
+	var serverStats ServerStats
+	mcs := MembersCollectionStats{}
+	req := &bigip.APIRequest{
+		Method:      "get",
+		URL:         urlPath,
+		ContentType: "application/json",
+	}
+	resp, err := s.APICall(req)
+	if err != nil {
+		var reqError bigip.RequestError
+		if unmarshalErr := json.Unmarshal(resp, &reqError); unmarshalErr != nil {
+			return serverStats, fmt.Errorf("could not unmarshal error response payload [BigIP URL Path = %s]: %w / APICall err = %w", urlPath, unmarshalErr, err)
+		}
+		if reqError.Code == 404 {
+			return serverStats, fmt.Errorf("entity not found [BigIP URL Path = %s]: %w", urlPath, err)
+		}
+		return serverStats, err
+	}
+	err = json.Unmarshal(resp, &mcs)
+	if err != nil {
+		return serverStats, err
+	}
+	if len(mcs.Entries) != 1 {
+		return serverStats, fmt.Errorf("expected exactly 1 key in `.entries`, got %d", len(mcs.Entries))
+	}
+	// stats.Entries, if valid, will always be a size 1 map and its only
+	// key is always the pool type A member stats we need, so we iterate
+	// just once in order to unmarshal its raw JSON value as a struct.
+	for _, rawEntry := range mcs.Entries {
+		if err := json.Unmarshal(rawEntry, &serverStats); err != nil {
+			return serverStats, fmt.Errorf("could not decode nested member stats `entries.???.nestedStats`: %s", err)
+		}
+	}
+	return serverStats, nil
 }

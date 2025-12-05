@@ -22,7 +22,7 @@ import {
 export const Error = ({error}) => {
     if (error) {
         return (
-            <Message variant="error" className="jn-mb-4">
+            <Message variant="error" className="mb-4">
                 {error.statusCode && `[${error.statusCode}] `}
                 {error.message}
             </Message>
@@ -33,7 +33,7 @@ export const Error = ({error}) => {
 export const Loading = ({isLoading}) => {
     if (isLoading) {
         return (
-            <Message variant="info" className="jn-mb-4">
+            <Message variant="info" className="mb-4">
                 <Stack>
                     Loading...
                 </Stack>
@@ -83,7 +83,7 @@ export const ListItemSpinner = ({data, onClick, className, maxLength = 25}) => {
                 className={`${backgroundClass(data.provisioning_status)}`}
             >
                 {data.name && <p>{data.name.substring(0, maxLength)}{data.name.length >= maxLength && "..."}</p> || ""}
-                <div className="jn-flex jn-justify-start">
+                <div className="flex justify-start">
                     <Icon size="14" icon="contentCopy" title="Copy" onClick={() => {
                         copyTextToClipboard(data.id).then(() => {
                             setToast(true)
@@ -156,7 +156,7 @@ export const HeaderUser = ({auth, logout, theme, setTheme}) => {
             <Tooltip triggerEvent="hover">
                 <TooltipTrigger>
                     <Stack gap="2" alignment="center">
-                        <img className="w-[30px] jn-rounded jn-justify-center bg-theme-background-lvl-2 bg-cover mr-2"
+                        <img className="w-[30px] rounded justify-center bg-theme-background-lvl-2 bg-cover mr-2"
                              src={`https://avatars.wdf.sap.corp/avatar/${sapID}`} alt={sapID}/>
                         {<span>{sapID}</span>}
                     </Stack>

@@ -9,7 +9,7 @@ import (
 	"fmt"
 
 	"github.com/go-openapi/strfmt"
-	"github.com/go-openapi/swag"
+	"github.com/go-openapi/swag/conv"
 
 	"github.com/sapcc/andromeda/client/monitors"
 	"github.com/sapcc/andromeda/models"
@@ -136,9 +136,9 @@ func (*MonitorSet) Execute(_ []string) error {
 		DomainName: (*strfmt.Hostname)(MonitorOptions.MonitorSet.DomainName),
 	}}
 	if MonitorOptions.MonitorSet.Disable {
-		monitor.Monitor.AdminStateUp = swag.Bool(false)
+		monitor.Monitor.AdminStateUp = conv.Pointer(false)
 	} else if MonitorOptions.MonitorSet.Enable {
-		monitor.Monitor.AdminStateUp = swag.Bool(true)
+		monitor.Monitor.AdminStateUp = conv.Pointer(true)
 	}
 
 	params := monitors.

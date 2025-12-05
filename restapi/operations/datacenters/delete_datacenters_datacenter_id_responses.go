@@ -42,6 +42,51 @@ func (o *DeleteDatacentersDatacenterIDNoContent) WriteResponse(rw http.ResponseW
 	rw.WriteHeader(204)
 }
 
+// DeleteDatacentersDatacenterIDBadRequestCode is the HTTP code returned for type DeleteDatacentersDatacenterIDBadRequest
+const DeleteDatacentersDatacenterIDBadRequestCode int = 400
+
+/*
+DeleteDatacentersDatacenterIDBadRequest Bad request
+
+swagger:response deleteDatacentersDatacenterIdBadRequest
+*/
+type DeleteDatacentersDatacenterIDBadRequest struct {
+
+	/*
+	  In: Body
+	*/
+	Payload *models.Error `json:"body,omitempty"`
+}
+
+// NewDeleteDatacentersDatacenterIDBadRequest creates DeleteDatacentersDatacenterIDBadRequest with default headers values
+func NewDeleteDatacentersDatacenterIDBadRequest() *DeleteDatacentersDatacenterIDBadRequest {
+
+	return &DeleteDatacentersDatacenterIDBadRequest{}
+}
+
+// WithPayload adds the payload to the delete datacenters datacenter Id bad request response
+func (o *DeleteDatacentersDatacenterIDBadRequest) WithPayload(payload *models.Error) *DeleteDatacentersDatacenterIDBadRequest {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the delete datacenters datacenter Id bad request response
+func (o *DeleteDatacentersDatacenterIDBadRequest) SetPayload(payload *models.Error) {
+	o.Payload = payload
+}
+
+// WriteResponse to the client
+func (o *DeleteDatacentersDatacenterIDBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.WriteHeader(400)
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
+	}
+}
+
 // DeleteDatacentersDatacenterIDNotFoundCode is the HTTP code returned for type DeleteDatacentersDatacenterIDNotFound
 const DeleteDatacentersDatacenterIDNotFoundCode int = 404
 

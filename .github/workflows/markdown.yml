@@ -7,7 +7,6 @@ name: markdown
 on:
   push:
     branches:
-      - master
       - main
 jobs:
   generate-markdown:
@@ -17,13 +16,16 @@ jobs:
     steps:
     - name: Install git
       run: apk add --no-cache git
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
     - name: Build
       run: swagger generate markdown --copyright-file COPYRIGHT.txt --output docs/api.md
-    - name: Commit API Doc
-      run: |
-        git config --global --add safe.directory /__w/andromeda/andromeda
-        git config --global user.name 'GitHub Action'
-        git config --global user.email 'markdown-generator@users.noreply.github.com'
-        git commit -am "Update docs/api.md" || true
-        git push
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v7
+      with:
+        commit-message: Update docs/api.md
+        title: Update docs/api.md
+        body: Update docs/api.md due to changes in the API
+        branch: update-apidocs
+

@@ -62,6 +62,51 @@ func (o *PutDatacentersDatacenterIDAccepted) WriteResponse(rw http.ResponseWrite
 	}
 }
 
+// PutDatacentersDatacenterIDBadRequestCode is the HTTP code returned for type PutDatacentersDatacenterIDBadRequest
+const PutDatacentersDatacenterIDBadRequestCode int = 400
+
+/*
+PutDatacentersDatacenterIDBadRequest Bad request
+
+swagger:response putDatacentersDatacenterIdBadRequest
+*/
+type PutDatacentersDatacenterIDBadRequest struct {
+
+	/*
+	  In: Body
+	*/
+	Payload *models.Error `json:"body,omitempty"`
+}
+
+// NewPutDatacentersDatacenterIDBadRequest creates PutDatacentersDatacenterIDBadRequest with default headers values
+func NewPutDatacentersDatacenterIDBadRequest() *PutDatacentersDatacenterIDBadRequest {
+
+	return &PutDatacentersDatacenterIDBadRequest{}
+}
+
+// WithPayload adds the payload to the put datacenters datacenter Id bad request response
+func (o *PutDatacentersDatacenterIDBadRequest) WithPayload(payload *models.Error) *PutDatacentersDatacenterIDBadRequest {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the put datacenters datacenter Id bad request response
+func (o *PutDatacentersDatacenterIDBadRequest) SetPayload(payload *models.Error) {
+	o.Payload = payload
+}
+
+// WriteResponse to the client
+func (o *PutDatacentersDatacenterIDBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.WriteHeader(400)
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
+	}
+}
+
 // PutDatacentersDatacenterIDNotFoundCode is the HTTP code returned for type PutDatacentersDatacenterIDNotFound
 const PutDatacentersDatacenterIDNotFoundCode int = 404
 

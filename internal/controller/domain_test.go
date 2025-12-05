@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
-	"github.com/go-openapi/swag"
+	"github.com/go-openapi/swag/conv"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/sapcc/andromeda/models"
@@ -22,8 +22,8 @@ func (t *SuiteTest) createDomain() strfmt.UUID {
 	domain := domains.PostDomainsBody{
 		Domain: &models.Domain{
 			Fqdn:     &fqdn,
-			Name:     swag.String("test"),
-			Provider: swag.String("akamai"),
+			Name:     conv.Pointer("test"),
+			Provider: conv.Pointer("akamai"),
 		},
 	}
 

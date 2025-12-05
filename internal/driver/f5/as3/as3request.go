@@ -4,7 +4,10 @@
 
 package as3
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 // AS3
 type AS3 struct {
@@ -20,8 +23,19 @@ type ADC struct {
 	Remark        string `json:"remark,omitempty"`
 	SchemaVersion string `json:"schemaVersion"`
 	Id            string `json:"id,omitempty"`
+	UpdateMode    string `json:"updateMode,omitempty"`
 
 	tenants map[string]Tenant
+}
+
+const ADCSchemaVersion = "3.36.0"
+const ADCUpdateMode = "complete"
+
+func NewADC() ADC {
+	return ADC{
+		SchemaVersion: ADCSchemaVersion,
+		UpdateMode:    ADCUpdateMode,
+	}
 }
 
 func (a ADC) MarshalJSON() ([]byte, error) {
@@ -29,6 +43,7 @@ func (a ADC) MarshalJSON() ([]byte, error) {
 	adc["class"] = "ADC"
 	adc["schemaVersion"] = a.SchemaVersion
 	adc["id"] = a.Id
+	adc["updateMode"] = a.UpdateMode
 
 	for name, tenant := range a.tenants {
 		adc[name] = tenant
@@ -41,6 +56,13 @@ func (a *ADC) AddTenant(name string, tenant Tenant) {
 		a.tenants = make(map[string]Tenant, 1)
 	}
 	a.tenants[name] = tenant
+}
+
+func (a *ADC) GetTenant(key string) (Tenant, error) {
+	if val, exists := a.tenants[key]; exists {
+		return val, nil
+	}
+	return Tenant{}, fmt.Errorf("no such key %q", key)
 }
 
 // Tenants
@@ -70,6 +92,13 @@ func (t *Tenant) AddApplication(name string, application Application) {
 	t.applications[name] = application
 }
 
+func (t *Tenant) GetApplication(key string) (Application, error) {
+	if val, exists := t.applications[key]; exists {
+		return val, nil
+	}
+	return Application{}, fmt.Errorf("no such key %q", key)
+}
+
 // Applications
 type Applications map[string]Application
 type Application struct {
@@ -94,11 +123,18 @@ func (a Application) MarshalJSON() ([]byte, error) {
 	return json.Marshal(application)
 }
 
-func (a *Application) AddEntity(name string, entity interface{}) {
+func (a *Application) SetEntity(key string, entity interface{}) {
 	if a.entities == nil {
 		a.entities = make(map[string]interface{}, 1)
 	}
-	a.entities[name] = entity
+	a.entities[key] = entity
+}
+
+func (a *Application) GetEntity(key string) any {
+	if val, exists := a.entities[key]; exists {
+		return val
+	}
+	return nil
 }
 
 // GSLB Entities
@@ -128,6 +164,9 @@ type GSLBPool struct {
 	Members            []GSLBPoolMember     `json:"members,omitempty"`
 	Monitors           []PointerGSLBMonitor `json:"monitors,omitempty"`
 	TTL                int                  `json:"ttl,omitempty"`
+	LBModePreferred    string               `json:"lbModePreferred,omitempty"`
+	LBModeAlternate    string               `json:"lbModeAlternate,omitempty"`
+	LBModeFallback     string               `json:"lbModeFallback,omitempty"`
 }
 
 type GSLBPoolMember struct {
@@ -146,14 +185,15 @@ type GSLBPoolMemberCNAME GSLBPoolMember
 type GSLBPoolMemberMX GSLBPoolMember
 
 type GSLBMonitor struct {
-	Class       string `json:"class"`
-	Label       string `json:"label,omitempty"`
-	Remark      string `json:"remark,omitempty"`
-	MonitorType string `json:"monitorType"`
-	Interval    int64  `json:"interval,omitempty"`
-	Timeout     int64  `json:"timeout,omitempty"`
-	Receive     string `json:"receive,omitempty"`
-	Send        string `json:"send,omitempty"`
+	Class        string `json:"class"`
+	Label        string `json:"label,omitempty"`
+	Remark       string `json:"remark,omitempty"`
+	MonitorType  string `json:"monitorType"`
+	Interval     int64  `json:"interval,omitempty"`
+	Timeout      int64  `json:"timeout,omitempty"`
+	ProbeTimeout int64  `json:"probeTimeout,omitempty"`
+	Receive      string `json:"receive,omitempty"`
+	Send         string `json:"send,omitempty"`
 }
 
 type GSLBMonitorHTTP GSLBMonitor
@@ -163,16 +203,14 @@ type GSLBMonitorTCP GSLBMonitor
 type GSLBMonitorUDP GSLBMonitor
 
 type GSLBServer struct {
-	Class                    string                `json:"class"`
-	Label                    string                `json:"label,omitempty"`
-	Remark                   string                `json:"remark,omitempty"`
-	DataCenter               PointerGSLBDataCenter `json:"dataCenter,omitempty"`
-	Devices                  []GSLBServerDevice    `json:"devices,omitempty"`
-	VirtualServers           []GSLBVirtualServer   `json:"virtualServers,omitempty"`
-	Monitors                 []PointerGSLBMonitor  `json:"monitors,omitempty"`
-	ServiceCheckProbeEnabled bool                  `json:"serviceCheckProbeEnabled"`
-	SnmpProbeEnabled         bool                  `json:"snmpProbeEnabled"`
-	PathProbeEnabled         bool                  `json:"pathProbeEnabled"`
+	Class          string                `json:"class"`
+	Label          string                `json:"label,omitempty"`
+	Remark         string                `json:"remark,omitempty"`
+	DataCenter     PointerGSLBDataCenter `json:"dataCenter,omitempty"`
+	Devices        []GSLBServerDevice    `json:"devices,omitempty"`
+	VirtualServers []GSLBVirtualServer   `json:"virtualServers,omitempty"`
+	Monitors       []PointerGSLBMonitor  `json:"monitors,omitempty"`
+	ServerType     string                `json:"serverType,omitempty"`
 }
 
 type GSLBServerDevice struct {

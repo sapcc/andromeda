@@ -9,9 +9,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v10/pkg/gtm"
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v12/pkg/gtm"
 	"github.com/apex/log"
-	"github.com/go-openapi/swag"
+	"github.com/go-openapi/swag/conv"
 
 	"github.com/sapcc/andromeda/internal/driver"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
@@ -91,7 +91,7 @@ MEMBERLOOP:
 			continue
 		}
 
-		datacenterUUID := member.GetDatacenter()
+		datacenterUUID := member.GetDatacenterId()
 		var datacenterID int
 		if len(datacenterUUID) > 0 {
 			var err error
@@ -116,7 +116,7 @@ MEMBERLOOP:
 
 		// Add new traffic target
 		trafficTarget := gtm.TrafficTarget{
-			Name:         member.GetDatacenter(),
+			Name:         member.GetDatacenterId(),
 			Enabled:      member.GetAdminStateUp(),
 			Servers:      []string{member.Address},
 			Weight:       50,
@@ -166,7 +166,7 @@ MEMBERLOOP:
 				if domainName := monitor.GetDomainName(); domainName != "" {
 					livenessTest.HTTPHeaders = []gtm.HTTPHeader{{Name: "Host", Value: domainName}}
 				}
-				livenessTest.HTTPMethod = swag.String(monitor.GetMethod().String())
+				livenessTest.HTTPMethod = conv.Pointer(monitor.GetMethod().String())
 			case rpcmodels.Monitor_TCP:
 				livenessTest.RequestString = monitor.GetSend()
 				livenessTest.ResponseString = monitor.GetReceive()

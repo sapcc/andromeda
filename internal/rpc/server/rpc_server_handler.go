@@ -24,7 +24,13 @@ type RPCHandler struct {
 
 // QueryxWithIds run sql query if optional WHERE condition based on IDs
 func (u *RPCHandler) QueryxWithIds(sql string, request *SearchRequest) (*sqlx.Rows, error) {
-	args := []interface{}{request.Provider}
+	args := []interface{}{}
+	if len(request.Provider) > 0 {
+		args = append(args, request.Provider)
+	}
+	if len(request.DatacenterId) > 0 {
+		args = append(args, request.DatacenterId)
+	}
 	if len(request.Ids) > 0 {
 		if strings.Contains(sql, "WHERE") {
 			sql += ` AND id IN (?)`
@@ -41,10 +47,21 @@ func (u *RPCHandler) QueryxWithIds(sql string, request *SearchRequest) (*sqlx.Ro
 	}
 
 	// Provider filter
-	if strings.Contains(sql, "WHERE") {
-		sql += ` AND provider = ?`
-	} else {
-		sql += ` WHERE provider = ?`
+	if len(request.Provider) > 0 {
+		if strings.Contains(sql, "WHERE") {
+			sql += ` AND provider = ?`
+		} else {
+			sql += ` WHERE provider = ?`
+		}
+	}
+
+	// Datacenter filter
+	if len(request.DatacenterId) > 0 {
+		if strings.Contains(sql, "WHERE") {
+			sql += ` AND datacenter_id = ?`
+		} else {
+			sql += ` WHERE datacenter_id = ?`
+		}
 	}
 
 	sql = u.DB.Rebind(sql)
@@ -53,7 +70,7 @@ func (u *RPCHandler) QueryxWithIds(sql string, request *SearchRequest) (*sqlx.Ro
 
 func (u *RPCHandler) GetMembers(ctx context.Context, request *SearchRequest) (*MembersResponse, error) {
 	var response = &MembersResponse{}
-	sql := u.DB.Rebind(`SELECT id, admin_state_up, address, port, provisioning_status FROM member;`)
+	sql := u.DB.Rebind(`SELECT id, admin_state_up, address, port, provisioning_status, datacenter_id, project_id, pool_id FROM member`)
 	rows, err := u.QueryxWithIds(sql, request)
 	if err != nil {
 		return nil, err
@@ -61,7 +78,7 @@ func (u *RPCHandler) GetMembers(ctx context.Context, request *SearchRequest) (*M
 	for rows.Next() {
 		var member rpcmodels.Member
 		if err := rows.Scan(&member.Id, &member.AdminStateUp, &member.Address,
-			&member.Port, &member.ProvisioningStatus); err != nil {
+			&member.Port, &member.ProvisioningStatus, &member.DatacenterId, &member.ProjectId, &member.PoolId); err != nil {
 			return nil, err
 		}
 		response.Response = append(response.Response, &member)
@@ -89,7 +106,7 @@ func (u *RPCHandler) GetPools(ctx context.Context, request *SearchRequest) (*Poo
 func (u *RPCHandler) GetDatacenters(ctx context.Context, request *SearchRequest) (*DatacentersResponse, error) {
 	q := sq.
 		Select("id", "admin_state_up", "city", "state_or_province", "continent", "country", "latitude",
-			"longitude", "scope", "provisioning_status", "provider", "meta", "project_id").
+			"longitude", "scope", "provisioning_status", "provider", "meta", "project_id", "name").
 		From("datacenter").
 		Where("provider = ?", request.Provider)
 
@@ -283,7 +300,7 @@ func populateMonitors(u *RPCHandler, poolID string) ([]*rpcmodels.Monitor, error
 
 func populateMembers(u *RPCHandler, poolID string) ([]*rpcmodels.Member, error) {
 	sql := u.DB.Rebind(`SELECT id, admin_state_up, address, port, COALESCE(datacenter_id, ''),
-       provisioning_status FROM member WHERE pool_id = ?`)
+       provisioning_status, COALESCE(project_id, '') FROM member WHERE pool_id = ?`)
 	rows, err := u.DB.Queryx(sql, poolID)
 	if err != nil {
 		return nil, err
@@ -293,11 +310,12 @@ func populateMembers(u *RPCHandler, poolID string) ([]*rpcmodels.Member, error) 
 	for rows.Next() {
 		var member rpcmodels.Member
 		if err := rows.Scan(&member.Id, &member.AdminStateUp, &member.Address,
-			&member.Port, &member.Datacenter, &member.ProvisioningStatus); err != nil {
+			&member.Port, &member.DatacenterId, &member.ProvisioningStatus, &member.ProjectId); err != nil {
 			log.Error(err.Error())
 			return nil, err
 		}
 
+		member.PoolId = poolID
 		members = append(members, &member)
 	}
 	return members, nil
@@ -333,12 +351,12 @@ func (u *RPCHandler) GetDomains(ctx context.Context, request *SearchRequest) (*D
 				for _, member := range pool.Members {
 					found := false
 					for _, datacenter := range datacenterIds {
-						if datacenter == member.Datacenter {
+						if datacenter == member.DatacenterId {
 							found = true
 						}
 					}
 					if !found {
-						datacenterIds = append(datacenterIds, member.Datacenter)
+						datacenterIds = append(datacenterIds, member.DatacenterId)
 					}
 				}
 			}

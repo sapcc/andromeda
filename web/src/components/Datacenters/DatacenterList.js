@@ -44,8 +44,8 @@ const DatacenterList = () => {
                 distribution="between"
                 direction="horizontal"
                 alignment="center"
-                className="jn-px-6 jn-py-3 mt-6 jn-bg-theme-background-lvl-1">
-                <div className="jn-text-lg jn-text-theme-high">
+                className="px-6 py-3 mt-6 bg-theme-background-lvl-1">
+                <div className="text-lg text-theme-high">
                     <strong>Datacenters</strong>
                 </div>
                 <Button
@@ -78,7 +78,7 @@ const DatacenterList = () => {
                     )}
                 </DataGrid>
             ) : (
-                <div className="jn-p-4">There are no datacenters to display.</div>
+                <div className="p-4">There are no datacenters to display.</div>
             )
             }
             <Box>

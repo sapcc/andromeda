@@ -43,7 +43,39 @@ func NewPostMonitors(ctx *middleware.Context, handler PostMonitorsHandler) *Post
 /*
 	PostMonitors swagger:route POST /monitors Monitors postMonitors
 
-Create new monitor
+# Create new monitor
+
+### F5 monitors
+
+Andromeda pool monitors are mapped to [F5 monitors][f5-monitors] based on the `type` property as follows:
+
+[f5-monitors]: <https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/refguide/schemaref/Monitor.schema.json.html>
+
+| Andromeda | F5             |
+|-----------|----------------|
+| `HTTP`    | `http`         |
+| `HTTPS`   | `https`        |
+| `ICMP`    | `gateway-icmp` |
+| `TCP`     | `tcp`          |
+| `UDP`     | `udp`          |
+
+Andromeda monitor properties map to an F5 `Monitor` as follows:
+
+| Andromeda     | F5 `Monitor` object   | Comments                                       |
+|---------------|-----------------------|------------------------------------------------|
+| `domain_name` | -                     | Unsupported by F5/AS3                          |
+| `http_method` | -                     | Unsupported by F5/AS3 (see caveats below)      |
+| `interval`    | `interval`            |                                                |
+| `receive`     | `receive`             | `HTTP` / `HTTPS` only                          |
+| `send`        | `send`                | `HTTP` / `HTTPS` only                          |
+| `timeout`     | `timeout`             |                                                |
+| `type`        | `monitorType`         |                                                |
+
+Caveats:
+
+* For HTTP/S monitors, F5 decides on the HTTP method, URL path and HTTP version according to `Monitor.send`. For details please refer to the [Monitor_HTTP object][monitor-http-object].
+
+[monitor-http-object]: <https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/refguide/schemaref/Monitor.schema.json.html#monitor-http-object>
 */
 type PostMonitors struct {
 	Context *middleware.Context

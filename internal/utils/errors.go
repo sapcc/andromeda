@@ -15,22 +15,23 @@ import (
 )
 
 var (
-	PolicyForbidden          = &models.Error{Code: 403, Message: "policy does not allow this request to be performed"}
-	NotFound                 = &models.Error{Code: 404, Message: "not found"}
-	ProviderUnchangeable     = &models.Error{Code: 400, Message: "provider cannot be changed"}
-	InvalidMarker            = &models.Error{Code: 400, Message: "invalid marker"}
-	PoolIDImmutable          = &models.Error{Code: 400, Message: "invalid value for 'pool_id': change of immutable attribute 'pool_id' not allowed"}
-	PoolIDRequired           = &models.Error{Code: 400, Message: "invalid value for 'pool_id': 'pool_id' is required"}
-	DuplicateMember          = &models.Error{Code: 409, Message: "invalid value for 'address' and 'port': endpoint already exists in pool"}
-	DuplicateDomain          = &models.Error{Code: 409, Message: "invalid value for 'domain' and 'provider': domain already exists"}
-	DatacenterInUse          = &models.Error{Code: 409, Message: "datacenter is in use"}
-	InvalidSendString        = &models.Error{Code: 409, Message: "invalid value for 'send': must be a URL path"}
-	MissingFQDN              = &models.Error{Code: 400, Message: "invalid value for 'fqdn': 'fqdn' is required"}
-	MissingProvider          = &models.Error{Code: 400, Message: "invalid value for 'provider': 'provider' is required"}
-	MissingAddressOrPort     = &models.Error{Code: 400, Message: "invalid value for 'address' and 'port': 'address' and 'port' are required"}
-	FQDNImmutable            = &models.Error{Code: 400, Message: "invalid value for 'fqdn': change of immutable attribute 'fqdn' not allowed"}
-	TryAgainLater            = &models.Error{Code: 503, Message: "service is currently unavailable, please try again later"}
-	MySQLForeignKeyViolation = &mysql.MySQLError{Number: 1451}
+	PolicyForbidden              = &models.Error{Code: 403, Message: "policy does not allow this request to be performed"}
+	NotFound                     = &models.Error{Code: 404, Message: "not found"}
+	ProviderUnchangeable         = &models.Error{Code: 400, Message: "provider cannot be changed"}
+	InvalidMarker                = &models.Error{Code: 400, Message: "invalid marker"}
+	PoolIDImmutable              = &models.Error{Code: 400, Message: "invalid value for 'pool_id': change of immutable attribute 'pool_id' not allowed"}
+	PoolIDRequired               = &models.Error{Code: 400, Message: "invalid value for 'pool_id': 'pool_id' is required"}
+	DuplicateMember              = &models.Error{Code: 409, Message: "invalid value for 'address' and 'port': endpoint already exists in pool"}
+	DuplicateDomain              = &models.Error{Code: 409, Message: "invalid value for 'domain' and 'provider': domain already exists"}
+	DatacenterInUse              = &models.Error{Code: 409, Message: "datacenter is in use"}
+	InvalidSendString            = &models.Error{Code: 409, Message: "invalid value for 'send': must be a URL path"}
+	MissingFQDN                  = &models.Error{Code: 400, Message: "invalid value for 'fqdn': 'fqdn' is required"}
+	MissingProvider              = &models.Error{Code: 400, Message: "invalid value for 'provider': 'provider' is required"}
+	MissingAddressOrPort         = &models.Error{Code: 400, Message: "invalid value for 'address' and 'port': 'address' and 'port' are required"}
+	FQDNImmutable                = &models.Error{Code: 400, Message: "invalid value for 'fqdn': change of immutable attribute 'fqdn' not allowed"}
+	TryAgainLater                = &models.Error{Code: 503, Message: "service is currently unavailable, please try again later"}
+	RestrictedDatacenterProvider = &models.Error{Code: 400, Message: "invalid value for 'provider': project-specific f5 datacenters are not supported; please use those with scope=public already available"}
+	MySQLForeignKeyViolation     = &mysql.MySQLError{Number: 1451}
 )
 
 func Unauthorized(err error) *models.Error {

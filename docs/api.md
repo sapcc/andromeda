@@ -119,14 +119,6 @@ Administrative API
   
 
 
-###  metrics
-
-| Method  | URI     | Name   | Summary |
-|---------|---------|--------|---------|
-| GET | /v1/metrics/akamai/total-dns-requests | [get metrics akamai total DNS requests](#get-metrics-akamai-total-dns-requests) | Get total DNS requests for Akamai GTM properties |
-  
-
-
 ###  monitors
 
 | Method  | URI     | Name   | Summary |
@@ -169,6 +161,7 @@ DELETE /v1/datacenters/{datacenter_id}
 | Code | Status | Description | Has headers | Schema |
 |------|--------|-------------|:-----------:|--------|
 | [204](#delete-datacenters-datacenter-id-204) | No Content | Resource successfully deleted. |  | [schema](#delete-datacenters-datacenter-id-204-schema) |
+| [400](#delete-datacenters-datacenter-id-400) | Bad Request | Bad request |  | [schema](#delete-datacenters-datacenter-id-400-schema) |
 | [404](#delete-datacenters-datacenter-id-404) | Not Found | Not Found |  | [schema](#delete-datacenters-datacenter-id-404-schema) |
 | [default](#delete-datacenters-datacenter-id-default) | | Unexpected Error |  | [schema](#delete-datacenters-datacenter-id-default-schema) |
 
@@ -179,6 +172,15 @@ DELETE /v1/datacenters/{datacenter_id}
 Status: No Content
 
 ###### <span id="delete-datacenters-datacenter-id-204-schema"></span> Schema
+
+##### <span id="delete-datacenters-datacenter-id-400"></span> 400 - Bad request
+Status: Bad Request
+
+###### <span id="delete-datacenters-datacenter-id-400-schema"></span> Schema
+   
+  
+
+[Error](#error)
 
 ##### <span id="delete-datacenters-datacenter-id-404"></span> 404 - Not Found
 Status: Not Found
@@ -1076,86 +1078,6 @@ Unexpected Error
 
 
 
-### <span id="get-metrics-akamai-total-dns-requests"></span> Get total DNS requests for Akamai GTM properties (*GetMetricsAkamaiTotalDNSRequests*)
-
-```
-GET /v1/metrics/akamai/total-dns-requests
-```
-
-Retrieve DNS request metrics for Akamai Global Traffic Management (GTM) properties
-
-#### Parameters
-
-| Name | Source | Type | Go type | Separator | Required | Default | Description |
-|------|--------|------|---------|-----------| :------: |---------|-------------|
-| project_id | `query` | string | `string` |  |  |  | Filter metrics by project ID |
-| property_name | `query` | string | `string` |  |  |  | Filter metrics by Akamai GTM property name |
-| time_range | `query` | string | `string` |  |  | `"last_hour"` | Time range for metrics data |
-
-#### All responses
-| Code | Status | Description | Has headers | Schema |
-|------|--------|-------------|:-----------:|--------|
-| [200](#get-metrics-akamai-total-dns-requests-200) | OK | A JSON object containing DNS request metrics |  | [schema](#get-metrics-akamai-total-dns-requests-200-schema) |
-| [400](#get-metrics-akamai-total-dns-requests-400) | Bad Request | Bad request |  | [schema](#get-metrics-akamai-total-dns-requests-400-schema) |
-| [404](#get-metrics-akamai-total-dns-requests-404) | Not Found | Not Found |  | [schema](#get-metrics-akamai-total-dns-requests-404-schema) |
-| [default](#get-metrics-akamai-total-dns-requests-default) | | Unexpected Error |  | [schema](#get-metrics-akamai-total-dns-requests-default-schema) |
-
-#### Responses
-
-
-##### <span id="get-metrics-akamai-total-dns-requests-200"></span> 200 - A JSON object containing DNS request metrics
-Status: OK
-
-###### <span id="get-metrics-akamai-total-dns-requests-200-schema"></span> Schema
-   
-  
-
-[GetMetricsAkamaiTotalDNSRequestsOKBody](#get-metrics-akamai-total-dns-requests-o-k-body)
-
-##### <span id="get-metrics-akamai-total-dns-requests-400"></span> 400 - Bad request
-Status: Bad Request
-
-###### <span id="get-metrics-akamai-total-dns-requests-400-schema"></span> Schema
-   
-  
-
-[Error](#error)
-
-##### <span id="get-metrics-akamai-total-dns-requests-404"></span> 404 - Not Found
-Status: Not Found
-
-###### <span id="get-metrics-akamai-total-dns-requests-404-schema"></span> Schema
-   
-  
-
-[Error](#error)
-
-##### <span id="get-metrics-akamai-total-dns-requests-default"></span> Default Response
-Unexpected Error
-
-###### <span id="get-metrics-akamai-total-dns-requests-default-schema"></span> Schema
-
-  
-
-[Error](#error)
-
-###### Inlined models
-
-**<span id="get-metrics-akamai-total-dns-requests-o-k-body"></span> GetMetricsAkamaiTotalDNSRequestsOKBody**
-
-
-  
-
-
-
-**Properties**
-
-| Name | Type | Go type | Required | Default | Description | Example |
-|------|------|---------|:--------:| ------- |-------------|---------|
-| total_dns_requests | [AkamaiTotalDNSRequests](#akamai-total-dns-requests)| `models.AkamaiTotalDNSRequests` |  | |  |  |
-
-
-
 ### <span id="get-monitors"></span> List monitors (*GetMonitors*)
 
 ```
@@ -1688,6 +1610,7 @@ POST /v1/datacenters
 | Code | Status | Description | Has headers | Schema |
 |------|--------|-------------|:-----------:|--------|
 | [201](#post-datacenters-201) | Created | Created datacenter. |  | [schema](#post-datacenters-201-schema) |
+| [400](#post-datacenters-400) | Bad Request | Bad request |  | [schema](#post-datacenters-400-schema) |
 | [404](#post-datacenters-404) | Not Found | Not Found |  | [schema](#post-datacenters-404-schema) |
 | [default](#post-datacenters-default) | | Unexpected Error |  | [schema](#post-datacenters-default-schema) |
 
@@ -1702,6 +1625,15 @@ Status: Created
   
 
 [PostDatacentersCreatedBody](#post-datacenters-created-body)
+
+##### <span id="post-datacenters-400"></span> 400 - Bad request
+Status: Bad Request
+
+###### <span id="post-datacenters-400-schema"></span> Schema
+   
+  
+
+[Error](#error)
 
 ##### <span id="post-datacenters-404"></span> 404 - Not Found
 Status: Not Found
@@ -2022,6 +1954,38 @@ Unexpected Error
 POST /v1/monitors
 ```
 
+### F5 monitors
+
+Andromeda pool monitors are mapped to [F5 monitors][f5-monitors] based on the `type` property as follows:
+
+[f5-monitors]: <https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/refguide/schemaref/Monitor.schema.json.html>
+
+| Andromeda | F5             |
+|-----------|----------------|
+| `HTTP`    | `http`         |
+| `HTTPS`   | `https`        |
+| `ICMP`    | `gateway-icmp` |
+| `TCP`     | `tcp`          |
+| `UDP`     | `udp`          |
+
+Andromeda monitor properties map to an F5 `GSLB_Monitor` as follows:
+
+| Andromeda     | F5 `GSLB_Monitor` object | Comments                                       |
+|---------------|--------------------------|------------------------------------------------|
+| `domain_name` | -                        | Unsupported by F5/AS3                          |
+| `http_method` | -                        | Unsupported by F5/AS3 (see caveats below)      |
+| `interval`    | `interval`               |                                                |
+| `receive`     | `receive`                | `HTTP` / `HTTPS` only                          |
+| `send`        | `send`                   | `HTTP` / `HTTPS` only                          |
+| `timeout`     | `probeTimeout`           |                                                |
+| `type`        | `monitorType`            |                                                |
+
+Caveats:
+
+* For HTTP/S monitors, F5 decides on the HTTP method, URL path and HTTP version according to `Monitor.send`. For details please refer to the [Monitor_HTTP object][monitor-http-object].
+
+[monitor-http-object]: <https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/refguide/schemaref/Monitor.schema.json.html#monitor-http-object>
+
 #### Parameters
 
 | Name | Source | Type | Go type | Separator | Required | Default | Description |
@@ -2257,6 +2221,7 @@ PUT /v1/datacenters/{datacenter_id}
 | Code | Status | Description | Has headers | Schema |
 |------|--------|-------------|:-----------:|--------|
 | [202](#put-datacenters-datacenter-id-202) | Accepted | Updated datacenter. |  | [schema](#put-datacenters-datacenter-id-202-schema) |
+| [400](#put-datacenters-datacenter-id-400) | Bad Request | Bad request |  | [schema](#put-datacenters-datacenter-id-400-schema) |
 | [404](#put-datacenters-datacenter-id-404) | Not Found | Not Found |  | [schema](#put-datacenters-datacenter-id-404-schema) |
 | [default](#put-datacenters-datacenter-id-default) | | Unexpected Error |  | [schema](#put-datacenters-datacenter-id-default-schema) |
 
@@ -2271,6 +2236,15 @@ Status: Accepted
   
 
 [PutDatacentersDatacenterIDAcceptedBody](#put-datacenters-datacenter-id-accepted-body)
+
+##### <span id="put-datacenters-datacenter-id-400"></span> 400 - Bad request
+Status: Bad Request
+
+###### <span id="put-datacenters-datacenter-id-400-schema"></span> Schema
+   
+  
+
+[Error](#error)
 
 ##### <span id="put-datacenters-datacenter-id-404"></span> 404 - Not Found
 Status: Not Found
@@ -2866,46 +2840,6 @@ Unexpected Error
 
 ## Models
 
-### <span id="akamai-total-dns-requests"></span> akamai_total_dns_requests
-
-
-  
-
-
-
-**Properties**
-
-| Name | Type | Go type | Required | Default | Description | Example |
-|------|------|---------|:--------:| ------- |-------------|---------|
-| datacenters | [][AkamaiTotalDNSRequestsDatacentersItems0](#akamai-total-dns-requests-datacenters-items0)| `[]*AkamaiTotalDNSRequestsDatacentersItems0` |  | |  |  |
-| property_name | string| `string` |  | | Name of the Akamai GTM property |  |
-| time_range | string| `string` |  | | Time range for the metrics data |  |
-| total_requests | integer| `int64` |  | | Total number of DNS requests for the property |  |
-
-
-
-#### Inlined models
-
-**<span id="akamai-total-dns-requests-datacenters-items0"></span> AkamaiTotalDNSRequestsDatacentersItems0**
-
-
-  
-
-
-
-**Properties**
-
-| Name | Type | Go type | Required | Default | Description | Example |
-|------|------|---------|:--------:| ------- |-------------|---------|
-| datacenter_id | string| `string` |  | | ID of the datacenter |  |
-| datacenter_nickname | string| `string` |  | | Nickname of the datacenter |  |
-| percentage | float (formatted number)| `float32` |  | | Percentage of total requests for this datacenter |  |
-| requests | integer| `int64` |  | | Number of requests for this datacenter |  |
-| status | string| `string` |  | | Status of the datacenter |  |
-| target_ip | string| `string` |  | | Target IP address for the datacenter |  |
-
-
-
 ### <span id="datacenter"></span> datacenter
 
 
@@ -3179,7 +3113,7 @@ Unexpected Error
 | heartbeat | date-time (formatted string)| `strfmt.DateTime` |  | | The UTC date and timestamp when had the last heartbeat. | `2020-05-11 17:21:34` |
 | host | hostname (formatted string)| `strfmt.Hostname` |  | | Hostname of the computer the service is running. | `example.host` |
 | id | string| `string` |  | | ID of the RPC service. | `andromeda-agent-fbb49979-03f5-4a97-a334-1fd2c9f61e7e` |
-| metadata | [interface{}](#interface)| `interface{}` |  | |  |  |
+| metadata | [any](#any)| `any` |  | |  |  |
 | provider | string| `string` |  | | Provider this service supports. | `akamai` |
 | rpc_address | string| `string` |  | | RPC Endpoint Address. | `_INBOX.VEfFxcAzZQ9iM9vwGH49It` |
 | type | string| `string` |  | | Type of service. | `healthcheck` |

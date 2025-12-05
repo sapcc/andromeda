@@ -33,6 +33,12 @@ func (o *DeleteDatacentersDatacenterIDReader) ReadResponse(response runtime.Clie
 			return nil, err
 		}
 		return result, nil
+	case 400:
+		result := NewDeleteDatacentersDatacenterIDBadRequest()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 404:
 		result := NewDeleteDatacentersDatacenterIDNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -103,6 +109,74 @@ func (o *DeleteDatacentersDatacenterIDNoContent) String() string {
 }
 
 func (o *DeleteDatacentersDatacenterIDNoContent) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewDeleteDatacentersDatacenterIDBadRequest creates a DeleteDatacentersDatacenterIDBadRequest with default headers values
+func NewDeleteDatacentersDatacenterIDBadRequest() *DeleteDatacentersDatacenterIDBadRequest {
+	return &DeleteDatacentersDatacenterIDBadRequest{}
+}
+
+/*
+DeleteDatacentersDatacenterIDBadRequest describes a response with status code 400, with default header values.
+
+Bad request
+*/
+type DeleteDatacentersDatacenterIDBadRequest struct {
+	Payload *models.Error
+}
+
+// IsSuccess returns true when this delete datacenters datacenter Id bad request response has a 2xx status code
+func (o *DeleteDatacentersDatacenterIDBadRequest) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this delete datacenters datacenter Id bad request response has a 3xx status code
+func (o *DeleteDatacentersDatacenterIDBadRequest) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this delete datacenters datacenter Id bad request response has a 4xx status code
+func (o *DeleteDatacentersDatacenterIDBadRequest) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this delete datacenters datacenter Id bad request response has a 5xx status code
+func (o *DeleteDatacentersDatacenterIDBadRequest) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this delete datacenters datacenter Id bad request response a status code equal to that given
+func (o *DeleteDatacentersDatacenterIDBadRequest) IsCode(code int) bool {
+	return code == 400
+}
+
+// Code gets the status code for the delete datacenters datacenter Id bad request response
+func (o *DeleteDatacentersDatacenterIDBadRequest) Code() int {
+	return 400
+}
+
+func (o *DeleteDatacentersDatacenterIDBadRequest) Error() string {
+	return fmt.Sprintf("[DELETE /datacenters/{datacenter_id}][%d] deleteDatacentersDatacenterIdBadRequest  %+v", 400, o.Payload)
+}
+
+func (o *DeleteDatacentersDatacenterIDBadRequest) String() string {
+	return fmt.Sprintf("[DELETE /datacenters/{datacenter_id}][%d] deleteDatacentersDatacenterIdBadRequest  %+v", 400, o.Payload)
+}
+
+func (o *DeleteDatacentersDatacenterIDBadRequest) GetPayload() *models.Error {
+	return o.Payload
+}
+
+func (o *DeleteDatacentersDatacenterIDBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.Error)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
 
 	return nil
 }

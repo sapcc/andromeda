@@ -77,7 +77,7 @@ const GeographicMapListItem = ({geomap, setError}) => {
             <DataGridCell>
                 <ListItemStatus data={geomap} />
             </DataGridCell>
-            <DataGridCell className="jn-items-end">
+            <DataGridCell className="items-end">
                 <Stack gap="1.5">
                     {geomap.project_id === auth?.project?.id && (
                         <>
@@ -95,12 +95,12 @@ const GeographicMapListItem = ({geomap, setError}) => {
                             />*/}
                             <PopupMenu>
                                 <PopupMenu.Menu>
-                                    <PopupMenu.Item className="jn-text-theme-accent"
+                                    <PopupMenu.Item className="text-theme-accent"
                                         icon="deleteForever"
                                         label="Delete"
                                         onClick={handleDeleteGeographicMapClick}
                                         />
-                                    <PopupMenu.Item className="jn-text-theme-accent"
+                                    <PopupMenu.Item className="text-theme-accent"
                                         icon="info"
                                         label="JSON"
                                         onClick={() => setShowJson(!showJson)}
