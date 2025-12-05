@@ -22,6 +22,27 @@ func formatValue(v reflect.Value) string {
 			return "Null"
 		}
 		return formatValue(v.Elem())
+	case reflect.Slice, reflect.Array:
+		if v.Len() == 0 {
+			return "[]"
+		}
+		// For datacenters slice, show a summary
+		if v.Len() > 0 {
+			firstElem := v.Index(0)
+			if firstElem.Kind() == reflect.Ptr && !firstElem.IsNil() {
+				firstElem = firstElem.Elem()
+			}
+			// Check if this looks like a datacenter slice
+			if firstElem.Kind() == reflect.Struct {
+				typeName := firstElem.Type().Name()
+				if typeName == "AkamaiTotalDNSRequestsDatacentersItems0" {
+					// Show a summary for datacenters
+					return fmt.Sprintf("%d datacenter(s)", v.Len())
+				}
+			}
+		}
+		// For other slices, show count
+		return fmt.Sprintf("[%d items]", v.Len())
 	default:
 		return fmt.Sprintf("%v", v)
 	}

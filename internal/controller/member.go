@@ -125,7 +125,7 @@ func (c MemberController) PostMembers(params members.PostMembersParams) middlewa
 		panic(err)
 	}
 
-	_ = PendingSync(c.rpc)
+	_ = c.PendingSync()
 	return members.NewPostMembersCreated().
 		WithPayload(&members.PostMembersCreatedBody{Member: member})
 }
@@ -186,7 +186,7 @@ func (c MemberController) PutMembersMemberID(params members.PutMembersMemberIDPa
 		panic(err)
 	}
 
-	if err := PendingSync(c.rpc); err != nil {
+	if err := c.PendingSync(); err != nil {
 		log.WithError(err).Error("Failed to sync provisioning status")
 	}
 	return members.NewPutMembersMemberIDAccepted().
@@ -218,7 +218,7 @@ func (c MemberController) DeleteMembersMemberID(params members.DeleteMembersMemb
 		panic(err)
 	}
 
-	_ = PendingSync(c.rpc)
+	_ = c.PendingSync()
 	return members.NewDeleteMembersMemberIDNoContent()
 }
 

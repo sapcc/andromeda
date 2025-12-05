@@ -17,11 +17,13 @@ import (
 )
 
 var (
-	fQNameNumReq = prometheus.BuildFQName("andromeda", "akamai", "requests_5m")
-	fQNameStatus = prometheus.BuildFQName("andromeda", "akamai", "status_5m")
-	labels       = []string{"domain", "datacenter_id", "project_id", "target_ip"}
-	descNumReq   = prometheus.NewDesc(fQNameNumReq, "Number of requests/5m per domain", labels, nil)
-	descStatus   = prometheus.NewDesc(fQNameStatus, "Status per domain", labels, nil)
+	fQNameNumReq  = prometheus.BuildFQName("andromeda", "akamai", "requests_5m")
+	fQNameStatus  = prometheus.BuildFQName("andromeda", "akamai", "status_5m")
+	fQNameUpdated = prometheus.BuildFQName("andromeda", "akamai", "last_update_timestamp")
+	labels        = []string{"domain", "datacenter_id", "project_id", "target_ip"}
+	descNumReq    = prometheus.NewDesc(fQNameNumReq, "Number of requests/5m per domain (most recent data point)", labels, nil)
+	descStatus    = prometheus.NewDesc(fQNameStatus, "Status per domain (most recent data point)", labels, nil)
+	descUpdated   = prometheus.NewDesc(fQNameUpdated, "Unix timestamp of when this metric was last updated from Akamai API", labels, nil)
 )
 
 type AndromedaAkamaiCollector struct {
@@ -46,12 +48,33 @@ func (p *AndromedaAkamaiCollector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- prometheus.NewDesc(p.fqName, "Andromeda Akamai Exporter", nil, nil)
 }
 
+// Collect fetches metrics from Akamai API and exposes them to Prometheus.
+// Since Akamai provides historical data (5-minute aggregated), we handle this by:
+// 1. Fetching all available data points from the API
+// 2. Keeping only the most recent value for each metric combination
+// 3. Exposing these as current gauge values (without historical timestamps)
+// 4. Including a separate metric to track when the data was collected by Akamai
+//
+// This approach avoids issues with Prometheus rejecting old timestamps and creating
+// gaps in the data, while still providing visibility into data freshness.
 func (p *AndromedaAkamaiCollector) Collect(ch chan<- prometheus.Metric) {
 	properties, err := p.session.getProperties()
 	if err != nil {
 		log.Error(err.Error())
 		return
 	}
+
+	// Track the most recent data point for each metric combination
+	type metricKey struct {
+		property   string
+		datacenter string
+		projectID  string
+		target     string
+	}
+	
+	latestRequests := make(map[metricKey]float64)
+	latestStatus := make(map[metricKey]float64)
+	latestTimestamp := make(map[metricKey]float64)
 
 	for _, property := range properties {
 		datarows, err := p.session.getTrafficReport(property)
@@ -60,7 +83,14 @@ func (p *AndromedaAkamaiCollector) Collect(ch chan<- prometheus.Metric) {
 			continue
 		}
 
+		// Process all data rows but only keep the most recent values
 		for _, dataRow := range datarows {
+			// Check if datacenters is empty to prevent panic
+			if len(dataRow.Datacenters) == 0 {
+				log.Warnf("Property %s has no datacenters in dataRow, skipping", property)
+				continue
+			}
+			
 			var projectID string
 			if projectID, err = p.rpc.GetProject(dataRow.Datacenters[0].Nickname); err != nil {
 				log.Error(err.Error())
@@ -68,19 +98,37 @@ func (p *AndromedaAkamaiCollector) Collect(ch chan<- prometheus.Metric) {
 			}
 
 			for _, datacenter := range dataRow.Datacenters {
-				// expose via prometheus
 				target := strings.Split(datacenter.TrafficTargetName, " - ")[1]
-				m := prometheus.MustNewConstMetric(descNumReq, prometheus.GaugeValue,
-					float64(datacenter.Requests), property, datacenter.Nickname, projectID,
-					target)
-				ch <- prometheus.NewMetricWithTimestamp(dataRow.Timestamp, m)
+				key := metricKey{
+					property:   property,
+					datacenter: datacenter.Nickname,
+					projectID:  projectID,
+					target:     target,
+				}
 
+				// Update with the latest values (datarows are ordered by time)
+				latestRequests[key] = float64(datacenter.Requests)
 				status, _ := strconv.Atoi(datacenter.Status)
-				m = prometheus.MustNewConstMetric(descStatus, prometheus.GaugeValue,
-					float64(status), property, datacenter.Nickname, projectID, target)
-				ch <- prometheus.NewMetricWithTimestamp(dataRow.Timestamp, m)
+				latestStatus[key] = float64(status)
+				latestTimestamp[key] = float64(dataRow.Timestamp.Unix())
 			}
 		}
+	}
+
+	// Emit the most recent values as current metrics
+	for key, requests := range latestRequests {
+		ch <- prometheus.MustNewConstMetric(descNumReq, prometheus.GaugeValue,
+			requests, key.property, key.datacenter, key.projectID, key.target)
+	}
+	
+	for key, status := range latestStatus {
+		ch <- prometheus.MustNewConstMetric(descStatus, prometheus.GaugeValue,
+			status, key.property, key.datacenter, key.projectID, key.target)
+	}
+	
+	for key, timestamp := range latestTimestamp {
+		ch <- prometheus.MustNewConstMetric(descUpdated, prometheus.GaugeValue,
+			timestamp, key.property, key.datacenter, key.projectID, key.target)
 	}
 }
 

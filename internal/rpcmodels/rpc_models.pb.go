@@ -147,6 +147,55 @@ func (Monitor_HttpMethod) EnumDescriptor() ([]byte, []int) {
 	return file_internal_rpcmodels_rpc_models_proto_rawDescGZIP(), []int{6, 1}
 }
 
+type GetDNSMetricsRequest_TimeRangeValue int32
+
+const (
+	GetDNSMetricsRequest_LAST_HOUR GetDNSMetricsRequest_TimeRangeValue = 0
+	GetDNSMetricsRequest_LAST_DAY  GetDNSMetricsRequest_TimeRangeValue = 1
+	GetDNSMetricsRequest_LAST_WEEK GetDNSMetricsRequest_TimeRangeValue = 2
+)
+
+// Enum value maps for GetDNSMetricsRequest_TimeRangeValue.
+var (
+	GetDNSMetricsRequest_TimeRangeValue_name = map[int32]string{
+		0: "LAST_HOUR",
+		1: "LAST_DAY",
+		2: "LAST_WEEK",
+	}
+	GetDNSMetricsRequest_TimeRangeValue_value = map[string]int32{
+		"LAST_HOUR": 0,
+		"LAST_DAY":  1,
+		"LAST_WEEK": 2,
+	}
+)
+
+func (x GetDNSMetricsRequest_TimeRangeValue) Enum() *GetDNSMetricsRequest_TimeRangeValue {
+	p := new(GetDNSMetricsRequest_TimeRangeValue)
+	*p = x
+	return p
+}
+
+func (x GetDNSMetricsRequest_TimeRangeValue) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (GetDNSMetricsRequest_TimeRangeValue) Descriptor() protoreflect.EnumDescriptor {
+	return file_internal_rpcmodels_rpc_models_proto_enumTypes[2].Descriptor()
+}
+
+func (GetDNSMetricsRequest_TimeRangeValue) Type() protoreflect.EnumType {
+	return &file_internal_rpcmodels_rpc_models_proto_enumTypes[2]
+}
+
+func (x GetDNSMetricsRequest_TimeRangeValue) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use GetDNSMetricsRequest_TimeRangeValue.Descriptor instead.
+func (GetDNSMetricsRequest_TimeRangeValue) EnumDescriptor() ([]byte, []int) {
+	return file_internal_rpcmodels_rpc_models_proto_rawDescGZIP(), []int{11, 0}
+}
+
 type Domain struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
 	Id                 string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -823,6 +872,486 @@ func (x *Monitor) GetDomainName() string {
 	return ""
 }
 
+type SyncRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DomainId      []string               `protobuf:"bytes,1,rep,name=domain_id,json=domainId,proto3" json:"domain_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SyncRequest) Reset() {
+	*x = SyncRequest{}
+	mi := &file_internal_rpcmodels_rpc_models_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SyncRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SyncRequest) ProtoMessage() {}
+
+func (x *SyncRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_rpcmodels_rpc_models_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SyncRequest.ProtoReflect.Descriptor instead.
+func (*SyncRequest) Descriptor() ([]byte, []int) {
+	return file_internal_rpcmodels_rpc_models_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *SyncRequest) GetDomainId() []string {
+	if x != nil {
+		return x.DomainId
+	}
+	return nil
+}
+
+type SyncResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SyncResponse) Reset() {
+	*x = SyncResponse{}
+	mi := &file_internal_rpcmodels_rpc_models_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SyncResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SyncResponse) ProtoMessage() {}
+
+func (x *SyncResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_rpcmodels_rpc_models_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SyncResponse.ProtoReflect.Descriptor instead.
+func (*SyncResponse) Descriptor() ([]byte, []int) {
+	return file_internal_rpcmodels_rpc_models_proto_rawDescGZIP(), []int{8}
+}
+
+type GetCidrsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCidrsRequest) Reset() {
+	*x = GetCidrsRequest{}
+	mi := &file_internal_rpcmodels_rpc_models_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCidrsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCidrsRequest) ProtoMessage() {}
+
+func (x *GetCidrsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_rpcmodels_rpc_models_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCidrsRequest.ProtoReflect.Descriptor instead.
+func (*GetCidrsRequest) Descriptor() ([]byte, []int) {
+	return file_internal_rpcmodels_rpc_models_proto_rawDescGZIP(), []int{9}
+}
+
+type GetCidrsResponse struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Cidrs         []*GetCidrsResponse_Cidr `protobuf:"bytes,1,rep,name=cidrs,proto3" json:"cidrs,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCidrsResponse) Reset() {
+	*x = GetCidrsResponse{}
+	mi := &file_internal_rpcmodels_rpc_models_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCidrsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCidrsResponse) ProtoMessage() {}
+
+func (x *GetCidrsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_rpcmodels_rpc_models_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCidrsResponse.ProtoReflect.Descriptor instead.
+func (*GetCidrsResponse) Descriptor() ([]byte, []int) {
+	return file_internal_rpcmodels_rpc_models_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *GetCidrsResponse) GetCidrs() []*GetCidrsResponse_Cidr {
+	if x != nil {
+		return x.Cidrs
+	}
+	return nil
+}
+
+type GetDNSMetricsRequest struct {
+	state         protoimpl.MessageState              `protogen:"open.v1"`
+	Domain        string                              `protobuf:"bytes,1,opt,name=domain,proto3" json:"domain,omitempty"`
+	Property      string                              `protobuf:"bytes,2,opt,name=property,proto3" json:"property,omitempty"`
+	TimeRange     GetDNSMetricsRequest_TimeRangeValue `protobuf:"varint,3,opt,name=time_range,json=timeRange,proto3,enum=GetDNSMetricsRequest_TimeRangeValue" json:"time_range,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDNSMetricsRequest) Reset() {
+	*x = GetDNSMetricsRequest{}
+	mi := &file_internal_rpcmodels_rpc_models_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDNSMetricsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDNSMetricsRequest) ProtoMessage() {}
+
+func (x *GetDNSMetricsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_rpcmodels_rpc_models_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDNSMetricsRequest.ProtoReflect.Descriptor instead.
+func (*GetDNSMetricsRequest) Descriptor() ([]byte, []int) {
+	return file_internal_rpcmodels_rpc_models_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *GetDNSMetricsRequest) GetDomain() string {
+	if x != nil {
+		return x.Domain
+	}
+	return ""
+}
+
+func (x *GetDNSMetricsRequest) GetProperty() string {
+	if x != nil {
+		return x.Property
+	}
+	return ""
+}
+
+func (x *GetDNSMetricsRequest) GetTimeRange() GetDNSMetricsRequest_TimeRangeValue {
+	if x != nil {
+		return x.TimeRange
+	}
+	return GetDNSMetricsRequest_LAST_HOUR
+}
+
+type GetDNSMetricsResponse struct {
+	state         protoimpl.MessageState              `protogen:"open.v1"`
+	Datacenters   []*GetDNSMetricsResponse_Datacenter `protobuf:"bytes,1,rep,name=datacenters,proto3" json:"datacenters,omitempty"`
+	TotalRequests int64                               `protobuf:"varint,2,opt,name=total_requests,json=totalRequests,proto3" json:"total_requests,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDNSMetricsResponse) Reset() {
+	*x = GetDNSMetricsResponse{}
+	mi := &file_internal_rpcmodels_rpc_models_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDNSMetricsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDNSMetricsResponse) ProtoMessage() {}
+
+func (x *GetDNSMetricsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_rpcmodels_rpc_models_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDNSMetricsResponse.ProtoReflect.Descriptor instead.
+func (*GetDNSMetricsResponse) Descriptor() ([]byte, []int) {
+	return file_internal_rpcmodels_rpc_models_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *GetDNSMetricsResponse) GetDatacenters() []*GetDNSMetricsResponse_Datacenter {
+	if x != nil {
+		return x.Datacenters
+	}
+	return nil
+}
+
+func (x *GetDNSMetricsResponse) GetTotalRequests() int64 {
+	if x != nil {
+		return x.TotalRequests
+	}
+	return 0
+}
+
+type GetCidrsResponse_Cidr struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CidrId        int32                  `protobuf:"varint,1,opt,name=cidrId,proto3" json:"cidrId,omitempty"`
+	ServiceId     int32                  `protobuf:"varint,2,opt,name=serviceId,proto3" json:"serviceId,omitempty"`
+	ServiceName   string                 `protobuf:"bytes,3,opt,name=serviceName,proto3" json:"serviceName,omitempty"`
+	Cidr          string                 `protobuf:"bytes,4,opt,name=cidr,proto3" json:"cidr,omitempty"`
+	CidrMask      string                 `protobuf:"bytes,5,opt,name=cidrMask,proto3" json:"cidrMask,omitempty"`
+	Port          string                 `protobuf:"bytes,6,opt,name=port,proto3" json:"port,omitempty"`
+	CreationDate  string                 `protobuf:"bytes,7,opt,name=creationDate,proto3" json:"creationDate,omitempty"`
+	EffectiveDate string                 `protobuf:"bytes,8,opt,name=effectiveDate,proto3" json:"effectiveDate,omitempty"`
+	ChangeDate    string                 `protobuf:"bytes,9,opt,name=changeDate,proto3" json:"changeDate,omitempty"`
+	MinIp         string                 `protobuf:"bytes,10,opt,name=minIp,proto3" json:"minIp,omitempty"`
+	MaxIp         string                 `protobuf:"bytes,11,opt,name=maxIp,proto3" json:"maxIp,omitempty"`
+	LastAction    string                 `protobuf:"bytes,12,opt,name=lastAction,proto3" json:"lastAction,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCidrsResponse_Cidr) Reset() {
+	*x = GetCidrsResponse_Cidr{}
+	mi := &file_internal_rpcmodels_rpc_models_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCidrsResponse_Cidr) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCidrsResponse_Cidr) ProtoMessage() {}
+
+func (x *GetCidrsResponse_Cidr) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_rpcmodels_rpc_models_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCidrsResponse_Cidr.ProtoReflect.Descriptor instead.
+func (*GetCidrsResponse_Cidr) Descriptor() ([]byte, []int) {
+	return file_internal_rpcmodels_rpc_models_proto_rawDescGZIP(), []int{10, 0}
+}
+
+func (x *GetCidrsResponse_Cidr) GetCidrId() int32 {
+	if x != nil {
+		return x.CidrId
+	}
+	return 0
+}
+
+func (x *GetCidrsResponse_Cidr) GetServiceId() int32 {
+	if x != nil {
+		return x.ServiceId
+	}
+	return 0
+}
+
+func (x *GetCidrsResponse_Cidr) GetServiceName() string {
+	if x != nil {
+		return x.ServiceName
+	}
+	return ""
+}
+
+func (x *GetCidrsResponse_Cidr) GetCidr() string {
+	if x != nil {
+		return x.Cidr
+	}
+	return ""
+}
+
+func (x *GetCidrsResponse_Cidr) GetCidrMask() string {
+	if x != nil {
+		return x.CidrMask
+	}
+	return ""
+}
+
+func (x *GetCidrsResponse_Cidr) GetPort() string {
+	if x != nil {
+		return x.Port
+	}
+	return ""
+}
+
+func (x *GetCidrsResponse_Cidr) GetCreationDate() string {
+	if x != nil {
+		return x.CreationDate
+	}
+	return ""
+}
+
+func (x *GetCidrsResponse_Cidr) GetEffectiveDate() string {
+	if x != nil {
+		return x.EffectiveDate
+	}
+	return ""
+}
+
+func (x *GetCidrsResponse_Cidr) GetChangeDate() string {
+	if x != nil {
+		return x.ChangeDate
+	}
+	return ""
+}
+
+func (x *GetCidrsResponse_Cidr) GetMinIp() string {
+	if x != nil {
+		return x.MinIp
+	}
+	return ""
+}
+
+func (x *GetCidrsResponse_Cidr) GetMaxIp() string {
+	if x != nil {
+		return x.MaxIp
+	}
+	return ""
+}
+
+func (x *GetCidrsResponse_Cidr) GetLastAction() string {
+	if x != nil {
+		return x.LastAction
+	}
+	return ""
+}
+
+type GetDNSMetricsResponse_Datacenter struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DatacenterId  string                 `protobuf:"bytes,1,opt,name=datacenter_id,json=datacenterId,proto3" json:"datacenter_id,omitempty"` // Datacenter ID
+	Percentage    float32                `protobuf:"fixed32,2,opt,name=percentage,proto3" json:"percentage,omitempty"`
+	Requests      int64                  `protobuf:"varint,3,opt,name=requests,proto3" json:"requests,omitempty"`
+	Status        string                 `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
+	TargetIp      string                 `protobuf:"bytes,5,opt,name=target_ip,json=targetIp,proto3" json:"target_ip,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDNSMetricsResponse_Datacenter) Reset() {
+	*x = GetDNSMetricsResponse_Datacenter{}
+	mi := &file_internal_rpcmodels_rpc_models_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDNSMetricsResponse_Datacenter) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDNSMetricsResponse_Datacenter) ProtoMessage() {}
+
+func (x *GetDNSMetricsResponse_Datacenter) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_rpcmodels_rpc_models_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDNSMetricsResponse_Datacenter.ProtoReflect.Descriptor instead.
+func (*GetDNSMetricsResponse_Datacenter) Descriptor() ([]byte, []int) {
+	return file_internal_rpcmodels_rpc_models_proto_rawDescGZIP(), []int{12, 0}
+}
+
+func (x *GetDNSMetricsResponse_Datacenter) GetDatacenterId() string {
+	if x != nil {
+		return x.DatacenterId
+	}
+	return ""
+}
+
+func (x *GetDNSMetricsResponse_Datacenter) GetPercentage() float32 {
+	if x != nil {
+		return x.Percentage
+	}
+	return 0
+}
+
+func (x *GetDNSMetricsResponse_Datacenter) GetRequests() int64 {
+	if x != nil {
+		return x.Requests
+	}
+	return 0
+}
+
+func (x *GetDNSMetricsResponse_Datacenter) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *GetDNSMetricsResponse_Datacenter) GetTargetIp() string {
+	if x != nil {
+		return x.TargetIp
+	}
+	return ""
+}
+
 var File_internal_rpcmodels_rpc_models_proto protoreflect.FileDescriptor
 
 const file_internal_rpcmodels_rpc_models_proto_rawDesc = "" +
@@ -916,7 +1445,52 @@ const file_internal_rpcmodels_rpc_models_proto_rawDesc = "" +
 	"\x05PATCH\x10\x04\x12\n" +
 	"\n" +
 	"\x06DELETE\x10\x05\x12\v\n" +
-	"\aOPTIONS\x10\x06B/Z-github.com/sapcc/andromeda/internal/rpcmodelsb\x06proto3"
+	"\aOPTIONS\x10\x06\"*\n" +
+	"\vSyncRequest\x12\x1b\n" +
+	"\tdomain_id\x18\x01 \x03(\tR\bdomainId\"\x0e\n" +
+	"\fSyncResponse\"\x11\n" +
+	"\x0fGetCidrsRequest\"\x9b\x03\n" +
+	"\x10GetCidrsResponse\x12,\n" +
+	"\x05cidrs\x18\x01 \x03(\v2\x16.GetCidrsResponse.CidrR\x05cidrs\x1a\xd8\x02\n" +
+	"\x04Cidr\x12\x16\n" +
+	"\x06cidrId\x18\x01 \x01(\x05R\x06cidrId\x12\x1c\n" +
+	"\tserviceId\x18\x02 \x01(\x05R\tserviceId\x12 \n" +
+	"\vserviceName\x18\x03 \x01(\tR\vserviceName\x12\x12\n" +
+	"\x04cidr\x18\x04 \x01(\tR\x04cidr\x12\x1a\n" +
+	"\bcidrMask\x18\x05 \x01(\tR\bcidrMask\x12\x12\n" +
+	"\x04port\x18\x06 \x01(\tR\x04port\x12\"\n" +
+	"\fcreationDate\x18\a \x01(\tR\fcreationDate\x12$\n" +
+	"\reffectiveDate\x18\b \x01(\tR\reffectiveDate\x12\x1e\n" +
+	"\n" +
+	"changeDate\x18\t \x01(\tR\n" +
+	"changeDate\x12\x14\n" +
+	"\x05minIp\x18\n" +
+	" \x01(\tR\x05minIp\x12\x14\n" +
+	"\x05maxIp\x18\v \x01(\tR\x05maxIp\x12\x1e\n" +
+	"\n" +
+	"lastAction\x18\f \x01(\tR\n" +
+	"lastAction\"\xcd\x01\n" +
+	"\x14GetDNSMetricsRequest\x12\x16\n" +
+	"\x06domain\x18\x01 \x01(\tR\x06domain\x12\x1a\n" +
+	"\bproperty\x18\x02 \x01(\tR\bproperty\x12C\n" +
+	"\n" +
+	"time_range\x18\x03 \x01(\x0e2$.GetDNSMetricsRequest.TimeRangeValueR\ttimeRange\"<\n" +
+	"\x0eTimeRangeValue\x12\r\n" +
+	"\tLAST_HOUR\x10\x00\x12\f\n" +
+	"\bLAST_DAY\x10\x01\x12\r\n" +
+	"\tLAST_WEEK\x10\x02\"\xa8\x02\n" +
+	"\x15GetDNSMetricsResponse\x12C\n" +
+	"\vdatacenters\x18\x01 \x03(\v2!.GetDNSMetricsResponse.DatacenterR\vdatacenters\x12%\n" +
+	"\x0etotal_requests\x18\x02 \x01(\x03R\rtotalRequests\x1a\xa2\x01\n" +
+	"\n" +
+	"Datacenter\x12#\n" +
+	"\rdatacenter_id\x18\x01 \x01(\tR\fdatacenterId\x12\x1e\n" +
+	"\n" +
+	"percentage\x18\x02 \x01(\x02R\n" +
+	"percentage\x12\x1a\n" +
+	"\brequests\x18\x03 \x01(\x03R\brequests\x12\x16\n" +
+	"\x06status\x18\x04 \x01(\tR\x06status\x12\x1b\n" +
+	"\ttarget_ip\x18\x05 \x01(\tR\btargetIpB/Z-github.com/sapcc/andromeda/internal/rpcmodelsb\x06proto3"
 
 var (
 	file_internal_rpcmodels_rpc_models_proto_rawDescOnce sync.Once
@@ -930,32 +1504,44 @@ func file_internal_rpcmodels_rpc_models_proto_rawDescGZIP() []byte {
 	return file_internal_rpcmodels_rpc_models_proto_rawDescData
 }
 
-var file_internal_rpcmodels_rpc_models_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_internal_rpcmodels_rpc_models_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_internal_rpcmodels_rpc_models_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
+var file_internal_rpcmodels_rpc_models_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_internal_rpcmodels_rpc_models_proto_goTypes = []any{
-	(Monitor_MonitorType)(0), // 0: Monitor.MonitorType
-	(Monitor_HttpMethod)(0),  // 1: Monitor.HttpMethod
-	(*Domain)(nil),           // 2: Domain
-	(*Pool)(nil),             // 3: Pool
-	(*Datacenter)(nil),       // 4: Datacenter
-	(*GeomapAssignment)(nil), // 5: GeomapAssignment
-	(*Geomap)(nil),           // 6: Geomap
-	(*Member)(nil),           // 7: Member
-	(*Monitor)(nil),          // 8: Monitor
+	(Monitor_MonitorType)(0),                 // 0: Monitor.MonitorType
+	(Monitor_HttpMethod)(0),                  // 1: Monitor.HttpMethod
+	(GetDNSMetricsRequest_TimeRangeValue)(0), // 2: GetDNSMetricsRequest.TimeRangeValue
+	(*Domain)(nil),                           // 3: Domain
+	(*Pool)(nil),                             // 4: Pool
+	(*Datacenter)(nil),                       // 5: Datacenter
+	(*GeomapAssignment)(nil),                 // 6: GeomapAssignment
+	(*Geomap)(nil),                           // 7: Geomap
+	(*Member)(nil),                           // 8: Member
+	(*Monitor)(nil),                          // 9: Monitor
+	(*SyncRequest)(nil),                      // 10: SyncRequest
+	(*SyncResponse)(nil),                     // 11: SyncResponse
+	(*GetCidrsRequest)(nil),                  // 12: GetCidrsRequest
+	(*GetCidrsResponse)(nil),                 // 13: GetCidrsResponse
+	(*GetDNSMetricsRequest)(nil),             // 14: GetDNSMetricsRequest
+	(*GetDNSMetricsResponse)(nil),            // 15: GetDNSMetricsResponse
+	(*GetCidrsResponse_Cidr)(nil),            // 16: GetCidrsResponse.Cidr
+	(*GetDNSMetricsResponse_Datacenter)(nil), // 17: GetDNSMetricsResponse.Datacenter
 }
 var file_internal_rpcmodels_rpc_models_proto_depIdxs = []int32{
-	3, // 0: Domain.pools:type_name -> Pool
-	4, // 1: Domain.datacenters:type_name -> Datacenter
-	7, // 2: Pool.members:type_name -> Member
-	8, // 3: Pool.monitors:type_name -> Monitor
-	5, // 4: Geomap.assignment:type_name -> GeomapAssignment
-	0, // 5: Monitor.type:type_name -> Monitor.MonitorType
-	1, // 6: Monitor.method:type_name -> Monitor.HttpMethod
-	7, // [7:7] is the sub-list for method output_type
-	7, // [7:7] is the sub-list for method input_type
-	7, // [7:7] is the sub-list for extension type_name
-	7, // [7:7] is the sub-list for extension extendee
-	0, // [0:7] is the sub-list for field type_name
+	4,  // 0: Domain.pools:type_name -> Pool
+	5,  // 1: Domain.datacenters:type_name -> Datacenter
+	8,  // 2: Pool.members:type_name -> Member
+	9,  // 3: Pool.monitors:type_name -> Monitor
+	6,  // 4: Geomap.assignment:type_name -> GeomapAssignment
+	0,  // 5: Monitor.type:type_name -> Monitor.MonitorType
+	1,  // 6: Monitor.method:type_name -> Monitor.HttpMethod
+	16, // 7: GetCidrsResponse.cidrs:type_name -> GetCidrsResponse.Cidr
+	2,  // 8: GetDNSMetricsRequest.time_range:type_name -> GetDNSMetricsRequest.TimeRangeValue
+	17, // 9: GetDNSMetricsResponse.datacenters:type_name -> GetDNSMetricsResponse.Datacenter
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_internal_rpcmodels_rpc_models_proto_init() }
@@ -968,8 +1554,8 @@ func file_internal_rpcmodels_rpc_models_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_rpcmodels_rpc_models_proto_rawDesc), len(file_internal_rpcmodels_rpc_models_proto_rawDesc)),
-			NumEnums:      2,
-			NumMessages:   7,
+			NumEnums:      3,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
