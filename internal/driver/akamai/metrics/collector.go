@@ -84,11 +84,60 @@ func (p *AndromedaAkamaiCollector) Collect(ch chan<- prometheus.Metric) {
 	}
 }
 
-// Experimental metrics:
+// Akamai metrics:
 //
-// * A Prometheus counter derived from Akamai "Report traffic per property" endpoint
+// * Prometheus gauges derived from Akamai "Availability per property" endpoint
+// * Prometheus counter derived from Akamai "Report traffic per property" endpoint
 // * Helper metrics for both Andromeda operators as well as customers
 //   to understand the freshness of the Akamai reporting
+
+var availabilityAliveGauge = prometheus.NewGaugeVec(
+	prometheus.GaugeOpts{
+		Name: "andromeda_akamai_availability_alive",
+		Help: "Indicates whether GTM considered the server alive",
+	},
+	[]string{"domain", "datacenter_id", "project_id", "target_ip"},
+)
+
+var availabilityHandedOutGauge = prometheus.NewGaugeVec(
+	prometheus.GaugeOpts{
+		Name: "andromeda_akamai_availability_handed_out",
+		Help: "Indicates whether the server was handed out",
+	},
+	[]string{"domain", "datacenter_id", "project_id", "target_ip"},
+)
+
+var availabilityScoreGauge = prometheus.NewGaugeVec(
+	prometheus.GaugeOpts{
+		Name: "andromeda_akamai_availability_score",
+		Help: "The server score according to GTM Liveness Tests from all Web agents",
+	},
+	[]string{"domain", "datacenter_id", "project_id", "target_ip"},
+)
+
+var availabilityLastSyncGauge = prometheus.NewGaugeVec(
+	prometheus.GaugeOpts{
+		Name: "andromeda_akamai_availability_last_sync",
+		Help: "Last time the respective 'availability' metrics were updated by Andromeda (Unix timestamp)",
+	},
+	[]string{"domain", "datacenter_id", "project_id", "target_ip"},
+)
+
+var availabilitySyncErrorsCounter = prometheus.NewCounterVec(
+	prometheus.CounterOpts{
+		Name: "andromeda_akamai_availability_sync_errors",
+		Help: "Total failures to retrieve 'availability' metrics from Akamai 'availability per property' API ('domain' is the only resolution possible)",
+	},
+	[]string{"domain"},
+)
+
+var availabilityLastReportPeriodGauge = prometheus.NewGaugeVec(
+	prometheus.GaugeOpts{
+		Name: "andromeda_akamai_availability_last_report_period",
+		Help: "Latest 5-minute time interval for which Akamai could report the respective metrics (Unix timestamp)",
+	},
+	[]string{"domain", "datacenter_id", "project_id", "target_ip"},
+)
 
 var requestsCounter = prometheus.NewCounterVec(
 	prometheus.CounterOpts{
@@ -144,7 +193,8 @@ func AkamaiCustomMetricsSync(akamaiSession *CachedAkamaiSession, rpcClient *Cach
 	var wg sync.WaitGroup
 	for _, property := range properties {
 		wg.Go(func() {
-			AkamaiPropertyMetricsSync(akamaiSession, rpcClient, property)
+			AkamaiPropertyAvailabilityMetricsSync(akamaiSession, rpcClient, property)
+			AkamaiPropertyTrafficMetricsSync(akamaiSession, rpcClient, property)
 		})
 	}
 	wg.Wait()
@@ -152,16 +202,79 @@ func AkamaiCustomMetricsSync(akamaiSession *CachedAkamaiSession, rpcClient *Cach
 	log.Infof("[AkamaiCustomMetricsSync] Sync completed in %s", time.Since(syncStart))
 }
 
-func AkamaiPropertyMetricsSync(akamaiSession *CachedAkamaiSession, rpcClient *CachedRPCClient, property string) {
-	datarows, err := akamaiSession.getTrafficReport(property)
+func AkamaiPropertyAvailabilityMetricsSync(akamaiSession *CachedAkamaiSession, rpcClient *CachedRPCClient, property string) {
+	datarows, err := akamaiSession.getAvailabilityReport(property)
 	if err != nil {
-		log.Errorf("Failed to fetch traffic reports for property %s: %v", property, err.Error())
+		log.Errorf("Failed to fetch AVAILABILITY reports for property %s: %v", property, err.Error())
 		requestsSyncErrorsCounter.WithLabelValues(property).Inc()
 		return
 	}
 
 	if len(datarows) == 0 {
-		log.Debugf("Skipping empty report (zero entries) for property %s", property)
+		log.Debugf("Skipping empty AVAILABILITY report (zero entries) for property %s", property)
+		return
+	}
+
+	// by dropping all but the latest report, we ensure
+	// the same reported count isn't re-added to the respective
+	// Prometheus counter in future iterations of propertyCh
+	dataRow := datarows[len(datarows)-1]
+
+	var projectID string
+	if projectID, err = rpcClient.GetProject(dataRow.Datacenters[0].Nickname); err != nil {
+		log.Errorf("%s Failed to extract report project ID for property %s: %v", property, err.Error())
+		return
+	}
+
+	boolToFloat64 := func(b bool) float64 {
+		if b {
+			return 1.0
+		}
+		return 0.0
+	}
+
+	for _, datacenter := range dataRow.Datacenters {
+		if len(datacenter.IPs) == 0 {
+			log.Errorf("incomplete datarow for property %s: datacenter.IPs has no entries", property)
+			return
+		}
+
+		targetReport := datacenter.IPs[0]
+
+		log.Debugf("AVAILABILITY [PROPERTY = %s | DC = %s | PROJECT = %s | TARGET = %s | TIMESTAMP = %s | "+
+			"ALIVE = %v | HANDED OUT = %v | SCORE = %f ]",
+			property, datacenter.Nickname,
+			projectID, targetReport.IP, dataRow.Timestamp.Format(time.RFC3339),
+			targetReport.Alive, targetReport.HandedOut, targetReport.Score)
+
+		availabilityAliveGauge.
+			WithLabelValues(property, datacenter.Nickname, projectID, targetReport.IP).
+			Set(boolToFloat64(targetReport.Alive))
+		availabilityHandedOutGauge.
+			WithLabelValues(property, datacenter.Nickname, projectID, targetReport.IP).
+			Set(boolToFloat64(targetReport.HandedOut))
+		availabilityScoreGauge.
+			WithLabelValues(property, datacenter.Nickname, projectID, targetReport.IP).
+			Set(targetReport.Score)
+		availabilityLastSyncGauge.
+			WithLabelValues(property, datacenter.Nickname, projectID, targetReport.IP).
+			Set(float64(time.Now().Unix()))
+		availabilityLastReportPeriodGauge.
+			WithLabelValues(property, datacenter.Nickname, projectID, targetReport.IP).
+			Set(float64(dataRow.Timestamp.Unix()))
+	}
+}
+
+func AkamaiPropertyTrafficMetricsSync(akamaiSession *CachedAkamaiSession, rpcClient *CachedRPCClient, property string) {
+	datarows, err := akamaiSession.getTrafficReport(property)
+	if err != nil {
+		log.Errorf("Failed to fetch TRAFFIC reports for property %s: %v", property, err.Error())
+		requestsSyncErrorsCounter.WithLabelValues(property).Inc()
+		return
+	}
+
+	if len(datarows) == 0 {
+		log.Debugf("Skipping empty TRAFFIC report (zero entries) for property %s", property)
 		return
 	}
 
@@ -178,7 +291,7 @@ func AkamaiPropertyMetricsSync(akamaiSession *CachedAkamaiSession, rpcClient *Ca
 	for _, datacenter := range dataRow.Datacenters {
 		target := strings.Split(datacenter.TrafficTargetName, " - ")[1]
 
-		log.Debugf("[PROPERTY = %s | DC = %s | PROJECT = %s | TARGET = %s | TIMESTAMP = %s | REQUESTS = %d ]",
+		log.Debugf("TRAFFIC [PROPERTY = %s | DC = %s | PROJECT = %s | TARGET = %s | TIMESTAMP = %s | REQUESTS = %d ]",
 			property, datacenter.Nickname,
 			projectID, target, dataRow.Timestamp.Format(time.RFC3339),
 			datacenter.Requests)

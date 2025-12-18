@@ -35,18 +35,27 @@ func ExecuteAkamaiMetrics() error {
 		return err
 	}
 
-	// Experimental: custom metrics collector
+	// Custom metrics collector
+	prometheus.MustRegister(availabilityAliveGauge)
+	prometheus.MustRegister(availabilityHandedOutGauge)
+	prometheus.MustRegister(availabilityScoreGauge)
+	prometheus.MustRegister(availabilityLastSyncGauge)
+	prometheus.MustRegister(availabilitySyncErrorsCounter)
+	prometheus.MustRegister(availabilityLastReportPeriodGauge)
+
 	prometheus.MustRegister(requestsCounter)
 	prometheus.MustRegister(requestsLastSyncGauge)
 	prometheus.MustRegister(requestsSyncErrorsCounter)
 	prometheus.MustRegister(requestsLastReportPeriodGauge)
+
 	prometheus.MustRegister(rateLimitingDurationSeconds)
 
 	go func() {
-		akamaiSession := NewCachedAkamaiSession(*session, config.Global.AkamaiConfig.Domain, NewAkamaiRateLimiter(40))
+		akamaiSession := NewCachedAkamaiSession(*session, config.Global.AkamaiConfig.Domain, NewAkamaiRateLimiter(100))
 		rpcClient := NewCachedRPCClient(client)
 
 		// Akamai API limitation, see <https://techdocs.akamai.com/gtm-reporting/reference/get-traffic-property>
+		// Akamai will update the traffic report **at best** every 5 minutes.
 		interval := 5 * time.Minute
 		for {
 			AkamaiCustomMetricsSync(akamaiSession, rpcClient)
