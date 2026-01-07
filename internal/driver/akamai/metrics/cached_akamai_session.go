@@ -121,7 +121,7 @@ func (c *CachedAkamaiSession) refreshPropertiesTrafficReportWindow() error {
 		return err
 	}
 	c.trafficReportLastWindowReport = time.Now()
-	log.Debugf("Set AVAILABILITY report last window report to %v", c.trafficReportLastWindowReport)
+	log.Debugf("Set TRAFFIC report last window report to %v", c.trafficReportLastWindowReport)
 	return nil
 }
 
