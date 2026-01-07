@@ -206,7 +206,7 @@ func AkamaiPropertyAvailabilityMetricsSync(akamaiSession *CachedAkamaiSession, r
 	datarows, err := akamaiSession.getAvailabilityReport(property)
 	if err != nil {
 		log.Errorf("Failed to fetch AVAILABILITY reports for property %s: %v", property, err.Error())
-		requestsSyncErrorsCounter.WithLabelValues(property).Inc()
+		availabilitySyncErrorsCounter.WithLabelValues(property).Inc()
 		return
 	}
 
@@ -220,9 +220,14 @@ func AkamaiPropertyAvailabilityMetricsSync(akamaiSession *CachedAkamaiSession, r
 	// Prometheus counter in future iterations of propertyCh
 	dataRow := datarows[len(datarows)-1]
 
+	if len(dataRow.Datacenters) == 0 {
+		log.Warnf("No datacenters in AVAILABILITY report for property %s", property)
+		return
+	}
+
 	var projectID string
 	if projectID, err = rpcClient.GetProject(dataRow.Datacenters[0].Nickname); err != nil {
-		log.Errorf("%s Failed to extract report project ID for property %s: %v", property, err.Error())
+		log.Errorf("%s Failed to extract AVAILABILITY report project ID for property %s: %v", property, err.Error())
 		return
 	}
 
@@ -283,9 +288,14 @@ func AkamaiPropertyTrafficMetricsSync(akamaiSession *CachedAkamaiSession, rpcCli
 	// Prometheus counter in future iterations of propertyCh
 	dataRow := datarows[len(datarows)-1]
 
+	if len(dataRow.Datacenters) == 0 {
+		log.Warnf("No datacenters in TRAFFIC report for property %s", property)
+		return
+	}
+
 	var projectID string
 	if projectID, err = rpcClient.GetProject(dataRow.Datacenters[0].Nickname); err != nil {
-		log.Errorf("%s Failed to extract report project ID for property %s: %v", property, err.Error())
+		log.Errorf("%s Failed to extract TRAFFIC report project ID for property %s: %v", property, err.Error())
 		return
 	}
 	for _, datacenter := range dataRow.Datacenters {
