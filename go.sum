@@ -173,8 +173,8 @@ github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/
 github.com/google/uuid v1.1.1/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
-github.com/gophercloud/gophercloud/v2 v2.9.0 h1:Y9OMrwKF9EDERcHFSOTpf/6XGoAI0yOxmsLmQki4LPM=
-github.com/gophercloud/gophercloud/v2 v2.9.0/go.mod h1:Ki/ILhYZr/5EPebrPL9Ej+tUg4lqx71/YH2JWVeU+Qk=
+github.com/gophercloud/gophercloud/v2 v2.10.0 h1:NRadC0aHNvy4iMoFXj5AFiPmut/Sj3hAPAo9B59VMGc=
+github.com/gophercloud/gophercloud/v2 v2.10.0/go.mod h1:Ki/ILhYZr/5EPebrPL9Ej+tUg4lqx71/YH2JWVeU+Qk=
 github.com/gophercloud/utils/v2 v2.0.0-20251121145439-0a38d66a3d88 h1:zyPxc6TsfPYsE903357+LpZ3P6vxbIMejXnrkXFY5bw=
 github.com/gophercloud/utils/v2 v2.0.0-20251121145439-0a38d66a3d88/go.mod h1:V71HTEkIqYH/FsQle8lMzA/5iCcCAYyGHURSgVhpOu0=
 github.com/gorilla/mux v1.8.1 h1:TuBL49tXwgrFYWhqrNgrUNEY92u81SPhu7sTdzQEiWY=

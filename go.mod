@@ -32,7 +32,7 @@ require (
 	github.com/go-openapi/swag/mangling v0.25.4
 	github.com/go-openapi/validate v0.25.1
 	github.com/go-sql-driver/mysql v1.9.3
-	github.com/gophercloud/gophercloud/v2 v2.9.0
+	github.com/gophercloud/gophercloud/v2 v2.10.0
 	github.com/gophercloud/utils/v2 v2.0.0-20251121145439-0a38d66a3d88
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/iancoleman/strcase v0.3.0
