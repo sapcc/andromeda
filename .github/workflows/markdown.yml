@@ -16,13 +16,13 @@ jobs:
     steps:
     - name: Install git
       run: apk add --no-cache git
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 0
     - name: Build
       run: swagger generate markdown --copyright-file COPYRIGHT.txt --output docs/api.md
     - name: Create Pull Request
-      uses: peter-evans/create-pull-request@v7
+      uses: peter-evans/create-pull-request@v8
       with:
         commit-message: Update docs/api.md
         title: Update docs/api.md
