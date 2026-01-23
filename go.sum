@@ -15,8 +15,8 @@ github.com/Masterminds/squirrel v1.5.4/go.mod h1:NNaOrjSoIDfDA40n7sr2tPNZRfjzjA4
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/actatum/stormrpc v0.5.1 h1:ioTnxzU258GvEVSAiVWv2EHZcigPDPYCaSNG26orvz8=
 github.com/actatum/stormrpc v0.5.1/go.mod h1:CuKUTbsZohkSRyJnrT80C7vEhA+taZ4p3paGP/+6NWw=
-github.com/akamai/AkamaiOPEN-edgegrid-golang/v12 v12.2.0 h1:nDx/0X2EkxwCGN/W9o+a6LcUrTRaDFFJ+7wxMoh4+lU=
-github.com/akamai/AkamaiOPEN-edgegrid-golang/v12 v12.2.0/go.mod h1:Bf6hnZkloZnfL4I/gFGnMMMdMHiu/ERnSOWtFgnodDk=
+github.com/akamai/AkamaiOPEN-edgegrid-golang/v12 v12.3.0 h1:iGVPe/gPqzpXggbbmVLWR0TyJ9UoPoqKL+kspjseZzE=
+github.com/akamai/AkamaiOPEN-edgegrid-golang/v12 v12.3.0/go.mod h1:76JtkiCKMwTdTOlKe9goT4Md+oWjfMouGBQgy+u1bgc=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=

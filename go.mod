@@ -14,7 +14,7 @@ require (
 	github.com/Boostport/migration/driver/postgres v1.1.3
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/actatum/stormrpc v0.5.1
-	github.com/akamai/AkamaiOPEN-edgegrid-golang/v12 v12.2.0
+	github.com/akamai/AkamaiOPEN-edgegrid-golang/v12 v12.3.0
 	github.com/apex/log v1.9.0
 	github.com/cockroachdb/cockroach-go/v2 v2.4.3
 	github.com/didip/tollbooth v4.0.2+incompatible
