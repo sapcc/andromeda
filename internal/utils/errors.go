@@ -29,6 +29,7 @@ var (
 	MissingProvider              = &models.Error{Code: 400, Message: "invalid value for 'provider': 'provider' is required"}
 	MissingAddressOrPort         = &models.Error{Code: 400, Message: "invalid value for 'address' and 'port': 'address' and 'port' are required"}
 	FQDNImmutable                = &models.Error{Code: 400, Message: "invalid value for 'fqdn': change of immutable attribute 'fqdn' not allowed"}
+	TryAgainLater                = &models.Error{Code: 503, Message: "service is currently unavailable, please try again later"}
 	RestrictedDatacenterProvider = &models.Error{Code: 400, Message: "invalid value for 'provider': project-specific f5 datacenters are not supported; please use those with scope=public already available"}
 	MySQLForeignKeyViolation     = &mysql.MySQLError{Number: 1451}
 )

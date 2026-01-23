@@ -6,7 +6,6 @@ package akamai
 
 import (
 	"context"
-	"net/http"
 	"os"
 	"os/signal"
 	"sync"
@@ -22,6 +21,8 @@ import (
 
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/rpc"
+	"github.com/sapcc/andromeda/internal/rpc/agent"
+	"github.com/sapcc/andromeda/internal/rpc/agent/akamai"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/utils"
 	"github.com/sapcc/andromeda/models"
@@ -48,39 +49,6 @@ type AkamaiAgent struct {
 	datacenterIdCache *lru.Cache[string, int]
 }
 
-var akamaiAgent *AkamaiAgent
-
-func Sync(ctx context.Context, req stormrpc.Request) stormrpc.Response {
-	var domainIDs []string
-	if err := req.Decode(&domainIDs); err != nil {
-		return stormrpc.NewErrorResponse(req.Reply, err)
-	}
-	log.WithField("domainIDs", domainIDs).Info("[Sync] Syncing domains")
-
-	akamaiAgent.forceSync <- domainIDs
-	resp, err := stormrpc.NewResponse(req.Reply, nil)
-	if err != nil {
-		return stormrpc.NewErrorResponse(req.Reply, err)
-	}
-
-	return resp
-}
-
-func GetCidrs(ctx context.Context, req stormrpc.Request) stormrpc.Response {
-	cidrBlocksReq, _ := http.NewRequest(http.MethodGet, "/firewall-rules-manager/v1/cidr-blocks", nil)
-	var cidrBlocks []AkamaiCIDRBlock
-	if _, err := (*akamaiAgent.session).Exec(cidrBlocksReq, &cidrBlocks); err != nil {
-		panic(err)
-	}
-
-	resp, err := stormrpc.NewResponse(req.Reply, cidrBlocks)
-	if err != nil {
-		return stormrpc.NewErrorResponse(req.Reply, err)
-	}
-
-	return resp
-}
-
 func ExecuteAkamaiAgent() error {
 	nc, err := nats.Connect(config.Global.Default.TransportURL)
 	if err != nil {
@@ -102,7 +70,7 @@ func ExecuteAkamaiAgent() error {
 
 	cache, _ := lru.New[string, int](64)
 
-	akamaiAgent = &AkamaiAgent{
+	akamaiAgent := &AkamaiAgent{
 		s,
 		gtm.Client(*s),
 		sync.Mutex{},
@@ -121,8 +89,9 @@ func ExecuteAkamaiAgent() error {
 	}
 
 	srv := rpc.NewServer("andromeda-akamai-agent", stormrpc.WithNatsConn(nc))
-	srv.Handle("andromeda.sync", Sync)
-	srv.Handle("andromeda.get_cidrs.akamai", GetCidrs)
+	svc := &RPCHandlerAkamai{akamaiAgent}
+	akamai.RegisterRPCAgentAkamaiServer(srv, svc)
+	agent.RegisterRPCAgentServer(srv, svc)
 
 	go func() {
 		_ = srv.Run()

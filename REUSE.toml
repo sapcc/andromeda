@@ -18,6 +18,7 @@ path = [
     "models/**",
     "etc/**",
     "web/**",
+    "internal/rpc/**.pb.go",
 ]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2022-2025 SAP SE or an SAP affiliate company and andromeda contributors"

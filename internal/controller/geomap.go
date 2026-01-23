@@ -148,7 +148,7 @@ func (c GeoMapController) PostGeomaps(params geographic_maps.PostGeomapsParams) 
 		panic(err)
 	}
 
-	_ = PendingSync(c.rpc)
+	_ = c.PendingSync()
 	return geographic_maps.NewPostGeomapsCreated().WithPayload(&geographic_maps.PostGeomapsCreatedBody{Geomap: geomap})
 }
 
@@ -227,7 +227,7 @@ func (c GeoMapController) DeleteGeomapsGeoMapID(params geographic_maps.DeleteGeo
 		panic(err)
 	}
 
-	_ = PendingSync(c.rpc)
+	_ = c.PendingSync()
 	return geographic_maps.NewDeleteGeomapsGeomapIDNoContent()
 }
 
