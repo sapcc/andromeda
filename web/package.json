@@ -5,7 +5,7 @@
   "source": "src/index.js",
   "private": true,
   "devDependencies": {
-    "@cloudoperators/juno-ui-components": "^5.3.0",
+    "@cloudoperators/juno-ui-components": "^6.0.0",
     "@tailwindcss/postcss": "^4.1.12",
     "@tanstack/react-query": "^5.85.9",
     "@tanstack/react-query-devtools": "^5.85.9",
