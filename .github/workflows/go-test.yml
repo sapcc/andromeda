@@ -23,6 +23,35 @@ jobs:
           db_url: postgresql://root:root@localhost/test_suite_controller?sslmode=disable
 
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: root
+          POSTGRES_DB: test_suite_controller
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U root"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test_suite_controller
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
     steps:
       - uses: actions/checkout@v6
 
@@ -31,22 +60,21 @@ jobs:
         with:
           go-version-file: ./go.mod
 
-      - if: ${{ matrix.database == 'mariadb' }}
-        name: Run MariaDB
-        uses: getong/mariadb-action@v1.11
-        with:
-          mysql database: 'test_suite_controller'
-          mysql root password: root
+      - name: Wait for Postgres
+        if: ${{ matrix.database == 'postgres' }}
+        run: |
+          until pg_isready -h localhost -U root; do
+            sleep 1
+          done
 
-      - if: ${{ matrix.database == 'postgres' }}
-        name: Run PostgreSQL
-        uses: harmon758/postgresql-action@v1
-        with:
-          postgresql version: '13'
-          postgresql db: 'test_suite_controller'
-          postgresql user: root
-          postgresql password: root
+      - name: Wait for MariaDB
+        if: ${{ matrix.database == 'mariadb' }}
+        run: |
+          until mysqladmin ping -h127.0.0.1 -proot --silent; do
+            sleep 1
+          done
+
       - name: Test
-        run: go test -v ./...
         env:
           DB_URL: ${{ matrix.db_url }}
+        run: go test -v ./...
