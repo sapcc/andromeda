@@ -23,6 +23,23 @@ jobs:
           db_url: postgresql://root:root@localhost/test_suite_controller?sslmode=disable
 
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        if: ${{ matrix.database == 'postgres' }}
+        image: postgres:13
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: root
+          POSTGRES_DB: test_suite_controller
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U root"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v6
 
@@ -38,14 +55,13 @@ jobs:
           mysql database: 'test_suite_controller'
           mysql root password: root
 
-      - if: ${{ matrix.database == 'postgres' }}
-        name: Run PostgreSQL
-        uses: harmon758/postgresql-action@v1
-        with:
-          postgresql version: '13'
-          postgresql db: 'test_suite_controller'
-          postgresql user: root
-          postgresql password: root
+      - name: Wait for Postgres to become ready
+        if: ${{ matrix.database == 'postgres' }}
+        run: |
+          until pg_isready -h localhost -U root; do
+            sleep 1
+          done
+
       - name: Test
         run: go test -v ./...
         env:
