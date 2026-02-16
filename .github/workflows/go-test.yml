@@ -26,7 +26,6 @@ jobs:
 
     services:
       postgres:
-        if: ${{ matrix.database == 'postgres' }}
         image: postgres:13
         env:
           POSTGRES_USER: root
@@ -63,6 +62,6 @@ jobs:
           done
 
       - name: Test
-        run: go test -v ./...
         env:
           DB_URL: ${{ matrix.db_url }}
+        run: go test -v ./...
