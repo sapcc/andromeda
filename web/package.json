@@ -22,7 +22,7 @@
     "simple-zustand-devtools": "^1.1.0",
     "use-sync-external-store": "^1.5.0",
     "zustand": "^5.0.8",
-    "zustand-querystring": "^0.5.0"
+    "zustand-querystring": "^0.6.0"
   },
   "scripts": {
     "start": "PORT=$APP_PORT APP_PROPS=$APP_PROPS NODE_ENV=development node esbuild.config.mjs --serve --watch",
