@@ -47,8 +47,8 @@ require (
 	github.com/nats-io/nats.go v1.48.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/rs/cors v1.11.1
-	github.com/sapcc/go-api-declarations v1.18.0
-	github.com/sapcc/go-bits v0.0.0-20260212180203-791f29d90b4b
+	github.com/sapcc/go-api-declarations v1.19.0
+	github.com/sapcc/go-bits v0.0.0-20260219121224-1c2b75dbf776
 	github.com/slok/go-http-metrics v0.13.0
 	github.com/stretchr/testify v1.11.1
 	github.com/urfave/cli/v2 v2.27.7
