@@ -8,7 +8,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v12/pkg/gtm"
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v13/pkg/gtm"
 
 	"github.com/sapcc/andromeda/internal/config"
 	"github.com/sapcc/andromeda/internal/driver"
