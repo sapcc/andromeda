@@ -4,7 +4,7 @@
 
 module github.com/sapcc/andromeda
 
-go 1.25
+go 1.25.0
 
 toolchain go1.26.0
 
@@ -53,7 +53,7 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/urfave/cli/v2 v2.27.7
 	github.com/xo/dburl v0.24.2
-	golang.org/x/net v0.50.0
+	golang.org/x/net v0.51.0
 	google.golang.org/protobuf v1.36.11
 	gopkg.in/yaml.v3 v3.0.1
 )
