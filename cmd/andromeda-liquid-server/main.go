@@ -137,34 +137,41 @@ func (l *liquidLogic) Init(context context.Context, provider *gophercloud.Provid
 
 func (l *liquidLogic) BuildServiceInfo(_ context.Context) (liquid.ServiceInfo, error) {
 	return liquid.ServiceInfo{
-		Version: 1,
+		DisplayName: "Global Load Balancing",
+		Version:     2,
 		Resources: map[liquid.ResourceName]liquid.ResourceInfo{
 			"datacenters": {
+				DisplayName: "Datacenters",
 				HasCapacity: false,
 				HasQuota:    true,
 				Topology:    liquid.FlatTopology,
 			},
 			"domains_akamai": {
+				DisplayName: "Domains (Akamai)",
 				HasCapacity: false,
 				HasQuota:    true,
 				Topology:    liquid.FlatTopology,
 			},
 			"domains_f5": {
+				DisplayName: "Domains (F5)",
 				HasCapacity: false,
 				HasQuota:    true,
 				Topology:    liquid.FlatTopology,
 			},
 			"members": {
+				DisplayName: "Members",
 				HasCapacity: false,
 				HasQuota:    true,
 				Topology:    liquid.FlatTopology,
 			},
 			"monitors": {
+				DisplayName: "Monitors",
 				HasCapacity: false,
 				HasQuota:    true,
 				Topology:    liquid.FlatTopology,
 			},
 			"pools": {
+				DisplayName: "Pools",
 				HasCapacity: false,
 				HasQuota:    true,
 				Topology:    liquid.FlatTopology,
