@@ -32,7 +32,7 @@ require (
 	github.com/go-openapi/swag/mangling v0.25.5
 	github.com/go-openapi/validate v0.25.1
 	github.com/go-sql-driver/mysql v1.9.3
-	github.com/gophercloud/gophercloud/v2 v2.11.0
+	github.com/gophercloud/gophercloud/v2 v2.11.1
 	github.com/gophercloud/utils/v2 v2.0.0-20260107124036-1d7954eb9711
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/iancoleman/strcase v0.3.0
@@ -48,7 +48,7 @@ require (
 	github.com/prometheus/client_golang v1.23.2
 	github.com/rs/cors v1.11.1
 	github.com/sapcc/go-api-declarations v1.20.2
-	github.com/sapcc/go-bits v0.0.0-20260304154021-aa2c8a1d2bca
+	github.com/sapcc/go-bits v0.0.0-20260312170110-034b497ebb7e
 	github.com/slok/go-http-metrics v0.13.0
 	github.com/stretchr/testify v1.11.1
 	github.com/urfave/cli/v2 v2.27.7
