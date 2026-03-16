@@ -59,8 +59,10 @@ func (rt *ReauthTransport) RoundTrip(req *http.Request) (*http.Response, error) 
 	return resp, nil
 }
 
+var currentLiquidVersion = int64(2)
+
 var defaultServiceUsageReport = liquid.ServiceUsageReport{
-	InfoVersion: 1,
+	InfoVersion: currentLiquidVersion,
 	Resources: map[liquid.ResourceName]*liquid.ResourceUsageReport{
 		"datacenters": {
 			Quota: option.Some(int64(0)),
@@ -138,7 +140,7 @@ func (l *liquidLogic) Init(context context.Context, provider *gophercloud.Provid
 func (l *liquidLogic) BuildServiceInfo(_ context.Context) (liquid.ServiceInfo, error) {
 	return liquid.ServiceInfo{
 		DisplayName: "Global Load Balancing",
-		Version:     2,
+		Version:     currentLiquidVersion,
 		Resources: map[liquid.ResourceName]liquid.ResourceInfo{
 			"datacenters": {
 				DisplayName: "Datacenters",
@@ -183,7 +185,7 @@ func (l *liquidLogic) BuildServiceInfo(_ context.Context) (liquid.ServiceInfo, e
 }
 
 func (l *liquidLogic) ScanCapacity(ctx context.Context, req liquid.ServiceCapacityRequest, serviceInfo liquid.ServiceInfo) (liquid.ServiceCapacityReport, error) {
-	return liquid.ServiceCapacityReport{InfoVersion: 1}, nil
+	return liquid.ServiceCapacityReport{InfoVersion: currentLiquidVersion}, nil
 }
 
 func (l *liquidLogic) ScanUsage(ctx context.Context, projectUUID string, req liquid.ServiceUsageRequest, serviceInfo liquid.ServiceInfo) (liquid.ServiceUsageReport, error) {
@@ -198,7 +200,7 @@ func (l *liquidLogic) ScanUsage(ctx context.Context, projectUUID string, req liq
 		return liquid.ServiceUsageReport{}, err
 	}
 	return liquid.ServiceUsageReport{
-		InfoVersion: 1,
+		InfoVersion: currentLiquidVersion,
 		Resources: map[liquid.ResourceName]*liquid.ResourceUsageReport{
 			"datacenters": {
 				Quota: options.FromPointer(resp.Payload.Quota.Datacenter),
