@@ -41,14 +41,14 @@ require (
 	github.com/jedib0t/go-pretty v4.3.0+incompatible
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/jmoiron/sqlx v1.4.0
-	github.com/lib/pq v1.12.0
-	github.com/majewsky/gg v1.5.0
+	github.com/lib/pq v1.12.1
+	github.com/majewsky/gg v1.6.0
 	github.com/mcuadros/go-defaults v1.2.0
 	github.com/nats-io/nats.go v1.50.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/rs/cors v1.11.1
 	github.com/sapcc/go-api-declarations v1.21.0
-	github.com/sapcc/go-bits v0.0.0-20260327094541-67aa124e8f0a
+	github.com/sapcc/go-bits v0.0.0-20260402121530-dccf194c4472
 	github.com/slok/go-http-metrics v0.13.0
 	github.com/stretchr/testify v1.11.1
 	github.com/urfave/cli/v2 v2.27.7
