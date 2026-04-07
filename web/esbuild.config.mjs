@@ -20,7 +20,7 @@ const serve = args.indexOf("--serve") >= 0
 let ctx = await esbuild.context({
     bundle: true,
     minify: isProduction,
-    target: ["es2020", "chrome64", "firefox67", "safari11.1", "edge79"],
+    target: ["es2020", "chrome64", "firefox67", "safari14.1", "edge79"],
     format: "esm",
     platform: "browser",
     loader: {".js": "jsx"},
