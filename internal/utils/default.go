@@ -38,7 +38,7 @@ func SetModelDefaults(s interface{}) error {
 				// Check if model has default set
 				if property.Default != nil {
 					propertyField := reflect.ValueOf(s).Elem().FieldByName(nameMangler.ToGoName(propName))
-					if propertyField.Kind() != reflect.Ptr && propertyField.Kind() != reflect.Uintptr {
+					if propertyField.Kind() != reflect.Pointer && propertyField.Kind() != reflect.Uintptr {
 						return fmt.Errorf("unexpected field %s for specDefinitionModel %s", propName, specDefinitionName)
 					}
 
