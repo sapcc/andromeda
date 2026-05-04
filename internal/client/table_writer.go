@@ -17,7 +17,7 @@ func formatValue(v reflect.Value) string {
 	switch kind := v.Kind(); kind {
 	case reflect.Bool:
 		return fmt.Sprintf("%t", v.Bool())
-	case reflect.Ptr:
+	case reflect.Pointer:
 		if v.IsNil() {
 			return "Null"
 		}
@@ -28,7 +28,7 @@ func formatValue(v reflect.Value) string {
 }
 
 func getRow(row reflect.Value, iMap []int) table.Row {
-	if row.Kind() == reflect.Ptr {
+	if row.Kind() == reflect.Pointer {
 		row = row.Elem()
 	}
 
@@ -45,7 +45,7 @@ func addSortedHeader(v reflect.Value) ([]int, error) {
 		Index  int
 	}
 
-	if v.Kind() == reflect.Ptr {
+	if v.Kind() == reflect.Pointer {
 		v = v.Elem()
 	}
 
@@ -112,7 +112,7 @@ func addSortedHeader(v reflect.Value) ([]int, error) {
 func WriteTable(data interface{}) error {
 	v := reflect.ValueOf(data)
 
-	if v.Kind() == reflect.Ptr {
+	if v.Kind() == reflect.Pointer {
 		// dereference: v = *v
 		v = v.Elem()
 	}
