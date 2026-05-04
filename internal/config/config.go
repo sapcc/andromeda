@@ -220,8 +220,9 @@ type AkamaiConfig struct {
 	Domain               string `yaml:"domain" description:"Traffic Management Domain to use (e.g. production.akadns.net)."`
 	DomainType           string `yaml:"domain_type" description:"Indicates the type of domain available based on your contract, defaults to autodetect. Either failover-only, static, weighted, basic, or full."`
 	ContractId           string `yaml:"contract_id" description:"Indicated the contract id to use, autodetects if only one contract is associated."`
-	SyncInterval         int64  `yaml:"sync_interval" default:"30" description:"Sync interval for checking for pending updates"`
-	MemberStatusInterval int64  `yaml:"member_status_interval" default:"60" description:"Sync interval for checking for member status"`
+	SyncInterval         int64 `yaml:"sync_interval" default:"30" description:"Sync interval for checking for pending updates"`
+	MemberStatusInterval int64 `yaml:"member_status_interval" default:"60" description:"Sync interval for checking for member status"`
+	PropagationTimeout   int64 `yaml:"propagation_timeout" default:"300" description:"Maximum time in seconds to wait for Akamai propagation before giving up"`
 }
 
 type Audit struct {
