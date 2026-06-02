@@ -86,7 +86,7 @@ func deepValueEqualField(v1, v2 reflect.Value, fieldsToCompare []string) bool {
 			}
 		}
 		return true
-	case reflect.Ptr:
+	case reflect.Pointer:
 		if v1.Pointer() == v2.Pointer() {
 			return true
 		}
