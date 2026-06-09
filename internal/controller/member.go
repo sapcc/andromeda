@@ -7,11 +7,13 @@ package controller
 import (
 	"errors"
 	"fmt"
+	"net"
 	"strings"
 
 	"github.com/apex/log"
 
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-sql-driver/mysql"
 	"github.com/jackc/pgerrcode"
 	"github.com/jmoiron/sqlx"
@@ -90,6 +92,14 @@ func (c MemberController) PostMembers(params members.PostMembersParams) middlewa
 	member.PoolID = &pool.ID
 	member.ProjectID = &projectID
 
+	f5, err := poolHasF5Domain(c.db, pool.ID)
+	if err != nil {
+		panic(err)
+	}
+	if f5 && net.ParseIP(*member.Address) == nil {
+		return members.NewPostMembersBadRequest().WithPayload(utils.InvalidMemberAddressForF5)
+	}
+
 	// Set default values
 	if err := utils.SetModelDefaults(member); err != nil {
 		panic(err)
@@ -158,6 +168,16 @@ func (c MemberController) PutMembersMemberID(params members.PutMembersMemberIDPa
 
 	if params.Member.Member.PoolID != nil && *params.Member.Member.PoolID != *member.PoolID {
 		return members.NewPutMembersMemberIDBadRequest().WithPayload(utils.PoolIDImmutable)
+	}
+
+	if params.Member.Member.Address != nil {
+		f5, err := poolHasF5Domain(c.db, *member.PoolID)
+		if err != nil {
+			panic(err)
+		}
+		if f5 && net.ParseIP(*params.Member.Member.Address) == nil {
+			return members.NewPutMembersMemberIDBadRequest().WithPayload(utils.InvalidMemberAddressForF5)
+		}
 	}
 
 	params.Member.Member.ID = params.MemberID
@@ -230,4 +250,17 @@ func PopulateMember(db *sqlx.DB, member *models.Member, fields []string) error {
 		return err
 	}
 	return nil
+}
+
+func poolHasF5Domain(db *sqlx.DB, poolID strfmt.UUID) (bool, error) {
+	var count int
+	sql := db.Rebind(`
+		SELECT COUNT(d.id) FROM domain d
+		JOIN domain_pool_relation dpr ON d.id = dpr.domain_id
+		WHERE dpr.pool_id = ? AND d.provider = 'f5'
+	`)
+	if err := db.Get(&count, sql, poolID); err != nil {
+		return false, err
+	}
+	return count > 0, nil
 }
