@@ -28,6 +28,7 @@ var (
 	MissingFQDN                  = &models.Error{Code: 400, Message: "invalid value for 'fqdn': 'fqdn' is required"}
 	MissingProvider              = &models.Error{Code: 400, Message: "invalid value for 'provider': 'provider' is required"}
 	MissingAddressOrPort         = &models.Error{Code: 400, Message: "invalid value for 'address' and 'port': 'address' and 'port' are required"}
+	InvalidMemberAddressForF5    = &models.Error{Code: 400, Message: "invalid value for 'address': must be a valid IPv4 or IPv6 address for pools associated with F5 domains"}
 	FQDNImmutable                = &models.Error{Code: 400, Message: "invalid value for 'fqdn': change of immutable attribute 'fqdn' not allowed"}
 	RestrictedDatacenterProvider = &models.Error{Code: 400, Message: "invalid value for 'provider': project-specific f5 datacenters are not supported; please use those with scope=public already available"}
 	MySQLForeignKeyViolation     = &mysql.MySQLError{Number: 1451}
