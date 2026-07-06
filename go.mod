@@ -14,7 +14,7 @@ require (
 	github.com/Boostport/migration/driver/postgres v1.1.3
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/actatum/stormrpc v0.5.1
-	github.com/akamai/AkamaiOPEN-edgegrid-golang/v13 v13.2.0
+	github.com/akamai/AkamaiOPEN-edgegrid-golang/v13 v13.3.0
 	github.com/apex/log v1.9.0
 	github.com/cockroachdb/cockroach-go/v2 v2.4.3
 	github.com/didip/tollbooth v4.0.2+incompatible
@@ -137,5 +137,5 @@ require (
 	golang.org/x/term v0.44.0 // indirect
 	golang.org/x/text v0.38.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
-	gopkg.in/ini.v1 v1.67.0 // indirect
+	gopkg.in/ini.v1 v1.67.3 // indirect
 )
