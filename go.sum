@@ -155,8 +155,8 @@ github.com/gobuffalo/packr/v2 v2.8.0 h1:IULGd15bQL59ijXLxEvA5wlMxsmx/ZkQv9T282zN
 github.com/gobuffalo/packr/v2 v2.8.0/go.mod h1:PDk2k3vGevNE3SwVyVRgQCCXETC9SaONCNSXT1Q8M1g=
 github.com/gofrs/flock v0.12.1 h1:MTLVXXHf8ekldpJk3AKicLij9MdwOWkZ+a/jHHZby9E=
 github.com/gofrs/flock v0.12.1/go.mod h1:9zxTsyu5xtJ9DK+1tFZyibEV7y3uwDxPPfbxeeHCoD0=
-github.com/gofrs/uuid/v5 v5.5.0 h1:FkPv6jYQRbZtH3bD8yC7106u+CedTCLF8+t7CLHSZNo=
-github.com/gofrs/uuid/v5 v5.5.0/go.mod h1:bbAA98EoIlxyRHIVg6ektCSsZ5n8mSbwgEhvhMYlZgg=
+github.com/gofrs/uuid/v5 v5.5.1 h1:z1Ce19/JwNidXpy3tOQc3241lnJLKdKyq/xlNvlD4Ng=
+github.com/gofrs/uuid/v5 v5.5.1/go.mod h1:bbAA98EoIlxyRHIVg6ektCSsZ5n8mSbwgEhvhMYlZgg=
 github.com/gogo/protobuf v1.1.1/go.mod h1:r8qH/GZQm5c6nD/R0oafs1akxWv10x8SbQlK7atdtwQ=
 github.com/gogo/protobuf v1.2.1/go.mod h1:hp+jE20tsWTFYpLwKvXlhS1hjn+gTNwPg2I6zVXpSg4=
 github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b/go.mod h1:SBH7ygxi8pfUlaOkMMuAQtPIUF8ecWP5IEl/CR7VP2Q=
@@ -363,8 +363,8 @@ github.com/russross/blackfriday/v2 v2.1.0 h1:JIOH55/0cWyOuilr9/qlrm0BSXldqnqwMsf
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/sapcc/go-api-declarations v1.24.0 h1:sGBvOMVSM1olJlyvNoQSk7NX5uatXHKkztGDBPnTWMs=
 github.com/sapcc/go-api-declarations v1.24.0/go.mod h1:ZWRTijvgF8o8aHg5stgg7u4DF6jFrd0X97le/uGlZsA=
-github.com/sapcc/go-bits v0.0.0-20260730170321-f6f727520601 h1:pF4eF41dp0AxM0IfICn3ttpI5IwQoUmC0IkGuXLTmBA=
-github.com/sapcc/go-bits v0.0.0-20260730170321-f6f727520601/go.mod h1:4z4Vd1C7d6hDdbJ5q1CgzE9B8ESWuiMTbkZSJA5gSjA=
+github.com/sapcc/go-bits v0.0.0-20260806170240-4bbc84d224db h1:DfseqB6CZzdpbSdL4sGlqEBSYu3JpUpwYFiNzoYTkog=
+github.com/sapcc/go-bits v0.0.0-20260806170240-4bbc84d224db/go.mod h1:1wh2+fuMXNrJYttuaqiU7sNQgJhTmsZ/0S0SK1ttwQc=
 github.com/sergi/go-diff v1.0.0/go.mod h1:0CfEIISq7TuYL3j771MWULgwwjU+GofnZX9QAmXWZgo=
 github.com/shurcooL/sanitized_anchor_name v1.0.0/go.mod h1:1NzhyTcUVG4SuEtjjoZeVRXNmyL/1OwPU0+IJeTBvfc=
 github.com/sirupsen/logrus v1.2.0/go.mod h1:LxeOpSwHxABJmUn/MG1IvRgCAasNZTLOkJPxbbu5VWo=
@@ -444,8 +444,8 @@ go.uber.org/multierr v1.1.0/go.mod h1:wR5kodmAFQ0UK8QlbwjlSNy0Z68gJhDJUG5sjR94q/
 go.uber.org/ratelimit v0.3.1 h1:K4qVE+byfv/B3tC+4nYWP7v/6SimcO7HzHekoMNBma0=
 go.uber.org/ratelimit v0.3.1/go.mod h1:6euWsTB6U/Nb3X++xEUXA8ciPJvr19Q/0h1+oDcJhRk=
 go.uber.org/zap v1.10.0/go.mod h1:vwi/ZaCAaUcBkycHslxD9B2zi4UTXhF60s6SWpuDF0Q=
-go.xyrillian.de/gg v1.11.1 h1:7P3kDFkTmR7jx2riYi0GwX5uhgrsL37QSrN16xH/n8E=
-go.xyrillian.de/gg v1.11.1/go.mod h1:DoO4fQSWIrBRlNlCjVyrYM0kAEBt/Jg2GkMH+cGRZ0k=
+go.xyrillian.de/gg v1.13.3 h1:Ulz3+eZnO2OUl7Bv+SWaA5ufDmjeLwwmICPP4dCurxA=
+go.xyrillian.de/gg v1.13.3/go.mod h1:DoO4fQSWIrBRlNlCjVyrYM0kAEBt/Jg2GkMH+cGRZ0k=
 go.yaml.in/yaml/v2 v2.4.4 h1:tuyd0P+2Ont/d6e2rl3be67goVK4R6deVxCUX5vyPaQ=
 go.yaml.in/yaml/v2 v2.4.4/go.mod h1:gMZqIpDtDqOfM0uNfy0SkpRhvUryYH0Z6wdMYcacYXQ=
 go.yaml.in/yaml/v3 v3.0.4 h1:tfq32ie2Jv2UxXFdLJdh3jXuOzWiL1fo0bu/FbuKpbc=
