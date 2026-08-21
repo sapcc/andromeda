@@ -46,14 +46,14 @@ require (
 	github.com/nats-io/nats.go v1.52.0
 	github.com/prometheus/client_golang v1.24.1
 	github.com/rs/cors v1.11.1
-	github.com/sapcc/go-api-declarations v1.24.0
-	github.com/sapcc/go-bits v0.0.0-20260813170327-ea1a14435d35
+	github.com/sapcc/go-api-declarations v1.25.0
+	github.com/sapcc/go-bits v0.0.0-20260818140528-75bdd20c7867
 	github.com/slok/go-http-metrics v0.13.0
 	github.com/stretchr/testify v1.11.1
 	github.com/urfave/cli/v2 v2.27.7
 	github.com/xo/dburl v0.24.2
-	go.xyrillian.de/gg v1.13.3
-	golang.org/x/net v0.57.0
+	go.xyrillian.de/gg v1.14.0
+	golang.org/x/net v0.58.0
 	google.golang.org/protobuf v1.36.11
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -117,7 +117,7 @@ require (
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.70.1 // indirect
 	github.com/prometheus/procfs v0.21.1 // indirect
-	github.com/rabbitmq/amqp091-go v1.13.0 // indirect
+	github.com/rabbitmq/amqp091-go v1.14.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
@@ -131,7 +131,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.44.0 // indirect
 	go.uber.org/ratelimit v0.3.1 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/crypto v0.54.0 // indirect
+	golang.org/x/crypto v0.55.0 // indirect
 	golang.org/x/sync v0.22.0 // indirect
 	golang.org/x/sys v0.47.0 // indirect
 	golang.org/x/term v0.45.0 // indirect
