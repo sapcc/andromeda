@@ -54,7 +54,7 @@ require (
 	github.com/xo/dburl v0.24.2
 	go.xyrillian.de/gg v1.13.3
 	golang.org/x/net v0.57.0
-	google.golang.org/protobuf v1.36.11
+	google.golang.org/protobuf v1.36.12
 	gopkg.in/yaml.v3 v3.0.1
 )
 
