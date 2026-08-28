@@ -4,7 +4,7 @@
 
 module github.com/sapcc/andromeda
 
-go 1.26
+go 1.27
 
 toolchain go1.27.0
 
@@ -32,7 +32,7 @@ require (
 	github.com/go-openapi/swag/mangling v0.29.0
 	github.com/go-openapi/validate v0.26.3
 	github.com/go-sql-driver/mysql v1.10.0
-	github.com/gophercloud/gophercloud/v2 v2.13.0
+	github.com/gophercloud/gophercloud/v2 v2.14.0
 	github.com/gophercloud/utils/v2 v2.0.0-20260820140002-321c0f238d1a
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/iancoleman/strcase v0.3.0
@@ -47,7 +47,7 @@ require (
 	github.com/prometheus/client_golang v1.24.1
 	github.com/rs/cors v1.11.1
 	github.com/sapcc/go-api-declarations v1.25.0
-	github.com/sapcc/go-bits v0.0.0-20260818140528-75bdd20c7867
+	github.com/sapcc/go-bits v0.0.0-20260827091731-7669cbdb53fb
 	github.com/slok/go-http-metrics v0.13.0
 	github.com/stretchr/testify v1.11.1
 	github.com/urfave/cli/v2 v2.27.7
