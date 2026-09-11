@@ -31,7 +31,7 @@ require (
 	github.com/go-openapi/swag/conv v0.29.2
 	github.com/go-openapi/swag/mangling v0.29.2
 	github.com/go-openapi/validate v1.0.0
-	github.com/go-sql-driver/mysql v1.10.0
+	github.com/go-sql-driver/mysql v1.10.1
 	github.com/gophercloud/gophercloud/v2 v2.14.0
 	github.com/gophercloud/utils/v2 v2.0.0-20260824073324-42b9474d09d4
 	github.com/hashicorp/golang-lru/v2 v2.0.7
