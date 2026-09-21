@@ -20,7 +20,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Build
-      run: swagger generate markdown --copyright-file COPYRIGHT.txt --output docs/api.md
+      run: swagger generate markdown --output docs/api.md
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v8
       with:
