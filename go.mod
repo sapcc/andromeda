@@ -22,7 +22,7 @@ require (
 	github.com/dre1080/recovr v1.0.3
 	github.com/f5devcentral/go-bigip v0.0.0-20260303071915-79fc4d8a2250
 	github.com/getsentry/sentry-go v0.20.0
-	github.com/go-openapi/errors v0.22.8
+	github.com/go-openapi/errors v0.22.9
 	github.com/go-openapi/loads v0.25.3
 	github.com/go-openapi/runtime v0.33.2
 	github.com/go-openapi/spec v1.0.1
