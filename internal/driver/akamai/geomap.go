@@ -110,7 +110,12 @@ func (s *AkamaiAgent) FetchAndSyncGeomaps(geomaps []string, force bool) error {
 
 	// Wait for status propagation
 	var status string
+	deadline := time.Now().Add(time.Duration(config.Global.AkamaiConfig.PropagationTimeout) * time.Second)
 	for ok := true; ok; ok = status == "PENDING" {
+		if time.Now().After(deadline) {
+			log.Errorf("FetchAndSyncGeomaps: propagation timeout after %ds", config.Global.AkamaiConfig.PropagationTimeout)
+			break
+		}
 		time.Sleep(5 * time.Second)
 		status, err = s.syncProvisioningStatus(nil)
 		if err != nil {
