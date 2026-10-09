@@ -47,12 +47,12 @@ require (
 	github.com/prometheus/client_golang v1.24.1
 	github.com/rs/cors v1.11.1
 	github.com/sapcc/go-api-declarations v1.25.1
-	github.com/sapcc/go-bits v0.0.0-20261001170337-e86369bc8beb
+	github.com/sapcc/go-bits v0.0.0-20261008092946-7e1776f25e27
 	github.com/slok/go-http-metrics v0.13.0
 	github.com/stretchr/testify v1.12.1
 	github.com/urfave/cli/v2 v2.27.7
 	github.com/xo/dburl v0.25.1
-	go.xyrillian.de/gg v1.16.0
+	go.xyrillian.de/gg v1.19.0
 	golang.org/x/net v0.59.0
 	google.golang.org/protobuf v1.36.12
 	gopkg.in/yaml.v3 v3.0.1
