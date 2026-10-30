@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/actatum/stormrpc"
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v13/pkg/session"
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v14/pkg/session"
 	"github.com/apex/log"
 	"github.com/prometheus/client_golang/prometheus"
 )

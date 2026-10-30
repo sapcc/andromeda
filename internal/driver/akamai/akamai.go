@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v13/pkg/edgegrid"
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v13/pkg/session"
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v14/pkg/edgegrid"
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v14/pkg/session"
 	"github.com/apex/log"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"

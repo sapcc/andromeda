@@ -9,7 +9,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v13/pkg/gtm"
+	"github.com/akamai/AkamaiOPEN-edgegrid-golang/v14/pkg/gtm"
 	"github.com/apex/log"
 	"github.com/go-openapi/swag/conv"
 
