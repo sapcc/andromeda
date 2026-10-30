@@ -14,7 +14,7 @@ require (
 	github.com/Boostport/migration/driver/postgres v1.1.3
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/actatum/stormrpc v0.6.0
-	github.com/akamai/AkamaiOPEN-edgegrid-golang/v13 v13.4.0
+	github.com/akamai/AkamaiOPEN-edgegrid-golang/v14 v14.1.0
 	github.com/apex/log v1.9.0
 	github.com/cockroachdb/cockroach-go/v2 v2.4.3
 	github.com/didip/tollbooth v4.0.2+incompatible
@@ -106,7 +106,6 @@ require (
 	github.com/markbates/oncer v1.0.0 // indirect
 	github.com/markbates/safe v1.0.1 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
-	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/nats-io/nkeys v0.4.16 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
