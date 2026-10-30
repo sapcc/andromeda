@@ -51,7 +51,7 @@ require (
 	github.com/slok/go-http-metrics v0.13.0
 	github.com/stretchr/testify v1.12.1
 	github.com/urfave/cli/v2 v2.27.7
-	github.com/xo/dburl v0.25.1
+	github.com/xo/dburl v0.54.0
 	go.xyrillian.de/gg v1.19.0
 	golang.org/x/net v0.62.0
 	google.golang.org/protobuf v1.36.12
