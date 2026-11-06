@@ -15,6 +15,7 @@ import (
 	"github.com/sapcc/andromeda/internal/driver"
 	"github.com/sapcc/andromeda/internal/rpc/server"
 	"github.com/sapcc/andromeda/internal/rpcmodels"
+	"github.com/sapcc/andromeda/models"
 )
 
 type IPAvailability struct {
@@ -36,6 +37,11 @@ type IPAvailability struct {
 }
 
 func (s *AkamaiAgent) syncMemberStatus(domain *rpcmodels.Domain) error {
+	// Geographic properties use handoutCName; the IP availability report has no IPs to check
+	if domain.GetMode() == models.DomainModeGEOGRAPHIC {
+		return nil
+	}
+
 	logger := log.WithField("domain.id", domain.Id)
 	trafficManagementDomain := config.Global.AkamaiConfig.Domain
 	hostURL := fmt.Sprintf("/gtm-api/v1/reports/ip-availability/domains/%s/properties/%s?mostRecent=true",

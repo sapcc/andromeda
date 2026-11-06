@@ -135,6 +135,11 @@ func (o *GetQuotasOKBody) contextValidateQuotas(ctx context.Context, formats str
 	for i := 0; i < len(o.Quotas); i++ {
 
 		if o.Quotas[i] != nil {
+
+			if swag.IsZero(o.Quotas[i]) { // not required
+				return nil
+			}
+
 			if err := o.Quotas[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("getQuotasOK" + "." + "quotas" + "." + strconv.Itoa(i))

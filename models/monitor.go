@@ -40,7 +40,7 @@ type Monitor struct {
 	DomainName *strfmt.Hostname `json:"domain_name,omitempty" db:"domain_name,omitempty"`
 
 	// HTTP method to use for monitor checks. Only used for HTTP/S monitors.
-	// Enum: [GET POST PUT HEAD PATCH DELETE OPTIONS]
+	// Enum: ["GET","POST","PUT","HEAD","PATCH","DELETE","OPTIONS"]
 	HTTPMethod *string `json:"http_method,omitempty" db:"http_method,omitempty"`
 
 	// The id of the resource.
@@ -70,7 +70,7 @@ type Monitor struct {
 
 	// provisioning status
 	// Read Only: true
-	// Enum: [PENDING_CREATE PENDING_UPDATE PENDING_DELETE ACTIVE ERROR]
+	// Enum: ["PENDING_CREATE","PENDING_UPDATE","PENDING_DELETE","ACTIVE","ERROR"]
 	ProvisioningStatus string `json:"provisioning_status,omitempty" db:"provisioning_status,omitempty"`
 
 	// Specifies the text string that the monitor expects to receive from the target member.
@@ -91,7 +91,7 @@ type Monitor struct {
 
 	// Type of the health check monitor.
 	// Example: HTTP
-	// Enum: [HTTP HTTPS ICMP TCP UDP]
+	// Enum: ["HTTP","HTTPS","ICMP","TCP","UDP"]
 	Type *string `json:"type,omitempty" db:"type,omitempty"`
 
 	// The UTC date and timestamp when the resource was created.

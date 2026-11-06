@@ -10,6 +10,7 @@ package administrative
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -90,11 +91,13 @@ func (o *GetCidrBlocksOK) Code() int {
 }
 
 func (o *GetCidrBlocksOK) Error() string {
-	return fmt.Sprintf("[GET /cidr-blocks][%d] getCidrBlocksOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /cidr-blocks][%d] getCidrBlocksOK %s", 200, payload)
 }
 
 func (o *GetCidrBlocksOK) String() string {
-	return fmt.Sprintf("[GET /cidr-blocks][%d] getCidrBlocksOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /cidr-blocks][%d] getCidrBlocksOK %s", 200, payload)
 }
 
 func (o *GetCidrBlocksOK) GetPayload() interface{} {
@@ -160,11 +163,13 @@ func (o *GetCidrBlocksDefault) Code() int {
 }
 
 func (o *GetCidrBlocksDefault) Error() string {
-	return fmt.Sprintf("[GET /cidr-blocks][%d] GetCidrBlocks default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /cidr-blocks][%d] GetCidrBlocks default %s", o._statusCode, payload)
 }
 
 func (o *GetCidrBlocksDefault) String() string {
-	return fmt.Sprintf("[GET /cidr-blocks][%d] GetCidrBlocks default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /cidr-blocks][%d] GetCidrBlocks default %s", o._statusCode, payload)
 }
 
 func (o *GetCidrBlocksDefault) GetPayload() *models.Error {

@@ -11,6 +11,7 @@ package pools
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -99,11 +100,13 @@ func (o *GetPoolsPoolIDOK) Code() int {
 }
 
 func (o *GetPoolsPoolIDOK) Error() string {
-	return fmt.Sprintf("[GET /pools/{pool_id}][%d] getPoolsPoolIdOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /pools/{pool_id}][%d] getPoolsPoolIdOK %s", 200, payload)
 }
 
 func (o *GetPoolsPoolIDOK) String() string {
-	return fmt.Sprintf("[GET /pools/{pool_id}][%d] getPoolsPoolIdOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /pools/{pool_id}][%d] getPoolsPoolIdOK %s", 200, payload)
 }
 
 func (o *GetPoolsPoolIDOK) GetPayload() *GetPoolsPoolIDOKBody {
@@ -167,11 +170,13 @@ func (o *GetPoolsPoolIDNotFound) Code() int {
 }
 
 func (o *GetPoolsPoolIDNotFound) Error() string {
-	return fmt.Sprintf("[GET /pools/{pool_id}][%d] getPoolsPoolIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /pools/{pool_id}][%d] getPoolsPoolIdNotFound %s", 404, payload)
 }
 
 func (o *GetPoolsPoolIDNotFound) String() string {
-	return fmt.Sprintf("[GET /pools/{pool_id}][%d] getPoolsPoolIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /pools/{pool_id}][%d] getPoolsPoolIdNotFound %s", 404, payload)
 }
 
 func (o *GetPoolsPoolIDNotFound) GetPayload() *models.Error {
@@ -239,11 +244,13 @@ func (o *GetPoolsPoolIDDefault) Code() int {
 }
 
 func (o *GetPoolsPoolIDDefault) Error() string {
-	return fmt.Sprintf("[GET /pools/{pool_id}][%d] GetPoolsPoolID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /pools/{pool_id}][%d] GetPoolsPoolID default %s", o._statusCode, payload)
 }
 
 func (o *GetPoolsPoolIDDefault) String() string {
-	return fmt.Sprintf("[GET /pools/{pool_id}][%d] GetPoolsPoolID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /pools/{pool_id}][%d] GetPoolsPoolID default %s", o._statusCode, payload)
 }
 
 func (o *GetPoolsPoolIDDefault) GetPayload() *models.Error {
@@ -322,6 +329,11 @@ func (o *GetPoolsPoolIDOKBody) ContextValidate(ctx context.Context, formats strf
 func (o *GetPoolsPoolIDOKBody) contextValidatePool(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Pool != nil {
+
+		if swag.IsZero(o.Pool) { // not required
+			return nil
+		}
+
 		if err := o.Pool.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("getPoolsPoolIdOK" + "." + "pool")

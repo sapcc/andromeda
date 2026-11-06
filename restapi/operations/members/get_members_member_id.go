@@ -124,6 +124,11 @@ func (o *GetMembersMemberIDOKBody) ContextValidate(ctx context.Context, formats 
 func (o *GetMembersMemberIDOKBody) contextValidateMember(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Member != nil {
+
+		if swag.IsZero(o.Member) { // not required
+			return nil
+		}
+
 		if err := o.Member.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("getMembersMemberIdOK" + "." + "member")

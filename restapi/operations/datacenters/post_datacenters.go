@@ -127,6 +127,7 @@ func (o *PostDatacentersBody) ContextValidate(ctx context.Context, formats strfm
 func (o *PostDatacentersBody) contextValidateDatacenter(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Datacenter != nil {
+
 		if err := o.Datacenter.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("datacenter" + "." + "datacenter")
@@ -217,6 +218,11 @@ func (o *PostDatacentersCreatedBody) ContextValidate(ctx context.Context, format
 func (o *PostDatacentersCreatedBody) contextValidateDatacenter(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Datacenter != nil {
+
+		if swag.IsZero(o.Datacenter) { // not required
+			return nil
+		}
+
 		if err := o.Datacenter.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("postDatacentersCreated" + "." + "datacenter")

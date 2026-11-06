@@ -10,6 +10,7 @@ package administrative
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -95,11 +96,11 @@ func (o *DeleteQuotasProjectIDNoContent) Code() int {
 }
 
 func (o *DeleteQuotasProjectIDNoContent) Error() string {
-	return fmt.Sprintf("[DELETE /quotas/{project_id}][%d] deleteQuotasProjectIdNoContent ", 204)
+	return fmt.Sprintf("[DELETE /quotas/{project_id}][%d] deleteQuotasProjectIdNoContent", 204)
 }
 
 func (o *DeleteQuotasProjectIDNoContent) String() string {
-	return fmt.Sprintf("[DELETE /quotas/{project_id}][%d] deleteQuotasProjectIdNoContent ", 204)
+	return fmt.Sprintf("[DELETE /quotas/{project_id}][%d] deleteQuotasProjectIdNoContent", 204)
 }
 
 func (o *DeleteQuotasProjectIDNoContent) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -152,11 +153,13 @@ func (o *DeleteQuotasProjectIDNotFound) Code() int {
 }
 
 func (o *DeleteQuotasProjectIDNotFound) Error() string {
-	return fmt.Sprintf("[DELETE /quotas/{project_id}][%d] deleteQuotasProjectIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /quotas/{project_id}][%d] deleteQuotasProjectIdNotFound %s", 404, payload)
 }
 
 func (o *DeleteQuotasProjectIDNotFound) String() string {
-	return fmt.Sprintf("[DELETE /quotas/{project_id}][%d] deleteQuotasProjectIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /quotas/{project_id}][%d] deleteQuotasProjectIdNotFound %s", 404, payload)
 }
 
 func (o *DeleteQuotasProjectIDNotFound) GetPayload() *models.Error {
@@ -224,11 +227,13 @@ func (o *DeleteQuotasProjectIDDefault) Code() int {
 }
 
 func (o *DeleteQuotasProjectIDDefault) Error() string {
-	return fmt.Sprintf("[DELETE /quotas/{project_id}][%d] DeleteQuotasProjectID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /quotas/{project_id}][%d] DeleteQuotasProjectID default %s", o._statusCode, payload)
 }
 
 func (o *DeleteQuotasProjectIDDefault) String() string {
-	return fmt.Sprintf("[DELETE /quotas/{project_id}][%d] DeleteQuotasProjectID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /quotas/{project_id}][%d] DeleteQuotasProjectID default %s", o._statusCode, payload)
 }
 
 func (o *DeleteQuotasProjectIDDefault) GetPayload() *models.Error {

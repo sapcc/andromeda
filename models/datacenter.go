@@ -77,16 +77,16 @@ type Datacenter struct {
 
 	// Provider driver for the backend solution
 	// Example: akamai
-	// Enum: [akamai f5]
+	// Enum: ["akamai","f5"]
 	Provider string `json:"provider,omitempty" db:"provider,omitempty"`
 
 	// provisioning status
 	// Read Only: true
-	// Enum: [PENDING_CREATE PENDING_UPDATE PENDING_DELETE ACTIVE ERROR]
+	// Enum: ["PENDING_CREATE","PENDING_UPDATE","PENDING_DELETE","ACTIVE","ERROR"]
 	ProvisioningStatus string `json:"provisioning_status,omitempty" db:"provisioning_status,omitempty"`
 
 	// Visibility of datacenter between different projects
-	// Enum: [private shared]
+	// Enum: ["private","shared"]
 	Scope *string `json:"scope,omitempty" db:"scope,omitempty"`
 
 	// state or province

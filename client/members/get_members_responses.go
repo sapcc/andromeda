@@ -11,6 +11,7 @@ package members
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"strconv"
@@ -100,11 +101,13 @@ func (o *GetMembersOK) Code() int {
 }
 
 func (o *GetMembersOK) Error() string {
-	return fmt.Sprintf("[GET /members][%d] getMembersOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /members][%d] getMembersOK %s", 200, payload)
 }
 
 func (o *GetMembersOK) String() string {
-	return fmt.Sprintf("[GET /members][%d] getMembersOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /members][%d] getMembersOK %s", 200, payload)
 }
 
 func (o *GetMembersOK) GetPayload() *GetMembersOKBody {
@@ -168,11 +171,13 @@ func (o *GetMembersBadRequest) Code() int {
 }
 
 func (o *GetMembersBadRequest) Error() string {
-	return fmt.Sprintf("[GET /members][%d] getMembersBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /members][%d] getMembersBadRequest %s", 400, payload)
 }
 
 func (o *GetMembersBadRequest) String() string {
-	return fmt.Sprintf("[GET /members][%d] getMembersBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /members][%d] getMembersBadRequest %s", 400, payload)
 }
 
 func (o *GetMembersBadRequest) GetPayload() *models.Error {
@@ -240,11 +245,13 @@ func (o *GetMembersDefault) Code() int {
 }
 
 func (o *GetMembersDefault) Error() string {
-	return fmt.Sprintf("[GET /members][%d] GetMembers default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /members][%d] GetMembers default %s", o._statusCode, payload)
 }
 
 func (o *GetMembersDefault) String() string {
-	return fmt.Sprintf("[GET /members][%d] GetMembers default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /members][%d] GetMembers default %s", o._statusCode, payload)
 }
 
 func (o *GetMembersDefault) GetPayload() *models.Error {
@@ -369,6 +376,11 @@ func (o *GetMembersOKBody) contextValidateLinks(ctx context.Context, formats str
 	for i := 0; i < len(o.Links); i++ {
 
 		if o.Links[i] != nil {
+
+			if swag.IsZero(o.Links[i]) { // not required
+				return nil
+			}
+
 			if err := o.Links[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("getMembersOK" + "." + "links" + "." + strconv.Itoa(i))
@@ -389,6 +401,11 @@ func (o *GetMembersOKBody) contextValidateMembers(ctx context.Context, formats s
 	for i := 0; i < len(o.Members); i++ {
 
 		if o.Members[i] != nil {
+
+			if swag.IsZero(o.Members[i]) { // not required
+				return nil
+			}
+
 			if err := o.Members[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("getMembersOK" + "." + "members" + "." + strconv.Itoa(i))

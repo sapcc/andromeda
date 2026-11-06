@@ -11,6 +11,7 @@ package datacenters
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -106,11 +107,13 @@ func (o *PostDatacentersCreated) Code() int {
 }
 
 func (o *PostDatacentersCreated) Error() string {
-	return fmt.Sprintf("[POST /datacenters][%d] postDatacentersCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /datacenters][%d] postDatacentersCreated %s", 201, payload)
 }
 
 func (o *PostDatacentersCreated) String() string {
-	return fmt.Sprintf("[POST /datacenters][%d] postDatacentersCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /datacenters][%d] postDatacentersCreated %s", 201, payload)
 }
 
 func (o *PostDatacentersCreated) GetPayload() *PostDatacentersCreatedBody {
@@ -174,11 +177,13 @@ func (o *PostDatacentersBadRequest) Code() int {
 }
 
 func (o *PostDatacentersBadRequest) Error() string {
-	return fmt.Sprintf("[POST /datacenters][%d] postDatacentersBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /datacenters][%d] postDatacentersBadRequest %s", 400, payload)
 }
 
 func (o *PostDatacentersBadRequest) String() string {
-	return fmt.Sprintf("[POST /datacenters][%d] postDatacentersBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /datacenters][%d] postDatacentersBadRequest %s", 400, payload)
 }
 
 func (o *PostDatacentersBadRequest) GetPayload() *models.Error {
@@ -242,11 +247,13 @@ func (o *PostDatacentersNotFound) Code() int {
 }
 
 func (o *PostDatacentersNotFound) Error() string {
-	return fmt.Sprintf("[POST /datacenters][%d] postDatacentersNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /datacenters][%d] postDatacentersNotFound %s", 404, payload)
 }
 
 func (o *PostDatacentersNotFound) String() string {
-	return fmt.Sprintf("[POST /datacenters][%d] postDatacentersNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /datacenters][%d] postDatacentersNotFound %s", 404, payload)
 }
 
 func (o *PostDatacentersNotFound) GetPayload() *models.Error {
@@ -314,11 +321,13 @@ func (o *PostDatacentersDefault) Code() int {
 }
 
 func (o *PostDatacentersDefault) Error() string {
-	return fmt.Sprintf("[POST /datacenters][%d] PostDatacenters default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /datacenters][%d] PostDatacenters default %s", o._statusCode, payload)
 }
 
 func (o *PostDatacentersDefault) String() string {
-	return fmt.Sprintf("[POST /datacenters][%d] PostDatacenters default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /datacenters][%d] PostDatacenters default %s", o._statusCode, payload)
 }
 
 func (o *PostDatacentersDefault) GetPayload() *models.Error {
@@ -399,6 +408,7 @@ func (o *PostDatacentersBody) ContextValidate(ctx context.Context, formats strfm
 func (o *PostDatacentersBody) contextValidateDatacenter(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Datacenter != nil {
+
 		if err := o.Datacenter.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("datacenter" + "." + "datacenter")
@@ -490,6 +500,11 @@ func (o *PostDatacentersCreatedBody) ContextValidate(ctx context.Context, format
 func (o *PostDatacentersCreatedBody) contextValidateDatacenter(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Datacenter != nil {
+
+		if swag.IsZero(o.Datacenter) { // not required
+			return nil
+		}
+
 		if err := o.Datacenter.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("postDatacentersCreated" + "." + "datacenter")

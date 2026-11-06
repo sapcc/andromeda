@@ -11,6 +11,7 @@ package domains
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -100,11 +101,13 @@ func (o *PostDomainsCreated) Code() int {
 }
 
 func (o *PostDomainsCreated) Error() string {
-	return fmt.Sprintf("[POST /domains][%d] postDomainsCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /domains][%d] postDomainsCreated %s", 201, payload)
 }
 
 func (o *PostDomainsCreated) String() string {
-	return fmt.Sprintf("[POST /domains][%d] postDomainsCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /domains][%d] postDomainsCreated %s", 201, payload)
 }
 
 func (o *PostDomainsCreated) GetPayload() *PostDomainsCreatedBody {
@@ -168,11 +171,13 @@ func (o *PostDomainsBadRequest) Code() int {
 }
 
 func (o *PostDomainsBadRequest) Error() string {
-	return fmt.Sprintf("[POST /domains][%d] postDomainsBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /domains][%d] postDomainsBadRequest %s", 400, payload)
 }
 
 func (o *PostDomainsBadRequest) String() string {
-	return fmt.Sprintf("[POST /domains][%d] postDomainsBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /domains][%d] postDomainsBadRequest %s", 400, payload)
 }
 
 func (o *PostDomainsBadRequest) GetPayload() *models.Error {
@@ -240,11 +245,13 @@ func (o *PostDomainsDefault) Code() int {
 }
 
 func (o *PostDomainsDefault) Error() string {
-	return fmt.Sprintf("[POST /domains][%d] PostDomains default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /domains][%d] PostDomains default %s", o._statusCode, payload)
 }
 
 func (o *PostDomainsDefault) String() string {
-	return fmt.Sprintf("[POST /domains][%d] PostDomains default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /domains][%d] PostDomains default %s", o._statusCode, payload)
 }
 
 func (o *PostDomainsDefault) GetPayload() *models.Error {
@@ -325,6 +332,7 @@ func (o *PostDomainsBody) ContextValidate(ctx context.Context, formats strfmt.Re
 func (o *PostDomainsBody) contextValidateDomain(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Domain != nil {
+
 		if err := o.Domain.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("domain" + "." + "domain")
@@ -416,6 +424,11 @@ func (o *PostDomainsCreatedBody) ContextValidate(ctx context.Context, formats st
 func (o *PostDomainsCreatedBody) contextValidateDomain(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Domain != nil {
+
+		if swag.IsZero(o.Domain) { // not required
+			return nil
+		}
+
 		if err := o.Domain.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("postDomainsCreated" + "." + "domain")

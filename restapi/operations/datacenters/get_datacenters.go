@@ -171,6 +171,11 @@ func (o *GetDatacentersOKBody) contextValidateDatacenters(ctx context.Context, f
 	for i := 0; i < len(o.Datacenters); i++ {
 
 		if o.Datacenters[i] != nil {
+
+			if swag.IsZero(o.Datacenters[i]) { // not required
+				return nil
+			}
+
 			if err := o.Datacenters[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("getDatacentersOK" + "." + "datacenters" + "." + strconv.Itoa(i))
@@ -191,6 +196,11 @@ func (o *GetDatacentersOKBody) contextValidateLinks(ctx context.Context, formats
 	for i := 0; i < len(o.Links); i++ {
 
 		if o.Links[i] != nil {
+
+			if swag.IsZero(o.Links[i]) { // not required
+				return nil
+			}
+
 			if err := o.Links[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("getDatacentersOK" + "." + "links" + "." + strconv.Itoa(i))

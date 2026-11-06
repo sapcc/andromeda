@@ -49,13 +49,17 @@ type Domain struct {
 	// Format: hostname
 	Fqdn *strfmt.Hostname `json:"fqdn,omitempty" db:"fqdn,omitempty"`
 
+	// The ID of the geographic map to use. Required when mode is GEOGRAPHIC.
+	// Format: uuid
+	GeomapID *strfmt.UUID `json:"geomap_id,omitempty" db:"geomap_id,omitempty"`
+
 	// The id of the resource.
 	// Read Only: true
 	// Format: uuid
 	ID strfmt.UUID `json:"id,omitempty" db:"id,omitempty"`
 
 	// Load balancing method to use for the references pools.
-	// Enum: [WEIGHTED ROUND_ROBIN GEOGRAPHIC AVAILABILITY]
+	// Enum: ["WEIGHTED","ROUND_ROBIN","GEOGRAPHIC","AVAILABILITY"]
 	Mode *string `json:"mode,omitempty" db:"mode,omitempty"`
 
 	// Human-readable name of the resource.
@@ -72,21 +76,21 @@ type Domain struct {
 
 	// Supported provider drivers
 	// Example: akamai
-	// Enum: [akamai f5]
+	// Enum: ["akamai","f5"]
 	Provider *string `json:"provider,omitempty" db:"provider,omitempty"`
 
 	// provisioning status
 	// Read Only: true
-	// Enum: [PENDING_CREATE PENDING_UPDATE PENDING_DELETE ACTIVE ERROR]
+	// Enum: ["PENDING_CREATE","PENDING_UPDATE","PENDING_DELETE","ACTIVE","ERROR"]
 	ProvisioningStatus string `json:"provisioning_status,omitempty" db:"provisioning_status,omitempty"`
 
 	// DNS Record type to use.
-	// Enum: [A AAAA CNAME MX]
+	// Enum: ["A","AAAA","CNAME","MX"]
 	RecordType *string `json:"record_type,omitempty" db:"record_type,omitempty"`
 
 	// status
 	// Read Only: true
-	// Enum: [ONLINE DOWN]
+	// Enum: ["ONLINE","DOWN"]
 	Status string `json:"status,omitempty" db:"status,omitempty"`
 
 	// The UTC date and timestamp when the resource was created.
@@ -109,6 +113,10 @@ func (m *Domain) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateFqdn(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateGeomapID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -188,6 +196,18 @@ func (m *Domain) validateFqdn(formats strfmt.Registry) error {
 	}
 
 	if err := validate.FormatOf("fqdn", "body", "hostname", m.Fqdn.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Domain) validateGeomapID(formats strfmt.Registry) error {
+	if swag.IsZero(m.GeomapID) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("geomap_id", "body", "uuid", m.GeomapID.String(), formats); err != nil {
 		return err
 	}
 

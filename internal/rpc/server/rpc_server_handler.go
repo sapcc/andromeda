@@ -322,7 +322,7 @@ func populateMembers(u *RPCHandler, poolID string) ([]*rpcmodels.Member, error) 
 }
 
 func (u *RPCHandler) GetDomains(ctx context.Context, request *SearchRequest) (*DomainsResponse, error) {
-	sql := `SELECT id, admin_state_up, fqdn, mode, record_type, provisioning_status
+	sql := `SELECT id, admin_state_up, fqdn, mode, record_type, provisioning_status, COALESCE(geomap_id, '')
                FROM domain WHERE provisioning_status != 'DELETED'`
 	if request.Pending {
 		sql += ` AND provisioning_status in ('PENDING_CREATE', 'PENDING_UPDATE', 'PENDING_DELETE')`
@@ -336,7 +336,8 @@ func (u *RPCHandler) GetDomains(ctx context.Context, request *SearchRequest) (*D
 	response := &DomainsResponse{Response: []*rpcmodels.Domain{}}
 	for rows.Next() {
 		var domain rpcmodels.Domain
-		if err = rows.StructScan(&domain); err != nil {
+		if err = rows.Scan(&domain.Id, &domain.AdminStateUp, &domain.Fqdn, &domain.Mode,
+			&domain.RecordType, &domain.ProvisioningStatus, &domain.GeomapId); err != nil {
 			log.Error(err.Error())
 			return nil, err
 		}

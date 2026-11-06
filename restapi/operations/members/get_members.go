@@ -171,6 +171,11 @@ func (o *GetMembersOKBody) contextValidateLinks(ctx context.Context, formats str
 	for i := 0; i < len(o.Links); i++ {
 
 		if o.Links[i] != nil {
+
+			if swag.IsZero(o.Links[i]) { // not required
+				return nil
+			}
+
 			if err := o.Links[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("getMembersOK" + "." + "links" + "." + strconv.Itoa(i))
@@ -191,6 +196,11 @@ func (o *GetMembersOKBody) contextValidateMembers(ctx context.Context, formats s
 	for i := 0; i < len(o.Members); i++ {
 
 		if o.Members[i] != nil {
+
+			if swag.IsZero(o.Members[i]) { // not required
+				return nil
+			}
+
 			if err := o.Members[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("getMembersOK" + "." + "members" + "." + strconv.Itoa(i))

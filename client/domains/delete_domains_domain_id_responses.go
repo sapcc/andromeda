@@ -10,6 +10,7 @@ package domains
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -101,11 +102,11 @@ func (o *DeleteDomainsDomainIDNoContent) Code() int {
 }
 
 func (o *DeleteDomainsDomainIDNoContent) Error() string {
-	return fmt.Sprintf("[DELETE /domains/{domain_id}][%d] deleteDomainsDomainIdNoContent ", 204)
+	return fmt.Sprintf("[DELETE /domains/{domain_id}][%d] deleteDomainsDomainIdNoContent", 204)
 }
 
 func (o *DeleteDomainsDomainIDNoContent) String() string {
-	return fmt.Sprintf("[DELETE /domains/{domain_id}][%d] deleteDomainsDomainIdNoContent ", 204)
+	return fmt.Sprintf("[DELETE /domains/{domain_id}][%d] deleteDomainsDomainIdNoContent", 204)
 }
 
 func (o *DeleteDomainsDomainIDNoContent) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -158,11 +159,13 @@ func (o *DeleteDomainsDomainIDNotFound) Code() int {
 }
 
 func (o *DeleteDomainsDomainIDNotFound) Error() string {
-	return fmt.Sprintf("[DELETE /domains/{domain_id}][%d] deleteDomainsDomainIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /domains/{domain_id}][%d] deleteDomainsDomainIdNotFound %s", 404, payload)
 }
 
 func (o *DeleteDomainsDomainIDNotFound) String() string {
-	return fmt.Sprintf("[DELETE /domains/{domain_id}][%d] deleteDomainsDomainIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /domains/{domain_id}][%d] deleteDomainsDomainIdNotFound %s", 404, payload)
 }
 
 func (o *DeleteDomainsDomainIDNotFound) GetPayload() *models.Error {
@@ -226,11 +229,13 @@ func (o *DeleteDomainsDomainIDConflict) Code() int {
 }
 
 func (o *DeleteDomainsDomainIDConflict) Error() string {
-	return fmt.Sprintf("[DELETE /domains/{domain_id}][%d] deleteDomainsDomainIdConflict  %+v", 409, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /domains/{domain_id}][%d] deleteDomainsDomainIdConflict %s", 409, payload)
 }
 
 func (o *DeleteDomainsDomainIDConflict) String() string {
-	return fmt.Sprintf("[DELETE /domains/{domain_id}][%d] deleteDomainsDomainIdConflict  %+v", 409, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /domains/{domain_id}][%d] deleteDomainsDomainIdConflict %s", 409, payload)
 }
 
 func (o *DeleteDomainsDomainIDConflict) GetPayload() *models.Error {
@@ -298,11 +303,13 @@ func (o *DeleteDomainsDomainIDDefault) Code() int {
 }
 
 func (o *DeleteDomainsDomainIDDefault) Error() string {
-	return fmt.Sprintf("[DELETE /domains/{domain_id}][%d] DeleteDomainsDomainID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /domains/{domain_id}][%d] DeleteDomainsDomainID default %s", o._statusCode, payload)
 }
 
 func (o *DeleteDomainsDomainIDDefault) String() string {
-	return fmt.Sprintf("[DELETE /domains/{domain_id}][%d] DeleteDomainsDomainID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /domains/{domain_id}][%d] DeleteDomainsDomainID default %s", o._statusCode, payload)
 }
 
 func (o *DeleteDomainsDomainIDDefault) GetPayload() *models.Error {

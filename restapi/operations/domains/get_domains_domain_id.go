@@ -124,6 +124,11 @@ func (o *GetDomainsDomainIDOKBody) ContextValidate(ctx context.Context, formats 
 func (o *GetDomainsDomainIDOKBody) contextValidateDomain(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Domain != nil {
+
+		if swag.IsZero(o.Domain) { // not required
+			return nil
+		}
+
 		if err := o.Domain.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("getDomainsDomainIdOK" + "." + "domain")

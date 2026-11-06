@@ -125,6 +125,11 @@ func (o *PutMonitorsMonitorIDAcceptedBody) ContextValidate(ctx context.Context, 
 func (o *PutMonitorsMonitorIDAcceptedBody) contextValidateMonitor(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Monitor != nil {
+
+		if swag.IsZero(o.Monitor) { // not required
+			return nil
+		}
+
 		if err := o.Monitor.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("putMonitorsMonitorIdAccepted" + "." + "monitor")
@@ -217,6 +222,7 @@ func (o *PutMonitorsMonitorIDBody) ContextValidate(ctx context.Context, formats 
 func (o *PutMonitorsMonitorIDBody) contextValidateMonitor(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Monitor != nil {
+
 		if err := o.Monitor.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("monitor" + "." + "monitor")

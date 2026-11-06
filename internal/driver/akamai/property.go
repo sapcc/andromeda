@@ -81,6 +81,11 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 		TrafficTargets:       []gtm.TrafficTarget{},
 		LivenessTests:        []gtm.LivenessTest{},
 	}
+	if domain.GetMode() == models.DomainModeGEOGRAPHIC {
+		property.MapName = domain.GetGeomapId()
+	}
+
+	geographic := domain.GetMode() == models.DomainModeGEOGRAPHIC
 
 	// Process Members
 MEMBERLOOP:
@@ -103,10 +108,11 @@ MEMBERLOOP:
 			}
 
 			// check if we have already a traffic target for this datacenter
-			for _, target := range property.TrafficTargets {
-				if target.DatacenterID == datacenterID {
-					// just add the server to the existing traffic target
-					target.Servers = append(target.Servers, member.Address)
+			for i := range property.TrafficTargets {
+				if property.TrafficTargets[i].DatacenterID == datacenterID {
+					if !geographic {
+						property.TrafficTargets[i].Servers = append(property.TrafficTargets[i].Servers, member.Address)
+					}
 					provRequests = append(provRequests,
 						driver.GetProvisioningStatusRequest(member.Id, "MEMBER", "ACTIVE"))
 					continue MEMBERLOOP
@@ -118,9 +124,13 @@ MEMBERLOOP:
 		trafficTarget := gtm.TrafficTarget{
 			Name:         member.GetDatacenterId(),
 			Enabled:      member.GetAdminStateUp(),
-			Servers:      []string{member.Address},
 			Weight:       50,
 			DatacenterID: datacenterID,
+		}
+		if geographic {
+			trafficTarget.HandoutCName = member.Address
+		} else {
+			trafficTarget.Servers = []string{member.Address}
 		}
 		property.TrafficTargets = append(property.TrafficTargets, trafficTarget)
 		provRequests = append(provRequests,
@@ -207,12 +217,14 @@ MEMBERLOOP:
 		"Type",
 		"Comments",
 		"HandoutMode",
+		"MapName",
 		"TrafficTargets",
 		"ScoreAggregationType",
 		"TrafficTargets.DatacenterId",
 		"TrafficTargets.Enabled",
 		"TrafficTargets.Weight",
 		"TrafficTargets.Servers",
+		"TrafficTargets.HandoutCName",
 		//"TrafficTargets.Name", # bug in Akamai API
 		"LivenessTests",
 		"LivenessTests.Name",
