@@ -11,6 +11,7 @@ package monitors
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -106,11 +107,13 @@ func (o *PutMonitorsMonitorIDAccepted) Code() int {
 }
 
 func (o *PutMonitorsMonitorIDAccepted) Error() string {
-	return fmt.Sprintf("[PUT /monitors/{monitor_id}][%d] putMonitorsMonitorIdAccepted  %+v", 202, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /monitors/{monitor_id}][%d] putMonitorsMonitorIdAccepted %s", 202, payload)
 }
 
 func (o *PutMonitorsMonitorIDAccepted) String() string {
-	return fmt.Sprintf("[PUT /monitors/{monitor_id}][%d] putMonitorsMonitorIdAccepted  %+v", 202, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /monitors/{monitor_id}][%d] putMonitorsMonitorIdAccepted %s", 202, payload)
 }
 
 func (o *PutMonitorsMonitorIDAccepted) GetPayload() *PutMonitorsMonitorIDAcceptedBody {
@@ -174,11 +177,13 @@ func (o *PutMonitorsMonitorIDBadRequest) Code() int {
 }
 
 func (o *PutMonitorsMonitorIDBadRequest) Error() string {
-	return fmt.Sprintf("[PUT /monitors/{monitor_id}][%d] putMonitorsMonitorIdBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /monitors/{monitor_id}][%d] putMonitorsMonitorIdBadRequest %s", 400, payload)
 }
 
 func (o *PutMonitorsMonitorIDBadRequest) String() string {
-	return fmt.Sprintf("[PUT /monitors/{monitor_id}][%d] putMonitorsMonitorIdBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /monitors/{monitor_id}][%d] putMonitorsMonitorIdBadRequest %s", 400, payload)
 }
 
 func (o *PutMonitorsMonitorIDBadRequest) GetPayload() *models.Error {
@@ -242,11 +247,13 @@ func (o *PutMonitorsMonitorIDNotFound) Code() int {
 }
 
 func (o *PutMonitorsMonitorIDNotFound) Error() string {
-	return fmt.Sprintf("[PUT /monitors/{monitor_id}][%d] putMonitorsMonitorIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /monitors/{monitor_id}][%d] putMonitorsMonitorIdNotFound %s", 404, payload)
 }
 
 func (o *PutMonitorsMonitorIDNotFound) String() string {
-	return fmt.Sprintf("[PUT /monitors/{monitor_id}][%d] putMonitorsMonitorIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /monitors/{monitor_id}][%d] putMonitorsMonitorIdNotFound %s", 404, payload)
 }
 
 func (o *PutMonitorsMonitorIDNotFound) GetPayload() *models.Error {
@@ -314,11 +321,13 @@ func (o *PutMonitorsMonitorIDDefault) Code() int {
 }
 
 func (o *PutMonitorsMonitorIDDefault) Error() string {
-	return fmt.Sprintf("[PUT /monitors/{monitor_id}][%d] PutMonitorsMonitorID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /monitors/{monitor_id}][%d] PutMonitorsMonitorID default %s", o._statusCode, payload)
 }
 
 func (o *PutMonitorsMonitorIDDefault) String() string {
-	return fmt.Sprintf("[PUT /monitors/{monitor_id}][%d] PutMonitorsMonitorID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /monitors/{monitor_id}][%d] PutMonitorsMonitorID default %s", o._statusCode, payload)
 }
 
 func (o *PutMonitorsMonitorIDDefault) GetPayload() *models.Error {
@@ -397,6 +406,11 @@ func (o *PutMonitorsMonitorIDAcceptedBody) ContextValidate(ctx context.Context, 
 func (o *PutMonitorsMonitorIDAcceptedBody) contextValidateMonitor(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Monitor != nil {
+
+		if swag.IsZero(o.Monitor) { // not required
+			return nil
+		}
+
 		if err := o.Monitor.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("putMonitorsMonitorIdAccepted" + "." + "monitor")
@@ -490,6 +504,7 @@ func (o *PutMonitorsMonitorIDBody) ContextValidate(ctx context.Context, formats 
 func (o *PutMonitorsMonitorIDBody) contextValidateMonitor(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Monitor != nil {
+
 		if err := o.Monitor.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("monitor" + "." + "monitor")

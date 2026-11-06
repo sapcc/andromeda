@@ -29,7 +29,7 @@ type Link struct {
 	Href strfmt.URI `json:"href,omitempty" db:"href,omitempty"`
 
 	// rel
-	// Enum: [next previous]
+	// Enum: ["next","previous"]
 	Rel string `json:"rel,omitempty" db:"rel,omitempty"`
 }
 

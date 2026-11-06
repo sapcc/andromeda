@@ -11,6 +11,7 @@ package administrative
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -93,11 +94,13 @@ func (o *GetQuotasDefaultsOK) Code() int {
 }
 
 func (o *GetQuotasDefaultsOK) Error() string {
-	return fmt.Sprintf("[GET /quotas/defaults][%d] getQuotasDefaultsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /quotas/defaults][%d] getQuotasDefaultsOK %s", 200, payload)
 }
 
 func (o *GetQuotasDefaultsOK) String() string {
-	return fmt.Sprintf("[GET /quotas/defaults][%d] getQuotasDefaultsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /quotas/defaults][%d] getQuotasDefaultsOK %s", 200, payload)
 }
 
 func (o *GetQuotasDefaultsOK) GetPayload() *GetQuotasDefaultsOKBody {
@@ -165,11 +168,13 @@ func (o *GetQuotasDefaultsDefault) Code() int {
 }
 
 func (o *GetQuotasDefaultsDefault) Error() string {
-	return fmt.Sprintf("[GET /quotas/defaults][%d] GetQuotasDefaults default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /quotas/defaults][%d] GetQuotasDefaults default %s", o._statusCode, payload)
 }
 
 func (o *GetQuotasDefaultsDefault) String() string {
-	return fmt.Sprintf("[GET /quotas/defaults][%d] GetQuotasDefaults default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /quotas/defaults][%d] GetQuotasDefaults default %s", o._statusCode, payload)
 }
 
 func (o *GetQuotasDefaultsDefault) GetPayload() *models.Error {
@@ -248,6 +253,11 @@ func (o *GetQuotasDefaultsOKBody) ContextValidate(ctx context.Context, formats s
 func (o *GetQuotasDefaultsOKBody) contextValidateQuota(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Quota != nil {
+
+		if swag.IsZero(o.Quota) { // not required
+			return nil
+		}
+
 		if err := o.Quota.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("getQuotasDefaultsOK" + "." + "quota")

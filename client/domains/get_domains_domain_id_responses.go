@@ -11,6 +11,7 @@ package domains
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -99,11 +100,13 @@ func (o *GetDomainsDomainIDOK) Code() int {
 }
 
 func (o *GetDomainsDomainIDOK) Error() string {
-	return fmt.Sprintf("[GET /domains/{domain_id}][%d] getDomainsDomainIdOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /domains/{domain_id}][%d] getDomainsDomainIdOK %s", 200, payload)
 }
 
 func (o *GetDomainsDomainIDOK) String() string {
-	return fmt.Sprintf("[GET /domains/{domain_id}][%d] getDomainsDomainIdOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /domains/{domain_id}][%d] getDomainsDomainIdOK %s", 200, payload)
 }
 
 func (o *GetDomainsDomainIDOK) GetPayload() *GetDomainsDomainIDOKBody {
@@ -167,11 +170,13 @@ func (o *GetDomainsDomainIDNotFound) Code() int {
 }
 
 func (o *GetDomainsDomainIDNotFound) Error() string {
-	return fmt.Sprintf("[GET /domains/{domain_id}][%d] getDomainsDomainIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /domains/{domain_id}][%d] getDomainsDomainIdNotFound %s", 404, payload)
 }
 
 func (o *GetDomainsDomainIDNotFound) String() string {
-	return fmt.Sprintf("[GET /domains/{domain_id}][%d] getDomainsDomainIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /domains/{domain_id}][%d] getDomainsDomainIdNotFound %s", 404, payload)
 }
 
 func (o *GetDomainsDomainIDNotFound) GetPayload() *models.Error {
@@ -239,11 +244,13 @@ func (o *GetDomainsDomainIDDefault) Code() int {
 }
 
 func (o *GetDomainsDomainIDDefault) Error() string {
-	return fmt.Sprintf("[GET /domains/{domain_id}][%d] GetDomainsDomainID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /domains/{domain_id}][%d] GetDomainsDomainID default %s", o._statusCode, payload)
 }
 
 func (o *GetDomainsDomainIDDefault) String() string {
-	return fmt.Sprintf("[GET /domains/{domain_id}][%d] GetDomainsDomainID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /domains/{domain_id}][%d] GetDomainsDomainID default %s", o._statusCode, payload)
 }
 
 func (o *GetDomainsDomainIDDefault) GetPayload() *models.Error {
@@ -322,6 +329,11 @@ func (o *GetDomainsDomainIDOKBody) ContextValidate(ctx context.Context, formats 
 func (o *GetDomainsDomainIDOKBody) contextValidateDomain(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Domain != nil {
+
+		if swag.IsZero(o.Domain) { // not required
+			return nil
+		}
+
 		if err := o.Domain.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("getDomainsDomainIdOK" + "." + "domain")

@@ -124,6 +124,11 @@ func (o *GetDatacentersDatacenterIDOKBody) ContextValidate(ctx context.Context, 
 func (o *GetDatacentersDatacenterIDOKBody) contextValidateDatacenter(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Datacenter != nil {
+
+		if swag.IsZero(o.Datacenter) { // not required
+			return nil
+		}
+
 		if err := o.Datacenter.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("getDatacentersDatacenterIdOK" + "." + "datacenter")

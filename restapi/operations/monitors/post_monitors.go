@@ -59,17 +59,17 @@ Andromeda pool monitors are mapped to [F5 monitors][f5-monitors] based on the `t
 | `TCP`     | `tcp`          |
 | `UDP`     | `udp`          |
 
-Andromeda monitor properties map to an F5 `Monitor` as follows:
+Andromeda monitor properties map to an F5 `GSLB_Monitor` as follows:
 
-| Andromeda     | F5 `Monitor` object   | Comments                                       |
-|---------------|-----------------------|------------------------------------------------|
-| `domain_name` | -                     | Unsupported by F5/AS3                          |
-| `http_method` | -                     | Unsupported by F5/AS3 (see caveats below)      |
-| `interval`    | `interval`            |                                                |
-| `receive`     | `receive`             | `HTTP` / `HTTPS` only                          |
-| `send`        | `send`                | `HTTP` / `HTTPS` only                          |
-| `timeout`     | `timeout`             |                                                |
-| `type`        | `monitorType`         |                                                |
+| Andromeda     | F5 `GSLB_Monitor` object | Comments                                       |
+|---------------|--------------------------|------------------------------------------------|
+| `domain_name` | -                        | Unsupported by F5/AS3                          |
+| `http_method` | -                        | Unsupported by F5/AS3 (see caveats below)      |
+| `interval`    | `interval`               |                                                |
+| `receive`     | `receive`                | `HTTP` / `HTTPS` only                          |
+| `send`        | `send`                   | `HTTP` / `HTTPS` only                          |
+| `timeout`     | `probeTimeout`           |                                                |
+| `type`        | `monitorType`            |                                                |
 
 Caveats:
 
@@ -159,6 +159,7 @@ func (o *PostMonitorsBody) ContextValidate(ctx context.Context, formats strfmt.R
 func (o *PostMonitorsBody) contextValidateMonitor(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Monitor != nil {
+
 		if err := o.Monitor.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("monitor" + "." + "monitor")
@@ -249,6 +250,11 @@ func (o *PostMonitorsCreatedBody) ContextValidate(ctx context.Context, formats s
 func (o *PostMonitorsCreatedBody) contextValidateMonitor(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Monitor != nil {
+
+		if swag.IsZero(o.Monitor) { // not required
+			return nil
+		}
+
 		if err := o.Monitor.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("postMonitorsCreated" + "." + "monitor")

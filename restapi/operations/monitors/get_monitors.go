@@ -171,6 +171,11 @@ func (o *GetMonitorsOKBody) contextValidateLinks(ctx context.Context, formats st
 	for i := 0; i < len(o.Links); i++ {
 
 		if o.Links[i] != nil {
+
+			if swag.IsZero(o.Links[i]) { // not required
+				return nil
+			}
+
 			if err := o.Links[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("getMonitorsOK" + "." + "links" + "." + strconv.Itoa(i))
@@ -191,6 +196,11 @@ func (o *GetMonitorsOKBody) contextValidateMonitors(ctx context.Context, formats
 	for i := 0; i < len(o.Monitors); i++ {
 
 		if o.Monitors[i] != nil {
+
+			if swag.IsZero(o.Monitors[i]) { // not required
+				return nil
+			}
+
 			if err := o.Monitors[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("getMonitorsOK" + "." + "monitors" + "." + strconv.Itoa(i))

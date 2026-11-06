@@ -11,6 +11,7 @@ package administrative
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -94,11 +95,13 @@ func (o *PutQuotasProjectIDAccepted) Code() int {
 }
 
 func (o *PutQuotasProjectIDAccepted) Error() string {
-	return fmt.Sprintf("[PUT /quotas/{project_id}][%d] putQuotasProjectIdAccepted  %+v", 202, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /quotas/{project_id}][%d] putQuotasProjectIdAccepted %s", 202, payload)
 }
 
 func (o *PutQuotasProjectIDAccepted) String() string {
-	return fmt.Sprintf("[PUT /quotas/{project_id}][%d] putQuotasProjectIdAccepted  %+v", 202, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /quotas/{project_id}][%d] putQuotasProjectIdAccepted %s", 202, payload)
 }
 
 func (o *PutQuotasProjectIDAccepted) GetPayload() *PutQuotasProjectIDAcceptedBody {
@@ -166,11 +169,13 @@ func (o *PutQuotasProjectIDDefault) Code() int {
 }
 
 func (o *PutQuotasProjectIDDefault) Error() string {
-	return fmt.Sprintf("[PUT /quotas/{project_id}][%d] PutQuotasProjectID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /quotas/{project_id}][%d] PutQuotasProjectID default %s", o._statusCode, payload)
 }
 
 func (o *PutQuotasProjectIDDefault) String() string {
-	return fmt.Sprintf("[PUT /quotas/{project_id}][%d] PutQuotasProjectID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /quotas/{project_id}][%d] PutQuotasProjectID default %s", o._statusCode, payload)
 }
 
 func (o *PutQuotasProjectIDDefault) GetPayload() *models.Error {
@@ -249,6 +254,11 @@ func (o *PutQuotasProjectIDAcceptedBody) ContextValidate(ctx context.Context, fo
 func (o *PutQuotasProjectIDAcceptedBody) contextValidateQuota(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Quota != nil {
+
+		if swag.IsZero(o.Quota) { // not required
+			return nil
+		}
+
 		if err := o.Quota.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("putQuotasProjectIdAccepted" + "." + "quota")
@@ -342,6 +352,7 @@ func (o *PutQuotasProjectIDBody) ContextValidate(ctx context.Context, formats st
 func (o *PutQuotasProjectIDBody) contextValidateQuota(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Quota != nil {
+
 		if err := o.Quota.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("quota" + "." + "quota")

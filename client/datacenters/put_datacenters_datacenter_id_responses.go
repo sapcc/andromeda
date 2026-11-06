@@ -11,6 +11,7 @@ package datacenters
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -106,11 +107,13 @@ func (o *PutDatacentersDatacenterIDAccepted) Code() int {
 }
 
 func (o *PutDatacentersDatacenterIDAccepted) Error() string {
-	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] putDatacentersDatacenterIdAccepted  %+v", 202, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] putDatacentersDatacenterIdAccepted %s", 202, payload)
 }
 
 func (o *PutDatacentersDatacenterIDAccepted) String() string {
-	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] putDatacentersDatacenterIdAccepted  %+v", 202, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] putDatacentersDatacenterIdAccepted %s", 202, payload)
 }
 
 func (o *PutDatacentersDatacenterIDAccepted) GetPayload() *PutDatacentersDatacenterIDAcceptedBody {
@@ -174,11 +177,13 @@ func (o *PutDatacentersDatacenterIDBadRequest) Code() int {
 }
 
 func (o *PutDatacentersDatacenterIDBadRequest) Error() string {
-	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] putDatacentersDatacenterIdBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] putDatacentersDatacenterIdBadRequest %s", 400, payload)
 }
 
 func (o *PutDatacentersDatacenterIDBadRequest) String() string {
-	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] putDatacentersDatacenterIdBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] putDatacentersDatacenterIdBadRequest %s", 400, payload)
 }
 
 func (o *PutDatacentersDatacenterIDBadRequest) GetPayload() *models.Error {
@@ -242,11 +247,13 @@ func (o *PutDatacentersDatacenterIDNotFound) Code() int {
 }
 
 func (o *PutDatacentersDatacenterIDNotFound) Error() string {
-	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] putDatacentersDatacenterIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] putDatacentersDatacenterIdNotFound %s", 404, payload)
 }
 
 func (o *PutDatacentersDatacenterIDNotFound) String() string {
-	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] putDatacentersDatacenterIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] putDatacentersDatacenterIdNotFound %s", 404, payload)
 }
 
 func (o *PutDatacentersDatacenterIDNotFound) GetPayload() *models.Error {
@@ -314,11 +321,13 @@ func (o *PutDatacentersDatacenterIDDefault) Code() int {
 }
 
 func (o *PutDatacentersDatacenterIDDefault) Error() string {
-	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] PutDatacentersDatacenterID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] PutDatacentersDatacenterID default %s", o._statusCode, payload)
 }
 
 func (o *PutDatacentersDatacenterIDDefault) String() string {
-	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] PutDatacentersDatacenterID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /datacenters/{datacenter_id}][%d] PutDatacentersDatacenterID default %s", o._statusCode, payload)
 }
 
 func (o *PutDatacentersDatacenterIDDefault) GetPayload() *models.Error {
@@ -397,6 +406,11 @@ func (o *PutDatacentersDatacenterIDAcceptedBody) ContextValidate(ctx context.Con
 func (o *PutDatacentersDatacenterIDAcceptedBody) contextValidateDatacenter(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Datacenter != nil {
+
+		if swag.IsZero(o.Datacenter) { // not required
+			return nil
+		}
+
 		if err := o.Datacenter.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("putDatacentersDatacenterIdAccepted" + "." + "datacenter")
@@ -490,6 +504,7 @@ func (o *PutDatacentersDatacenterIDBody) ContextValidate(ctx context.Context, fo
 func (o *PutDatacentersDatacenterIDBody) contextValidateDatacenter(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Datacenter != nil {
+
 		if err := o.Datacenter.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("datacenter" + "." + "datacenter")

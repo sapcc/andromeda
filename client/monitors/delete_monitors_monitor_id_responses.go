@@ -10,6 +10,7 @@ package monitors
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -95,11 +96,11 @@ func (o *DeleteMonitorsMonitorIDNoContent) Code() int {
 }
 
 func (o *DeleteMonitorsMonitorIDNoContent) Error() string {
-	return fmt.Sprintf("[DELETE /monitors/{monitor_id}][%d] deleteMonitorsMonitorIdNoContent ", 204)
+	return fmt.Sprintf("[DELETE /monitors/{monitor_id}][%d] deleteMonitorsMonitorIdNoContent", 204)
 }
 
 func (o *DeleteMonitorsMonitorIDNoContent) String() string {
-	return fmt.Sprintf("[DELETE /monitors/{monitor_id}][%d] deleteMonitorsMonitorIdNoContent ", 204)
+	return fmt.Sprintf("[DELETE /monitors/{monitor_id}][%d] deleteMonitorsMonitorIdNoContent", 204)
 }
 
 func (o *DeleteMonitorsMonitorIDNoContent) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -152,11 +153,13 @@ func (o *DeleteMonitorsMonitorIDNotFound) Code() int {
 }
 
 func (o *DeleteMonitorsMonitorIDNotFound) Error() string {
-	return fmt.Sprintf("[DELETE /monitors/{monitor_id}][%d] deleteMonitorsMonitorIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /monitors/{monitor_id}][%d] deleteMonitorsMonitorIdNotFound %s", 404, payload)
 }
 
 func (o *DeleteMonitorsMonitorIDNotFound) String() string {
-	return fmt.Sprintf("[DELETE /monitors/{monitor_id}][%d] deleteMonitorsMonitorIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /monitors/{monitor_id}][%d] deleteMonitorsMonitorIdNotFound %s", 404, payload)
 }
 
 func (o *DeleteMonitorsMonitorIDNotFound) GetPayload() *models.Error {
@@ -224,11 +227,13 @@ func (o *DeleteMonitorsMonitorIDDefault) Code() int {
 }
 
 func (o *DeleteMonitorsMonitorIDDefault) Error() string {
-	return fmt.Sprintf("[DELETE /monitors/{monitor_id}][%d] DeleteMonitorsMonitorID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /monitors/{monitor_id}][%d] DeleteMonitorsMonitorID default %s", o._statusCode, payload)
 }
 
 func (o *DeleteMonitorsMonitorIDDefault) String() string {
-	return fmt.Sprintf("[DELETE /monitors/{monitor_id}][%d] DeleteMonitorsMonitorID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /monitors/{monitor_id}][%d] DeleteMonitorsMonitorID default %s", o._statusCode, payload)
 }
 
 func (o *DeleteMonitorsMonitorIDDefault) GetPayload() *models.Error {

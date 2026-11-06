@@ -10,6 +10,7 @@ package pools
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -101,11 +102,11 @@ func (o *DeletePoolsPoolIDNoContent) Code() int {
 }
 
 func (o *DeletePoolsPoolIDNoContent) Error() string {
-	return fmt.Sprintf("[DELETE /pools/{pool_id}][%d] deletePoolsPoolIdNoContent ", 204)
+	return fmt.Sprintf("[DELETE /pools/{pool_id}][%d] deletePoolsPoolIdNoContent", 204)
 }
 
 func (o *DeletePoolsPoolIDNoContent) String() string {
-	return fmt.Sprintf("[DELETE /pools/{pool_id}][%d] deletePoolsPoolIdNoContent ", 204)
+	return fmt.Sprintf("[DELETE /pools/{pool_id}][%d] deletePoolsPoolIdNoContent", 204)
 }
 
 func (o *DeletePoolsPoolIDNoContent) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -158,11 +159,13 @@ func (o *DeletePoolsPoolIDNotFound) Code() int {
 }
 
 func (o *DeletePoolsPoolIDNotFound) Error() string {
-	return fmt.Sprintf("[DELETE /pools/{pool_id}][%d] deletePoolsPoolIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /pools/{pool_id}][%d] deletePoolsPoolIdNotFound %s", 404, payload)
 }
 
 func (o *DeletePoolsPoolIDNotFound) String() string {
-	return fmt.Sprintf("[DELETE /pools/{pool_id}][%d] deletePoolsPoolIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /pools/{pool_id}][%d] deletePoolsPoolIdNotFound %s", 404, payload)
 }
 
 func (o *DeletePoolsPoolIDNotFound) GetPayload() *models.Error {
@@ -226,11 +229,13 @@ func (o *DeletePoolsPoolIDConflict) Code() int {
 }
 
 func (o *DeletePoolsPoolIDConflict) Error() string {
-	return fmt.Sprintf("[DELETE /pools/{pool_id}][%d] deletePoolsPoolIdConflict  %+v", 409, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /pools/{pool_id}][%d] deletePoolsPoolIdConflict %s", 409, payload)
 }
 
 func (o *DeletePoolsPoolIDConflict) String() string {
-	return fmt.Sprintf("[DELETE /pools/{pool_id}][%d] deletePoolsPoolIdConflict  %+v", 409, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /pools/{pool_id}][%d] deletePoolsPoolIdConflict %s", 409, payload)
 }
 
 func (o *DeletePoolsPoolIDConflict) GetPayload() *models.Error {
@@ -298,11 +303,13 @@ func (o *DeletePoolsPoolIDDefault) Code() int {
 }
 
 func (o *DeletePoolsPoolIDDefault) Error() string {
-	return fmt.Sprintf("[DELETE /pools/{pool_id}][%d] DeletePoolsPoolID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /pools/{pool_id}][%d] DeletePoolsPoolID default %s", o._statusCode, payload)
 }
 
 func (o *DeletePoolsPoolIDDefault) String() string {
-	return fmt.Sprintf("[DELETE /pools/{pool_id}][%d] DeletePoolsPoolID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /pools/{pool_id}][%d] DeletePoolsPoolID default %s", o._statusCode, payload)
 }
 
 func (o *DeletePoolsPoolIDDefault) GetPayload() *models.Error {

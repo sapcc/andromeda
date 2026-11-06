@@ -127,6 +127,7 @@ func (o *PostGeomapsBody) ContextValidate(ctx context.Context, formats strfmt.Re
 func (o *PostGeomapsBody) contextValidateGeomap(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Geomap != nil {
+
 		if err := o.Geomap.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("geomap" + "." + "geomap")
@@ -217,6 +218,11 @@ func (o *PostGeomapsCreatedBody) ContextValidate(ctx context.Context, formats st
 func (o *PostGeomapsCreatedBody) contextValidateGeomap(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Geomap != nil {
+
+		if swag.IsZero(o.Geomap) { // not required
+			return nil
+		}
+
 		if err := o.Geomap.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("postGeomapsCreated" + "." + "geomap")

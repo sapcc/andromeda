@@ -124,6 +124,11 @@ func (o *GetGeomapsGeomapIDOKBody) ContextValidate(ctx context.Context, formats 
 func (o *GetGeomapsGeomapIDOKBody) contextValidateGeomap(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Geomap != nil {
+
+		if swag.IsZero(o.Geomap) { // not required
+			return nil
+		}
+
 		if err := o.Geomap.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("getGeomapsGeomapIdOK" + "." + "geomap")

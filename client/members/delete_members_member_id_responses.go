@@ -10,6 +10,7 @@ package members
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -95,11 +96,11 @@ func (o *DeleteMembersMemberIDNoContent) Code() int {
 }
 
 func (o *DeleteMembersMemberIDNoContent) Error() string {
-	return fmt.Sprintf("[DELETE /members/{member_id}][%d] deleteMembersMemberIdNoContent ", 204)
+	return fmt.Sprintf("[DELETE /members/{member_id}][%d] deleteMembersMemberIdNoContent", 204)
 }
 
 func (o *DeleteMembersMemberIDNoContent) String() string {
-	return fmt.Sprintf("[DELETE /members/{member_id}][%d] deleteMembersMemberIdNoContent ", 204)
+	return fmt.Sprintf("[DELETE /members/{member_id}][%d] deleteMembersMemberIdNoContent", 204)
 }
 
 func (o *DeleteMembersMemberIDNoContent) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -152,11 +153,13 @@ func (o *DeleteMembersMemberIDNotFound) Code() int {
 }
 
 func (o *DeleteMembersMemberIDNotFound) Error() string {
-	return fmt.Sprintf("[DELETE /members/{member_id}][%d] deleteMembersMemberIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /members/{member_id}][%d] deleteMembersMemberIdNotFound %s", 404, payload)
 }
 
 func (o *DeleteMembersMemberIDNotFound) String() string {
-	return fmt.Sprintf("[DELETE /members/{member_id}][%d] deleteMembersMemberIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /members/{member_id}][%d] deleteMembersMemberIdNotFound %s", 404, payload)
 }
 
 func (o *DeleteMembersMemberIDNotFound) GetPayload() *models.Error {
@@ -224,11 +227,13 @@ func (o *DeleteMembersMemberIDDefault) Code() int {
 }
 
 func (o *DeleteMembersMemberIDDefault) Error() string {
-	return fmt.Sprintf("[DELETE /members/{member_id}][%d] DeleteMembersMemberID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /members/{member_id}][%d] DeleteMembersMemberID default %s", o._statusCode, payload)
 }
 
 func (o *DeleteMembersMemberIDDefault) String() string {
-	return fmt.Sprintf("[DELETE /members/{member_id}][%d] DeleteMembersMemberID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /members/{member_id}][%d] DeleteMembersMemberID default %s", o._statusCode, payload)
 }
 
 func (o *DeleteMembersMemberIDDefault) GetPayload() *models.Error {

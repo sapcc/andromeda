@@ -11,6 +11,7 @@ package geographic_maps
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"strconv"
@@ -100,11 +101,13 @@ func (o *GetGeomapsOK) Code() int {
 }
 
 func (o *GetGeomapsOK) Error() string {
-	return fmt.Sprintf("[GET /geomaps][%d] getGeomapsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /geomaps][%d] getGeomapsOK %s", 200, payload)
 }
 
 func (o *GetGeomapsOK) String() string {
-	return fmt.Sprintf("[GET /geomaps][%d] getGeomapsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /geomaps][%d] getGeomapsOK %s", 200, payload)
 }
 
 func (o *GetGeomapsOK) GetPayload() *GetGeomapsOKBody {
@@ -168,11 +171,13 @@ func (o *GetGeomapsBadRequest) Code() int {
 }
 
 func (o *GetGeomapsBadRequest) Error() string {
-	return fmt.Sprintf("[GET /geomaps][%d] getGeomapsBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /geomaps][%d] getGeomapsBadRequest %s", 400, payload)
 }
 
 func (o *GetGeomapsBadRequest) String() string {
-	return fmt.Sprintf("[GET /geomaps][%d] getGeomapsBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /geomaps][%d] getGeomapsBadRequest %s", 400, payload)
 }
 
 func (o *GetGeomapsBadRequest) GetPayload() *models.Error {
@@ -240,11 +245,13 @@ func (o *GetGeomapsDefault) Code() int {
 }
 
 func (o *GetGeomapsDefault) Error() string {
-	return fmt.Sprintf("[GET /geomaps][%d] GetGeomaps default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /geomaps][%d] GetGeomaps default %s", o._statusCode, payload)
 }
 
 func (o *GetGeomapsDefault) String() string {
-	return fmt.Sprintf("[GET /geomaps][%d] GetGeomaps default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /geomaps][%d] GetGeomaps default %s", o._statusCode, payload)
 }
 
 func (o *GetGeomapsDefault) GetPayload() *models.Error {
@@ -369,6 +376,11 @@ func (o *GetGeomapsOKBody) contextValidateGeomaps(ctx context.Context, formats s
 	for i := 0; i < len(o.Geomaps); i++ {
 
 		if o.Geomaps[i] != nil {
+
+			if swag.IsZero(o.Geomaps[i]) { // not required
+				return nil
+			}
+
 			if err := o.Geomaps[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("getGeomapsOK" + "." + "geomaps" + "." + strconv.Itoa(i))
@@ -389,6 +401,11 @@ func (o *GetGeomapsOKBody) contextValidateLinks(ctx context.Context, formats str
 	for i := 0; i < len(o.Links); i++ {
 
 		if o.Links[i] != nil {
+
+			if swag.IsZero(o.Links[i]) { // not required
+				return nil
+			}
+
 			if err := o.Links[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("getGeomapsOK" + "." + "links" + "." + strconv.Itoa(i))

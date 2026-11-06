@@ -11,12 +11,38 @@ package monitors
 
 import (
 	"github.com/go-openapi/runtime"
+	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 )
 
 // New creates a new monitors API client.
 func New(transport runtime.ClientTransport, formats strfmt.Registry) ClientService {
 	return &Client{transport: transport, formats: formats}
+}
+
+// New creates a new monitors API client with basic auth credentials.
+// It takes the following parameters:
+// - host: http host (github.com).
+// - basePath: any base path for the API client ("/v1", "/v3").
+// - scheme: http scheme ("http", "https").
+// - user: user for basic authentication header.
+// - password: password for basic authentication header.
+func NewClientWithBasicAuth(host, basePath, scheme, user, password string) ClientService {
+	transport := httptransport.New(host, basePath, []string{scheme})
+	transport.DefaultAuthentication = httptransport.BasicAuth(user, password)
+	return &Client{transport: transport, formats: strfmt.Default}
+}
+
+// New creates a new monitors API client with a bearer token for authentication.
+// It takes the following parameters:
+// - host: http host (github.com).
+// - basePath: any base path for the API client ("/v1", "/v3").
+// - scheme: http scheme ("http", "https").
+// - bearerToken: bearer token for Bearer authentication header.
+func NewClientWithBearerToken(host, basePath, scheme, bearerToken string) ClientService {
+	transport := httptransport.New(host, basePath, []string{scheme})
+	transport.DefaultAuthentication = httptransport.BearerToken(bearerToken)
+	return &Client{transport: transport, formats: strfmt.Default}
 }
 
 /*
@@ -27,7 +53,7 @@ type Client struct {
 	formats   strfmt.Registry
 }
 
-// ClientOption is the option for Client methods
+// ClientOption may be used to customize the behavior of Client methods.
 type ClientOption func(*runtime.ClientOperation)
 
 // ClientService is the interface for Client methods
@@ -173,17 +199,17 @@ Andromeda pool monitors are mapped to [F5 monitors][f5-monitors] based on the `t
 | `TCP`     | `tcp`          |
 | `UDP`     | `udp`          |
 
-Andromeda monitor properties map to an F5 `Monitor` as follows:
+Andromeda monitor properties map to an F5 `GSLB_Monitor` as follows:
 
-| Andromeda     | F5 `Monitor` object   | Comments                                       |
-|---------------|-----------------------|------------------------------------------------|
-| `domain_name` | -                     | Unsupported by F5/AS3                          |
-| `http_method` | -                     | Unsupported by F5/AS3 (see caveats below)      |
-| `interval`    | `interval`            |                                                |
-| `receive`     | `receive`             | `HTTP` / `HTTPS` only                          |
-| `send`        | `send`                | `HTTP` / `HTTPS` only                          |
-| `timeout`     | `timeout`             |                                                |
-| `type`        | `monitorType`         |                                                |
+| Andromeda     | F5 `GSLB_Monitor` object | Comments                                       |
+|---------------|--------------------------|------------------------------------------------|
+| `domain_name` | -                        | Unsupported by F5/AS3                          |
+| `http_method` | -                        | Unsupported by F5/AS3 (see caveats below)      |
+| `interval`    | `interval`               |                                                |
+| `receive`     | `receive`                | `HTTP` / `HTTPS` only                          |
+| `send`        | `send`                   | `HTTP` / `HTTPS` only                          |
+| `timeout`     | `probeTimeout`           |                                                |
+| `type`        | `monitorType`            |                                                |
 
 Caveats:
 

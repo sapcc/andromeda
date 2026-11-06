@@ -11,6 +11,7 @@ package monitors
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"strconv"
@@ -100,11 +101,13 @@ func (o *GetMonitorsOK) Code() int {
 }
 
 func (o *GetMonitorsOK) Error() string {
-	return fmt.Sprintf("[GET /monitors][%d] getMonitorsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /monitors][%d] getMonitorsOK %s", 200, payload)
 }
 
 func (o *GetMonitorsOK) String() string {
-	return fmt.Sprintf("[GET /monitors][%d] getMonitorsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /monitors][%d] getMonitorsOK %s", 200, payload)
 }
 
 func (o *GetMonitorsOK) GetPayload() *GetMonitorsOKBody {
@@ -168,11 +171,13 @@ func (o *GetMonitorsBadRequest) Code() int {
 }
 
 func (o *GetMonitorsBadRequest) Error() string {
-	return fmt.Sprintf("[GET /monitors][%d] getMonitorsBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /monitors][%d] getMonitorsBadRequest %s", 400, payload)
 }
 
 func (o *GetMonitorsBadRequest) String() string {
-	return fmt.Sprintf("[GET /monitors][%d] getMonitorsBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /monitors][%d] getMonitorsBadRequest %s", 400, payload)
 }
 
 func (o *GetMonitorsBadRequest) GetPayload() *models.Error {
@@ -240,11 +245,13 @@ func (o *GetMonitorsDefault) Code() int {
 }
 
 func (o *GetMonitorsDefault) Error() string {
-	return fmt.Sprintf("[GET /monitors][%d] GetMonitors default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /monitors][%d] GetMonitors default %s", o._statusCode, payload)
 }
 
 func (o *GetMonitorsDefault) String() string {
-	return fmt.Sprintf("[GET /monitors][%d] GetMonitors default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /monitors][%d] GetMonitors default %s", o._statusCode, payload)
 }
 
 func (o *GetMonitorsDefault) GetPayload() *models.Error {
@@ -369,6 +376,11 @@ func (o *GetMonitorsOKBody) contextValidateLinks(ctx context.Context, formats st
 	for i := 0; i < len(o.Links); i++ {
 
 		if o.Links[i] != nil {
+
+			if swag.IsZero(o.Links[i]) { // not required
+				return nil
+			}
+
 			if err := o.Links[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("getMonitorsOK" + "." + "links" + "." + strconv.Itoa(i))
@@ -389,6 +401,11 @@ func (o *GetMonitorsOKBody) contextValidateMonitors(ctx context.Context, formats
 	for i := 0; i < len(o.Monitors); i++ {
 
 		if o.Monitors[i] != nil {
+
+			if swag.IsZero(o.Monitors[i]) { // not required
+				return nil
+			}
+
 			if err := o.Monitors[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("getMonitorsOK" + "." + "monitors" + "." + strconv.Itoa(i))

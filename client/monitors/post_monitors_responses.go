@@ -11,6 +11,7 @@ package monitors
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -106,11 +107,13 @@ func (o *PostMonitorsCreated) Code() int {
 }
 
 func (o *PostMonitorsCreated) Error() string {
-	return fmt.Sprintf("[POST /monitors][%d] postMonitorsCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /monitors][%d] postMonitorsCreated %s", 201, payload)
 }
 
 func (o *PostMonitorsCreated) String() string {
-	return fmt.Sprintf("[POST /monitors][%d] postMonitorsCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /monitors][%d] postMonitorsCreated %s", 201, payload)
 }
 
 func (o *PostMonitorsCreated) GetPayload() *PostMonitorsCreatedBody {
@@ -174,11 +177,13 @@ func (o *PostMonitorsBadRequest) Code() int {
 }
 
 func (o *PostMonitorsBadRequest) Error() string {
-	return fmt.Sprintf("[POST /monitors][%d] postMonitorsBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /monitors][%d] postMonitorsBadRequest %s", 400, payload)
 }
 
 func (o *PostMonitorsBadRequest) String() string {
-	return fmt.Sprintf("[POST /monitors][%d] postMonitorsBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /monitors][%d] postMonitorsBadRequest %s", 400, payload)
 }
 
 func (o *PostMonitorsBadRequest) GetPayload() *models.Error {
@@ -242,11 +247,13 @@ func (o *PostMonitorsNotFound) Code() int {
 }
 
 func (o *PostMonitorsNotFound) Error() string {
-	return fmt.Sprintf("[POST /monitors][%d] postMonitorsNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /monitors][%d] postMonitorsNotFound %s", 404, payload)
 }
 
 func (o *PostMonitorsNotFound) String() string {
-	return fmt.Sprintf("[POST /monitors][%d] postMonitorsNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /monitors][%d] postMonitorsNotFound %s", 404, payload)
 }
 
 func (o *PostMonitorsNotFound) GetPayload() *models.Error {
@@ -314,11 +321,13 @@ func (o *PostMonitorsDefault) Code() int {
 }
 
 func (o *PostMonitorsDefault) Error() string {
-	return fmt.Sprintf("[POST /monitors][%d] PostMonitors default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /monitors][%d] PostMonitors default %s", o._statusCode, payload)
 }
 
 func (o *PostMonitorsDefault) String() string {
-	return fmt.Sprintf("[POST /monitors][%d] PostMonitors default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /monitors][%d] PostMonitors default %s", o._statusCode, payload)
 }
 
 func (o *PostMonitorsDefault) GetPayload() *models.Error {
@@ -399,6 +408,7 @@ func (o *PostMonitorsBody) ContextValidate(ctx context.Context, formats strfmt.R
 func (o *PostMonitorsBody) contextValidateMonitor(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Monitor != nil {
+
 		if err := o.Monitor.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("monitor" + "." + "monitor")
@@ -490,6 +500,11 @@ func (o *PostMonitorsCreatedBody) ContextValidate(ctx context.Context, formats s
 func (o *PostMonitorsCreatedBody) contextValidateMonitor(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Monitor != nil {
+
+		if swag.IsZero(o.Monitor) { // not required
+			return nil
+		}
+
 		if err := o.Monitor.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("postMonitorsCreated" + "." + "monitor")
