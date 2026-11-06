@@ -11,6 +11,7 @@ package domains
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"strconv"
@@ -100,11 +101,13 @@ func (o *GetDomainsOK) Code() int {
 }
 
 func (o *GetDomainsOK) Error() string {
-	return fmt.Sprintf("[GET /domains][%d] getDomainsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /domains][%d] getDomainsOK %s", 200, payload)
 }
 
 func (o *GetDomainsOK) String() string {
-	return fmt.Sprintf("[GET /domains][%d] getDomainsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /domains][%d] getDomainsOK %s", 200, payload)
 }
 
 func (o *GetDomainsOK) GetPayload() *GetDomainsOKBody {
@@ -168,11 +171,13 @@ func (o *GetDomainsBadRequest) Code() int {
 }
 
 func (o *GetDomainsBadRequest) Error() string {
-	return fmt.Sprintf("[GET /domains][%d] getDomainsBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /domains][%d] getDomainsBadRequest %s", 400, payload)
 }
 
 func (o *GetDomainsBadRequest) String() string {
-	return fmt.Sprintf("[GET /domains][%d] getDomainsBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /domains][%d] getDomainsBadRequest %s", 400, payload)
 }
 
 func (o *GetDomainsBadRequest) GetPayload() *models.Error {
@@ -240,11 +245,13 @@ func (o *GetDomainsDefault) Code() int {
 }
 
 func (o *GetDomainsDefault) Error() string {
-	return fmt.Sprintf("[GET /domains][%d] GetDomains default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /domains][%d] GetDomains default %s", o._statusCode, payload)
 }
 
 func (o *GetDomainsDefault) String() string {
-	return fmt.Sprintf("[GET /domains][%d] GetDomains default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /domains][%d] GetDomains default %s", o._statusCode, payload)
 }
 
 func (o *GetDomainsDefault) GetPayload() *models.Error {
@@ -369,6 +376,11 @@ func (o *GetDomainsOKBody) contextValidateDomains(ctx context.Context, formats s
 	for i := 0; i < len(o.Domains); i++ {
 
 		if o.Domains[i] != nil {
+
+			if swag.IsZero(o.Domains[i]) { // not required
+				return nil
+			}
+
 			if err := o.Domains[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("getDomainsOK" + "." + "domains" + "." + strconv.Itoa(i))
@@ -389,6 +401,11 @@ func (o *GetDomainsOKBody) contextValidateLinks(ctx context.Context, formats str
 	for i := 0; i < len(o.Links); i++ {
 
 		if o.Links[i] != nil {
+
+			if swag.IsZero(o.Links[i]) { // not required
+				return nil
+			}
+
 			if err := o.Links[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("getDomainsOK" + "." + "links" + "." + strconv.Itoa(i))

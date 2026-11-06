@@ -125,6 +125,11 @@ func (o *PutMembersMemberIDAcceptedBody) ContextValidate(ctx context.Context, fo
 func (o *PutMembersMemberIDAcceptedBody) contextValidateMember(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Member != nil {
+
+		if swag.IsZero(o.Member) { // not required
+			return nil
+		}
+
 		if err := o.Member.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("putMembersMemberIdAccepted" + "." + "member")
@@ -217,6 +222,7 @@ func (o *PutMembersMemberIDBody) ContextValidate(ctx context.Context, formats st
 func (o *PutMembersMemberIDBody) contextValidateMember(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Member != nil {
+
 		if err := o.Member.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("member" + "." + "member")

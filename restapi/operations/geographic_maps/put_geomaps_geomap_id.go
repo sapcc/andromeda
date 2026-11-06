@@ -125,6 +125,11 @@ func (o *PutGeomapsGeomapIDAcceptedBody) ContextValidate(ctx context.Context, fo
 func (o *PutGeomapsGeomapIDAcceptedBody) contextValidateGeomap(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Geomap != nil {
+
+		if swag.IsZero(o.Geomap) { // not required
+			return nil
+		}
+
 		if err := o.Geomap.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("putGeomapsGeomapIdAccepted" + "." + "geomap")
@@ -217,6 +222,7 @@ func (o *PutGeomapsGeomapIDBody) ContextValidate(ctx context.Context, formats st
 func (o *PutGeomapsGeomapIDBody) contextValidateGeomap(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Geomap != nil {
+
 		if err := o.Geomap.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("geomap" + "." + "geomap")

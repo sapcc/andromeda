@@ -125,6 +125,11 @@ func (o *PutDatacentersDatacenterIDAcceptedBody) ContextValidate(ctx context.Con
 func (o *PutDatacentersDatacenterIDAcceptedBody) contextValidateDatacenter(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Datacenter != nil {
+
+		if swag.IsZero(o.Datacenter) { // not required
+			return nil
+		}
+
 		if err := o.Datacenter.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("putDatacentersDatacenterIdAccepted" + "." + "datacenter")
@@ -217,6 +222,7 @@ func (o *PutDatacentersDatacenterIDBody) ContextValidate(ctx context.Context, fo
 func (o *PutDatacentersDatacenterIDBody) contextValidateDatacenter(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Datacenter != nil {
+
 		if err := o.Datacenter.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("datacenter" + "." + "datacenter")

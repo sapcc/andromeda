@@ -11,6 +11,7 @@ package geographic_maps
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -99,11 +100,13 @@ func (o *GetGeomapsGeomapIDOK) Code() int {
 }
 
 func (o *GetGeomapsGeomapIDOK) Error() string {
-	return fmt.Sprintf("[GET /geomaps/{geomap_id}][%d] getGeomapsGeomapIdOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /geomaps/{geomap_id}][%d] getGeomapsGeomapIdOK %s", 200, payload)
 }
 
 func (o *GetGeomapsGeomapIDOK) String() string {
-	return fmt.Sprintf("[GET /geomaps/{geomap_id}][%d] getGeomapsGeomapIdOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /geomaps/{geomap_id}][%d] getGeomapsGeomapIdOK %s", 200, payload)
 }
 
 func (o *GetGeomapsGeomapIDOK) GetPayload() *GetGeomapsGeomapIDOKBody {
@@ -167,11 +170,13 @@ func (o *GetGeomapsGeomapIDNotFound) Code() int {
 }
 
 func (o *GetGeomapsGeomapIDNotFound) Error() string {
-	return fmt.Sprintf("[GET /geomaps/{geomap_id}][%d] getGeomapsGeomapIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /geomaps/{geomap_id}][%d] getGeomapsGeomapIdNotFound %s", 404, payload)
 }
 
 func (o *GetGeomapsGeomapIDNotFound) String() string {
-	return fmt.Sprintf("[GET /geomaps/{geomap_id}][%d] getGeomapsGeomapIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /geomaps/{geomap_id}][%d] getGeomapsGeomapIdNotFound %s", 404, payload)
 }
 
 func (o *GetGeomapsGeomapIDNotFound) GetPayload() *models.Error {
@@ -239,11 +244,13 @@ func (o *GetGeomapsGeomapIDDefault) Code() int {
 }
 
 func (o *GetGeomapsGeomapIDDefault) Error() string {
-	return fmt.Sprintf("[GET /geomaps/{geomap_id}][%d] GetGeomapsGeomapID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /geomaps/{geomap_id}][%d] GetGeomapsGeomapID default %s", o._statusCode, payload)
 }
 
 func (o *GetGeomapsGeomapIDDefault) String() string {
-	return fmt.Sprintf("[GET /geomaps/{geomap_id}][%d] GetGeomapsGeomapID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /geomaps/{geomap_id}][%d] GetGeomapsGeomapID default %s", o._statusCode, payload)
 }
 
 func (o *GetGeomapsGeomapIDDefault) GetPayload() *models.Error {
@@ -322,6 +329,11 @@ func (o *GetGeomapsGeomapIDOKBody) ContextValidate(ctx context.Context, formats 
 func (o *GetGeomapsGeomapIDOKBody) contextValidateGeomap(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Geomap != nil {
+
+		if swag.IsZero(o.Geomap) { // not required
+			return nil
+		}
+
 		if err := o.Geomap.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("getGeomapsGeomapIdOK" + "." + "geomap")

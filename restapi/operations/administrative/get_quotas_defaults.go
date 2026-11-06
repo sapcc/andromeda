@@ -124,6 +124,11 @@ func (o *GetQuotasDefaultsOKBody) ContextValidate(ctx context.Context, formats s
 func (o *GetQuotasDefaultsOKBody) contextValidateQuota(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Quota != nil {
+
+		if swag.IsZero(o.Quota) { // not required
+			return nil
+		}
+
 		if err := o.Quota.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("getQuotasDefaultsOK" + "." + "quota")

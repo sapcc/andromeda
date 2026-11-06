@@ -11,6 +11,7 @@ package datacenters
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -99,11 +100,13 @@ func (o *GetDatacentersDatacenterIDOK) Code() int {
 }
 
 func (o *GetDatacentersDatacenterIDOK) Error() string {
-	return fmt.Sprintf("[GET /datacenters/{datacenter_id}][%d] getDatacentersDatacenterIdOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /datacenters/{datacenter_id}][%d] getDatacentersDatacenterIdOK %s", 200, payload)
 }
 
 func (o *GetDatacentersDatacenterIDOK) String() string {
-	return fmt.Sprintf("[GET /datacenters/{datacenter_id}][%d] getDatacentersDatacenterIdOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /datacenters/{datacenter_id}][%d] getDatacentersDatacenterIdOK %s", 200, payload)
 }
 
 func (o *GetDatacentersDatacenterIDOK) GetPayload() *GetDatacentersDatacenterIDOKBody {
@@ -167,11 +170,13 @@ func (o *GetDatacentersDatacenterIDNotFound) Code() int {
 }
 
 func (o *GetDatacentersDatacenterIDNotFound) Error() string {
-	return fmt.Sprintf("[GET /datacenters/{datacenter_id}][%d] getDatacentersDatacenterIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /datacenters/{datacenter_id}][%d] getDatacentersDatacenterIdNotFound %s", 404, payload)
 }
 
 func (o *GetDatacentersDatacenterIDNotFound) String() string {
-	return fmt.Sprintf("[GET /datacenters/{datacenter_id}][%d] getDatacentersDatacenterIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /datacenters/{datacenter_id}][%d] getDatacentersDatacenterIdNotFound %s", 404, payload)
 }
 
 func (o *GetDatacentersDatacenterIDNotFound) GetPayload() *models.Error {
@@ -239,11 +244,13 @@ func (o *GetDatacentersDatacenterIDDefault) Code() int {
 }
 
 func (o *GetDatacentersDatacenterIDDefault) Error() string {
-	return fmt.Sprintf("[GET /datacenters/{datacenter_id}][%d] GetDatacentersDatacenterID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /datacenters/{datacenter_id}][%d] GetDatacentersDatacenterID default %s", o._statusCode, payload)
 }
 
 func (o *GetDatacentersDatacenterIDDefault) String() string {
-	return fmt.Sprintf("[GET /datacenters/{datacenter_id}][%d] GetDatacentersDatacenterID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /datacenters/{datacenter_id}][%d] GetDatacentersDatacenterID default %s", o._statusCode, payload)
 }
 
 func (o *GetDatacentersDatacenterIDDefault) GetPayload() *models.Error {
@@ -322,6 +329,11 @@ func (o *GetDatacentersDatacenterIDOKBody) ContextValidate(ctx context.Context, 
 func (o *GetDatacentersDatacenterIDOKBody) contextValidateDatacenter(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Datacenter != nil {
+
+		if swag.IsZero(o.Datacenter) { // not required
+			return nil
+		}
+
 		if err := o.Datacenter.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("getDatacentersDatacenterIdOK" + "." + "datacenter")

@@ -56,16 +56,16 @@ type Geomap struct {
 
 	// Provider driver for the backend solution
 	// Example: akamai
-	// Enum: [akamai f5]
+	// Enum: ["akamai","f5"]
 	Provider string `json:"provider,omitempty" db:"provider,omitempty"`
 
 	// provisioning status
 	// Read Only: true
-	// Enum: [PENDING_CREATE PENDING_UPDATE PENDING_DELETE ACTIVE ERROR]
+	// Enum: ["PENDING_CREATE","PENDING_UPDATE","PENDING_DELETE","ACTIVE","ERROR"]
 	ProvisioningStatus string `json:"provisioning_status,omitempty" db:"provisioning_status,omitempty"`
 
 	// Visibility of datacenter between different projects
-	// Enum: [private shared]
+	// Enum: ["private","shared"]
 	Scope *string `json:"scope,omitempty" db:"scope,omitempty"`
 
 	// The UTC date and timestamp when the resource was created.
@@ -398,6 +398,11 @@ func (m *Geomap) contextValidateAssignments(ctx context.Context, formats strfmt.
 	for i := 0; i < len(m.Assignments); i++ {
 
 		if m.Assignments[i] != nil {
+
+			if swag.IsZero(m.Assignments[i]) { // not required
+				return nil
+			}
+
 			if err := m.Assignments[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("assignments" + "." + strconv.Itoa(i))

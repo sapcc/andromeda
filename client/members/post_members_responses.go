@@ -11,6 +11,7 @@ package members
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -106,11 +107,13 @@ func (o *PostMembersCreated) Code() int {
 }
 
 func (o *PostMembersCreated) Error() string {
-	return fmt.Sprintf("[POST /members][%d] postMembersCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /members][%d] postMembersCreated %s", 201, payload)
 }
 
 func (o *PostMembersCreated) String() string {
-	return fmt.Sprintf("[POST /members][%d] postMembersCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /members][%d] postMembersCreated %s", 201, payload)
 }
 
 func (o *PostMembersCreated) GetPayload() *PostMembersCreatedBody {
@@ -174,11 +177,13 @@ func (o *PostMembersBadRequest) Code() int {
 }
 
 func (o *PostMembersBadRequest) Error() string {
-	return fmt.Sprintf("[POST /members][%d] postMembersBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /members][%d] postMembersBadRequest %s", 400, payload)
 }
 
 func (o *PostMembersBadRequest) String() string {
-	return fmt.Sprintf("[POST /members][%d] postMembersBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /members][%d] postMembersBadRequest %s", 400, payload)
 }
 
 func (o *PostMembersBadRequest) GetPayload() *models.Error {
@@ -242,11 +247,13 @@ func (o *PostMembersNotFound) Code() int {
 }
 
 func (o *PostMembersNotFound) Error() string {
-	return fmt.Sprintf("[POST /members][%d] postMembersNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /members][%d] postMembersNotFound %s", 404, payload)
 }
 
 func (o *PostMembersNotFound) String() string {
-	return fmt.Sprintf("[POST /members][%d] postMembersNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /members][%d] postMembersNotFound %s", 404, payload)
 }
 
 func (o *PostMembersNotFound) GetPayload() *models.Error {
@@ -314,11 +321,13 @@ func (o *PostMembersDefault) Code() int {
 }
 
 func (o *PostMembersDefault) Error() string {
-	return fmt.Sprintf("[POST /members][%d] PostMembers default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /members][%d] PostMembers default %s", o._statusCode, payload)
 }
 
 func (o *PostMembersDefault) String() string {
-	return fmt.Sprintf("[POST /members][%d] PostMembers default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /members][%d] PostMembers default %s", o._statusCode, payload)
 }
 
 func (o *PostMembersDefault) GetPayload() *models.Error {
@@ -399,6 +408,7 @@ func (o *PostMembersBody) ContextValidate(ctx context.Context, formats strfmt.Re
 func (o *PostMembersBody) contextValidateMember(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Member != nil {
+
 		if err := o.Member.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("member" + "." + "member")
@@ -490,6 +500,11 @@ func (o *PostMembersCreatedBody) ContextValidate(ctx context.Context, formats st
 func (o *PostMembersCreatedBody) contextValidateMember(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Member != nil {
+
+		if swag.IsZero(o.Member) { // not required
+			return nil
+		}
+
 		if err := o.Member.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("postMembersCreated" + "." + "member")

@@ -11,6 +11,7 @@ package datacenters
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"strconv"
@@ -100,11 +101,13 @@ func (o *GetDatacentersOK) Code() int {
 }
 
 func (o *GetDatacentersOK) Error() string {
-	return fmt.Sprintf("[GET /datacenters][%d] getDatacentersOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /datacenters][%d] getDatacentersOK %s", 200, payload)
 }
 
 func (o *GetDatacentersOK) String() string {
-	return fmt.Sprintf("[GET /datacenters][%d] getDatacentersOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /datacenters][%d] getDatacentersOK %s", 200, payload)
 }
 
 func (o *GetDatacentersOK) GetPayload() *GetDatacentersOKBody {
@@ -168,11 +171,13 @@ func (o *GetDatacentersBadRequest) Code() int {
 }
 
 func (o *GetDatacentersBadRequest) Error() string {
-	return fmt.Sprintf("[GET /datacenters][%d] getDatacentersBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /datacenters][%d] getDatacentersBadRequest %s", 400, payload)
 }
 
 func (o *GetDatacentersBadRequest) String() string {
-	return fmt.Sprintf("[GET /datacenters][%d] getDatacentersBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /datacenters][%d] getDatacentersBadRequest %s", 400, payload)
 }
 
 func (o *GetDatacentersBadRequest) GetPayload() *models.Error {
@@ -240,11 +245,13 @@ func (o *GetDatacentersDefault) Code() int {
 }
 
 func (o *GetDatacentersDefault) Error() string {
-	return fmt.Sprintf("[GET /datacenters][%d] GetDatacenters default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /datacenters][%d] GetDatacenters default %s", o._statusCode, payload)
 }
 
 func (o *GetDatacentersDefault) String() string {
-	return fmt.Sprintf("[GET /datacenters][%d] GetDatacenters default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /datacenters][%d] GetDatacenters default %s", o._statusCode, payload)
 }
 
 func (o *GetDatacentersDefault) GetPayload() *models.Error {
@@ -369,6 +376,11 @@ func (o *GetDatacentersOKBody) contextValidateDatacenters(ctx context.Context, f
 	for i := 0; i < len(o.Datacenters); i++ {
 
 		if o.Datacenters[i] != nil {
+
+			if swag.IsZero(o.Datacenters[i]) { // not required
+				return nil
+			}
+
 			if err := o.Datacenters[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("getDatacentersOK" + "." + "datacenters" + "." + strconv.Itoa(i))
@@ -389,6 +401,11 @@ func (o *GetDatacentersOKBody) contextValidateLinks(ctx context.Context, formats
 	for i := 0; i < len(o.Links); i++ {
 
 		if o.Links[i] != nil {
+
+			if swag.IsZero(o.Links[i]) { // not required
+				return nil
+			}
+
 			if err := o.Links[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("getDatacentersOK" + "." + "links" + "." + strconv.Itoa(i))

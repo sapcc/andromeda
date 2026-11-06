@@ -125,6 +125,11 @@ func (o *PutPoolsPoolIDAcceptedBody) ContextValidate(ctx context.Context, format
 func (o *PutPoolsPoolIDAcceptedBody) contextValidatePool(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Pool != nil {
+
+		if swag.IsZero(o.Pool) { // not required
+			return nil
+		}
+
 		if err := o.Pool.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("putPoolsPoolIdAccepted" + "." + "pool")
@@ -217,6 +222,7 @@ func (o *PutPoolsPoolIDBody) ContextValidate(ctx context.Context, formats strfmt
 func (o *PutPoolsPoolIDBody) contextValidatePool(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Pool != nil {
+
 		if err := o.Pool.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("pool" + "." + "pool")

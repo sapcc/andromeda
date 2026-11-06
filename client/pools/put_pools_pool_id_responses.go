@@ -11,6 +11,7 @@ package pools
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -106,11 +107,13 @@ func (o *PutPoolsPoolIDAccepted) Code() int {
 }
 
 func (o *PutPoolsPoolIDAccepted) Error() string {
-	return fmt.Sprintf("[PUT /pools/{pool_id}][%d] putPoolsPoolIdAccepted  %+v", 202, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /pools/{pool_id}][%d] putPoolsPoolIdAccepted %s", 202, payload)
 }
 
 func (o *PutPoolsPoolIDAccepted) String() string {
-	return fmt.Sprintf("[PUT /pools/{pool_id}][%d] putPoolsPoolIdAccepted  %+v", 202, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /pools/{pool_id}][%d] putPoolsPoolIdAccepted %s", 202, payload)
 }
 
 func (o *PutPoolsPoolIDAccepted) GetPayload() *PutPoolsPoolIDAcceptedBody {
@@ -174,11 +177,13 @@ func (o *PutPoolsPoolIDNotFound) Code() int {
 }
 
 func (o *PutPoolsPoolIDNotFound) Error() string {
-	return fmt.Sprintf("[PUT /pools/{pool_id}][%d] putPoolsPoolIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /pools/{pool_id}][%d] putPoolsPoolIdNotFound %s", 404, payload)
 }
 
 func (o *PutPoolsPoolIDNotFound) String() string {
-	return fmt.Sprintf("[PUT /pools/{pool_id}][%d] putPoolsPoolIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /pools/{pool_id}][%d] putPoolsPoolIdNotFound %s", 404, payload)
 }
 
 func (o *PutPoolsPoolIDNotFound) GetPayload() *models.Error {
@@ -242,11 +247,13 @@ func (o *PutPoolsPoolIDConflict) Code() int {
 }
 
 func (o *PutPoolsPoolIDConflict) Error() string {
-	return fmt.Sprintf("[PUT /pools/{pool_id}][%d] putPoolsPoolIdConflict  %+v", 409, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /pools/{pool_id}][%d] putPoolsPoolIdConflict %s", 409, payload)
 }
 
 func (o *PutPoolsPoolIDConflict) String() string {
-	return fmt.Sprintf("[PUT /pools/{pool_id}][%d] putPoolsPoolIdConflict  %+v", 409, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /pools/{pool_id}][%d] putPoolsPoolIdConflict %s", 409, payload)
 }
 
 func (o *PutPoolsPoolIDConflict) GetPayload() *models.Error {
@@ -314,11 +321,13 @@ func (o *PutPoolsPoolIDDefault) Code() int {
 }
 
 func (o *PutPoolsPoolIDDefault) Error() string {
-	return fmt.Sprintf("[PUT /pools/{pool_id}][%d] PutPoolsPoolID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /pools/{pool_id}][%d] PutPoolsPoolID default %s", o._statusCode, payload)
 }
 
 func (o *PutPoolsPoolIDDefault) String() string {
-	return fmt.Sprintf("[PUT /pools/{pool_id}][%d] PutPoolsPoolID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /pools/{pool_id}][%d] PutPoolsPoolID default %s", o._statusCode, payload)
 }
 
 func (o *PutPoolsPoolIDDefault) GetPayload() *models.Error {
@@ -397,6 +406,11 @@ func (o *PutPoolsPoolIDAcceptedBody) ContextValidate(ctx context.Context, format
 func (o *PutPoolsPoolIDAcceptedBody) contextValidatePool(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Pool != nil {
+
+		if swag.IsZero(o.Pool) { // not required
+			return nil
+		}
+
 		if err := o.Pool.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("putPoolsPoolIdAccepted" + "." + "pool")
@@ -490,6 +504,7 @@ func (o *PutPoolsPoolIDBody) ContextValidate(ctx context.Context, formats strfmt
 func (o *PutPoolsPoolIDBody) contextValidatePool(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Pool != nil {
+
 		if err := o.Pool.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("pool" + "." + "pool")

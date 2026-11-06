@@ -171,6 +171,11 @@ func (o *GetPoolsOKBody) contextValidateLinks(ctx context.Context, formats strfm
 	for i := 0; i < len(o.Links); i++ {
 
 		if o.Links[i] != nil {
+
+			if swag.IsZero(o.Links[i]) { // not required
+				return nil
+			}
+
 			if err := o.Links[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("getPoolsOK" + "." + "links" + "." + strconv.Itoa(i))
@@ -191,6 +196,11 @@ func (o *GetPoolsOKBody) contextValidatePools(ctx context.Context, formats strfm
 	for i := 0; i < len(o.Pools); i++ {
 
 		if o.Pools[i] != nil {
+
+			if swag.IsZero(o.Pools[i]) { // not required
+				return nil
+			}
+
 			if err := o.Pools[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("getPoolsOK" + "." + "pools" + "." + strconv.Itoa(i))

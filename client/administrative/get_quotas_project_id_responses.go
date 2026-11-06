@@ -11,6 +11,7 @@ package administrative
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -99,11 +100,13 @@ func (o *GetQuotasProjectIDOK) Code() int {
 }
 
 func (o *GetQuotasProjectIDOK) Error() string {
-	return fmt.Sprintf("[GET /quotas/{project_id}][%d] getQuotasProjectIdOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /quotas/{project_id}][%d] getQuotasProjectIdOK %s", 200, payload)
 }
 
 func (o *GetQuotasProjectIDOK) String() string {
-	return fmt.Sprintf("[GET /quotas/{project_id}][%d] getQuotasProjectIdOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /quotas/{project_id}][%d] getQuotasProjectIdOK %s", 200, payload)
 }
 
 func (o *GetQuotasProjectIDOK) GetPayload() *GetQuotasProjectIDOKBody {
@@ -167,11 +170,13 @@ func (o *GetQuotasProjectIDNotFound) Code() int {
 }
 
 func (o *GetQuotasProjectIDNotFound) Error() string {
-	return fmt.Sprintf("[GET /quotas/{project_id}][%d] getQuotasProjectIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /quotas/{project_id}][%d] getQuotasProjectIdNotFound %s", 404, payload)
 }
 
 func (o *GetQuotasProjectIDNotFound) String() string {
-	return fmt.Sprintf("[GET /quotas/{project_id}][%d] getQuotasProjectIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /quotas/{project_id}][%d] getQuotasProjectIdNotFound %s", 404, payload)
 }
 
 func (o *GetQuotasProjectIDNotFound) GetPayload() *models.Error {
@@ -239,11 +244,13 @@ func (o *GetQuotasProjectIDDefault) Code() int {
 }
 
 func (o *GetQuotasProjectIDDefault) Error() string {
-	return fmt.Sprintf("[GET /quotas/{project_id}][%d] GetQuotasProjectID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /quotas/{project_id}][%d] GetQuotasProjectID default %s", o._statusCode, payload)
 }
 
 func (o *GetQuotasProjectIDDefault) String() string {
-	return fmt.Sprintf("[GET /quotas/{project_id}][%d] GetQuotasProjectID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /quotas/{project_id}][%d] GetQuotasProjectID default %s", o._statusCode, payload)
 }
 
 func (o *GetQuotasProjectIDDefault) GetPayload() *models.Error {

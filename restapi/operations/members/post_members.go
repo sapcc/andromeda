@@ -127,6 +127,7 @@ func (o *PostMembersBody) ContextValidate(ctx context.Context, formats strfmt.Re
 func (o *PostMembersBody) contextValidateMember(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Member != nil {
+
 		if err := o.Member.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("member" + "." + "member")
@@ -217,6 +218,11 @@ func (o *PostMembersCreatedBody) ContextValidate(ctx context.Context, formats st
 func (o *PostMembersCreatedBody) contextValidateMember(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Member != nil {
+
+		if swag.IsZero(o.Member) { // not required
+			return nil
+		}
+
 		if err := o.Member.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("postMembersCreated" + "." + "member")

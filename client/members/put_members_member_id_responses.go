@@ -11,6 +11,7 @@ package members
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -106,11 +107,13 @@ func (o *PutMembersMemberIDAccepted) Code() int {
 }
 
 func (o *PutMembersMemberIDAccepted) Error() string {
-	return fmt.Sprintf("[PUT /members/{member_id}][%d] putMembersMemberIdAccepted  %+v", 202, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /members/{member_id}][%d] putMembersMemberIdAccepted %s", 202, payload)
 }
 
 func (o *PutMembersMemberIDAccepted) String() string {
-	return fmt.Sprintf("[PUT /members/{member_id}][%d] putMembersMemberIdAccepted  %+v", 202, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /members/{member_id}][%d] putMembersMemberIdAccepted %s", 202, payload)
 }
 
 func (o *PutMembersMemberIDAccepted) GetPayload() *PutMembersMemberIDAcceptedBody {
@@ -174,11 +177,13 @@ func (o *PutMembersMemberIDBadRequest) Code() int {
 }
 
 func (o *PutMembersMemberIDBadRequest) Error() string {
-	return fmt.Sprintf("[PUT /members/{member_id}][%d] putMembersMemberIdBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /members/{member_id}][%d] putMembersMemberIdBadRequest %s", 400, payload)
 }
 
 func (o *PutMembersMemberIDBadRequest) String() string {
-	return fmt.Sprintf("[PUT /members/{member_id}][%d] putMembersMemberIdBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /members/{member_id}][%d] putMembersMemberIdBadRequest %s", 400, payload)
 }
 
 func (o *PutMembersMemberIDBadRequest) GetPayload() *models.Error {
@@ -242,11 +247,13 @@ func (o *PutMembersMemberIDNotFound) Code() int {
 }
 
 func (o *PutMembersMemberIDNotFound) Error() string {
-	return fmt.Sprintf("[PUT /members/{member_id}][%d] putMembersMemberIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /members/{member_id}][%d] putMembersMemberIdNotFound %s", 404, payload)
 }
 
 func (o *PutMembersMemberIDNotFound) String() string {
-	return fmt.Sprintf("[PUT /members/{member_id}][%d] putMembersMemberIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /members/{member_id}][%d] putMembersMemberIdNotFound %s", 404, payload)
 }
 
 func (o *PutMembersMemberIDNotFound) GetPayload() *models.Error {
@@ -314,11 +321,13 @@ func (o *PutMembersMemberIDDefault) Code() int {
 }
 
 func (o *PutMembersMemberIDDefault) Error() string {
-	return fmt.Sprintf("[PUT /members/{member_id}][%d] PutMembersMemberID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /members/{member_id}][%d] PutMembersMemberID default %s", o._statusCode, payload)
 }
 
 func (o *PutMembersMemberIDDefault) String() string {
-	return fmt.Sprintf("[PUT /members/{member_id}][%d] PutMembersMemberID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /members/{member_id}][%d] PutMembersMemberID default %s", o._statusCode, payload)
 }
 
 func (o *PutMembersMemberIDDefault) GetPayload() *models.Error {
@@ -397,6 +406,11 @@ func (o *PutMembersMemberIDAcceptedBody) ContextValidate(ctx context.Context, fo
 func (o *PutMembersMemberIDAcceptedBody) contextValidateMember(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Member != nil {
+
+		if swag.IsZero(o.Member) { // not required
+			return nil
+		}
+
 		if err := o.Member.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("putMembersMemberIdAccepted" + "." + "member")
@@ -490,6 +504,7 @@ func (o *PutMembersMemberIDBody) ContextValidate(ctx context.Context, formats st
 func (o *PutMembersMemberIDBody) contextValidateMember(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Member != nil {
+
 		if err := o.Member.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("member" + "." + "member")

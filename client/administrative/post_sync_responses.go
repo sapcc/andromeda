@@ -11,6 +11,7 @@ package administrative
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"strconv"
@@ -94,11 +95,11 @@ func (o *PostSyncAccepted) Code() int {
 }
 
 func (o *PostSyncAccepted) Error() string {
-	return fmt.Sprintf("[POST /sync][%d] postSyncAccepted ", 202)
+	return fmt.Sprintf("[POST /sync][%d] postSyncAccepted", 202)
 }
 
 func (o *PostSyncAccepted) String() string {
-	return fmt.Sprintf("[POST /sync][%d] postSyncAccepted ", 202)
+	return fmt.Sprintf("[POST /sync][%d] postSyncAccepted", 202)
 }
 
 func (o *PostSyncAccepted) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -155,11 +156,13 @@ func (o *PostSyncDefault) Code() int {
 }
 
 func (o *PostSyncDefault) Error() string {
-	return fmt.Sprintf("[POST /sync][%d] PostSync default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /sync][%d] PostSync default %s", o._statusCode, payload)
 }
 
 func (o *PostSyncDefault) String() string {
-	return fmt.Sprintf("[POST /sync][%d] PostSync default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /sync][%d] PostSync default %s", o._statusCode, payload)
 }
 
 func (o *PostSyncDefault) GetPayload() *models.Error {

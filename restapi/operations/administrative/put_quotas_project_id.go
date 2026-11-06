@@ -125,6 +125,11 @@ func (o *PutQuotasProjectIDAcceptedBody) ContextValidate(ctx context.Context, fo
 func (o *PutQuotasProjectIDAcceptedBody) contextValidateQuota(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Quota != nil {
+
+		if swag.IsZero(o.Quota) { // not required
+			return nil
+		}
+
 		if err := o.Quota.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("putQuotasProjectIdAccepted" + "." + "quota")
@@ -217,6 +222,7 @@ func (o *PutQuotasProjectIDBody) ContextValidate(ctx context.Context, formats st
 func (o *PutQuotasProjectIDBody) contextValidateQuota(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Quota != nil {
+
 		if err := o.Quota.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("quota" + "." + "quota")

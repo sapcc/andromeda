@@ -11,6 +11,7 @@ package members
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -99,11 +100,13 @@ func (o *GetMembersMemberIDOK) Code() int {
 }
 
 func (o *GetMembersMemberIDOK) Error() string {
-	return fmt.Sprintf("[GET /members/{member_id}][%d] getMembersMemberIdOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /members/{member_id}][%d] getMembersMemberIdOK %s", 200, payload)
 }
 
 func (o *GetMembersMemberIDOK) String() string {
-	return fmt.Sprintf("[GET /members/{member_id}][%d] getMembersMemberIdOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /members/{member_id}][%d] getMembersMemberIdOK %s", 200, payload)
 }
 
 func (o *GetMembersMemberIDOK) GetPayload() *GetMembersMemberIDOKBody {
@@ -167,11 +170,13 @@ func (o *GetMembersMemberIDNotFound) Code() int {
 }
 
 func (o *GetMembersMemberIDNotFound) Error() string {
-	return fmt.Sprintf("[GET /members/{member_id}][%d] getMembersMemberIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /members/{member_id}][%d] getMembersMemberIdNotFound %s", 404, payload)
 }
 
 func (o *GetMembersMemberIDNotFound) String() string {
-	return fmt.Sprintf("[GET /members/{member_id}][%d] getMembersMemberIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /members/{member_id}][%d] getMembersMemberIdNotFound %s", 404, payload)
 }
 
 func (o *GetMembersMemberIDNotFound) GetPayload() *models.Error {
@@ -239,11 +244,13 @@ func (o *GetMembersMemberIDDefault) Code() int {
 }
 
 func (o *GetMembersMemberIDDefault) Error() string {
-	return fmt.Sprintf("[GET /members/{member_id}][%d] GetMembersMemberID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /members/{member_id}][%d] GetMembersMemberID default %s", o._statusCode, payload)
 }
 
 func (o *GetMembersMemberIDDefault) String() string {
-	return fmt.Sprintf("[GET /members/{member_id}][%d] GetMembersMemberID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /members/{member_id}][%d] GetMembersMemberID default %s", o._statusCode, payload)
 }
 
 func (o *GetMembersMemberIDDefault) GetPayload() *models.Error {
@@ -322,6 +329,11 @@ func (o *GetMembersMemberIDOKBody) ContextValidate(ctx context.Context, formats 
 func (o *GetMembersMemberIDOKBody) contextValidateMember(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Member != nil {
+
+		if swag.IsZero(o.Member) { // not required
+			return nil
+		}
+
 		if err := o.Member.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("getMembersMemberIdOK" + "." + "member")

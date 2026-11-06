@@ -11,6 +11,7 @@ package administrative
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"strconv"
@@ -94,11 +95,13 @@ func (o *GetServicesOK) Code() int {
 }
 
 func (o *GetServicesOK) Error() string {
-	return fmt.Sprintf("[GET /services][%d] getServicesOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /services][%d] getServicesOK %s", 200, payload)
 }
 
 func (o *GetServicesOK) String() string {
-	return fmt.Sprintf("[GET /services][%d] getServicesOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /services][%d] getServicesOK %s", 200, payload)
 }
 
 func (o *GetServicesOK) GetPayload() *GetServicesOKBody {
@@ -166,11 +169,13 @@ func (o *GetServicesDefault) Code() int {
 }
 
 func (o *GetServicesDefault) Error() string {
-	return fmt.Sprintf("[GET /services][%d] GetServices default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /services][%d] GetServices default %s", o._statusCode, payload)
 }
 
 func (o *GetServicesDefault) String() string {
-	return fmt.Sprintf("[GET /services][%d] GetServices default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /services][%d] GetServices default %s", o._statusCode, payload)
 }
 
 func (o *GetServicesDefault) GetPayload() *models.Error {
@@ -258,6 +263,11 @@ func (o *GetServicesOKBody) contextValidateServices(ctx context.Context, formats
 	for i := 0; i < len(o.Services); i++ {
 
 		if o.Services[i] != nil {
+
+			if swag.IsZero(o.Services[i]) { // not required
+				return nil
+			}
+
 			if err := o.Services[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("getServicesOK" + "." + "services" + "." + strconv.Itoa(i))

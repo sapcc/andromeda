@@ -11,6 +11,7 @@ package monitors
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -99,11 +100,13 @@ func (o *GetMonitorsMonitorIDOK) Code() int {
 }
 
 func (o *GetMonitorsMonitorIDOK) Error() string {
-	return fmt.Sprintf("[GET /monitors/{monitor_id}][%d] getMonitorsMonitorIdOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /monitors/{monitor_id}][%d] getMonitorsMonitorIdOK %s", 200, payload)
 }
 
 func (o *GetMonitorsMonitorIDOK) String() string {
-	return fmt.Sprintf("[GET /monitors/{monitor_id}][%d] getMonitorsMonitorIdOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /monitors/{monitor_id}][%d] getMonitorsMonitorIdOK %s", 200, payload)
 }
 
 func (o *GetMonitorsMonitorIDOK) GetPayload() *GetMonitorsMonitorIDOKBody {
@@ -167,11 +170,13 @@ func (o *GetMonitorsMonitorIDNotFound) Code() int {
 }
 
 func (o *GetMonitorsMonitorIDNotFound) Error() string {
-	return fmt.Sprintf("[GET /monitors/{monitor_id}][%d] getMonitorsMonitorIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /monitors/{monitor_id}][%d] getMonitorsMonitorIdNotFound %s", 404, payload)
 }
 
 func (o *GetMonitorsMonitorIDNotFound) String() string {
-	return fmt.Sprintf("[GET /monitors/{monitor_id}][%d] getMonitorsMonitorIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /monitors/{monitor_id}][%d] getMonitorsMonitorIdNotFound %s", 404, payload)
 }
 
 func (o *GetMonitorsMonitorIDNotFound) GetPayload() *models.Error {
@@ -239,11 +244,13 @@ func (o *GetMonitorsMonitorIDDefault) Code() int {
 }
 
 func (o *GetMonitorsMonitorIDDefault) Error() string {
-	return fmt.Sprintf("[GET /monitors/{monitor_id}][%d] GetMonitorsMonitorID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /monitors/{monitor_id}][%d] GetMonitorsMonitorID default %s", o._statusCode, payload)
 }
 
 func (o *GetMonitorsMonitorIDDefault) String() string {
-	return fmt.Sprintf("[GET /monitors/{monitor_id}][%d] GetMonitorsMonitorID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /monitors/{monitor_id}][%d] GetMonitorsMonitorID default %s", o._statusCode, payload)
 }
 
 func (o *GetMonitorsMonitorIDDefault) GetPayload() *models.Error {
@@ -322,6 +329,11 @@ func (o *GetMonitorsMonitorIDOKBody) ContextValidate(ctx context.Context, format
 func (o *GetMonitorsMonitorIDOKBody) contextValidateMonitor(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Monitor != nil {
+
+		if swag.IsZero(o.Monitor) { // not required
+			return nil
+		}
+
 		if err := o.Monitor.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("getMonitorsMonitorIdOK" + "." + "monitor")

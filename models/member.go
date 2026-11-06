@@ -68,12 +68,12 @@ type Member struct {
 
 	// provisioning status
 	// Read Only: true
-	// Enum: [PENDING_CREATE PENDING_UPDATE PENDING_DELETE ACTIVE ERROR]
+	// Enum: ["PENDING_CREATE","PENDING_UPDATE","PENDING_DELETE","ACTIVE","ERROR"]
 	ProvisioningStatus string `json:"provisioning_status,omitempty" db:"provisioning_status,omitempty"`
 
 	// status
 	// Read Only: true
-	// Enum: [ONLINE NO_MONITOR OFFLINE]
+	// Enum: ["ONLINE","NO_MONITOR","OFFLINE"]
 	Status string `json:"status,omitempty" db:"status,omitempty"`
 
 	// The UTC date and timestamp when the resource was created.

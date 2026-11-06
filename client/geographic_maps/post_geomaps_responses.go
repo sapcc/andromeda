@@ -11,6 +11,7 @@ package geographic_maps
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -106,11 +107,13 @@ func (o *PostGeomapsCreated) Code() int {
 }
 
 func (o *PostGeomapsCreated) Error() string {
-	return fmt.Sprintf("[POST /geomaps][%d] postGeomapsCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /geomaps][%d] postGeomapsCreated %s", 201, payload)
 }
 
 func (o *PostGeomapsCreated) String() string {
-	return fmt.Sprintf("[POST /geomaps][%d] postGeomapsCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /geomaps][%d] postGeomapsCreated %s", 201, payload)
 }
 
 func (o *PostGeomapsCreated) GetPayload() *PostGeomapsCreatedBody {
@@ -174,11 +177,13 @@ func (o *PostGeomapsBadRequest) Code() int {
 }
 
 func (o *PostGeomapsBadRequest) Error() string {
-	return fmt.Sprintf("[POST /geomaps][%d] postGeomapsBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /geomaps][%d] postGeomapsBadRequest %s", 400, payload)
 }
 
 func (o *PostGeomapsBadRequest) String() string {
-	return fmt.Sprintf("[POST /geomaps][%d] postGeomapsBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /geomaps][%d] postGeomapsBadRequest %s", 400, payload)
 }
 
 func (o *PostGeomapsBadRequest) GetPayload() *models.Error {
@@ -242,11 +247,13 @@ func (o *PostGeomapsNotFound) Code() int {
 }
 
 func (o *PostGeomapsNotFound) Error() string {
-	return fmt.Sprintf("[POST /geomaps][%d] postGeomapsNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /geomaps][%d] postGeomapsNotFound %s", 404, payload)
 }
 
 func (o *PostGeomapsNotFound) String() string {
-	return fmt.Sprintf("[POST /geomaps][%d] postGeomapsNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /geomaps][%d] postGeomapsNotFound %s", 404, payload)
 }
 
 func (o *PostGeomapsNotFound) GetPayload() *models.Error {
@@ -314,11 +321,13 @@ func (o *PostGeomapsDefault) Code() int {
 }
 
 func (o *PostGeomapsDefault) Error() string {
-	return fmt.Sprintf("[POST /geomaps][%d] PostGeomaps default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /geomaps][%d] PostGeomaps default %s", o._statusCode, payload)
 }
 
 func (o *PostGeomapsDefault) String() string {
-	return fmt.Sprintf("[POST /geomaps][%d] PostGeomaps default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /geomaps][%d] PostGeomaps default %s", o._statusCode, payload)
 }
 
 func (o *PostGeomapsDefault) GetPayload() *models.Error {
@@ -399,6 +408,7 @@ func (o *PostGeomapsBody) ContextValidate(ctx context.Context, formats strfmt.Re
 func (o *PostGeomapsBody) contextValidateGeomap(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Geomap != nil {
+
 		if err := o.Geomap.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("geomap" + "." + "geomap")
@@ -490,6 +500,11 @@ func (o *PostGeomapsCreatedBody) ContextValidate(ctx context.Context, formats st
 func (o *PostGeomapsCreatedBody) contextValidateGeomap(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Geomap != nil {
+
+		if swag.IsZero(o.Geomap) { // not required
+			return nil
+		}
+
 		if err := o.Geomap.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("postGeomapsCreated" + "." + "geomap")

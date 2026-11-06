@@ -124,6 +124,11 @@ func (o *GetMonitorsMonitorIDOKBody) ContextValidate(ctx context.Context, format
 func (o *GetMonitorsMonitorIDOKBody) contextValidateMonitor(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Monitor != nil {
+
+		if swag.IsZero(o.Monitor) { // not required
+			return nil
+		}
+
 		if err := o.Monitor.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("getMonitorsMonitorIdOK" + "." + "monitor")

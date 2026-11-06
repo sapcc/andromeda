@@ -125,6 +125,11 @@ func (o *PutDomainsDomainIDAcceptedBody) ContextValidate(ctx context.Context, fo
 func (o *PutDomainsDomainIDAcceptedBody) contextValidateDomain(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Domain != nil {
+
+		if swag.IsZero(o.Domain) { // not required
+			return nil
+		}
+
 		if err := o.Domain.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("putDomainsDomainIdAccepted" + "." + "domain")
@@ -217,6 +222,7 @@ func (o *PutDomainsDomainIDBody) ContextValidate(ctx context.Context, formats st
 func (o *PutDomainsDomainIDBody) contextValidateDomain(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Domain != nil {
+
 		if err := o.Domain.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("domain" + "." + "domain")

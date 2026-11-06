@@ -10,6 +10,7 @@ package geographic_maps
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -95,11 +96,11 @@ func (o *DeleteGeomapsGeomapIDNoContent) Code() int {
 }
 
 func (o *DeleteGeomapsGeomapIDNoContent) Error() string {
-	return fmt.Sprintf("[DELETE /geomaps/{geomap_id}][%d] deleteGeomapsGeomapIdNoContent ", 204)
+	return fmt.Sprintf("[DELETE /geomaps/{geomap_id}][%d] deleteGeomapsGeomapIdNoContent", 204)
 }
 
 func (o *DeleteGeomapsGeomapIDNoContent) String() string {
-	return fmt.Sprintf("[DELETE /geomaps/{geomap_id}][%d] deleteGeomapsGeomapIdNoContent ", 204)
+	return fmt.Sprintf("[DELETE /geomaps/{geomap_id}][%d] deleteGeomapsGeomapIdNoContent", 204)
 }
 
 func (o *DeleteGeomapsGeomapIDNoContent) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -152,11 +153,13 @@ func (o *DeleteGeomapsGeomapIDNotFound) Code() int {
 }
 
 func (o *DeleteGeomapsGeomapIDNotFound) Error() string {
-	return fmt.Sprintf("[DELETE /geomaps/{geomap_id}][%d] deleteGeomapsGeomapIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /geomaps/{geomap_id}][%d] deleteGeomapsGeomapIdNotFound %s", 404, payload)
 }
 
 func (o *DeleteGeomapsGeomapIDNotFound) String() string {
-	return fmt.Sprintf("[DELETE /geomaps/{geomap_id}][%d] deleteGeomapsGeomapIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /geomaps/{geomap_id}][%d] deleteGeomapsGeomapIdNotFound %s", 404, payload)
 }
 
 func (o *DeleteGeomapsGeomapIDNotFound) GetPayload() *models.Error {
@@ -224,11 +227,13 @@ func (o *DeleteGeomapsGeomapIDDefault) Code() int {
 }
 
 func (o *DeleteGeomapsGeomapIDDefault) Error() string {
-	return fmt.Sprintf("[DELETE /geomaps/{geomap_id}][%d] DeleteGeomapsGeomapID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /geomaps/{geomap_id}][%d] DeleteGeomapsGeomapID default %s", o._statusCode, payload)
 }
 
 func (o *DeleteGeomapsGeomapIDDefault) String() string {
-	return fmt.Sprintf("[DELETE /geomaps/{geomap_id}][%d] DeleteGeomapsGeomapID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /geomaps/{geomap_id}][%d] DeleteGeomapsGeomapID default %s", o._statusCode, payload)
 }
 
 func (o *DeleteGeomapsGeomapIDDefault) GetPayload() *models.Error {

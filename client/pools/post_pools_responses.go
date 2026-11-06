@@ -11,6 +11,7 @@ package pools
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -100,11 +101,13 @@ func (o *PostPoolsCreated) Code() int {
 }
 
 func (o *PostPoolsCreated) Error() string {
-	return fmt.Sprintf("[POST /pools][%d] postPoolsCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /pools][%d] postPoolsCreated %s", 201, payload)
 }
 
 func (o *PostPoolsCreated) String() string {
-	return fmt.Sprintf("[POST /pools][%d] postPoolsCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /pools][%d] postPoolsCreated %s", 201, payload)
 }
 
 func (o *PostPoolsCreated) GetPayload() *PostPoolsCreatedBody {
@@ -168,11 +171,13 @@ func (o *PostPoolsBadRequest) Code() int {
 }
 
 func (o *PostPoolsBadRequest) Error() string {
-	return fmt.Sprintf("[POST /pools][%d] postPoolsBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /pools][%d] postPoolsBadRequest %s", 400, payload)
 }
 
 func (o *PostPoolsBadRequest) String() string {
-	return fmt.Sprintf("[POST /pools][%d] postPoolsBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /pools][%d] postPoolsBadRequest %s", 400, payload)
 }
 
 func (o *PostPoolsBadRequest) GetPayload() *models.Error {
@@ -240,11 +245,13 @@ func (o *PostPoolsDefault) Code() int {
 }
 
 func (o *PostPoolsDefault) Error() string {
-	return fmt.Sprintf("[POST /pools][%d] PostPools default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /pools][%d] PostPools default %s", o._statusCode, payload)
 }
 
 func (o *PostPoolsDefault) String() string {
-	return fmt.Sprintf("[POST /pools][%d] PostPools default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /pools][%d] PostPools default %s", o._statusCode, payload)
 }
 
 func (o *PostPoolsDefault) GetPayload() *models.Error {
@@ -325,6 +332,7 @@ func (o *PostPoolsBody) ContextValidate(ctx context.Context, formats strfmt.Regi
 func (o *PostPoolsBody) contextValidatePool(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Pool != nil {
+
 		if err := o.Pool.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("pool" + "." + "pool")
@@ -416,6 +424,11 @@ func (o *PostPoolsCreatedBody) ContextValidate(ctx context.Context, formats strf
 func (o *PostPoolsCreatedBody) contextValidatePool(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Pool != nil {
+
+		if swag.IsZero(o.Pool) { // not required
+			return nil
+		}
+
 		if err := o.Pool.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("postPoolsCreated" + "." + "pool")

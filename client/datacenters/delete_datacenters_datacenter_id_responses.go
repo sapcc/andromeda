@@ -10,6 +10,7 @@ package datacenters
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -101,11 +102,11 @@ func (o *DeleteDatacentersDatacenterIDNoContent) Code() int {
 }
 
 func (o *DeleteDatacentersDatacenterIDNoContent) Error() string {
-	return fmt.Sprintf("[DELETE /datacenters/{datacenter_id}][%d] deleteDatacentersDatacenterIdNoContent ", 204)
+	return fmt.Sprintf("[DELETE /datacenters/{datacenter_id}][%d] deleteDatacentersDatacenterIdNoContent", 204)
 }
 
 func (o *DeleteDatacentersDatacenterIDNoContent) String() string {
-	return fmt.Sprintf("[DELETE /datacenters/{datacenter_id}][%d] deleteDatacentersDatacenterIdNoContent ", 204)
+	return fmt.Sprintf("[DELETE /datacenters/{datacenter_id}][%d] deleteDatacentersDatacenterIdNoContent", 204)
 }
 
 func (o *DeleteDatacentersDatacenterIDNoContent) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -158,11 +159,13 @@ func (o *DeleteDatacentersDatacenterIDBadRequest) Code() int {
 }
 
 func (o *DeleteDatacentersDatacenterIDBadRequest) Error() string {
-	return fmt.Sprintf("[DELETE /datacenters/{datacenter_id}][%d] deleteDatacentersDatacenterIdBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /datacenters/{datacenter_id}][%d] deleteDatacentersDatacenterIdBadRequest %s", 400, payload)
 }
 
 func (o *DeleteDatacentersDatacenterIDBadRequest) String() string {
-	return fmt.Sprintf("[DELETE /datacenters/{datacenter_id}][%d] deleteDatacentersDatacenterIdBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /datacenters/{datacenter_id}][%d] deleteDatacentersDatacenterIdBadRequest %s", 400, payload)
 }
 
 func (o *DeleteDatacentersDatacenterIDBadRequest) GetPayload() *models.Error {
@@ -226,11 +229,13 @@ func (o *DeleteDatacentersDatacenterIDNotFound) Code() int {
 }
 
 func (o *DeleteDatacentersDatacenterIDNotFound) Error() string {
-	return fmt.Sprintf("[DELETE /datacenters/{datacenter_id}][%d] deleteDatacentersDatacenterIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /datacenters/{datacenter_id}][%d] deleteDatacentersDatacenterIdNotFound %s", 404, payload)
 }
 
 func (o *DeleteDatacentersDatacenterIDNotFound) String() string {
-	return fmt.Sprintf("[DELETE /datacenters/{datacenter_id}][%d] deleteDatacentersDatacenterIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /datacenters/{datacenter_id}][%d] deleteDatacentersDatacenterIdNotFound %s", 404, payload)
 }
 
 func (o *DeleteDatacentersDatacenterIDNotFound) GetPayload() *models.Error {
@@ -298,11 +303,13 @@ func (o *DeleteDatacentersDatacenterIDDefault) Code() int {
 }
 
 func (o *DeleteDatacentersDatacenterIDDefault) Error() string {
-	return fmt.Sprintf("[DELETE /datacenters/{datacenter_id}][%d] DeleteDatacentersDatacenterID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /datacenters/{datacenter_id}][%d] DeleteDatacentersDatacenterID default %s", o._statusCode, payload)
 }
 
 func (o *DeleteDatacentersDatacenterIDDefault) String() string {
-	return fmt.Sprintf("[DELETE /datacenters/{datacenter_id}][%d] DeleteDatacentersDatacenterID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /datacenters/{datacenter_id}][%d] DeleteDatacentersDatacenterID default %s", o._statusCode, payload)
 }
 
 func (o *DeleteDatacentersDatacenterIDDefault) GetPayload() *models.Error {

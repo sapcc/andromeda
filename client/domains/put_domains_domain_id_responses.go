@@ -11,6 +11,7 @@ package domains
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -112,11 +113,13 @@ func (o *PutDomainsDomainIDAccepted) Code() int {
 }
 
 func (o *PutDomainsDomainIDAccepted) Error() string {
-	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdAccepted  %+v", 202, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdAccepted %s", 202, payload)
 }
 
 func (o *PutDomainsDomainIDAccepted) String() string {
-	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdAccepted  %+v", 202, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdAccepted %s", 202, payload)
 }
 
 func (o *PutDomainsDomainIDAccepted) GetPayload() *PutDomainsDomainIDAcceptedBody {
@@ -180,11 +183,13 @@ func (o *PutDomainsDomainIDBadRequest) Code() int {
 }
 
 func (o *PutDomainsDomainIDBadRequest) Error() string {
-	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdBadRequest %s", 400, payload)
 }
 
 func (o *PutDomainsDomainIDBadRequest) String() string {
-	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdBadRequest %s", 400, payload)
 }
 
 func (o *PutDomainsDomainIDBadRequest) GetPayload() *models.Error {
@@ -248,11 +253,13 @@ func (o *PutDomainsDomainIDNotFound) Code() int {
 }
 
 func (o *PutDomainsDomainIDNotFound) Error() string {
-	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdNotFound %s", 404, payload)
 }
 
 func (o *PutDomainsDomainIDNotFound) String() string {
-	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdNotFound %s", 404, payload)
 }
 
 func (o *PutDomainsDomainIDNotFound) GetPayload() *models.Error {
@@ -316,11 +323,13 @@ func (o *PutDomainsDomainIDConflict) Code() int {
 }
 
 func (o *PutDomainsDomainIDConflict) Error() string {
-	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdConflict  %+v", 409, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdConflict %s", 409, payload)
 }
 
 func (o *PutDomainsDomainIDConflict) String() string {
-	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdConflict  %+v", 409, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] putDomainsDomainIdConflict %s", 409, payload)
 }
 
 func (o *PutDomainsDomainIDConflict) GetPayload() *models.Error {
@@ -388,11 +397,13 @@ func (o *PutDomainsDomainIDDefault) Code() int {
 }
 
 func (o *PutDomainsDomainIDDefault) Error() string {
-	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] PutDomainsDomainID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] PutDomainsDomainID default %s", o._statusCode, payload)
 }
 
 func (o *PutDomainsDomainIDDefault) String() string {
-	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] PutDomainsDomainID default  %+v", o._statusCode, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PUT /domains/{domain_id}][%d] PutDomainsDomainID default %s", o._statusCode, payload)
 }
 
 func (o *PutDomainsDomainIDDefault) GetPayload() *models.Error {
@@ -471,6 +482,11 @@ func (o *PutDomainsDomainIDAcceptedBody) ContextValidate(ctx context.Context, fo
 func (o *PutDomainsDomainIDAcceptedBody) contextValidateDomain(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Domain != nil {
+
+		if swag.IsZero(o.Domain) { // not required
+			return nil
+		}
+
 		if err := o.Domain.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("putDomainsDomainIdAccepted" + "." + "domain")
@@ -564,6 +580,7 @@ func (o *PutDomainsDomainIDBody) ContextValidate(ctx context.Context, formats st
 func (o *PutDomainsDomainIDBody) contextValidateDomain(ctx context.Context, formats strfmt.Registry) error {
 
 	if o.Domain != nil {
+
 		if err := o.Domain.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("domain" + "." + "domain")
