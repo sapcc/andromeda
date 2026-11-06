@@ -15,6 +15,7 @@ message Domain {
   string record_type = 7;
   repeated Datacenter datacenters = 8;
   string provisioning_status = 9;
+  string geomap_id = 10;
 }
 
 message Pool {
