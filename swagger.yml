@@ -1356,6 +1356,11 @@ definitions:
           - GEOGRAPHIC
           - AVAILABILITY
         default: ROUND_ROBIN
+      geomap_id:
+        type: string
+        format: uuid
+        description: The ID of the geographic map to use. Required when mode is GEOGRAPHIC.
+        x-nullable: true
       record_type:
         type: string
         description: DNS Record type to use.

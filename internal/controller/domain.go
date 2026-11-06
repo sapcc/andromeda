@@ -93,6 +93,11 @@ func (c DomainController) PostDomains(params domains.PostDomainsParams) middlewa
 		return domains.NewPostDomainsDefault(400).WithPayload(utils.MissingProvider)
 	}
 
+	if domain.Mode != nil && *domain.Mode == models.DomainModeGEOGRAPHIC && domain.GeomapID == nil {
+		return domains.NewPostDomainsDefault(400).WithPayload(
+			&models.Error{Code: 400, Message: "geomap_id is required when mode is GEOGRAPHIC"})
+	}
+
 	if domain.Pools == nil {
 		domain.Pools = []strfmt.UUID{}
 	}
@@ -105,10 +110,10 @@ func (c DomainController) PostDomains(params domains.PostDomainsParams) middlewa
 	// Wrap insert and relations into transaction
 	if err := db.TxExecute(c.db, func(tx *sqlx.Tx) error {
 		sql := `
-			INSERT INTO domain 
-				(name, fqdn, record_type, mode, admin_state_up, provider, project_id)
+			INSERT INTO domain
+				(name, fqdn, record_type, mode, admin_state_up, provider, project_id, geomap_id)
 			VALUES
-				(:name, :fqdn, :record_type, :mode, :admin_state_up, :provider, :project_id)
+				(:name, :fqdn, :record_type, :mode, :admin_state_up, :provider, :project_id, :geomap_id)
 			RETURNING *
 		`
 		stmt, err := tx.PrepareNamed(sql)
@@ -223,9 +228,10 @@ func (c DomainController) PutDomainsDomainID(params domains.PutDomainsDomainIDPa
 			UPDATE domain SET
 				name = COALESCE(:name, name),
 				admin_state_up = COALESCE(:admin_state_up, admin_state_up),
-				fqdn = COALESCE(:fqdn, fqdn), 
-				mode = COALESCE(:mode, mode), 
-				record_type = COALESCE(:record_type, record_type), 
+				fqdn = COALESCE(:fqdn, fqdn),
+				mode = COALESCE(:mode, mode),
+				record_type = COALESCE(:record_type, record_type),
+				geomap_id = COALESCE(:geomap_id, geomap_id),
 			    provisioning_status = 'PENDING_UPDATE',
 				updated_at = NOW()
 			WHERE id = :id
