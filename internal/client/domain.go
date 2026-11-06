@@ -41,6 +41,7 @@ type DomainCreate struct {
 	Mode       string        `short:"m" long:"mode" description:"Load balancing method to use for the references pools." default:"ROUND_ROBIN" choice:"ROUND_ROBIN" choice:"WEIGHTED" choice:"GEOGRAPHIC" choice:"AVAILABILITY"`
 	RecordType string        `short:"r" long:"recordtype" description:"Record type" default:"A"`
 	Pools      []strfmt.UUID `short:"p" long:"pool" description:"Pool ID to associate, can be specified multiple times"`
+	GeomapID   strfmt.UUID   `short:"g" long:"geomap" description:"Geographic map ID (required when mode is GEOGRAPHIC)"`
 	Disable    bool          `short:"d" long:"disable" description:"Disable Domain" optional:"true" optional-value:"false"`
 }
 
@@ -59,6 +60,7 @@ type DomainSet struct {
 	Mode       string        `short:"m" long:"mode" description:"Load balancing method to use for the references pools." optional:"true" choice:"ROUND_ROBIN" choice:"WEIGHTED" choice:"GEOGRAPHIC" choice:"AVAILABILITY"`
 	RecordType string        `short:"r" long:"recordtype" description:"Record type"`
 	Pools      []strfmt.UUID `short:"p" long:"pool" description:"Pool ID to associate, can be specified multiple times"`
+	GeomapID   strfmt.UUID   `short:"g" long:"geomap" description:"Geographic map ID"`
 	NoPools    bool          `long:"no-pools" description:"Remove all pools from domain" optional:"true" optional-value:"true"`
 	Disable    bool          `short:"d" long:"disable" description:"Enable Domain" optional:"true" optional-value:"true"`
 	Enable     bool          `short:"e" long:"enable" description:"Enable Domain" optional:"true" optional-value:"true"`
@@ -87,6 +89,9 @@ func (*DomainCreate) Execute(_ []string) error {
 		RecordType: &DomainOptions.DomainCreate.RecordType,
 		Pools:      DomainOptions.DomainCreate.Pools,
 	}}
+	if DomainOptions.DomainCreate.GeomapID != "" {
+		domain.Domain.GeomapID = &DomainOptions.DomainCreate.GeomapID
+	}
 	resp, err := AndromedaClient.Domains.PostDomains(domains.NewPostDomainsParams().WithDomain(domain))
 	if err != nil {
 		return err
@@ -146,6 +151,9 @@ func (*DomainSet) Execute(_ []string) error {
 	}
 	if DomainOptions.DomainSet.Mode != "" {
 		domain.Domain.Mode = &DomainOptions.DomainSet.Mode
+	}
+	if DomainOptions.DomainSet.GeomapID != "" {
+		domain.Domain.GeomapID = &DomainOptions.DomainSet.GeomapID
 	}
 	if len(DomainOptions.DomainSet.Pools) > 0 {
 		domain.Domain.Pools = DomainOptions.DomainSet.Pools
