@@ -118,7 +118,7 @@ func (s *AkamaiAgent) FetchAndSyncDomains(domains []string, force bool) error {
 			log.Infof("FetchAndSyncDomains(%s) finished with '%s'", domain.Id, status)
 			return nil
 		}(); err != nil {
-			return err
+			log.Errorf("domainSync(%s) failed, skipping: %v", domain.Id, err)
 		}
 	}
 	return nil
