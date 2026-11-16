@@ -82,6 +82,9 @@ func (s *AkamaiAgent) SyncProperty(domain *rpcmodels.Domain, trafficManagementDo
 		LivenessTests:        []gtm.LivenessTest{},
 	}
 	if domain.GetMode() == models.DomainModeGEOGRAPHIC {
+		if domain.GetGeomapId() == "" {
+			return nil, fmt.Errorf("GEOGRAPHIC domain %s has no geomap_id assigned", domain.Id)
+		}
 		property.MapName = domain.GetGeomapId()
 	}
 
@@ -97,26 +100,28 @@ MEMBERLOOP:
 		}
 
 		datacenterUUID := member.GetDatacenterId()
+		if len(datacenterUUID) == 0 {
+			log.WithField("memberID", member.Id).Error("Member has no datacenter_id, skipping")
+			continue
+		}
 		var datacenterID int
-		if len(datacenterUUID) > 0 {
-			var err error
-			datacenterID, err = s.GetDatacenterMeta(datacenterUUID, domain.Datacenters)
-			if err != nil {
-				log.WithField("datacenterUUID", datacenterUUID).
-					WithError(err).Error("Failed to get datacenter meta")
-				continue
-			}
+		var err error
+		datacenterID, err = s.GetDatacenterMeta(datacenterUUID, domain.Datacenters)
+		if err != nil {
+			log.WithField("datacenterUUID", datacenterUUID).
+				WithError(err).Error("Failed to get datacenter meta")
+			continue
+		}
 
-			// check if we have already a traffic target for this datacenter
-			for i := range property.TrafficTargets {
-				if property.TrafficTargets[i].DatacenterID == datacenterID {
-					if !geographic {
-						property.TrafficTargets[i].Servers = append(property.TrafficTargets[i].Servers, member.Address)
-					}
-					provRequests = append(provRequests,
-						driver.GetProvisioningStatusRequest(member.Id, "MEMBER", "ACTIVE"))
-					continue MEMBERLOOP
+		// check if we have already a traffic target for this datacenter
+		for i := range property.TrafficTargets {
+			if property.TrafficTargets[i].DatacenterID == datacenterID {
+				if !geographic {
+					property.TrafficTargets[i].Servers = append(property.TrafficTargets[i].Servers, member.Address)
 				}
+				provRequests = append(provRequests,
+					driver.GetProvisioningStatusRequest(member.Id, "MEMBER", "ACTIVE"))
+				continue MEMBERLOOP
 			}
 		}
 
