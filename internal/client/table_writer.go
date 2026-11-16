@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"reflect"
 	"sort"
+	"strings"
 
 	"github.com/jedib0t/go-pretty/table"
 	"github.com/jedib0t/go-pretty/text"
@@ -22,6 +23,28 @@ func formatValue(v reflect.Value) string {
 			return "Null"
 		}
 		return formatValue(v.Elem())
+	case reflect.Slice:
+		if v.IsNil() || v.Len() == 0 {
+			return "[]"
+		}
+		items := make([]string, v.Len())
+		for i := range items {
+			items[i] = formatValue(v.Index(i))
+		}
+		return fmt.Sprintf("[%s]", strings.Join(items, " "))
+	case reflect.Struct:
+		if s, ok := v.Interface().(interface{ String() string }); ok {
+			return s.String()
+		}
+		t := v.Type()
+		parts := make([]string, 0, t.NumField())
+		for i := 0; i < t.NumField(); i++ {
+			fv := formatValue(v.Field(i))
+			if fv != "" && fv != "Null" {
+				parts = append(parts, fv)
+			}
+		}
+		return strings.Join(parts, ":")
 	default:
 		return fmt.Sprintf("%v", v)
 	}
