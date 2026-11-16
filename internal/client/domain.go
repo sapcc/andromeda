@@ -57,7 +57,6 @@ type DomainSet struct {
 	} `positional-args:"yes" required:"yes"`
 	Name       string        `short:"n" long:"name" description:"Name of the Domain"`
 	FQDN       string        `short:"q" long:"fqdn" description:"Fully qualified domain name"`
-	Mode       string        `short:"m" long:"mode" description:"Load balancing method to use for the references pools." optional:"true" choice:"ROUND_ROBIN" choice:"WEIGHTED" choice:"GEOGRAPHIC" choice:"AVAILABILITY"`
 	RecordType string        `short:"r" long:"recordtype" description:"Record type"`
 	Pools      []strfmt.UUID `short:"p" long:"pool" description:"Pool ID to associate, can be specified multiple times"`
 	GeomapID   strfmt.UUID   `short:"g" long:"geomap" description:"Geographic map ID"`
@@ -148,9 +147,6 @@ func (*DomainSet) Execute(_ []string) error {
 	if DomainOptions.DomainSet.FQDN != "" {
 		fqdn := strfmt.Hostname(DomainOptions.DomainSet.FQDN)
 		domain.Domain.Fqdn = &fqdn
-	}
-	if DomainOptions.DomainSet.Mode != "" {
-		domain.Domain.Mode = &DomainOptions.DomainSet.Mode
 	}
 	if DomainOptions.DomainSet.GeomapID != "" {
 		domain.Domain.GeomapID = &DomainOptions.DomainSet.GeomapID
