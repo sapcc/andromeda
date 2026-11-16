@@ -146,6 +146,9 @@ func (c DomainController) PostDomains(params domains.PostDomainsParams) middlewa
 		if errors.As(err, &me) && me.Number == 1062 {
 			return domains.NewPostDomainsDefault(409).WithPayload(utils.DuplicateDomain)
 		}
+		if fkErr := utils.IsForeignKeyChildViolation(err); fkErr != nil {
+			return domains.NewPostDomainsDefault(400).WithPayload(fkErr)
+		}
 		panic(err)
 	}
 
@@ -185,6 +188,23 @@ func (c DomainController) PutDomainsDomainID(params domains.PutDomainsDomainIDPa
 	if params.Domain.Domain.Provider != nil && *params.Domain.Domain.Provider != *domain.Provider {
 		// cannot change provider
 		return domains.NewPutDomainsDomainIDNotFound().WithPayload(utils.ProviderUnchangeable)
+	}
+
+	if params.Domain.Domain.Mode != nil && *params.Domain.Domain.Mode != *domain.Mode {
+		return domains.NewPutDomainsDomainIDBadRequest().WithPayload(utils.ModeImmutable)
+	}
+
+	effectiveMode := domain.Mode
+	if params.Domain.Domain.Mode != nil {
+		effectiveMode = params.Domain.Domain.Mode
+	}
+	effectiveGeomapID := domain.GeomapID
+	if params.Domain.Domain.GeomapID != nil {
+		effectiveGeomapID = params.Domain.Domain.GeomapID
+	}
+	if effectiveMode != nil && *effectiveMode == models.DomainModeGEOGRAPHIC && effectiveGeomapID == nil {
+		return domains.NewPutDomainsDomainIDBadRequest().WithPayload(
+			&models.Error{Code: 400, Message: "geomap_id is required when mode is GEOGRAPHIC"})
 	}
 
 	if params.Domain.Domain.Fqdn != nil {
@@ -248,10 +268,12 @@ func (c DomainController) PutDomainsDomainID(params domains.PutDomainsDomainIDPa
 			return domains.NewPutDomainsDomainIDBadRequest().WithPayload(
 				&models.Error{Code: 400, Message: errMsg})
 		}
+		if fkErr := utils.IsForeignKeyChildViolation(err); fkErr != nil {
+			return domains.NewPutDomainsDomainIDBadRequest().WithPayload(fkErr)
+		}
 		if errors.Is(err, dbsql.ErrNoRows) {
 			return domains.NewPutDomainsDomainIDNotFound().WithPayload(utils.NotFound)
 		}
-		// Unknown Error
 		panic(err)
 	}
 
