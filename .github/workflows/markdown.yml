@@ -11,6 +11,9 @@ on:
 jobs:
   generate-markdown:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     container:
       image: quay.io/goswagger/swagger
     steps:
