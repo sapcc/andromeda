@@ -5,11 +5,14 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/go-openapi/strfmt"
 	"github.com/go-sql-driver/mysql"
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgerrcode"
 
 	"github.com/sapcc/andromeda/models"
 )
@@ -31,11 +34,26 @@ var (
 	InvalidMemberAddressForF5    = &models.Error{Code: 400, Message: "invalid value for 'address': must be a valid IPv4 or IPv6 address for pools associated with F5 domains"}
 	FQDNImmutable                = &models.Error{Code: 400, Message: "invalid value for 'fqdn': change of immutable attribute 'fqdn' not allowed"}
 	RestrictedDatacenterProvider = &models.Error{Code: 400, Message: "invalid value for 'provider': project-specific f5 datacenters are not supported; please use those with scope=public already available"}
-	MySQLForeignKeyViolation     = &mysql.MySQLError{Number: 1451}
+	MySQLForeignKeyViolation = &mysql.MySQLError{Number: 1451} // ER_ROW_IS_REFERENCED_2: delete blocked by child row
+	ModeImmutable            = &models.Error{Code: 400, Message: "invalid value for 'mode': change of immutable attribute 'mode' not allowed"}
 )
 
 func Unauthorized(err error) *models.Error {
 	return &models.Error{Code: 401, Message: fmt.Sprintf("Unauthorized: %s", err.Error())}
+}
+
+// IsForeignKeyChildViolation returns a 400 *models.Error if err is a MySQL 1452
+// or PostgreSQL FK violation (parent row not found), nil otherwise.
+func IsForeignKeyChildViolation(err error) *models.Error {
+	var me *mysql.MySQLError
+	if errors.As(err, &me) && me.Number == 1452 { // ER_NO_REFERENCED_ROW_2: parent row not found
+		return &models.Error{Code: 400, Message: fmt.Sprintf("foreign key constraint violation: %s", me.Message)}
+	}
+	var pe *pgconn.PgError
+	if errors.As(err, &pe) && pe.Code == pgerrcode.ForeignKeyViolation {
+		return &models.Error{Code: 400, Message: fmt.Sprintf("foreign key constraint violation: %s", pe.Message)}
+	}
+	return nil
 }
 
 func GetQuotaMetResponse(resource string) *models.Error {
