@@ -2889,6 +2889,7 @@ Unexpected Error
 | cname_target | hostname (formatted string)| `strfmt.Hostname` |  | | If not empty, the backend created a CNAME target to be used for the FQDN. | `example.org.production.gtm.com` |
 | created_at | date-time (formatted string)| `strfmt.DateTime` |  | | The UTC date and timestamp when the resource was created. | `2020-05-11T17:21:34` |
 | fqdn | hostname (formatted string)| `strfmt.Hostname` |  | | Desired Fully-Qualified Host Name. | `example.org` |
+| geomap_id | uuid (formatted string)| `strfmt.UUID` |  | | The ID of the geographic map to use. Required when mode is GEOGRAPHIC. |  |
 | id | uuid (formatted string)| `strfmt.UUID` |  | | The id of the resource. |  |
 | mode | string| `string` |  | `"ROUND_ROBIN"`| Load balancing method to use for the references pools. |  |
 | name | string| `string` |  | | Human-readable name of the resource. |  |
