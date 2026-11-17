@@ -26,7 +26,7 @@ func Migrate(dbUrl string) error {
 	}
 	var driver migration.Driver
 
-	switch u.Driver {
+	switch u.Dialect {
 	case "mysql":
 		// Create driver
 		driver, err = mysql.New(u.DSN)
@@ -41,7 +41,7 @@ func Migrate(dbUrl string) error {
 			return err
 		}
 	default:
-		return fmt.Errorf("database driver not supported: %s", u.Driver)
+		return fmt.Errorf("database driver not supported: %s", u.Dialect)
 	}
 
 	// Run all up migrations
@@ -64,7 +64,7 @@ func Rollback(dbUrl string) error {
 	}
 	var driver migration.Driver
 
-	switch u.Driver {
+	switch u.Dialect {
 	case "mysql":
 		// Create driver
 		driver, err = mysql.New(u.DSN)
@@ -79,7 +79,7 @@ func Rollback(dbUrl string) error {
 			return err
 		}
 	default:
-		return fmt.Errorf("database driver not supported: %s", u.Driver)
+		return fmt.Errorf("database driver not supported: %s", u.Dialect)
 	}
 
 	// Run all up migrations

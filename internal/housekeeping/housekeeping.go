@@ -124,9 +124,6 @@ func HouseKeeping() error {
 	if err != nil {
 		return err
 	}
-	if u.Driver == "postgres" {
-		u.Driver = "pgx"
-	}
 	db, err := sqlx.Connect(u.Driver, u.DSN)
 	if err != nil {
 		log.WithError(err).WithField("driver", u.Driver).Fatal("Failed to connect to database")
