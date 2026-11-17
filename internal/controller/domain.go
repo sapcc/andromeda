@@ -129,21 +129,19 @@ func (c DomainController) PostDomains(params domains.PostDomainsParams) middlewa
 			if _, err := insertDomainPoolRelations(tx, domain.ID, projectID, domain.Pools); err != nil {
 				return err
 			}
+			if domain.Mode != nil && *domain.Mode == models.DomainModeGEOGRAPHIC {
+				return validateGeographicMemberCoverage(tx, domain.ID, *domain.GeomapID)
+			}
 		}
 		return nil
 	}); err != nil {
-		var rnfError *utils.ResourcesNotFoundError
-		if errors.As(err, &rnfError) {
-			errMsg := "Invalid value for 'pools': " + rnfError.Error()
-			return domains.NewPostDomainsDefault(400).WithPayload(
-				&models.Error{Code: 400, Message: errMsg})
+		if modelErr, ok := errors.AsType[*models.Error](err); ok {
+			return domains.NewPostDomainsDefault(int(modelErr.Code)).WithPayload(modelErr)
 		}
-		var pe *pgconn.PgError
-		if errors.As(err, &pe) && pe.Code == pgerrcode.UniqueViolation {
+		if pe, ok := errors.AsType[*pgconn.PgError](err); ok && pe.Code == pgerrcode.UniqueViolation {
 			return domains.NewPostDomainsDefault(409).WithPayload(utils.DuplicateDomain)
 		}
-		var me *mysql.MySQLError
-		if errors.As(err, &me) && me.Number == 1062 {
+		if me, ok := errors.AsType[*mysql.MySQLError](err); ok && me.Number == 1062 {
 			return domains.NewPostDomainsDefault(409).WithPayload(utils.DuplicateDomain)
 		}
 		if fkErr := utils.IsForeignKeyChildViolation(err); fkErr != nil {
@@ -187,7 +185,7 @@ func (c DomainController) PutDomainsDomainID(params domains.PutDomainsDomainIDPa
 
 	if params.Domain.Domain.Provider != nil && *params.Domain.Domain.Provider != *domain.Provider {
 		// cannot change provider
-		return domains.NewPutDomainsDomainIDNotFound().WithPayload(utils.ProviderUnchangeable)
+		return domains.NewPutDomainsDomainIDBadRequest().WithPayload(utils.ProviderUnchangeable)
 	}
 
 	if params.Domain.Domain.Mode != nil && *params.Domain.Domain.Mode != *domain.Mode {
@@ -240,6 +238,10 @@ func (c DomainController) PutDomainsDomainID(params domains.PutDomainsDomainIDPa
 					return err
 				}
 			}
+
+			if effectiveMode != nil && *effectiveMode == models.DomainModeGEOGRAPHIC && effectiveGeomapID != nil {
+				return validateGeographicMemberCoverage(tx, params.DomainID, *effectiveGeomapID)
+			}
 		}
 
 		// Update
@@ -262,11 +264,8 @@ func (c DomainController) PutDomainsDomainID(params domains.PutDomainsDomainIDPa
 
 		return nil
 	}); err != nil {
-		var rnfError *utils.ResourcesNotFoundError
-		if errors.As(err, &rnfError) {
-			errMsg := "Invalid value for 'pools': " + rnfError.Error()
-			return domains.NewPutDomainsDomainIDBadRequest().WithPayload(
-				&models.Error{Code: 400, Message: errMsg})
+		if modelErr, ok := errors.AsType[*models.Error](err); ok {
+			return domains.NewPutDomainsDomainIDBadRequest().WithPayload(modelErr)
 		}
 		if fkErr := utils.IsForeignKeyChildViolation(err); fkErr != nil {
 			return domains.NewPutDomainsDomainIDBadRequest().WithPayload(fkErr)
@@ -334,13 +333,13 @@ func insertDomainPoolRelations(tx *sqlx.Tx, domainID strfmt.UUID, projectID stri
 	}
 	if len(validPoolsFound) != len(poolIDs) {
 		missingPools := utils.UUIDsDifference(poolIDs, validPoolsFound)
-		return nil, &utils.ResourcesNotFoundError{Ids: missingPools, Resource: "Pool"}
+		return nil, utils.GetErrorResourcesNotFound("Pool", missingPools)
 	}
 
 	for _, poolID := range poolIDs {
 		if _, err := tx.NamedExec(
 			"INSERT INTO domain_pool_relation (domain_id, pool_id) VALUES (:domain_id, :pool_id)",
-			map[string]interface{}{
+			map[string]any{
 				"domain_id": domainID,
 				"pool_id":   poolID,
 			},
@@ -389,4 +388,35 @@ func populateCNAME(domain *models.Domain) {
 		cname := strfmt.Hostname(fmt.Sprintf("%s.%s", domain.Fqdn.String(), config.Global.AkamaiConfig.Domain))
 		domain.CnameTarget = &cname
 	}
+}
+
+// validateGeographicMemberCoverage checks that the domain's pools contain at least one member
+// in the geomap's default_datacenter. Must be called inside a transaction after pool relations are set.
+func validateGeographicMemberCoverage(tx *sqlx.Tx, domainID, geomapID strfmt.UUID) error {
+	var defaultDatacenter string
+	if err := tx.Get(&defaultDatacenter, tx.Rebind(
+		`SELECT default_datacenter FROM geographic_map WHERE id = ?`), geomapID); err != nil {
+		if errors.Is(err, dbsql.ErrNoRows) {
+			return nil // geomap not found — FK will catch this separately
+		}
+		return err
+	}
+
+	var count int
+	sql := `
+		SELECT COUNT(m.id)
+		FROM member m
+		JOIN pool p ON m.pool_id = p.id
+		JOIN domain_pool_relation dpr ON p.id = dpr.pool_id
+		WHERE dpr.domain_id = ?
+		  AND m.datacenter_id = ?
+		  AND m.provisioning_status != 'PENDING_DELETE'
+	`
+	if err := tx.Get(&count, tx.Rebind(sql), domainID, defaultDatacenter); err != nil {
+		return err
+	}
+	if count == 0 {
+		return utils.GetErrorGeographicMissingDefaultDatacenterMember(defaultDatacenter, string(geomapID))
+	}
+	return nil
 }
