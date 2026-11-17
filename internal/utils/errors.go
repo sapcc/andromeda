@@ -45,12 +45,10 @@ func Unauthorized(err error) *models.Error {
 // IsForeignKeyChildViolation returns a 400 *models.Error if err is a MySQL 1452
 // or PostgreSQL FK violation (parent row not found), nil otherwise.
 func IsForeignKeyChildViolation(err error) *models.Error {
-	var me *mysql.MySQLError
-	if errors.As(err, &me) && me.Number == 1452 { // ER_NO_REFERENCED_ROW_2: parent row not found
+	if me, ok := errors.AsType[*mysql.MySQLError](err); ok && me.Number == 1452 { // ER_NO_REFERENCED_ROW_2: parent row not found
 		return &models.Error{Code: 400, Message: fmt.Sprintf("foreign key constraint violation: %s", me.Message)}
 	}
-	var pe *pgconn.PgError
-	if errors.As(err, &pe) && pe.Code == pgerrcode.ForeignKeyViolation {
+	if pe, ok := errors.AsType[*pgconn.PgError](err); ok && pe.Code == pgerrcode.ForeignKeyViolation {
 		return &models.Error{Code: 400, Message: fmt.Sprintf("foreign key constraint violation: %s", pe.Message)}
 	}
 	return nil
@@ -82,20 +80,24 @@ func GetErrorImmutable(self string, related string) *models.Error {
 
 }
 
-type ResourcesNotFoundError struct {
-	Ids      []strfmt.UUID
-	Resource string
+func GetErrorResourcesNotFound(resource string, ids []strfmt.UUID) *models.Error {
+	idStrs := make([]string, len(ids))
+	for i, id := range ids {
+		idStrs[i] = id.String()
+	}
+	return &models.Error{Code: 400, Message: fmt.Sprintf(
+		"Invalid value for '%s': %s(s) not found: [%s]",
+		strings.ToLower(resource), resource, strings.Join(idStrs, ", "))}
 }
 
-func (rnf ResourcesNotFoundError) Error() string {
-	var err strings.Builder
-	err.WriteString(rnf.Resource + "(s) not found: [")
-	for i, id := range rnf.Ids {
-		err.WriteString(id.String())
-		if i < len(rnf.Ids)-1 {
-			err.WriteString(", ")
-		}
+// GetErrorGeographicMissingDefaultDatacenterMember returns a 400 error when a geographic domain's geomap
+// default datacenter has no member assigned (would cause Akamai sync to fail with "no datacenter is assigned to map target (all others)").
+func GetErrorGeographicMissingDefaultDatacenterMember(defaultDatacenter, geomapID string) *models.Error {
+	return &models.Error{
+		Code: 400,
+		Message: fmt.Sprintf(
+			"geographic domain requires at least one pool member in the geomap's default datacenter %s (geomap %s); "+
+				"add a member with datacenter_id=%s to one of the domain's pools to cover the catch-all 'all others' mapping",
+			defaultDatacenter, geomapID, defaultDatacenter),
 	}
-	err.WriteString("]")
-	return err.String()
 }

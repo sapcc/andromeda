@@ -73,6 +73,7 @@ func (t *SuiteTest) SetupSuite() {
 		Services:    ServiceController{cc},
 		Quotas:      QuotaController{cc},
 		Sync:        SyncController{cc},
+		GeoMaps:     GeoMapController{cc},
 	}
 
 	if err := migration.Migrate(t.dbUrl); err != nil {
