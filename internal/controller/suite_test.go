@@ -43,9 +43,6 @@ func (t *SuiteTest) SetupSuite() {
 	}
 
 	u, _ := dburl.Parse(t.dbUrl)
-	if u.Driver == "postgres" {
-		u.Driver = "pgx"
-	}
 	t.db, err = sqlx.Connect(u.Driver, u.DSN)
 	if err != nil {
 		t.FailNow("Failed connecting to Database", err)
