@@ -25,10 +25,15 @@ func NewServer(name string, opts ...stormrpc.ServerOption) *stormrpc.Server {
 	}))
 
 	version := strings.TrimLeft(bininfo.VersionOr("-unknown"), "v")
+	// Strip the git commit suffix from "git describe" output (e.g. "1.2.3-7-gabcdef" -> "1.2.3").
+	// If the version is a clean tag with no suffix, use it as-is to avoid a panic on index -1.
+	if idx := strings.Index(version, "-"); idx >= 0 {
+		version = version[:idx]
+	}
 	srv, err := stormrpc.NewServer(&stormrpc.ServerConfig{
 		NatsURL: config.Global.Default.TransportURL,
 		Name:    name,
-		Version: version[:strings.LastIndex(version, "-")],
+		Version: version,
 	}, opts...)
 	if err != nil {
 		log.Fatal(err.Error())
