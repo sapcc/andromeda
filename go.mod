@@ -23,14 +23,14 @@ require (
 	github.com/f5devcentral/go-bigip v0.0.0-20260303071915-79fc4d8a2250
 	github.com/getsentry/sentry-go v0.20.0
 	github.com/go-openapi/errors v0.22.9
-	github.com/go-openapi/loads v0.25.3
-	github.com/go-openapi/runtime v0.33.4
+	github.com/go-openapi/loads v0.25.4
+	github.com/go-openapi/runtime v0.33.5
 	github.com/go-openapi/spec v1.0.1
 	github.com/go-openapi/strfmt v0.27.4
 	github.com/go-openapi/swag v0.29.2
 	github.com/go-openapi/swag/conv v0.29.2
 	github.com/go-openapi/swag/mangling v0.29.2
-	github.com/go-openapi/validate v1.0.1
+	github.com/go-openapi/validate v1.0.3
 	github.com/go-sql-driver/mysql v1.10.1
 	github.com/gophercloud/gophercloud/v2 v2.16.0
 	github.com/gophercloud/utils/v2 v2.0.0-20260922174841-b4759ea0529b
@@ -68,10 +68,10 @@ require (
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/go-openapi/analysis v1.0.1 // indirect
+	github.com/go-openapi/analysis v1.0.2 // indirect
 	github.com/go-openapi/jsonpointer v1.0.2 // indirect
 	github.com/go-openapi/jsonreference v1.0.3 // indirect
-	github.com/go-openapi/runtime/server-middleware v0.33.4 // indirect
+	github.com/go-openapi/runtime/server-middleware v0.33.5 // indirect
 	github.com/go-openapi/swag/cmdutils v0.29.2 // indirect
 	github.com/go-openapi/swag/fileutils v0.29.2 // indirect
 	github.com/go-openapi/swag/jsonutils v0.29.2 // indirect
@@ -129,7 +129,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.47.0 // indirect
 	go.opentelemetry.io/otel/trace v1.47.0 // indirect
 	go.uber.org/ratelimit v0.3.1 // indirect
-	go.yaml.in/yaml/v3 v3.0.5 // indirect
+	go.yaml.in/yaml/v3 v3.0.6 // indirect
 	golang.org/x/crypto v0.59.0 // indirect
 	golang.org/x/sync v0.25.0 // indirect
 	golang.org/x/sys v0.50.0 // indirect
